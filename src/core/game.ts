@@ -590,6 +590,16 @@ export function advanceDay(s: GameState): DayReport {
   }
   for (const a of s.adventurers) addLoyalty(a, T.dailyLoyalty);
   const mails = applyResignations(s, notices);
+  // 全員が去ったあとに資金がマイナスのままだと、雇う資金も稼ぐ手も無く詰む。ゲームオーバーは作らない方針なので、
+  // 借金を帳消しにして立て直せる額まで戻す。人がいるあいだは、派遣で稼いで返せるので触らない。
+  // マイナスになったときだけ支援するのは、空の名簿のまま日を送る間、毎日お知らせと台帳が増えるのを避けるため
+  if (s.adventurers.length === 0 && s.gold < 0) {
+    const add = T.reliefGold - s.gold;
+    s.gold = T.reliefGold;
+    s.debt = false;
+    ledger(s, '再建支援(借金の帳消しと立て直しの資金)', add);
+    notices.push(`ギルドから人がいなくなった。街の人々の支援で借金が帳消しになり、資金が${T.reliefGold}Gに戻った。`);
+  }
   mails.push(...checkMails(s, rngFor(s.seed, 'mail', s.day), notices));
 
   expireCandidates(s);

@@ -111,6 +111,8 @@ export interface Tuning {
     facilityUpkeepScale: number;
     /** 解体で戻る割合(払った建設費・増築費の合計に掛ける) */
     demolishRefund: number;
+    /** 名簿が空で資金がマイナスのとき、借金を帳消しにしてこの額に戻す(再建支援) */
+    reliefGold: number;
     startGold: number;
     startPotions: number;
     upkeepPerDay: number;

@@ -112,7 +112,8 @@
     "baseCapacity": 6,
     "sellScale": 3,
     "facilityUpkeepScale": 0.5,
-    "demolishRefund": 0.5
+    "demolishRefund": 0.5,
+    "reliefGold": 600
   },
   "quests": {
     "deliverPriceMul": 5.6,

@@ -12,6 +12,7 @@ import {
 } from '../src/core/game';
 import { availableRecipes, canCraft } from '../src/core/craft';
 import { createQuest, deliver } from '../src/core/quests';
+import { hire } from '../src/core/recruit';
 import { rngFor } from '../src/core/rng';
 import { planSteps, route } from '../src/core/world';
 import { trainSkill } from '../src/core/training';
@@ -121,6 +122,62 @@ describe('advanceDay', () => {
     expect(s.rep).toBe(4);
     expect(s.debt).toBe(true);
     s.adventurers.forEach((a, i) => expect(a.loyalty).toBe(loyal[i] + TUNING.game.debtLoyalty + 1));
+  });
+
+  describe('再建支援(全員が去ったあとに詰まない)', () => {
+    const empty = (gold: number) => {
+      const s = newGame(9);
+      s.adventurers = [];
+      s.gold = gold;
+      return s;
+    };
+
+    it('名簿が空で資金がマイナスのとき、借金を帳消しにして reliefGold に戻し、台帳とお知らせに残す', () => {
+      const s = empty(-150_000);
+      advanceDay(s);
+      expect(s.gold).toBe(TUNING.game.reliefGold);
+      expect(s.debt).toBe(false);
+      expect(s.ledger[0].label).toContain('再建支援');
+      expect(s.ledger[0].amount).toBeGreaterThan(150_000);
+      expect(s.notices[0].text).toContain('帳消し');
+    });
+
+    it('そのあと候補者を雇って立て直せる', () => {
+      const s = empty(-150_000);
+      advanceDay(s);
+      const cand = s.candidates[0];
+      expect(hire(s, cand.adv.id)).toEqual({ ok: true });
+      expect(s.adventurers).toHaveLength(1);
+    });
+
+    it('名簿が空でも、資金が0以上のあいだは何もしない(空の名簿で日を送るたびにお知らせを出さない)', () => {
+      const s = empty(100);
+      advanceDay(s);
+      expect(s.ledger.some((l) => l.label.includes('再建支援'))).toBe(false);
+      expect(s.gold).toBe(100 + SUP - 30);
+      expect(empty(TUNING.game.reliefGold + 5000).gold).toBeGreaterThan(TUNING.game.reliefGold);
+    });
+
+    it('名簿に人がいるあいだは、借金が深くても何もしない(派遣で稼いで返せる)', () => {
+      const s = newGame(9);
+      s.gold = -50_000;
+      advanceDay(s);
+      expect(s.gold).toBeLessThan(0);
+      expect(s.ledger.some((l) => l.label.includes('再建支援'))).toBe(false);
+    });
+
+    it('idle のまま長く放置しても、名簿が空になった日以降は資金がマイナスのまま残らず、借金が膨らみ続けない', () => {
+      const s = newGame(9);
+      let emptyDays = 0;
+      for (let d = 0; d < 400; d++) {
+        advanceDay(s);
+        if (s.adventurers.length === 0) {
+          emptyDays++;
+          expect(s.gold, `${s.day}日目`).toBeGreaterThanOrEqual(0);
+        }
+      }
+      expect(emptyDays).toBeGreaterThan(0);
+    });
   });
 
   it('忠誠は全員毎日+1(派遣中も)、上限255', () => {
