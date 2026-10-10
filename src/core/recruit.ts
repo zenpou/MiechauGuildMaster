@@ -1,7 +1,8 @@
 // 募集: 候補者の到着・入れ替わり、雇用(契約金と上限)、解雇。仕組みは前作 GuildQuest のまま(DESIGN 第6節)。
 import { generateAdventurer, isTalent } from './adventurer';
 import { facilityEffect } from './base';
-import { TUNING } from './data';
+import { TUNING, UNIQUES } from './data';
+import { uniqueAdventurer } from './events';
 import { ledger } from './ledger';
 import { repLevel } from './quests';
 import type { Rng } from './rng';
@@ -15,6 +16,8 @@ const EXTRA_ARRIVAL_CHANCE = 0.4;
 /** 評判Lvごとの候補者の質の上がり幅と、Lv2で来る確率の上がり幅 */
 const QUALITY_PER_LV = 0.2;
 const LEVEL2_PER_LV = 0.2;
+/** ユニークは一度きりなので、通常の候補者より長く待つ */
+const UNIQUE_DAYS = 10;
 
 const ok = (): Result => ({ ok: true });
 const fail = (reason: string): Result => ({ ok: false, reason });
@@ -28,7 +31,9 @@ export function capacity(s: GameState): number {
 /** 候補者を1人作って s.candidates に入れる。上限は見ない(呼び出し側で見る) */
 export function spawnCandidate(s: GameState, rng: Rng): Candidate {
   const lv = repLevel(s.rep);
-  const usedNames = new Set([...s.adventurers.map((a) => a.name), ...s.candidates.map((c) => c.adv.name)]);
+  // 自己退職した人は候補に二度と出さない。id は候補ごとに振り直すので名前で避ける
+  const gone = Object.keys(s.flags).filter((k) => k.startsWith('goneName:')).map((k) => k.slice('goneName:'.length));
+  const usedNames = new Set([...s.adventurers.map((a) => a.name), ...s.candidates.map((c) => c.adv.name), ...gone]);
   const level = rng.chance(LEVEL2_PER_LV * (lv - 1)) ? 2 : 1;
   const adv = generateAdventurer(rng, { id: `a${s.counters.nextId++}`, quality: (lv - 1) * QUALITY_PER_LV, level, usedNames });
   const c: Candidate = { adv, arrivedDay: s.day, expiresDay: s.day + T.candidateDays };
@@ -43,6 +48,13 @@ export function arriveCandidates(s: GameState, rng: Rng): Candidate[] {
   const n = 1 + (repLevel(s.rep) >= EXTRA_ARRIVAL_REP_LV ? 1 : 0) + extra;
   const out: Candidate[] = [];
   for (let i = 0; i < n && s.candidates.length < T.candidateMax; i++) out.push(spawnCandidate(s, rng));
+  for (const u of UNIQUES) {
+    if (s.flags[`unique:${u.id}`] || s.day < u.join.minDay || s.rep < u.join.minRep || s.candidates.length >= T.candidateMax) continue;
+    s.flags[`unique:${u.id}`] = true;
+    const c: Candidate = { adv: uniqueAdventurer(u, `a${s.counters.nextId++}`), arrivedDay: s.day, expiresDay: s.day + UNIQUE_DAYS };
+    s.candidates.push(c);
+    out.push(c);
+  }
   return out;
 }
 
@@ -54,7 +66,7 @@ export function hire(s: GameState, candId: string): Result {
   const c = s.candidates.find((x) => x.adv.id === candId);
   if (!c) return fail('その候補者はもういません');
   if (s.adventurers.length >= capacity(s)) return fail(`雇えるのは${capacity(s)}人までです(宿舎で増やせます)`);
-  const fee = hireFee(c.adv.salary);
+  const fee = c.adv.unique ? 0 : hireFee(c.adv.salary);
   if (s.gold < fee) return fail(`契約金が足りません(${fee}G必要)`);
   s.gold -= fee;
   ledger(s, `契約金: ${c.adv.name}`, -fee);
@@ -65,6 +77,7 @@ export function hire(s: GameState, candId: string): Result {
   // 何もしなかった日(day_idle)の判定に使う
   s.flags.hiredDay = s.day;
   if (isTalent(c.adv) && !s.pendingTags.includes('hire_talent')) s.pendingTags.push('hire_talent');
+  if (c.adv.unique) s.flags[`unique:${c.adv.unique}:hired`] = s.day;
   return ok();
 }
 

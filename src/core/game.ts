@@ -2,9 +2,11 @@
 import { addExp, carryCapacity, generateAdventurer, powerOf, salaryOf } from './adventurer';
 import { build, completeConstructions, facilityEffect, facilityUpkeep, synergyValue } from './base';
 import { completeCrafts } from './craft';
-import { DUNGEON, EDGE, ITEM, JOB, NODE, POLICY, QUEST_TEMPLATES, TUNING } from './data';
+import { completeTraining } from './training';
+import { DUNGEON, EDGE, ITEM, JOB, NODE, POLICY, QUEST_TEMPLATES, TUNING, type ReturnOutcome } from './data';
 import { exploredRate, parseFloor } from './dungeon';
-import { simulateExploration } from './explore';
+import { onReturn, advanceUniqueChain } from './events';
+import { returnDialogue, simulateExploration } from './explore';
 import {
   QUEST_TOWNS, REP_LEVELS, accept, createQuest, expireQuests, generateDailyQuests, progressFromReturn, questCargo,
   repLevel, seedUnlockQuests, type RoadInfo,
@@ -13,12 +15,13 @@ import { arriveCandidates, expireCandidates, spawnCandidate } from './recruit';
 import { addRelation } from './relations';
 import { rngFor, type Rng } from './rng';
 import { addInventory, ledger } from './ledger';
+import { applyResignations, checkMails, dispatchBlock, markGreeted, markTired, recordParty } from './mail';
 import { resolveScenes } from './scenes';
 import { emptyState } from './state';
 import {
   LOYALTY_MAX, PARTIES_MAX, PARTY_MAX,
   type ActionKind, type Adventurer, type DispatchOrder, type Expedition, type ExpeditionResult, type GameState,
-  type LogEntry, type Result, type Scene, type WorldStep,
+  type LogEntry, type Mail, type Result, type Scene, type WorldStep,
 } from './types';
 import { edgeBetween, planSteps, route, simulateTravel, type TravelResult } from './world';
 
@@ -52,7 +55,7 @@ const SAFE_WEAK_POLICIES = ['safe', 'avoid'];
 const SAFE_WEAK_LEVEL = 2;
 
 export type { Result } from './types';
-export interface DayReport { day: number; returned: Expedition[]; notices: string[]; scene: Scene | null }
+export interface DayReport { day: number; returned: Expedition[]; notices: string[]; scene: Scene | null; mails: Mail[] }
 
 /**
  * 呼び戻しで結果を組み直すため、出発時に引いた道中を区間ごとに残す。帰還時に消す。
@@ -146,6 +149,7 @@ export function newGame(seed: number, playerName = ''): GameState {
     for (const r of JOB[job].roles) a.apt[r] = Math.max(a.apt[r], T.startApt);
     a.salary = salaryOf(a);
     a.history.hiredDay = 1;
+    markGreeted(s, a);
     s.adventurers.push(a);
   });
   s.world.visitedNodes = [...START_NODES];
@@ -177,6 +181,8 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
     if (m.injuryDays > 0) return fail(`${m.name}は負傷療養中です`);
     members.push(m);
   }
+  const blocked = dispatchBlock(s, members);
+  if (blocked) return fail(blocked);
   const items = o.items ?? {};
   for (const [k, n] of Object.entries(items)) {
     if (!has(ITEM, k) || !isCount(n)) return fail('持ち物の指定が不正です');
@@ -207,6 +213,8 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
     });
   }
   const result = combineLegs(outLeg, site, outLeg.wiped || site?.wiped ? null : backLeg, items, outDays);
+  // 現地のひとことは現地の結果で決まるが、道中や復路の全滅で最終の結果は変わる。現地の無い護衛・運搬も含め、最終結果で作り直す
+  result.returnDialogue = returnDialogue(rngFor(s.seed, 'rdlg', n), members, finalOutcome(result, o.days, !!site));
   // 採り尽くし・討伐完了で早帰りした隊は、予定日数ではなく実際の日数で戻る
   const stay = site ? Math.max(1, site.daysSpent) : 0;
   let steps = tripSteps(trip.out, trip.back, stay, s.day, k);
@@ -223,6 +231,8 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
     legs: { out: outLeg, back: backLeg, outNodes: trip.out, backNodes: trip.back, items: { ...items } },
   };
   s.counters.dispatches++;
+  markTired(s, members);
+  recordParty(s, o.partyIds);
   for (const m of members) m.status = 'away';
   for (const [k2, c] of Object.entries(items)) addInventory(s, k2, -c);
   s.expeditions.push(expedition);
@@ -391,8 +401,14 @@ export function recall(s: GameState, expeditionId: string): Result {
   r.log.splice(at < 0 ? r.log.length : at, 0, { day: walked, kind: 'event', text: 'ギルドからの呼び戻しを受け、引き返した。' });
   r.success = false;
   r.retreated = true;
+  const crew = e.order.partyIds.map((id) => s.adventurers.find((a) => a.id === id)).filter((a): a is Adventurer => !!a);
+  r.returnDialogue = returnDialogue(rngFor(s.seed, 'rdlg', e.id), crew, 'retreat');
   e.result = r;
   return ok();
+}
+
+function finalOutcome(r: ExpeditionResult, days: number, hadSite: boolean): ReturnOutcome {
+  return r.wiped ? 'wipe' : r.retreated ? 'retreat' : hadSite && r.daysSpent < days ? 'early' : 'success';
 }
 
 function outcomeLabel(e: Expedition): string {
@@ -537,19 +553,26 @@ export function advanceDay(s: GameState): DayReport {
   const returned = s.expeditions.filter((e) => e.returnDay <= s.day);
   s.expeditions = s.expeditions.filter((e) => e.returnDay > s.day);
   for (const e of returned) applyReturn(s, e, notices);
+  // 親友とユニークの頼みは、忠誠・関係値・地図の反映が済んだ後の状態で数える
+  for (const e of returned) onReturn(s, e, notices);
   completeConstructions(s, notices);
   completeCrafts(s, notices);
+  completeTraining(s, notices);
+  advanceUniqueChain(s, notices);
 
   const returnedIds = new Set(returned.flatMap((e) => e.order.partyIds));
   const rest = T.restFatigue - facilityEffect(s, 'clinic', 'fatigueRecover') - synergyValue(s, 'fatigueRecover');
   const idleExp = synergyValue(s, 'idleExp');
   for (const a of s.adventurers) {
-    if ((a.status !== 'idle' && a.status !== 'working') || returnedIds.has(a.id)) continue;
+    // 派遣中だけ回復しない。訓練中・勤務中は待機と同じに休める
+    if (a.status === 'away' || returnedIds.has(a.id)) continue;
     a.fatigue = Math.max(0, a.fatigue + rest);
     if (a.injuryDays > 0) a.injuryDays--;
     if (idleExp && a.status === 'idle' && addExp(a, idleExp)) notices.push(`${a.name}がLv${a.level}に上がった。`);
   }
   for (const a of s.adventurers) addLoyalty(a, T.dailyLoyalty);
+  const mails = applyResignations(s, notices);
+  mails.push(...checkMails(s, rngFor(s.seed, 'mail', s.day), notices));
 
   expireCandidates(s);
   arriveCandidates(s, rngFor(s.seed, 'recruit', s.day));
@@ -564,7 +587,7 @@ export function advanceDay(s: GameState): DayReport {
 
   for (const n of notices) s.notices.unshift({ day: s.day, text: n });
   if (s.notices.length > NOTICES_MAX) s.notices.length = NOTICES_MAX;
-  return { day: s.day, returned, notices, scene };
+  return { day: s.day, returned, notices, scene, mails };
 }
 
 export function sellMaterial(s: GameState, item: string, n: number): Result {

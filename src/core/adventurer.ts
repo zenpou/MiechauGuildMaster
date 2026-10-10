@@ -1,4 +1,4 @@
-import { ITEM, JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, ROLE_SKILL, TRAIT, TRAITS, TUNING } from './data';
+import { ITEM, JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, ROLE_SKILL, TRAINED_SKILL, TRAIT, TRAITS, TUNING } from './data';
 import type { Rng } from './rng';
 import {
   ROLE_IDS, STAT_KEYS,
@@ -61,6 +61,7 @@ export function effectiveStats(a: Adventurer, job: string = a.job, withFatigue =
     let v = (a.base[k] + (a.level - 1) * LEVEL_GAIN[k] * a.growth) * j.statMult[k];
     if ((COMBAT_STATS as readonly string[]).includes(k)) v *= apt;
     for (const t of traitDefs(a)) v += t.mods[k] ?? 0;
+    for (const id of a.skills) v += TRAINED_SKILL[id]?.mods[k] ?? 0;
     for (const eq of equipped) v += eq.mods[k] ?? 0;
     out[k] = Math.max(1, Math.round(v * ff));
   }

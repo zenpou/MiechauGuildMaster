@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { carryCapacity, generateAdventurer } from '../src/core/adventurer';
-import { DUNGEON, ITEM, JOB, PERSONALITY, TUNING } from '../src/core/data';
+import { DUNGEON, ITEM, JOB, PERSONALITY, RETURN_LINES, TUNING, type ReturnOutcome } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
 import { cellDepths, runExploration, simulateExploration, type ExploreInput } from '../src/core/explore';
 import { rngFor } from '../src/core/rng';
@@ -307,7 +307,7 @@ describe('探索シミュレーション', () => {
     }
     expect(result.repGain).toBe(0);
     expect(result.questProgress).toEqual({});
-    expect(result.returnDialogue).toEqual([]);
+    expect(result.returnDialogue.map((d) => d.advId)).toEqual(['m0', 'm1', 'm2', 'm3']);
     if (!result.wiped) expect(result.relationDeltas.filter((r) => r.reason === '共に帰還した')).toHaveLength(6);
     expect(result.log[0].day).toBe(1);
     expect(result.log.some((l) => l.kind === 'map')).toBe(true);
@@ -321,6 +321,42 @@ function knownUpTo(d: DungeonDef, maxCol: number): number[] {
 }
 const cellsOf = (d: DungeonDef, kind: string) =>
   parseFloor(d.floors[0]).cells.flatMap((c, i) => (c.kind === kind ? [i] : []));
+
+describe('帰還のひとこと', () => {
+  const outcomeOf = (r: { wiped: boolean; retreated: boolean; daysSpent: number }, days: number): ReturnOutcome =>
+    r.wiped ? 'wipe' : r.retreated ? 'retreat' : r.daysSpent < days ? 'early' : 'success';
+
+  it('結果の種類に応じた一言が全員分入る', () => {
+    const lair = corridor('lair', ['#######', 'EhhhhB#', '#######']);
+    const all = GRID.cells.flatMap((c, i) => (c.kind !== 'wall' && c.kind !== 'hidden' ? [i] : []));
+    const runs = SEEDS.flatMap((seed) => [
+      input(seed, { leader: ['brave', 'cautious', 'greedy', 'proud', 'timid', 'caring'][seed % 6] }),
+      input(seed, { dungeon: lair, members: party(seed, 'brave', ['priest']), leaderId: 'm0', policy: 'hunt', items: {} }),
+      input(seed, { leader: 'cautious', progress: progressOf(all), action: 'boss' }),
+    ]);
+    const seen = new Set<ReturnOutcome>();
+    for (const inp of runs) {
+      const result = simulateExploration(inp);
+      const outcome = outcomeOf(result, inp.days);
+      seen.add(outcome);
+      expect(result.returnDialogue.map((d) => d.advId)).toEqual(inp.members.map((m) => m.id));
+      for (const d of result.returnDialogue) {
+        const m = inp.members.find((x) => x.id === d.advId)!;
+        expect(d.name).toBe(m.name);
+        expect(RETURN_LINES[m.personality][outcome]).toContain(d.text);
+      }
+    }
+    expect(seen).toContain('success');
+    expect(seen).toContain('wipe');
+    expect(seen).toContain('early');
+  });
+
+  it('台詞は性格6種 × 結果4種すべてにある', () => {
+    for (const p of Object.keys(PERSONALITY)) {
+      for (const o of ['success', 'retreat', 'wipe', 'early'] as const) expect(RETURN_LINES[p][o].length).toBeGreaterThanOrEqual(2);
+    }
+  });
+});
 
 describe('行動種別', () => {
   it('今回の日数では届く目標しか無いときは、入口で日数を使い切らず初日に引き返す', () => {

@@ -111,5 +111,31 @@
     "huntExpMul": 22,
     "escortGoldPerDay": 120,
     "transportGoldPerDay": 90
+  },
+  "training": {
+    "days": 3,
+    "gold": 150,
+    "maxSkills": 2
+  },
+  "mail": {
+    "raiseThreshold": 0.85,
+    "raiseResendDays": 7,
+    "holdMax": 2,
+    "warnLoyalty": 30,
+    "resignLoyalty": 10,
+    "resignDays": 7,
+    "restFatigue": 70,
+    "complaintRelation": -40,
+    "complaintStreak": 3,
+    "splitDays": 7,
+    "perDay": 3,
+    "reply": {
+      "accept": 5,
+      "refuse": -20,
+      "rest": 2,
+      "deny": -5,
+      "split": 2,
+      "keep": -3
+    }
   }
 }

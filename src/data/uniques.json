@@ -1,0 +1,17 @@
+[
+  {
+    "id": "u_alpha", "name": "ユニークA(仮)", "job": "scout", "personality": "cautious", "age": 24,
+    "base": {"hp": 66, "atk": 11, "def": 9, "mag": 8, "spd": 12, "dex": 13, "scout": 15, "gather": 10},
+    "apt": {"attacker": 45, "tank": 30, "healer": 35, "scout": 92, "gatherer": 60},
+    "growth": 1.2, "salary": 0,
+    "persona": {"hobby": "星を眺めること(仮)", "talent": "足跡の見分け(仮)", "likes": "静かな森(仮)", "dislikes": "大きな音(仮)"},
+    "skill": {"id": "u_alpha_skill", "name": "見通す目(仮)", "desc": "固有。道の先を読む。偵察+3。", "mods": {"scout": 3}},
+    "join": {"minDay": 10, "minRep": 8},
+    "chain": [
+      {"kind": "deliver", "item": "herb", "n": 5, "text": "森の薬草を5つ届けてほしい(仮)"},
+      {"kind": "visit", "dungeon": "old_mine", "n": 3, "text": "坑道へ3回連れて行ってほしい(仮)"},
+      {"kind": "soloKill", "enemy": "goblin_chief", "n": 1, "text": "1人でゴブリンの頭を討ちたい(仮)"}
+    ],
+    "chainLoyalty": 30
+  }
+]

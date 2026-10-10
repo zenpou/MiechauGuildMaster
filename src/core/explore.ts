@@ -2,11 +2,11 @@
 // 乱数は inp.rng だけを使う。inp.progress は読むだけで、差分は mapDeltas で返す。
 import { carryCapacity, effectiveStats, equipEffect, traitNum } from './adventurer';
 import { hasSkill, makeAllyUnit, makeEnemies, runCombat, type Unit } from './combat';
-import { ENEMY, ITEM, PERSONALITY, POLICY, ROLE_SKILL, TRAIT, TUNING } from './data';
+import { ENEMY, ITEM, PERSONALITY, POLICY, RETURN_LINES, ROLE_SKILL, TRAIT, TUNING, type ReturnOutcome } from './data';
 import { exploredRate, frontier, isPassable, neighbors, parseFloor, shortestPath, visibleFrom, xy, type Grid, type PassKnowledge } from './dungeon';
 import type { Rng } from './rng';
 import type {
-  ActionKind, Adventurer, CellKind, DungeonDef, DungeonProgress, ExpeditionResult, LogKind, StatKey,
+  ActionKind, Adventurer, CellKind, DungeonDef, DungeonProgress, ExpeditionResult, LogKind, ReturnDialogue, StatKey,
 } from './types';
 
 // sim で調整する値は src/data/tuning.json
@@ -83,6 +83,14 @@ export function cellDepths(grid: Grid): number[] {
   const closed = walk({ keys: [], hiddenFound: [] });
   const open = walk({ keys: [], hiddenFound: hidden });
   return closed.map((v, i) => (v >= 0 ? v : open[i]));
+}
+
+/** 帰還のひとこと。隊員全員分を性格と結果の種類から1つずつ選ぶ */
+export function returnDialogue(rng: Rng, members: Adventurer[], outcome: ReturnOutcome): ReturnDialogue[] {
+  return members.map((m) => {
+    const lines = RETURN_LINES[m.personality] ?? RETURN_LINES.cautious;
+    return { advId: m.id, name: m.name, text: rng.pick(lines[outcome]) };
+  });
 }
 
 export function simulateExploration(inp: ExploreInput): ExpeditionResult {
@@ -700,6 +708,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     result.revealedTraits.push({ advId: m.id, traitId: t.id });
     say('result', `【発見】${m.name}の特性「${TRAIT[t.id].name}」が判明した。(${TRAIT[t.id].desc})`);
   }
+
+  // 既存の乱数列を変えないよう、ひとことは最後に引く
+  const outcome: ReturnOutcome = result.wiped ? 'wipe' : result.retreated ? 'retreat' : daysSpent < days ? 'early' : 'success';
+  result.returnDialogue = returnDialogue(rng, members, outcome);
 
   result.mapDeltas = [{ dungeon: dungeon.id, floor: inp.floorId, cells: newCells, hidden: newHidden }];
   result.maxDepth = trace.maxDepth;

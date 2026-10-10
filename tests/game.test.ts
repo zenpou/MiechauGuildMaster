@@ -14,6 +14,10 @@ import { availableRecipes, canCraft } from '../src/core/craft';
 import { createQuest, deliver } from '../src/core/quests';
 import { rngFor } from '../src/core/rng';
 import { planSteps, route } from '../src/core/world';
+import { trainSkill } from '../src/core/training';
+import { uniqueAdventurer } from '../src/core/events';
+import { pairKey } from '../src/core/relations';
+import { UNIQUE } from '../src/core/data';
 import type { DispatchOrder, Expedition, GameState, Quest } from '../src/core/types';
 
 function order(s: GameState, o: Partial<DispatchOrder> = {}): DispatchOrder {
@@ -735,5 +739,49 @@ describe('近道の発見', () => {
     void go;
     expect(s.world.foundEdges).toContain('mountain_village__old_mine_short');
     expect(s.notices.some((n) => n.text.includes('近道'))).toBe(true);
+  });
+});
+
+describe('訓練・親友・ユニークの日送りへの組み込み', () => {
+  it('訓練は日数後に完了してスキルが付き、訓練中も疲労は回復する', () => {
+    const s = newGame(31);
+    place(s, 'training', 0, 0);
+    const a = s.adventurers[0];
+    a.fatigue = 60;
+    expect(trainSkill(s, a.id, 'might').ok).toBe(true);
+    expect(a.status).toBe('training');
+    advanceDay(s);
+    expect(a.fatigue).toBeLessThan(60);
+    advanceDay(s);
+    advanceDay(s);
+    expect(a.status).toBe('idle');
+    expect(a.skills).toContain('might');
+  });
+
+  it('関係値60以上の2人は、同じ隊で5回目に帰還すると親友になる', () => {
+    const s = newGame(32);
+    const [a, b] = s.adventurers;
+    s.relations[pairKey(a.id, b.id)] = 70;
+    s.flags[`pair:${pairKey(a.id, b.id)}`] = 4;
+    const r = dispatch(s, order(s, { partyIds: [a.id, b.id], leaderId: a.id, days: 1 }));
+    expect(r.ok).toBe(true);
+    for (let i = 0; i < 6 && s.expeditions.length; i++) advanceDay(s);
+    expect(s.flags[`friends:${pairKey(a.id, b.id)}`]).toBe(true);
+  });
+
+  it('ユニークの最初の頼み(薬草の納品)は、在庫があれば日送りで進む', () => {
+    const s = newGame(33);
+    s.adventurers.push(uniqueAdventurer(UNIQUE.u_alpha, 'ux'));
+    s.inventory.herb = 5;
+    advanceDay(s);
+    expect(s.flags['u_alpha:step']).toBe(1);
+    expect(s.inventory.herb ?? 0).toBe(0);
+  });
+
+  it('帰還のひとことは最終結果で全員分作られる(現地なしの護衛・呼び戻しでも空にならない)', () => {
+    const s = newGame(34);
+    const r = dispatch(s, order(s, { days: 1 }));
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.expedition.result.returnDialogue).toHaveLength(s.adventurers.length);
   });
 });

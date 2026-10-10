@@ -15,6 +15,11 @@ import recipesJson from '../data/recipes.json';
 import questTemplatesJson from '../data/quest-templates.json';
 import misunderstandingsJson from '../data/misunderstandings.json';
 import worldJson from '../data/world.json';
+import mailTextJson from '../data/mail-text.json';
+import trainedSkillsJson from '../data/trained-skills.json';
+import returnLinesJson from '../data/return-lines.json';
+import uniquesJson from '../data/uniques.json';
+import type { Aptitude, Persona, Stats } from './types';
 import type { DungeonDef, EnemyDef, FacilityDef, ItemDef, JobDef, PersonalityDef, PolicyDef, RecipeDef, RoleSkillDef, SynergyDef, TraitDef } from './types';
 import type { QuestTemplateDef } from './types';
 import type { WorldEdgeDef, WorldNodeDef } from './types';
@@ -109,6 +114,55 @@ export interface Tuning {
     hireSalaryDays: number;
     baseCapacity: number;
   };
+  training: {
+    days: number;
+    gold: number;
+    /** 1人が訓練で覚えられる数 */
+    maxSkills: number;
+  };
+  mail: {
+    /** 日給が再計算値のこの割合未満で昇給要望 */
+    raiseThreshold: number;
+    /** 保留・断ったあと、次の昇給要望まで空ける日数。未返信もこの日数で保留扱い */
+    raiseResendDays: number;
+    /** 保留できる回数。これを超えた保留は断る扱い */
+    holdMax: number;
+    warnLoyalty: number;
+    /** 引き留めた直後でも、この忠誠未満なら警告し直す */
+    resignLoyalty: number;
+    /** 警告からこの日数を過ぎると自己退職 */
+    resignDays: number;
+    restFatigue: number;
+    complaintRelation: number;
+    complaintStreak: number;
+    /** 「分ける」と返信してから同じ隊に組めない日数 */
+    splitDays: number;
+    perDay: number;
+    /** 返信の忠誠の増減(第6節の表) */
+    reply: { accept: number; refuse: number; rest: number; deny: number; split: number; keep: number };
+  };
+}
+
+/** 訓練で覚える、または固有で持つパッシブ。effectiveStats に特性と同じ段で足す */
+export interface TrainedSkillDef { id: string; name: string; desc: string; mods: Partial<Stats> }
+
+export type ReturnOutcome = 'success' | 'retreat' | 'wipe' | 'early';
+
+export interface UniqueChainStep {
+  kind: 'deliver' | 'visit' | 'soloKill';
+  item?: string; dungeon?: string; enemy?: string; n: number;
+  text: string;
+}
+export interface UniqueDef {
+  id: string; name: string; job: string; personality: string; age: number;
+  base: Stats; apt: Aptitude; growth: number;
+  /** 0 なら雇う時に salaryOf で決める */
+  salary: number;
+  persona: Persona;
+  skill: TrainedSkillDef;
+  join: { minDay: number; minRep: number };
+  chain: UniqueChainStep[];
+  chainLoyalty: number;
 }
 
 const byId = <T extends { id: string }>(arr: T[]): Record<string, T> => Object.fromEntries(arr.map((x) => [x.id, x]));
@@ -130,6 +184,15 @@ export const RECIPES = recipesJson as unknown as RecipeDef[];
 export const QUEST_TEMPLATES = questTemplatesJson as unknown as QuestTemplateDef[];
 /** 勘違いイベント(行動タグ→噂→評判)。台詞はフェーズ4では仮 */
 export const MISUNDERSTANDINGS = misunderstandingsJson as { id: string; tag: string; rep: number; scene: string[]; thought: string }[];
+export const TRAINED_SKILLS = trainedSkillsJson as unknown as TrainedSkillDef[];
+/** 性格 → 結果 → 候補の台詞 */
+export const RETURN_LINES = returnLinesJson as unknown as Record<string, Record<ReturnOutcome, string[]>>;
+export const UNIQUES = uniquesJson as unknown as UniqueDef[];
+/** メールの文面。kind × 性格。台詞はフェーズ7で書き直す */
+export const MAIL_TEXT = mailTextJson as {
+  text: Record<string, Record<string, { subject: string; body: string }>>;
+  choices: Record<string, { id: string; label: string }[]>;
+};
 export const WORLD = worldJson as unknown as { nodes: WorldNodeDef[]; edges: WorldEdgeDef[] };
 
 export const JOB = byId(JOBS);
@@ -145,6 +208,9 @@ export const RECIPE = byId(RECIPES);
 export const QUEST_TEMPLATE = byId(QUEST_TEMPLATES);
 export const NODE = byId(WORLD.nodes);
 export const EDGE = byId(WORLD.edges);
+export const UNIQUE = byId(UNIQUES);
+/** 訓練スキルと固有スキルを合わせた表。effectiveStats はこちらを引く */
+export const TRAINED_SKILL = byId([...TRAINED_SKILLS, ...UNIQUES.map((u) => u.skill)]);
 
 export const LOWER_JOBS = JOBS.filter((j) => j.tier === 'lower');
 export const UPPER_JOBS = JOBS.filter((j) => j.tier === 'upper');

@@ -141,3 +141,52 @@ describe('解雇', () => {
     expect(s.gold).toBe(gold);
   });
 });
+
+describe('ユニーク冒険者の出現', () => {
+  it('10日目以降・評判8以上で一度だけ現れ、期限10日、契約金なしで雇える', () => {
+    const uniques = (s: GameState) => s.candidates.filter((c) => c.adv.unique === 'u_alpha');
+    const early = bare();
+    early.day = 9;
+    early.rep = 8;
+    arriveCandidates(early, rngFor(1, 'recruit', 9));
+    const lowRep = bare();
+    lowRep.day = 10;
+    lowRep.rep = 7;
+    arriveCandidates(lowRep, rngFor(1, 'recruit', 10));
+    expect(uniques(early)).toEqual([]);
+    expect(uniques(lowRep)).toEqual([]);
+
+    const s = bare();
+    s.day = 10;
+    s.rep = 8;
+    arriveCandidates(s, rngFor(1, 'recruit', 10));
+    const [c] = uniques(s);
+    expect(c).toMatchObject({ arrivedDay: 10, expiresDay: 20 });
+    expect(c.adv.skills).toEqual(['u_alpha_skill']);
+    s.day = 11;
+    arriveCandidates(s, rngFor(1, 'recruit', 11));
+    expect(uniques(s)).toHaveLength(1);
+
+    s.gold = 0;
+    expect(hire(s, c.adv.id)).toEqual({ ok: true });
+    expect(s.gold).toBe(0);
+    expect(s.adventurers.find((a) => a.id === c.adv.id)?.unique).toBe('u_alpha');
+    expect(s.flags['unique:u_alpha:hired']).toBe(11);
+    s.day = 30;
+    arriveCandidates(s, rngFor(1, 'recruit', 30));
+    expect(uniques(s)).toEqual([]);
+  });
+
+  it('ユニークの出現は通常の候補者の乱数列を変えない', () => {
+    const a = bare();
+    const b = bare();
+    b.day = 10;
+    b.rep = 8;
+    a.day = 10;
+    a.rep = 8;
+    a.flags['unique:u_alpha'] = true;
+    arriveCandidates(a, rngFor(1, 'recruit', 10));
+    arriveCandidates(b, rngFor(1, 'recruit', 10));
+    expect(b.candidates.filter((c) => !c.adv.unique).map((c) => c.adv.name)).toEqual(a.candidates.map((c) => c.adv.name));
+  });
+});

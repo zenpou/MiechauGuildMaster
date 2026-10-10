@@ -1,0 +1,107 @@
+{
+  "text": {
+    "greeting": {
+      "cautious": { "subject": "ご挨拶(仮)", "body": "{name}です。本日よりお世話になります。趣味は{hobby}、{likes}が好きです。慎重に務めます。(仮)" },
+      "brave": { "subject": "よろしく!(仮)", "body": "{name}だ。{hobby}が趣味、{likes}が好物。どこへでも行くぜ。(仮)" },
+      "greedy": { "subject": "契約の件(仮)", "body": "{name}です。稼げる仕事、待ってます。息抜きは{hobby}、好きなのは{likes}。(仮)" },
+      "caring": { "subject": "はじめまして(仮)", "body": "{name}です。皆さんと仲良くやれたら嬉しいです。{hobby}が好きで、{likes}にも目がありません。(仮)" },
+      "proud": { "subject": "期待していい(仮)", "body": "{name}だ。いい買い物をしたと思うぞ。{hobby}なら誰にも負けない。{likes}が好きだ。(仮)" },
+      "timid": { "subject": "あの……(仮)", "body": "{name}です……。ご迷惑をかけないようにします。{hobby}をしていると落ち着きます。{likes}が好きです。(仮)" }
+    },
+    "loyalty": {
+      "cautious": { "subject": "ひとこと(仮)", "body": "{name}です。このギルドでなら、安心して背中を預けられると思うようになりました。(忠誠{milestone})(仮)" },
+      "brave": { "subject": "なあ(仮)", "body": "ここの連中となら、どんな奥でも行ける気がするぜ。(忠誠{milestone})(仮)" },
+      "greedy": { "subject": "本音を言うと(仮)", "body": "金だけじゃない……かもしれません。ここ、居心地がいいので。(忠誠{milestone})(仮)" },
+      "caring": { "subject": "ありがとう(仮)", "body": "いつも気にかけてくださってありがとうございます。ずっとここにいたいです。(忠誠{milestone})(仮)" },
+      "proud": { "subject": "認めよう(仮)", "body": "ギルドマスター、あんたの采配は悪くない。俺が言うんだから間違いない。(忠誠{milestone})(仮)" },
+      "timid": { "subject": "少しだけ(仮)", "body": "ここに来て、少しだけ自信がつきました……。(忠誠{milestone})(仮)" }
+    },
+    "raise": {
+      "cautious": { "subject": "日給のご相談(仮)", "body": "恐れ入りますが、現在の日給{salary}Gを{desired}Gに見直していただけないでしょうか。(仮)" },
+      "brave": { "subject": "日給の話だ(仮)", "body": "腕も上がった。{salary}Gじゃなく{desired}Gで頼む。(仮)" },
+      "greedy": { "subject": "昇給の要望(仮)", "body": "今の働きなら{desired}Gが相場です。{salary}Gのままでは割に合いません。(仮)" },
+      "caring": { "subject": "お願いがあって(仮)", "body": "家に仕送りがあって……日給を{salary}Gから{desired}Gにしてもらえると助かります。(仮)" },
+      "proud": { "subject": "当然の要求(仮)", "body": "俺の価値は{desired}Gだ。{salary}Gは安すぎる。(仮)" },
+      "timid": { "subject": "もしよければ……(仮)", "body": "あの……日給を{desired}Gにしていただけたら……。今は{salary}Gです……。(仮)" }
+    },
+    "warning": {
+      "cautious": { "subject": "今後について(仮)", "body": "{name}です。このまま続けるべきか、考えております。日給{desired}Gでお考えいただけなければ、近く身を引きます。(仮)" },
+      "brave": { "subject": "潮時かもな(仮)", "body": "正直、ここにいる理由が見えねえ。{desired}Gで引き留めるなら今のうちだ。(仮)" },
+      "greedy": { "subject": "他所の話が来ています(仮)", "body": "他のギルドから声がかかっています。{desired}Gを出せないなら、そちらへ行きます。(仮)" },
+      "caring": { "subject": "迷っています(仮)", "body": "皆さんと離れたくはないのですが……このままでは続けられません。(希望日給{desired}G)(仮)" },
+      "proud": { "subject": "最後通告(仮)", "body": "俺を安く使うのもここまでだ。{desired}Gを出すか、俺が出ていくかだ。(仮)" },
+      "timid": { "subject": "ごめんなさい(仮)", "body": "もう……続けられないかもしれません。(希望日給{desired}G)(仮)" }
+    },
+    "resign": {
+      "cautious": { "subject": "退職のご挨拶(仮)", "body": "{name}です。本日をもって失礼いたします。お世話になりました。(仮)" },
+      "brave": { "subject": "じゃあな(仮)", "body": "世話になった。俺は行く。(仮)" },
+      "greedy": { "subject": "契約終了(仮)", "body": "条件の合うところへ移ります。では。(仮)" },
+      "caring": { "subject": "さようなら(仮)", "body": "皆さんによろしく伝えてください。どうかお元気で。(仮)" },
+      "proud": { "subject": "後悔するぞ(仮)", "body": "俺を手放したこと、いずれ分かる。(仮)" },
+      "timid": { "subject": "すみません(仮)", "body": "黙って出ていくのは嫌なので……今までありがとうございました。(仮)" }
+    },
+    "rest": {
+      "cautious": { "subject": "休養のお願い(仮)", "body": "疲れが抜けきらないまま出るのは危険です。少し休ませてください。(仮)" },
+      "brave": { "subject": "ちっと休ませろ(仮)", "body": "まだやれる……と言いたいが、体が重い。一日くれ。(仮)" },
+      "greedy": { "subject": "休みの件(仮)", "body": "倒れたら稼げません。一日休みをください。(仮)" },
+      "caring": { "subject": "少しだけ(仮)", "body": "足を引っ張りたくないので、一日だけ休ませてもらえますか。(仮)" },
+      "proud": { "subject": "休息を取る(仮)", "body": "万全でない俺を見せたくない。休ませてもらう。(仮)" },
+      "timid": { "subject": "もう限界です……(仮)", "body": "疲れて……一日だけ、休ませてください……。(仮)" }
+    },
+    "complaint": {
+      "cautious": { "subject": "隊の編成について(仮)", "body": "{mate}さんとは、どうにも呼吸が合いません。編成をご再考ください。(仮)" },
+      "brave": { "subject": "あいつとは無理だ(仮)", "body": "{mate}と組むのはもう御免だ。(仮)" },
+      "greedy": { "subject": "分け前の件(仮)", "body": "{mate}と一緒だと仕事になりません。隊を分けてください。(仮)" },
+      "caring": { "subject": "相談です(仮)", "body": "{mate}さんとうまくいかなくて……私の努力が足りないのかもしれませんが。(仮)" },
+      "proud": { "subject": "編成に異議あり(仮)", "body": "{mate}は俺の足を引っ張る。外してくれ。(仮)" },
+      "timid": { "subject": "こわいです(仮)", "body": "{mate}さんと一緒だと、こわくて……。(仮)" }
+    },
+    "rumor": {
+      "cautious": { "subject": "ダンジョンの噂(仮)", "body": "探索の途中で耳にしました。{dungeon}という場所があるそうです。(仮)" },
+      "brave": { "subject": "ダンジョンの噂(仮)", "body": "{dungeon}って場所があるらしい。行ってみてえな。(仮)" },
+      "greedy": { "subject": "ダンジョンの噂(仮)", "body": "{dungeon}にはお宝が眠っているとか。(仮)" },
+      "caring": { "subject": "ダンジョンの噂(仮)", "body": "{dungeon}という場所の話を聞きました。皆で行けるといいですね。(仮)" },
+      "proud": { "subject": "ダンジョンの噂(仮)", "body": "{dungeon}か。俺が一番乗りしてやる。(仮)" },
+      "timid": { "subject": "ダンジョンの噂(仮)", "body": "{dungeon}という場所があるって……こわそうです。(仮)" }
+    },
+    "quest": {
+      "cautious": { "subject": "依頼のお知らせ(仮)", "body": "新しい依頼が届いています。(仮)" },
+      "brave": { "subject": "依頼のお知らせ(仮)", "body": "新しい依頼が届いています。(仮)" },
+      "greedy": { "subject": "依頼のお知らせ(仮)", "body": "新しい依頼が届いています。(仮)" },
+      "caring": { "subject": "依頼のお知らせ(仮)", "body": "新しい依頼が届いています。(仮)" },
+      "proud": { "subject": "依頼のお知らせ(仮)", "body": "新しい依頼が届いています。(仮)" },
+      "timid": { "subject": "依頼のお知らせ(仮)", "body": "新しい依頼が届いています。(仮)" }
+    },
+    "event": {
+      "cautious": { "subject": "お話が(仮)", "body": "{name}です。少しご相談があります。(仮)" },
+      "brave": { "subject": "頼みがある(仮)", "body": "{name}だ。ひとつ頼まれてくれ。(仮)" },
+      "greedy": { "subject": "儲け話(仮)", "body": "{name}です。いい話があります。(仮)" },
+      "caring": { "subject": "お願い(仮)", "body": "{name}です。聞いてほしいことがあるんです。(仮)" },
+      "proud": { "subject": "話がある(仮)", "body": "{name}だ。あんたに話がある。(仮)" },
+      "timid": { "subject": "あの……(仮)", "body": "{name}です……。聞いてもらえますか……。(仮)" }
+    }
+  },
+  "choices": {
+    "raise": [
+      { "id": "accept", "label": "承認する" },
+      { "id": "hold", "label": "保留する" },
+      { "id": "refuse", "label": "断る" }
+    ],
+    "warning": [
+      { "id": "retain", "label": "昇給して引き留める" },
+      { "id": "leave", "label": "放っておく" }
+    ],
+    "rest": [
+      { "id": "rest", "label": "休ませる" },
+      { "id": "deny", "label": "断る" }
+    ],
+    "complaint": [
+      { "id": "split", "label": "分ける" },
+      { "id": "keep", "label": "そのまま" }
+    ],
+    "event": [
+      { "id": "accept", "label": "受ける" },
+      { "id": "decline", "label": "断る" }
+    ]
+  }
+}
