@@ -323,6 +323,19 @@ const cellsOf = (d: DungeonDef, kind: string) =>
   parseFloor(d.floors[0]).cells.flatMap((c, i) => (c.kind === kind ? [i] : []));
 
 describe('行動種別', () => {
+  it('今回の日数では届く目標しか無いときは、入口で日数を使い切らず初日に引き返す', () => {
+    // 森の洞窟を隠し通路以外すべて踏んだ知識。シンボルまで片道25歩で、慎重(13歩/日)の3日では往復できない
+    const all = GRID.cells.flatMap((c, i) => (c.kind !== 'wall' && c.kind !== 'hidden' ? [i] : []));
+    for (const seed of SEEDS.slice(0, 5)) {
+      const { result, trace } = runExploration(input(seed, {
+        leader: 'cautious', progress: progressOf(all), days: 3, action: 'boss',
+      }));
+      expect(trace.days[0].moves).toEqual([]);
+      expect(result.daysSpent).toBe(1);
+      expect(result.log.some((l) => l.text.includes('出直す'))).toBe(true);
+    }
+  });
+
   // 薬草2か所と、脇道の苔鉱石。列6以降は未踏
   const herbs = corridor('herbs', [
     '##########',

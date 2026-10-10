@@ -583,6 +583,13 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       if (target < 0 || pos === target) {
         const t = chooseTarget();
         if (t === 'far') {
+          // 入口で何も出来ない日は、待っても届くようにならない。予定日数を使い切らずに戻す
+          if (pos === entrance && today.moves.length === 0) {
+            mapFull = true;
+            flush();
+            say('narration', '今の日数では届く場所が無い。出直すことにした。');
+            continue;
+          }
           homeReason = 'safety';
           continue;
         }
