@@ -66,6 +66,8 @@ export interface ExploreBehavior {
 
 export interface PersonalityDef {
   id: string; name: string; desc: string;
+  /** 隊長のときの地図の埋まり方(第6節の表)。派遣画面で見せる */
+  exploreDesc: string;
   retreatBias: number; fightBias: number; lootBias: number; trapCare: number; cover: number;
   explore: ExploreBehavior;
   likes: string[]; dislikes: string[];
