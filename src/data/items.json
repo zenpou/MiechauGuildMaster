@@ -4,5 +4,9 @@
   {"id":"slime_gel","name":"スライムの核","desc":"洞窟スライムの芯。弾力があり、薬や接着剤になる。","kind":"material","price":22,"weight":1},
   {"id":"moss_ore","name":"苔鉄鉱","desc":"苔に覆われた鉄鉱石。重いが鍛冶屋が高く買う。","kind":"material","price":30,"weight":2},
   {"id":"potion","name":"回復薬","desc":"薬草を煎じた飲み薬。戦闘中にHPを回復する。","kind":"consumable","price":30,"weight":1,
-   "consumable":{"effect":"heal","params":{"ratio":0.45}}}
+   "consumable":{"effect":"heal","params":{"ratio":0.45}}},
+  {"id":"iron_ore","name":"鉄鉱石","desc":"古い坑道の岩壁に残る鉄の鉱脈。重いが武具の材料になる。","kind":"material","price":36,"weight":2,"source":"old_mine"},
+  {"id":"glow_moss","name":"光苔","desc":"坑道の暗がりで青く光る苔。灯りや薬の材料になる。","kind":"material","price":20,"weight":1,"source":"old_mine"},
+  {"id":"bone_shard","name":"骨片","desc":"骸骨兵の砕けた骨。細工物や呪い除けに使う。","kind":"material","price":15,"weight":1},
+  {"id":"golem_core","name":"ゴーレムの核","desc":"坑道のゴーレムを動かしていた石の芯。重く、高値で取引される。","kind":"material","price":240,"weight":3}
 ]

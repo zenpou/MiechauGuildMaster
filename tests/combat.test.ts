@@ -55,8 +55,8 @@ describe('役割スキルの定義', () => {
 });
 
 describe('敵の定義(森の洞窟)', () => {
-  it('4種あり、巣の主は symbol', () => {
-    expect(ENEMIES.map((e) => e.id).sort()).toEqual(['goblin', 'goblin_chief', 'slime', 'wolf']);
+  it('森の4種を含み、巣の主は symbol', () => {
+    expect(ENEMIES.map((e) => e.id)).toEqual(expect.arrayContaining(['goblin', 'goblin_chief', 'slime', 'wolf']));
     expect(ENEMIES.find((e) => e.id === 'goblin_chief')!.symbol).toBe(true);
   });
 });

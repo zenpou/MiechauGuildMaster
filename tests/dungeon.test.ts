@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   exploredRate, frontier, idx, isPassable, looksLikeWall, neighbors, parseFloor, shortestPath, visibleFrom, xy,
 } from '../src/core/dungeon';
-import { DUNGEON, ITEM } from '../src/core/data';
+import { DUNGEON, ENEMY, ITEM, PERSONALITIES } from '../src/core/data';
 import type { CellKind, FloorDef } from '../src/core/types';
+import type { PassKnowledge } from '../src/core/dungeon';
 
 // テストリスト
 // - [x] は実装済み
@@ -16,6 +17,7 @@ import type { CellKind, FloorDef } from '../src/core/types';
 // - [ ] frontier: 見たが踏んでいない通行可能マス
 // - [ ] looksLikeWall: 未発見 hidden と wall
 // - [ ] forest_cave: 通行可能 60〜75、全マス到達、hidden 閉でも symbol 到達、内訳
+// - [ ] old_mine: 14×14、通行可能 80〜100、全マス到達、hidden 閉でも symbol 到達、symbol まで 閉28〜34/開20〜24歩
 
 const legend: FloorDef['legend'] = {
   '#': { kind: 'wall' },
@@ -304,5 +306,133 @@ describe('items.json', () => {
     expect(pick('potion')).toEqual(['consumable', 30, 1]);
     expect(ITEM.herb.source).toBe('forest_cave');
     expect(ITEM.potion.consumable).toEqual({ effect: 'heal', params: { ratio: 0.45 } });
+  });
+});
+
+describe('old_mine', () => {
+  const dungeon = () => DUNGEON.old_mine;
+  const grid = () => parseFloor(dungeon().floors[0]);
+  const ofKind = (g: ReturnType<typeof grid>, kind: CellKind) =>
+    g.cells.map((c, i) => (c.kind === kind ? i : -1)).filter((i) => i >= 0);
+  const openCells = (g: ReturnType<typeof grid>) =>
+    g.cells.map((c, i) => (c.kind === 'wall' ? -1 : i)).filter((i) => i >= 0);
+  const allFound = (g: ReturnType<typeof grid>) => ({ keys: [], hiddenFound: ofKind(g, 'hidden') });
+  const everything = (g: ReturnType<typeof grid>) => new Set(g.cells.map((_, i) => i));
+  const stepsToSymbol = (g: ReturnType<typeof grid>, know: PassKnowledge) =>
+    shortestPath(g, g.entrance, ofKind(g, 'symbol')[0], everything(g), know)!.length - 1;
+
+  it('フロア f1 が1枚、14×14', () => {
+    expect(dungeon().floors.map((f) => f.id)).toEqual(['f1']);
+    const g = grid();
+    expect([g.width, g.height]).toEqual([14, 14]);
+  });
+  it('入口は上端の中央', () => {
+    const g = grid();
+    const { x, y } = xy(g, g.entrance);
+    expect(y).toBe(0);
+    expect(x).toBeGreaterThanOrEqual(6);
+    expect(x).toBeLessThanOrEqual(7);
+  });
+  it('通行可能マスは80〜100', () => {
+    const n = openCells(grid()).length;
+    expect(n).toBeGreaterThanOrEqual(80);
+    expect(n).toBeLessThanOrEqual(100);
+  });
+  it('マスの内訳がプラン通り', () => {
+    const g = grid();
+    const count = (kind: CellKind) => ofKind(g, kind).length;
+    expect(count('entrance')).toBe(1);
+    expect(count('gather')).toBe(5);
+    expect(count('nest')).toBe(3);
+    expect(count('symbol')).toBe(1);
+    expect(count('treasure')).toBe(2);
+    expect(count('trap')).toBe(3);
+    expect(count('hidden')).toBeGreaterThanOrEqual(3);
+    expect(count('hidden')).toBeLessThanOrEqual(4);
+    const items = ofKind(g, 'gather').map((i) => g.cells[i].item).sort();
+    expect(items).toEqual(['glow_moss', 'glow_moss', 'iron_ore', 'iron_ore', 'moss_ore']);
+    expect(ofKind(g, 'nest').map((i) => g.cells[i].enemy).sort()).toEqual(['cave_bat', 'skeleton', 'skeleton']);
+    expect(g.cells[ofKind(g, 'symbol')[0]].enemy).toBe('golem');
+    expect(ofKind(g, 'trap').every((i) => g.cells[i].trap === 'rockfall')).toBe(true);
+  });
+  it('採取点の素材は items.json に、巣とシンボルの敵は enemies.json にある', () => {
+    const g = grid();
+    for (const i of ofKind(g, 'gather')) expect(ITEM[g.cells[i].item!]).toBeDefined();
+    for (const i of [...ofKind(g, 'nest'), ...ofKind(g, 'symbol')]) expect(ENEMY[g.cells[i].enemy!]).toBeDefined();
+  });
+  it('隠し通路を開けた状態で、入口から全通行可能マスへ到達できる', () => {
+    const g = grid();
+    const known = everything(g);
+    for (const i of openCells(g)) expect(shortestPath(g, g.entrance, i, known, allFound(g)), `${i}`).not.toBeNull();
+  });
+  it('隠し通路を閉じた状態でも symbol へ到達できる', () => {
+    const g = grid();
+    expect(shortestPath(g, g.entrance, ofKind(g, 'symbol')[0], everything(g), none)).not.toBeNull();
+  });
+  it('symbol までの最短歩数は 閉28〜34 / 開20〜24', () => {
+    const g = grid();
+    const closed = stepsToSymbol(g, none);
+    const open = stepsToSymbol(g, allFound(g));
+    expect(closed).toBeGreaterThanOrEqual(28);
+    expect(closed).toBeLessThanOrEqual(34);
+    expect(open).toBeGreaterThanOrEqual(20);
+    expect(open).toBeLessThanOrEqual(24);
+  });
+  it('隠し通路は1本につながっていて、symbol への近道に使われる', () => {
+    const g = grid();
+    const hidden = ofKind(g, 'hidden');
+    const path = shortestPath(g, g.entrance, ofKind(g, 'symbol')[0], everything(g), allFound(g))!;
+    expect(hidden.every((h) => path.includes(h))).toBe(true);
+  });
+  it('行き止まり(入口以外で隣接1マス)が3本', () => {
+    const g = grid();
+    const know = allFound(g);
+    const ends = openCells(g).filter((i) => i !== g.entrance && neighbors(g, i, know).length === 1);
+    expect(ends).toHaveLength(3);
+  });
+  it('出現敵・推奨戦力・救助費用・遭遇率', () => {
+    const d = dungeon();
+    expect(d.node).toBe('old_mine');
+    expect(d.enemies).toEqual([
+      { id: 'skeleton', weight: 4, group: [1, 2] },
+      { id: 'cave_bat', weight: 4, group: [2, 4] },
+      { id: 'slime', weight: 2, group: [1, 2] },
+    ]);
+    expect(d.recommended).toBe(320);
+    expect(d.rescueCost).toBe(260);
+    expect(d.encounterRate).toBe(0.05);
+  });
+});
+
+describe('古い坑道の敵と素材', () => {
+  it('敵3種がプランの表どおり', () => {
+    const pick = (id: string) => {
+      const e = ENEMY[id];
+      return e && [e.hp, e.atk, e.def, e.mag, e.spd, e.exp, e.ai];
+    };
+    expect(pick('skeleton')).toEqual([62, 22, 10, 0, 8, 11, 'random']);
+    expect(pick('cave_bat')).toEqual([20, 12, 2, 0, 18, 4, 'weakest']);
+    expect(pick('golem')).toEqual([480, 34, 18, 0, 4, 70, 'strongest']);
+    expect(ENEMY.skeleton.loot).toEqual([{ item: 'bone_shard', chance: 0.6 }]);
+    expect(ENEMY.cave_bat.loot).toEqual([{ item: 'glow_moss', chance: 0.2 }]);
+    expect(ENEMY.golem.loot).toEqual([{ item: 'golem_core', chance: 1 }, { item: 'iron_ore', chance: 1 }]);
+    expect(ENEMY.golem.symbol).toBe(true);
+    expect(ENEMY.golem.skill).toEqual({ name: '岩砕き', mult: 1.4, cd: 3, aoe: true });
+  });
+  it('素材4種がプランの表どおり', () => {
+    const pick = (id: string) => {
+      const it = ITEM[id];
+      return it && [it.kind, it.price, it.weight, it.source];
+    };
+    expect(pick('iron_ore')).toEqual(['material', 36, 2, 'old_mine']);
+    expect(pick('glow_moss')).toEqual(['material', 20, 1, 'old_mine']);
+    expect(pick('bone_shard')).toEqual(['material', 15, 1, undefined]);
+    expect(pick('golem_core')).toEqual(['material', 240, 3, undefined]);
+  });
+});
+
+describe('personalities.json', () => {
+  it('全性格に exploreDesc(隊長のときの埋まり方)がある', () => {
+    for (const p of PERSONALITIES) expect(p.exploreDesc, p.id).toMatch(/\S/);
   });
 });

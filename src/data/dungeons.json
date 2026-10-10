@@ -37,5 +37,46 @@
      {"id":"wolf","weight":3,"group":[1,2]},
      {"id":"slime","weight":3,"group":[1,2]}
    ],
-   "recommended":180,"rescueCost":120,"encounterRate":0.04}
+   "recommended":180,"rescueCost":120,"encounterRate":0.04},
+  {"id":"old_mine","name":"古い坑道","desc":"森の洞窟よりさらに奥の山腹に残る廃坑。噂では、崩れた坑道の底にゴーレムが棲みついている。",
+   "node":"old_mine",
+   "floors":[
+     {"id":"f1","name":"地下1階",
+      "rows":[
+        "######E#######",
+        "##..........l#",
+        "##.#####.#.b.#",
+        "##.####..#T..#",
+        "#..####i.###.#",
+        "##.#l..#####.#",
+        "##.....HHH.###",
+        "##.#k..###^###",
+        "##.#######...#",
+        "##^#....T#..G#",
+        "##....k.i#...#",
+        "##..######.###",
+        "##.......^..m#",
+        "##############"
+      ],
+      "legend":{
+        "#":{"kind":"wall"},
+        ".":{"kind":"floor"},
+        "E":{"kind":"entrance"},
+        "i":{"kind":"gather","item":"iron_ore"},
+        "l":{"kind":"gather","item":"glow_moss"},
+        "m":{"kind":"gather","item":"moss_ore"},
+        "k":{"kind":"nest","enemy":"skeleton"},
+        "b":{"kind":"nest","enemy":"cave_bat"},
+        "G":{"kind":"symbol","enemy":"golem"},
+        "T":{"kind":"treasure"},
+        "^":{"kind":"trap","trap":"rockfall"},
+        "H":{"kind":"hidden"}
+      }}
+   ],
+   "enemies":[
+     {"id":"skeleton","weight":4,"group":[1,2]},
+     {"id":"cave_bat","weight":4,"group":[2,4]},
+     {"id":"slime","weight":2,"group":[1,2]}
+   ],
+   "recommended":320,"rescueCost":260,"encounterRate":0.05}
 ]
