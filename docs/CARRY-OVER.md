@@ -7,10 +7,10 @@
 
 | ファイル | 内容 | 注意 |
 |---|---|---|
-| `src/core/rng.ts` | mulberry32、`hash(seed, タグ, カウンタ)` 派生、`rngFor` | 変更不要 |
-| `src/core/save.ts` | localStorage への保存・読み込みの型付きラッパ | キー名を変える |
+| `src/core/rng.ts` | mulberry32、`hash(seed, タグ, カウンタ)` 派生、`rngFor` | 変更不要(2026-10-10 持ち込み済み) |
+| `src/core/save.ts` + `src/ui/shared.ts` の load/save | 前作の `save.ts` は移行関数のみで、保存処理は `ui/shared.ts` にあった。新作は `core/save.ts` に Storage 風の口を渡す形でまとめ、DOM非依存にした(2026-10-10 持ち込み済み) | — |
 | `src/core/relations.ts` | 2人ごとの関係値、性格の相性から初期値、ラベル | 性格IDを新作のものに |
-| `src/ui/dom.ts` | `h()` / `div()` の小さなDOMヘルパ | 変更不要 |
+| `src/ui/dom.ts` | `h()` / `div()` の小さなDOMヘルパ | 変更不要(2026-10-10 持ち込み済み) |
 | `src/ui/storyPlayer.ts`, `storyPlayer.css`, `storyAudio.ts` | 紙芝居プレイヤー(背景・立ち絵・ポーズ・位置・SFX・タイプライター・履歴・スキップ・reduced-motion) | 台本JSONの形式(`campaign-story.json` の行構造)も踏襲する |
 | `src/ui/pwa.ts`, `scripts/pwa-plugin.ts`, `public/manifest.webmanifest` | Service Worker 生成、更新ボタン、オフライン | アプリ名とアイコンを差し替え |
 | `scripts/browser-check.cjs`, `scripts/ui-review-check.cjs` | Playwright で PC/スマホ幅・保存・offline・PWA更新を検証する手順 | シナリオは書き直し。骨組みと起動方法だけ流用 |

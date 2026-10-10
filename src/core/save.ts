@@ -1,0 +1,48 @@
+// セーブの直列化と読み込み。DOM非依存にするため、保存先は Storage 風の口を外から渡す。
+import { emptyState } from './state';
+import { SAVE_VERSION, type GameState } from './types';
+
+export interface KeyValueStore {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+
+export const SAVE_KEY = 'miechau-guild-master.save.v1';
+
+/**
+ * 読み込んだ状態に、後から足した項目の既定値を埋める。
+ * GameState に項目を足したら、ここに既定値を書く。版番号を上げたら移行処理も書く。
+ */
+export function migrate(raw: unknown): GameState | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const s = raw as Partial<GameState>;
+  if (typeof s.seed !== 'number' || typeof s.day !== 'number') return null;
+  const base = emptyState(s.seed, s.playerName ?? '');
+  const merged: GameState = { ...base, ...(s as GameState) };
+  // 入れ子の既定値
+  merged.base = { ...base.base, ...(s.base ?? {}) };
+  merged.world = { ...base.world, ...(s.world ?? {}) };
+  merged.counters = { ...base.counters, ...(s.counters ?? {}) };
+  merged.version = SAVE_VERSION;
+  return merged;
+}
+
+export function serialize(state: GameState): string {
+  return JSON.stringify(state);
+}
+
+export function deserialize(text: string): GameState | null {
+  try { return migrate(JSON.parse(text)); } catch { return null; }
+}
+
+export function load(store: KeyValueStore, key = SAVE_KEY): GameState | null {
+  try {
+    const raw = store.getItem(key);
+    return raw ? deserialize(raw) : null;
+  } catch { return null; }
+}
+
+/** 保存できたら true。容量不足などで失敗したら false(呼び出し側が警告を出す) */
+export function save(store: KeyValueStore, state: GameState, key = SAVE_KEY): boolean {
+  try { store.setItem(key, serialize(state)); return true; } catch { return false; }
+}

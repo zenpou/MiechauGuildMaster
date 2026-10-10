@@ -1,0 +1,23 @@
+[
+  {"id":"fighter","name":"剣士","desc":"前に出て斬る。アタッカーの専門。","tier":"lower","roles":["attacker"],"attackStat":"atk",
+   "statMult":{"hp":1.1,"atk":1.25,"def":1.0,"mag":0.6,"spd":1.0,"dex":1.0,"scout":0.9,"gather":0.8},"armor":["light","medium","heavy"]},
+  {"id":"warrior","name":"戦士","desc":"盾で受け止め、仲間をかばう。タンクの専門。","tier":"lower","roles":["tank"],"attackStat":"atk",
+   "statMult":{"hp":1.3,"atk":1.0,"def":1.3,"mag":0.6,"spd":0.85,"dex":0.9,"scout":0.85,"gather":0.9},"armor":["medium","heavy"]},
+  {"id":"priest","name":"僧侶","desc":"傷を癒し、隊を立て直す。ヒーラーの専門。","tier":"lower","roles":["healer"],"attackStat":"mag",
+   "statMult":{"hp":0.85,"atk":0.6,"def":0.8,"mag":1.3,"spd":0.95,"dex":1.0,"scout":1.0,"gather":1.0},"armor":["light","medium"]},
+  {"id":"gatherer","name":"採取士","desc":"素材を見分けて採り、背負って帰る。ギャザラーの専門。","tier":"lower","roles":["gatherer"],"attackStat":"atk",
+   "statMult":{"hp":1.0,"atk":0.9,"def":0.85,"mag":0.7,"spd":0.95,"dex":1.2,"scout":1.0,"gather":1.35},"armor":["light","medium"]},
+  {"id":"scout","name":"斥候","desc":"先を読み、罠を外し、地図を埋める。スカウトの専門。","tier":"lower","roles":["scout"],"attackStat":"atk",
+   "statMult":{"hp":0.9,"atk":0.95,"def":0.8,"mag":0.7,"spd":1.3,"dex":1.2,"scout":1.3,"gather":1.0},"armor":["light"]},
+
+  {"id":"warlord","name":"ウォーロード","desc":"殴って受ける前線の主。アタッカー+タンク。","tier":"upper","roles":["attacker","tank"],"from":["fighter","warrior"],"requireLevel":10,"attackStat":"atk",
+   "statMult":{"hp":1.25,"atk":1.2,"def":1.2,"mag":0.6,"spd":0.95,"dex":0.95,"scout":0.9,"gather":0.85},"armor":["medium","heavy"]},
+  {"id":"paladin","name":"パラディン","desc":"守りと癒しの聖騎士。タンク+ヒーラー。","tier":"upper","roles":["tank","healer"],"from":["warrior","priest"],"requireLevel":10,"attackStat":"atk",
+   "statMult":{"hp":1.15,"atk":0.9,"def":1.15,"mag":1.1,"spd":0.9,"dex":0.95,"scout":0.9,"gather":0.95},"armor":["medium","heavy"]},
+  {"id":"alchemist","name":"アルケミスト","desc":"採った素材をその場で薬に変える。ヒーラー+ギャザラー。","tier":"upper","roles":["healer","gatherer"],"from":["priest","gatherer"],"requireLevel":10,"attackStat":"mag",
+   "statMult":{"hp":0.95,"atk":0.75,"def":0.85,"mag":1.2,"spd":0.95,"dex":1.15,"scout":1.0,"gather":1.25},"armor":["light","medium"]},
+  {"id":"treasure_hunter","name":"トレジャーハンター","desc":"地図を埋め、採って運ぶ野外の専門家。ギャザラー+スカウト。","tier":"upper","roles":["gatherer","scout"],"from":["gatherer","scout"],"requireLevel":10,"attackStat":"atk",
+   "statMult":{"hp":0.95,"atk":0.95,"def":0.85,"mag":0.7,"spd":1.2,"dex":1.25,"scout":1.25,"gather":1.25},"armor":["light","medium"]},
+  {"id":"assassin","name":"アサシン","desc":"先に見つけて先に仕留める。スカウト+アタッカー。","tier":"upper","roles":["scout","attacker"],"from":["scout","fighter"],"requireLevel":10,"attackStat":"atk",
+   "statMult":{"hp":0.95,"atk":1.2,"def":0.85,"mag":0.65,"spd":1.25,"dex":1.15,"scout":1.2,"gather":0.9},"armor":["light"]}
+]

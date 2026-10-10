@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.npm-cache/
+# 検証スクリプトが実行のたびに上書きする出力。再生成できない元画像だけ管理する
+artifacts/*
+!artifacts/source-art/
+# tsc を noEmit なしで実行したときの誤出力。ソースは .ts
+src/**/*.js
+tests/**/*.js
+scripts/*.js
