@@ -3,7 +3,7 @@ import {
   addExp, aptFactor, bestJob, carryCapacity, effectiveStats, equipEffect, equipResist, expToNext, fatigueFactor,
   generateAdventurer, jobAptitude, PENTAGON, rollAptitude, salaryOf,
 } from '../src/core/adventurer';
-import { ITEM, JOB, LOWER_JOBS, PERSONA, PERSONALITY, TRAIT } from '../src/core/data';
+import { ITEM, JOB, LOWER_JOBS, PERSONA, PERSONALITY, TRAIT, TUNING } from '../src/core/data';
 import { Rng, rngFor } from '../src/core/rng';
 import { ROLE_IDS, type Adventurer, type RoleId } from '../src/core/types';
 
@@ -75,9 +75,9 @@ describe('実効能力', () => {
 });
 
 describe('成長と日給', () => {
-  it('次のレベルまでの経験値は 40×Lv', () => {
-    expect(expToNext(1)).toBe(40);
-    expect(expToNext(5)).toBe(200);
+  it('次のレベルまでの経験値は expPerLevel×Lv', () => {
+    expect(expToNext(1)).toBe(TUNING.growth.expPerLevel);
+    expect(expToNext(5)).toBe(5 * TUNING.growth.expPerLevel);
   });
   it('addExp でレベルが上がり、日給は変わらない', () => {
     const a = fixture({ salary: 12 });

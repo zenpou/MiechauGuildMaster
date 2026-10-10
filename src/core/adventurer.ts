@@ -69,7 +69,7 @@ export function effectiveStats(a: Adventurer, job: string = a.job, withFatigue =
 }
 
 export function expToNext(level: number): number {
-  return 40 * level;
+  return TUNING.growth.expPerLevel * level;
 }
 
 export function rankOf(v: number): string {

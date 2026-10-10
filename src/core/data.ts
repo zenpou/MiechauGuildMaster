@@ -73,6 +73,10 @@ export interface Tuning {
     returnRelation: number;
     gatherFocusBonus: number;
   };
+  growth: {
+    /** 次のレベルまでの経験値 = expPerLevel × 今のレベル */
+    expPerLevel: number;
+  };
   combat: {
     /** 被ダメージ = 攻撃×倍率 − 守備×defScale。大きいほど守備(防具)が効く */
     defScale: number;

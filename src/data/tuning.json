@@ -64,6 +64,9 @@
     "returnRelation": 1,
     "gatherFocusBonus": 1
   },
+  "growth": {
+    "expPerLevel": 40
+  },
   "combat": {
     "defScale": 1.0
   },
