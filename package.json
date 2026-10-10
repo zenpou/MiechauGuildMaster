@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
+    "test:browser": "node scripts/browser-check.cjs",
     "sim": "tsx scripts/sim.ts",
     "sim:styles": "tsx scripts/playstyles.ts",
     "sim:dragon": "tsx scripts/dragon.ts",
