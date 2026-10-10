@@ -25,7 +25,8 @@ export function facilityEffect(s: GameState, facilityId: string, key: string): n
 
 /** 完成済み施設の日額維持費の合計 */
 export function facilityUpkeep(s: GameState): number {
-  return s.base.facilities.reduce((t, f) => t + (f.level >= 1 && has(FACILITY, f.id) ? FACILITY[f.id].upkeep : 0), 0);
+  const sum = s.base.facilities.reduce((t, f) => t + (f.level >= 1 && has(FACILITY, f.id) ? FACILITY[f.id].upkeep : 0), 0);
+  return Math.round(sum * TUNING.game.facilityUpkeepScale);
 }
 
 function checkCost(s: GameState, cost: FacilityLevelCost): string | null {

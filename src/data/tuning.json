@@ -66,7 +66,8 @@
     "gatherFocusBonus": 1
   },
   "growth": {
-    "expPerLevel": 40
+    "expPerLevel": 40,
+    "wageSlope": 0.6
   },
   "combat": {
     "defScale": 1.0
@@ -108,7 +109,9 @@
     "candidateMax": 8,
     "candidateDays": 5,
     "hireSalaryDays": 4,
-    "baseCapacity": 6
+    "baseCapacity": 6,
+    "sellScale": 1,
+    "facilityUpkeepScale": 1
   },
   "quests": {
     "deliverPriceMul": 3.75,

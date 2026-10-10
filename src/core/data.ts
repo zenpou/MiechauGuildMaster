@@ -78,6 +78,8 @@ export interface Tuning {
   growth: {
     /** 次のレベルまでの経験値 = expPerLevel × 今のレベル */
     expPerLevel: number;
+    /** 日給 = 10 + (戦力−50)×この値 + (成長率−1)×14。大きいほど育った人の日給が重い */
+    wageSlope: number;
   };
   combat: {
     /** 被ダメージ = 攻撃×倍率 − 守備×defScale。大きいほど守備(防具)が効く */
@@ -103,6 +105,10 @@ export interface Tuning {
     uncertaintyEdges: number[];
   };
   game: {
+    /** 素材の売却額の倍率(市場の bonus とは別に、全体の相場) */
+    sellScale: number;
+    /** 施設の維持費の倍率 */
+    facilityUpkeepScale: number;
     startGold: number;
     startPotions: number;
     upkeepPerDay: number;

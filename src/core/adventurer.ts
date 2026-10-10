@@ -103,7 +103,7 @@ export function bestJob(a: Adventurer): string {
 /** 日給は適職での戦力(疲労を除く)に比例する。 */
 export function salaryOf(a: Adventurer): number {
   const p = powerOf(a, bestJob(a), false);
-  const raw = 10 + (p - 50) * 0.6 + (a.growth - 1) * 14;
+  const raw = 10 + (p - 50) * TUNING.growth.wageSlope + (a.growth - 1) * 14;
   return Math.max(8, Math.round(raw * traitNum(a, 'salaryMult', 1)));
 }
 

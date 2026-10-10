@@ -613,7 +613,7 @@ export function advanceDay(s: GameState): DayReport {
 
 /** 素材を n 個売ったときの額。UI の表示と売却で同じ額を使う */
 export function sellGold(s: GameState, item: string, n: number): number {
-  return Math.round((has(ITEM, item) ? ITEM[item].price : 0) * n * (1 + bonus(s, 'sellMult')));
+  return Math.round((has(ITEM, item) ? ITEM[item].price : 0) * n * T.sellScale * (1 + bonus(s, 'sellMult')));
 }
 
 export function sellMaterial(s: GameState, item: string, n: number): Result {
