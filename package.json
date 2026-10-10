@@ -9,6 +9,7 @@
     "test": "vitest run",
     "sim": "tsx scripts/sim.ts",
     "sim:styles": "tsx scripts/playstyles.ts",
+    "sim:dragon": "tsx scripts/dragon.ts",
     "preview": "vite preview --host 127.0.0.1"
   },
   "devDependencies": {
