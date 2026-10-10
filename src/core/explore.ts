@@ -2,56 +2,16 @@
 // 乱数は inp.rng だけを使う。inp.progress は読むだけで、差分は mapDeltas で返す。
 import { carryCapacity, effectiveStats, traitNum } from './adventurer';
 import { hasSkill, makeAllyUnit, makeEnemies, runCombat, type Unit } from './combat';
-import { ENEMY, ITEM, PERSONALITY, POLICY, ROLE_SKILL, TRAIT } from './data';
+import { ENEMY, ITEM, PERSONALITY, POLICY, ROLE_SKILL, TRAIT, TUNING } from './data';
 import { exploredRate, frontier, isPassable, neighbors, parseFloor, shortestPath, visibleFrom, xy, type Grid, type PassKnowledge } from './dungeon';
 import type { Rng } from './rng';
 import type {
   Adventurer, CellKind, DungeonDef, DungeonProgress, ExpeditionResult, LogKind, StatKey,
 } from './types';
 
-// ---- sim で調整する値(フェーズ2で JSON へ移す) ----
-export const BASE_STEPS = 16;
-const COST_KNOWN = 1;
-const COST_UNKNOWN = 2;
-const REST_STEPS = 3;
-const REST_HEAL = 0.15;
-const REST_MAX_PER_DAY = 2;
-const CAMP_HEAL = 0.2;
-const CAMP_FATIGUE = -8;
-const DAY_FATIGUE = 10;
-const COMBAT_FATIGUE = 4;
-const TRAP_FATIGUE = 5;
-const TRAP_DAMAGE: [number, number] = [0.1, 0.2];
-const TRAP_BASE = 0.4;
-const TRAP_DEX_SCALE = 40;
-const TREASURE_GOLD: [number, number] = [30, 80];
-const TREASURE_TRAP = 0.3;
-const GATHER_BASE = 0.35;
-const GATHER_SCALE = 40;
-const GATHER_QTY: [number, number] = [1, 2];
-const HIDDEN_BASE = 0.2;
-const HIDDEN_SCALE = 50;
-const NEST_GROUP: [number, number] = [2, 3];
-const DEFAULT_ENCOUNTER = 0.04;
-const DETOUR_BONUS = 0.5;
-// 前の派遣で踏んだ寄り道先は加点を弱める。強欲が入口近くの採取点だけを毎回往復して地図が止まったため
-const DETOUR_BONUS_KNOWN = 0.05;
-const SCORE_NOISE = 0.05;
-const FORK_NEIGHBORS = 3;
-const FORK_TOP = 3;
-const INJURED_HP = 0.5;
-const REVIVE_HP = 0.2;
-const RETREAT_TIRED = 70;
-const RETREAT_TIRED_ADD = 0.08;
-const FLEE_RATIO = 0.55;
-const INJURY_LOW_HP = 0.3;
-const INJURY_LOW_DAYS: [number, number] = [1, 3];
-const INJURY_DOWN_DAYS: [number, number] = [2, 4];
-const WIPE_INJURY_DAYS: [number, number] = [2, 4];
-const EXP_PER_CELL = 2;
-const EXP_PER_DAY = 5;
-const TRAIT_REVEAL = 0.25;
-const RETURN_RELATION = 1;
+// sim で調整する値は src/data/tuning.json
+const T = TUNING.explore;
+
 
 export interface ExploreInput {
   rng: Rng;
@@ -181,7 +141,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   };
   const avgFatigue = () => members.reduce((s, m) => s + m.fatigue + result.fatigue[m.id], 0) / members.length;
   const retreatThreshold = () =>
-    clamp(policy.retreat + PERSONALITY[leader.personality].retreatBias * 0.6 + (avgFatigue() > RETREAT_TIRED ? RETREAT_TIRED_ADD : 0), 0.1, 0.75);
+    clamp(policy.retreat + PERSONALITY[leader.personality].retreatBias * 0.6 + (avgFatigue() > T.retreatTired ? T.retreatTiredAdd : 0), 0.1, 0.75);
   const ratio = (u: Unit) => (u.down ? 0 : u.hp / u.maxHp);
   const avgHp = () => units.reduce((s, u) => s + ratio(u), 0) / units.length;
   const minHp = () => Math.min(...units.map(ratio));
@@ -291,11 +251,11 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     say('combat', `${def.name}${count > 1 ? `${count}体` : ''}と戦闘になった。`);
     const foes = makeEnemies(def, count);
     const r = runCombat(units, foes, {
-      rng, say, potions, rel: bumpRel, canFlee: true, fleeBelow: retreatThreshold() * FLEE_RATIO,
+      rng, say, potions, rel: bumpRel, canFlee: true, fleeBelow: retreatThreshold() * T.fleeRatio,
     });
     for (const [k, v] of Object.entries(r.kills)) result.kills[k] = (result.kills[k] ?? 0) + v;
     for (const id of r.downed) downedEver.add(id);
-    addFatigue(COMBAT_FATIGUE);
+    addFatigue(T.combatFatigue);
     if (r.outcome === 'lost') {
       wiped = true;
       return;
@@ -303,7 +263,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     for (const u of units) {
       if (!u.down) continue;
       u.down = false;
-      u.hp = Math.max(1, Math.round(u.maxHp * REVIVE_HP));
+      u.hp = Math.max(1, Math.round(u.maxHp * T.reviveHp));
       say('narration', `${u.name}は仲間に担がれ、しばらくして意識を取り戻した。`);
     }
     if (r.outcome === 'fled') {
@@ -331,15 +291,15 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     }
     // 斥候が外し損ねても、器用な者がよける機会は残す(斥候がいて不利になる逆転を避けるため)
     const deft = best('dex');
-    if (rng.chance(clamp(TRAP_BASE + stats[deft.id].dex / TRAP_DEX_SCALE + trapCare, 0.1, 0.95))) {
+    if (rng.chance(clamp(T.trapBase + stats[deft.id].dex / T.trapDexScale + trapCare, 0.1, 0.95))) {
       say('event', `${deft.name}が仕掛けに気づき、皆を下がらせた。`);
       return;
     }
     const victim = rng.pick(units.filter((u) => !u.down));
-    const dmg = Math.max(1, Math.round(victim.maxHp * rng.range(TRAP_DAMAGE[0], TRAP_DAMAGE[1])));
+    const dmg = Math.max(1, Math.round(victim.maxHp * rng.range(T.trapDamage[0], T.trapDamage[1])));
     // 罠で倒れると「死なない」の表現が戦闘外で必要になるので、HPは1で止める
     victim.hp = Math.max(1, victim.hp - dmg);
-    addFatigue(TRAP_FATIGUE);
+    addFatigue(T.trapFatigue);
     say('event', `罠が作動し、${victim.name}が${dmg}ダメージを受けた。`);
   };
 
@@ -354,19 +314,19 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         event(i, 'gather');
         const item = cell.item!;
         const g = best('gather');
-        if (!rng.chance(clamp(GATHER_BASE + stats[g.id].gather / GATHER_SCALE + luck * 0.1, 0.1, 0.95))) {
+        if (!rng.chance(clamp(T.gatherBase + stats[g.id].gather / T.gatherScale + luck * 0.1, 0.1, 0.95))) {
           say('event', `${g.name}が${ITEM[item].name}を探したが、使えるものは見つからなかった。`);
           return;
         }
-        const qty = rng.int(GATHER_QTY[0], GATHER_QTY[1]) + (skilled('pack') ? ROLE_SKILL.pack.params.gatherBonus : 0);
+        const qty = rng.int(T.gatherQty[0], T.gatherQty[1]) + (skilled('pack') ? ROLE_SKILL.pack.params.gatherBonus : 0);
         const kept = addMaterial(item, qty);
         if (kept > 0) say('event', `${g.name}が${ITEM[item].name}を${kept}個採った。`);
         return;
       }
       case 'treasure': {
         event(i, 'treasure');
-        const gold = rng.int(TREASURE_GOLD[0], TREASURE_GOLD[1]);
-        if (rng.chance(TREASURE_TRAP)) springTrap('宝箱に罠が仕掛けられていた。');
+        const gold = rng.int(T.treasureGold[0], T.treasureGold[1]);
+        if (rng.chance(T.treasureTrap)) springTrap('宝箱に罠が仕掛けられていた。');
         result.gold += gold;
         say('event', `宝箱から${gold}G見つけた。`);
         return;
@@ -377,7 +337,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         return;
       case 'nest': {
         const entry = dungeon.enemies.find((e) => e.id === cell.enemy);
-        const [lo, hi] = entry?.group ?? NEST_GROUP;
+        const [lo, hi] = entry?.group ?? T.nestGroup;
         fight(i, cell.enemy!, rng.int(lo, hi), 'nest');
         return;
       }
@@ -386,7 +346,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         fight(i, cell.enemy!, 1, cell.kind);
         return;
       case 'floor':
-        if (rng.chance(dungeon.encounterRate ?? DEFAULT_ENCOUNTER) && dungeon.enemies.length) {
+        if (rng.chance(dungeon.encounterRate ?? T.defaultEncounter) && dungeon.enemies.length) {
           const e = rng.weighted(dungeon.enemies, (x) => x.weight);
           fight(i, e.id, rng.int(e.group[0], e.group[1]), 'encounter');
         }
@@ -410,7 +370,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       if (kindOf(n) !== 'hidden' || hiddenFound.includes(n) || tried.has(n)) continue;
       tried.add(n);
       const s = best('scout');
-      if (!rng.chance(clamp(HIDDEN_BASE + stats[s.id].scout / HIDDEN_SCALE, 0.1, 0.9))) continue;
+      if (!rng.chance(clamp(T.hiddenBase + stats[s.id].scout / T.hiddenScale, 0.1, 0.9))) continue;
       for (const h of hiddenRun(n)) {
         if (hiddenFound.includes(h)) continue;
         hiddenFound.push(h);
@@ -450,17 +410,17 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       startRetreat(`隊の消耗が激しい。${leader.name}は撤退を決めた。`);
     }
     const low = ex.restMode === 'any' ? minHp() : avgHp();
-    if (rests < REST_MAX_PER_DAY && low < ex.restHp && left - REST_STEPS + future >= homeDist(pos)) {
+    if (rests < T.restMaxPerDay && low < ex.restHp && left - T.restSteps + future >= homeDist(pos)) {
       rests++;
-      left -= REST_STEPS;
-      today.used += REST_STEPS;
+      left -= T.restSteps;
+      today.used += T.restSteps;
       const healer = units.some((u) => !u.down && hasSkill(u, 'heal'));
-      const r = REST_HEAL + (healer ? ROLE_SKILL.heal.params.ratio : 0);
+      const r = T.restHeal + (healer ? ROLE_SKILL.heal.params.ratio : 0);
       healAll(r);
       flush();
       say('narration', `${leader.name}の判断で小休止を取った(HP+${Math.round(r * 100)}%)。`);
     }
-    if (ex.detour === 'injured' && homeReason === null && !retreating && units.some((u) => ratio(u) < INJURED_HP)) {
+    if (ex.detour === 'injured' && homeReason === null && !retreating && units.some((u) => ratio(u) < T.injuredHp)) {
       homeReason = 'injured';
       flush();
       say('narration', `${leader.name}は傷ついた仲間を気づかい、今日は入口へ引き返すことにした。`);
@@ -482,7 +442,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     cands.delete(pos);
     if (cands.size === 0) return null;
 
-    const fork = neighbors(grid, pos, know).length >= FORK_NEIGHBORS;
+    const fork = neighbors(grid, pos, know).length >= T.forkNeighbors;
     if (fork && ex.hesitate > 0 && rng.chance(ex.hesitate) && left - 1 + future >= homeDist(pos)) {
       left--;
       today.used++;
@@ -495,8 +455,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     const scored: { cell: number; dist: number; depth: number; detour: number }[] = [];
     let far = false;
     for (const cell of [...cands.keys()].sort((a, b) => a - b)) {
-      let dist = costVia(dSafe, cell, COST_UNKNOWN);
-      if (dist < 0) dist = costVia(dAll, cell, COST_UNKNOWN);
+      let dist = costVia(dSafe, cell, T.costUnknown);
+      if (dist < 0) dist = costVia(dAll, cell, T.costUnknown);
       const depth = costVia(dEnt, cell, 1);
       if (dist < 0 || depth < 0) continue;
       // 往復できない目標を選ぶと帰路の制約に当たって足踏みするだけなので、最初から外す
@@ -504,7 +464,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         far = true;
         continue;
       }
-      scored.push({ cell, dist, depth, detour: cands.get(cell)! ? (visited.has(cell) ? DETOUR_BONUS_KNOWN : DETOUR_BONUS) : 0 });
+      // 前の派遣で踏んだ寄り道先は加点を弱める。強欲が入口近くの採取点だけを毎回往復して地図が止まったため
+      scored.push({ cell, dist, depth, detour: cands.get(cell)! ? (visited.has(cell) ? T.detourBonusKnown : T.detourBonus) : 0 });
     }
     if (!scored.length) return far ? 'far' : null;
     const maxDist = Math.max(1, ...scored.map((s) => s.dist));
@@ -512,10 +473,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       .map((s) => ({
         cell: s.cell,
         score: ex.venture * Math.min(1, s.depth / maxDepthAll) - ex.thorough * (s.dist / maxDist)
-          + s.detour + rng.range(0, SCORE_NOISE),
+          + s.detour + rng.range(0, T.scoreNoise),
       }))
       .sort((a, b) => b.score - a.score || a.cell - b.cell);
-    return fork && ex.forkRandom ? rng.pick(ranked.slice(0, FORK_TOP)).cell : ranked[0].cell;
+    return fork && ex.forkRandom ? rng.pick(ranked.slice(0, T.forkTop)).cell : ranked[0].cell;
   };
 
   // ---- 本編 ----
@@ -526,7 +487,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   }
   look(entrance);
 
-  const budget = Math.max(1, Math.round(BASE_STEPS * ex.speed));
+  const budget = Math.max(1, Math.round(T.baseSteps * ex.speed));
   const days = Math.max(1, inp.days);
   let end: ExploreTrace['end'] | null = null;
   let daysSpent = 0;
@@ -560,8 +521,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
           if (pos === entrance && (retreating || mapFull || last)) end = retreating ? 'retreat' : mapFull ? 'mapFull' : 'done';
           break;
         }
-        if (left < COST_KNOWN) break;
-        move(pathTo(pos, entrance)![1], COST_KNOWN);
+        if (left < T.costKnown) break;
+        move(pathTo(pos, entrance)![1], T.costKnown);
         afterMove();
         if (wiped) end = 'wipe';
         continue;
@@ -589,7 +550,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         ri = 0;
       }
       const next = route[ri + 1];
-      const cost = visited.has(next) ? COST_KNOWN : COST_UNKNOWN;
+      const cost = visited.has(next) ? T.costKnown : T.costUnknown;
       // 最終日は「次の1歩+そこから入口までの既知の道」を払えなくなった時点で帰路に入る。
       // 最終日以外も翌日以降の歩数で帰れる範囲に留める(野営地が遠すぎると最終日に戻れないため)
       if (left < cost || left - cost + future < homeDist(next)) {
@@ -611,7 +572,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       pos = entrance;
       end = 'done';
     }
-    if (end !== 'wipe') addFatigue(DAY_FATIGUE);
+    if (end !== 'wipe') addFatigue(T.dayFatigue);
     const fresh = newCells.length - cellsBefore;
     if (fresh > 0 || newHidden.length > hiddenBefore) {
       const rate = Math.round(exploredRate(grid, [...visited]) * 100);
@@ -619,8 +580,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     }
     today.camp = pos;
     if (end === null) {
-      healAll(CAMP_HEAL);
-      for (const m of members) result.fatigue[m.id] += CAMP_FATIGUE;
+      healAll(T.campHeal);
+      for (const m of members) result.fatigue[m.id] += T.campFatigue;
       say('narration', 'その場で野営した。');
     }
   }
@@ -650,10 +611,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   for (const m of members) {
     const u = units.find((x) => x.id === m.id)!;
     let d = 0;
-    if (result.wiped) d = rng.int(WIPE_INJURY_DAYS[0], WIPE_INJURY_DAYS[1]);
+    if (result.wiped) d = rng.int(T.wipeInjuryDays[0], T.wipeInjuryDays[1]);
     else {
-      if (ratio(u) < INJURY_LOW_HP) d = rng.int(INJURY_LOW_DAYS[0], INJURY_LOW_DAYS[1]);
-      if (downedEver.has(m.id)) d = Math.max(d, rng.int(INJURY_DOWN_DAYS[0], INJURY_DOWN_DAYS[1]));
+      if (ratio(u) < T.injuryLowHp) d = rng.int(T.injuryLowDays[0], T.injuryLowDays[1]);
+      if (downedEver.has(m.id)) d = Math.max(d, rng.int(T.injuryDownDays[0], T.injuryDownDays[1]));
     }
     if (d > 0) {
       result.injuries[m.id] = d;
@@ -663,20 +624,20 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
 
   const killExp = Object.entries(result.kills).reduce((s, [k, n]) => s + ENEMY[k].exp * n, 0);
   for (const m of members) {
-    const base = newCells.length * EXP_PER_CELL + daysSpent * EXP_PER_DAY + killExp / members.length;
+    const base = newCells.length * T.expPerCell + daysSpent * T.expPerDay + killExp / members.length;
     result.expGain[m.id] = Math.max(1, Math.round(base * policy.expMult * traitNum(m, 'expRate', 1)));
   }
 
   if (!result.wiped && members.length > 1) {
     for (let i = 0; i < members.length; i++) {
-      for (let j = i + 1; j < members.length; j++) bumpRel(members[i].id, members[j].id, RETURN_RELATION, '共に帰還した');
+      for (let j = i + 1; j < members.length; j++) bumpRel(members[i].id, members[j].id, T.returnRelation, '共に帰還した');
     }
-    say('relation', `共に帰還し、仲間意識が少し深まった(関係値 +${RETURN_RELATION})。`);
+    say('relation', `共に帰還し、仲間意識が少し深まった(関係値 +${T.returnRelation})。`);
   }
 
   for (const m of members) {
     const hidden = m.traits.filter((t) => !t.revealed);
-    if (!hidden.length || !rng.chance(TRAIT_REVEAL)) continue;
+    if (!hidden.length || !rng.chance(T.traitReveal)) continue;
     const t = rng.pick(hidden);
     result.revealedTraits.push({ advId: m.id, traitId: t.id });
     say('result', `【発見】${m.name}の特性「${TRAIT[t.id].name}」が判明した。(${TRAIT[t.id].desc})`);

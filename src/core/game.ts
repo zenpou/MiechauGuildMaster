@@ -1,6 +1,6 @@
 // ゲーム状態の進行。派遣は出発時に simulateExploration で全部確定し、帰還日に applyReturn で開示する。
 import { addExp, generateAdventurer, salaryOf } from './adventurer';
-import { DUNGEON, ITEM, JOB, POLICY } from './data';
+import { DUNGEON, ITEM, JOB, POLICY, TUNING } from './data';
 import { exploredRate, parseFloor } from './dungeon';
 import { simulateExploration } from './explore';
 import { addRelation } from './relations';
@@ -11,21 +11,12 @@ import {
   type Adventurer, type DispatchOrder, type Expedition, type GameState,
 } from './types';
 
-// ---- sim で調整する値(フェーズ2で JSON へ移す) ----
-export const START_GOLD = 500;
-export const START_POTIONS = 2;
-export const UPKEEP_PER_DAY = 30;
+// sim で調整する値は src/data/tuning.json
+const T = TUNING.game;
+export const START_GOLD = T.startGold;
+export const START_POTIONS = T.startPotions;
+export const UPKEEP_PER_DAY = T.upkeepPerDay;
 const START_JOBS = ['fighter', 'warrior', 'priest', 'scout'];
-const START_APT = 70;
-const DEBT_INTEREST = 0.02;
-const DEBT_LOYALTY = -4;
-const DEBT_REP = -1;
-const REST_FATIGUE = -25;
-const DAILY_LOYALTY = 1;
-const LOYALTY_SUCCESS = 3;
-const LOYALTY_INJURED = -3;
-const LOYALTY_WIPE = -20;
-const DAYS_MAX = 7;
 const BUYABLE = ['potion'];
 const LEDGER_MAX = 300;
 const NOTICES_MAX = 80;
@@ -36,7 +27,7 @@ export interface DayReport { day: number; returned: Expedition[]; notices: strin
 
 const ok = (): Result => ({ ok: true });
 const fail = (reason: string) => ({ ok: false as const, reason });
-const has = <T>(table: Record<string, T>, key: string) => Object.prototype.hasOwnProperty.call(table, key);
+const has = <V>(table: Record<string, V>, key: string) => Object.prototype.hasOwnProperty.call(table, key);
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const isCount = (n: unknown): n is number => Number.isInteger(n) && (n as number) >= 0;
 
@@ -66,7 +57,7 @@ export function newGame(seed: number, playerName = ''): GameState {
   START_JOBS.forEach((job, i) => {
     const a = generateAdventurer(rngFor(seed, 'init', i), { id: `a${s.counters.nextId++}`, usedNames });
     a.job = job;
-    for (const r of JOB[job].roles) a.apt[r] = Math.max(a.apt[r], START_APT);
+    for (const r of JOB[job].roles) a.apt[r] = Math.max(a.apt[r], T.startApt);
     a.salary = salaryOf(a);
     a.history.hiredDay = 1;
     s.adventurers.push(a);
@@ -86,7 +77,7 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   const floorId = o.target.floor ?? 'f1';
   if (!dungeon.floors.some((f) => f.id === floorId)) return fail('行き先のフロアが分かりません');
   if (!has(POLICY, o.policy)) return fail('方針が不正です');
-  if (!Number.isInteger(o.days) || o.days < 1 || o.days > DAYS_MAX) return fail(`日数は1〜${DAYS_MAX}日で指定してください`);
+  if (!Number.isInteger(o.days) || o.days < 1 || o.days > T.daysMax) return fail(`日数は1〜${T.daysMax}日で指定してください`);
   if (o.partyIds.length < 1 || o.partyIds.length > PARTY_MAX) return fail(`隊は1〜${PARTY_MAX}人で組んでください`);
   if (new Set(o.partyIds).size !== o.partyIds.length) return fail('同じ冒険者が重複しています');
   if (!o.partyIds.includes(o.leaderId)) return fail('隊長は隊員から選んでください');
@@ -153,10 +144,10 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
     const inj = r.injuries[m.id] ?? 0;
     if (inj) m.injuryDays = Math.max(m.injuryDays, inj);
     // 全滅は全員が負傷扱いになるので、負傷の−3を重ねず全滅の−20だけにする
-    if (r.wiped) addLoyalty(m, LOYALTY_WIPE);
+    if (r.wiped) addLoyalty(m, T.loyaltyWipe);
     else {
-      if (r.success) addLoyalty(m, LOYALTY_SUCCESS);
-      if (inj) addLoyalty(m, LOYALTY_INJURED);
+      if (r.success) addLoyalty(m, T.loyaltySuccess);
+      if (inj) addLoyalty(m, T.loyaltyInjured);
     }
     const ups = addExp(m, r.expGain[m.id] ?? 0);
     if (ups) notices.push(`${m.name}がLv${m.level}に上がった。`);
@@ -197,12 +188,12 @@ export function advanceDay(s: GameState): DayReport {
   ledger(s, '日給(全冒険者)', -wages);
   ledger(s, 'ギルド維持費', -UPKEEP_PER_DAY);
   if (s.gold < 0) {
-    const interest = Math.ceil(-s.gold * DEBT_INTEREST);
+    const interest = Math.ceil(-s.gold * T.debtInterest);
     s.gold -= interest;
     ledger(s, '借金の利息', -interest);
     s.debt = true;
-    s.rep = Math.max(0, s.rep + DEBT_REP);
-    for (const a of s.adventurers) addLoyalty(a, DEBT_LOYALTY);
+    s.rep = Math.max(0, s.rep + T.debtRep);
+    for (const a of s.adventurers) addLoyalty(a, T.debtLoyalty);
     notices.push('資金がマイナスです。利息がかかり、忠誠と評判が下がりました。');
   } else s.debt = false;
 
@@ -215,10 +206,10 @@ export function advanceDay(s: GameState): DayReport {
   const returnedIds = new Set(returned.flatMap((e) => e.order.partyIds));
   for (const a of s.adventurers) {
     if (a.status !== 'idle' || returnedIds.has(a.id)) continue;
-    a.fatigue = Math.max(0, a.fatigue + REST_FATIGUE);
+    a.fatigue = Math.max(0, a.fatigue + T.restFatigue);
     if (a.injuryDays > 0) a.injuryDays--;
   }
-  for (const a of s.adventurers) addLoyalty(a, DAILY_LOYALTY);
+  for (const a of s.adventurers) addLoyalty(a, T.dailyLoyalty);
 
   for (const n of notices) s.notices.unshift({ day: s.day, text: n });
   if (s.notices.length > NOTICES_MAX) s.notices.length = NOTICES_MAX;

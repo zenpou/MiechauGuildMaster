@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DUNGEONS, ENEMIES, ENEMY, ITEM, JOBS, LOWER_JOBS, PERSONALITIES, ROLE_SKILLS, UPPER_JOBS, upperJobsFrom } from '../src/core/data';
+import { DUNGEONS, ENEMIES, ENEMY, ITEM, JOBS, LOWER_JOBS, PERSONALITIES, ROLE_SKILLS, TUNING, UPPER_JOBS, upperJobsFrom } from '../src/core/data';
 import { Rng, rngFor } from '../src/core/rng';
 import { deserialize, load, migrate, save, serialize, type KeyValueStore } from '../src/core/save';
 import { emptyState } from '../src/core/state';
@@ -106,5 +106,21 @@ describe('データの整合(JSON同士の参照)', () => {
         if (c.item) expect(ITEM[c.item], `${d.id}/${f.id} の item ${c.item}`).toBeDefined();
       }
     }
+  });
+});
+
+describe('tuning', () => {
+  it('全値が number か number[]', () => {
+    for (const section of [TUNING.explore, TUNING.game]) {
+      for (const [key, v] of Object.entries(section)) {
+        const ok = typeof v === 'number' || (Array.isArray(v) && v.every((x) => typeof x === 'number'));
+        expect(ok, key).toBe(true);
+      }
+    }
+  });
+
+  it('baseSteps > 0、costUnknown >= costKnown', () => {
+    expect(TUNING.explore.baseSteps).toBeGreaterThan(0);
+    expect(TUNING.explore.costUnknown).toBeGreaterThanOrEqual(TUNING.explore.costKnown);
   });
 });

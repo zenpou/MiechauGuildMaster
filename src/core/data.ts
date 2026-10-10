@@ -8,7 +8,70 @@ import dungeonsJson from '../data/dungeons.json';
 import skillsJson from '../data/skills.json';
 import namesJson from '../data/names.json';
 import personaJson from '../data/persona.json';
+import tuningJson from '../data/tuning.json';
 import type { DungeonDef, EnemyDef, ItemDef, JobDef, PersonalityDef, PolicyDef, RoleSkillDef, TraitDef } from './types';
+
+/** sim で調整する値。中身は src/data/tuning.json */
+export interface Tuning {
+  explore: {
+    baseSteps: number;
+    costKnown: number;
+    costUnknown: number;
+    restSteps: number;
+    restHeal: number;
+    restMaxPerDay: number;
+    campHeal: number;
+    campFatigue: number;
+    dayFatigue: number;
+    combatFatigue: number;
+    trapFatigue: number;
+    trapDamage: [number, number];
+    trapBase: number;
+    trapDexScale: number;
+    treasureGold: [number, number];
+    treasureTrap: number;
+    gatherBase: number;
+    gatherScale: number;
+    gatherQty: [number, number];
+    hiddenBase: number;
+    hiddenScale: number;
+    nestGroup: [number, number];
+    defaultEncounter: number;
+    detourBonus: number;
+    detourBonusKnown: number;
+    scoreNoise: number;
+    forkNeighbors: number;
+    forkTop: number;
+    injuredHp: number;
+    reviveHp: number;
+    retreatTired: number;
+    retreatTiredAdd: number;
+    fleeRatio: number;
+    injuryLowHp: number;
+    injuryLowDays: [number, number];
+    injuryDownDays: [number, number];
+    wipeInjuryDays: [number, number];
+    expPerCell: number;
+    expPerDay: number;
+    traitReveal: number;
+    returnRelation: number;
+  };
+  game: {
+    startGold: number;
+    startPotions: number;
+    upkeepPerDay: number;
+    startApt: number;
+    debtInterest: number;
+    debtLoyalty: number;
+    debtRep: number;
+    restFatigue: number;
+    dailyLoyalty: number;
+    loyaltySuccess: number;
+    loyaltyInjured: number;
+    loyaltyWipe: number;
+    daysMax: number;
+  };
+}
 
 const byId = <T extends { id: string }>(arr: T[]): Record<string, T> => Object.fromEntries(arr.map((x) => [x.id, x]));
 
@@ -22,6 +85,7 @@ export const DUNGEONS = dungeonsJson as unknown as DungeonDef[];
 export const ROLE_SKILLS = skillsJson as unknown as RoleSkillDef[];
 export const NAMES = namesJson as { given: string[] };
 export const PERSONA = personaJson as { hobby: string[]; talent: string[]; likes: string[]; dislikes: string[] };
+export const TUNING = tuningJson as Tuning;
 
 export const JOB = byId(JOBS);
 export const PERSONALITY = byId(PERSONALITIES);

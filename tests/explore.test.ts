@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { carryCapacity, generateAdventurer } from '../src/core/adventurer';
-import { DUNGEON, ITEM, JOB, PERSONALITY } from '../src/core/data';
+import { DUNGEON, ITEM, JOB, PERSONALITY, TUNING } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
-import { BASE_STEPS, cellDepths, runExploration, simulateExploration, type ExploreInput } from '../src/core/explore';
+import { cellDepths, runExploration, simulateExploration, type ExploreInput } from '../src/core/explore';
 import { rngFor } from '../src/core/rng';
 import type { Adventurer, DungeonDef, DungeonProgress } from '../src/core/types';
 
@@ -82,7 +82,7 @@ describe('探索シミュレーション', () => {
 
   it('1日の歩数は 基準歩数×隊長の速度係数 に収まる', () => {
     for (const leader of ['cautious', 'brave']) {
-      const budget = Math.round(BASE_STEPS * PERSONALITY[leader].explore.speed);
+      const budget = Math.round(TUNING.explore.baseSteps * PERSONALITY[leader].explore.speed);
       for (const seed of SEEDS.slice(0, 8)) {
         const { trace } = runExploration(input(seed, { leader, days: 3 }));
         for (const d of trace.days) {
@@ -94,7 +94,7 @@ describe('探索シミュレーション', () => {
         }
       }
     }
-    expect(Math.round(BASE_STEPS * PERSONALITY.brave.explore.speed)).toBeGreaterThan(Math.round(BASE_STEPS * PERSONALITY.cautious.explore.speed));
+    expect(Math.round(TUNING.explore.baseSteps * PERSONALITY.brave.explore.speed)).toBeGreaterThan(Math.round(TUNING.explore.baseSteps * PERSONALITY.cautious.explore.speed));
   });
 
   it('未踏マスへの移動は2歩、既踏マスへは1歩', () => {
