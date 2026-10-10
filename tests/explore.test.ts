@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { carryCapacity, generateAdventurer } from '../src/core/adventurer';
 import { DUNGEON, ITEM, JOB, PERSONALITY, RETURN_LINES, TUNING, type ReturnOutcome } from '../src/core/data';
-import { parseFloor } from '../src/core/dungeon';
+import { neighbors, parseFloor } from '../src/core/dungeon';
 import { cellDepths, floorTransit, runExploration, simulateExploration, type ExploreInput } from '../src/core/explore';
 import { rngFor } from '../src/core/rng';
 import type { Adventurer, DungeonDef, DungeonProgress } from '../src/core/types';
@@ -745,6 +745,40 @@ describe('隠し通路の再調査', () => {
       const back = moves.indexOf(cell(1, 2));
       expect(east).toBeGreaterThanOrEqual(0);
       expect(back).toBeGreaterThan(east);
+    }
+  });
+});
+
+describe('塔f1の遺跡の鍵(隠し通路の奥)', () => {
+  const TOWER = DUNGEON.ruined_tower;
+  const grid = parseFloor(TOWER.floors[0]);
+  const keyCell = grid.cells.findIndex((c) => c.kind === 'treasure' && c.item === 'ruin_key');
+  // 隠し通路を閉じたまま入口から歩いて届くマス(これを全部踏んだ状態 = 歩き尽くした)
+  const closed = { keys: [] as string[], hiddenFound: [] as number[] };
+  const walked: number[] = [grid.entrance];
+  for (let head = 0; head < walked.length; head++) {
+    for (const n of neighbors(grid, walked[head], closed)) if (!walked.includes(n)) walked.push(n);
+  }
+
+  it('鍵の宝箱は隠し通路の奥にあり、隠し通路を閉じたままでは届かない', () => {
+    expect(keyCell).toBeGreaterThanOrEqual(0);
+    expect(walked).not.toContain(keyCell);
+  });
+
+  it('歩き尽くしていても、探索を重ねれば全 seed で鍵の宝箱に届く(1回の判定に外れても詰まない)', () => {
+    for (const seed of SEEDS) {
+      let progress = progressOf(walked);
+      let reached = -1;
+      for (let trip = 1; trip <= 10 && reached < 0; trip++) {
+        // 塔の敵に撤退させられない強さの隊(この試験は隠し通路の調べ直しだけを見る)
+        const members = party(seed, 'brave').map((a) => ({ ...a, level: 40 }));
+        const { result } = runExploration(input(seed, { dungeon: TOWER, progress, days: 3, members }));
+        const delta = result.mapDeltas[0];
+        const fl = progress.floors.f1;
+        progress = progressOf([...fl.visited, ...delta.cells], [...new Set([...fl.hiddenFound, ...delta.hidden])]);
+        if (progress.floors.f1.visited.includes(keyCell)) reached = trip;
+      }
+      expect(reached, `seed ${seed}`).toBeGreaterThan(0);
     }
   });
 });

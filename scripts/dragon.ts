@@ -1,10 +1,13 @@
 // 竜までの bot: メール・雇用・施設・装備・転職・依頼をこなしながら、竜の寝床の竜まで攻める。
 // 竜の討伐までの日数の分布、目標の達成日、討伐できなかった seed がどこで・なぜ止まったかを測る。
-// 使い方: npm run sim:dragon -- [seeds=10] [days=200] [--seed N] [--route fast|full] [--rich] [--set パス=値]...
+// 使い方: npm run sim:dragon -- [seeds=10] [days=200] [--seed N [--dump 出力先]] [--route fast|full] [--rich] [--set パス=値]...
+//   --dump は --seed の最後の状態を、ブラウザの localStorage に入れられるセーブ(JSON)として書き出す(途中の画面を確かめる用)
 //   --route fast(既定)は竜までの最短の進行(目標①〜⑤)、full は全階を探索率100%と主の討伐で進む
 //   --rich は毎日、所持金を50000Gまで補う(経済を切り離して進みの速さだけを測る)
-//   --set はゲームの数値をメモリ上で上書きする(ファイルは書き換えない)。パスは tuning / enemy / item / recipe / facility / dungeon
-//   で始まる点区切り(配列は添字)、値は数値か true/false。例 --set tuning.game.debtInterest=0.01 --set enemy.dragon.hp=2000
+//   --set はゲームの数値をメモリ上で上書きする(ファイルは書き換えない)。パスは tuning / enemy / item / recipe / facility / dungeon / world
+//   で始まる点区切り(配列は添字)。world も指定できる(道の日数など)、値は数値か true/false。例 --set tuning.game.debtInterest=0.01 --set enemy.dragon.hp=2000
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { DUNGEON, ENEMY, FACILITY, ITEM, JOB, PERSONALITY, POLICY, RECIPE, RECIPES, TUNING, WORLD } from '../src/core/data';
 import type { Readiness } from '../src/core/readiness';
 import type { ActionKind, Adventurer, CellDef, DispatchOrder, GameState, LedgerEntry, Mail, Quest } from '../src/core/types';
@@ -16,7 +19,7 @@ function fail(msg: string): never {
 
 // ---- 引数 ----
 const args = process.argv.slice(2);
-const VALUE_FLAGS = ['--seed', '--route', '--set'];
+const VALUE_FLAGS = ['--seed', '--route', '--set', '--dump'];
 const FLAGS = [...VALUE_FLAGS, '--rich'];
 /** 値をとる指定の、値の位置 */
 const valueAt = new Set<number>();
@@ -35,6 +38,9 @@ const routeArg = valuesOf('--route')[0] ?? 'fast';
 if (routeArg !== 'fast' && routeArg !== 'full') fail('--route は fast か full');
 const ROUTE = routeArg as 'fast' | 'full';
 const RICH = args.some((a, i) => a === '--rich' && !valueAt.has(i));
+/** --seed の最後の状態を、ブラウザのセーブとして読める形で書き出す先(UIの確認用の途中セーブ) */
+const DUMP = valuesOf('--dump')[0] ?? null;
+if (DUMP !== null && ONE_SEED === null) fail('--dump は --seed と一緒に使う');
 const plain = args.filter((a, i) => !valueAt.has(i) && !a.startsWith('--'));
 const unread = plain.filter((a) => !/^\d+$/.test(a));
 if (unread.length) fail(`読めない引数: ${unread.join(' ')}`);
@@ -90,6 +96,7 @@ const { dispatchBlock, markRead, replyMail } = await import('../src/core/mail');
 const { activeMax, activeQuests, deliver, recipeUnlocked, visibleQuests } = await import('../src/core/quests');
 const { assessReadiness } = await import('../src/core/readiness');
 const { capacity, hire, hireFee } = await import('../src/core/recruit');
+const { serialize } = await import('../src/core/save');
 const { canTrain, trainSkill } = await import('../src/core/training');
 const { PARTY_MAX } = await import('../src/core/types');
 const { travelDays } = await import('../src/core/world');
@@ -1165,6 +1172,10 @@ function runSeed(seed: number, log: boolean): Run {
   front = frontier();
   const last = snap();
   const n = s.adventurers.length;
+  if (DUMP !== null) {
+    mkdirSync(dirname(DUMP), { recursive: true });
+    writeFileSync(DUMP, serialize(s));
+  }
   return {
     seed,
     dragonDay: s.dragonDefeated ? (typeof s.flags.clearDay === 'number' ? s.flags.clearDay : s.day) : null,
