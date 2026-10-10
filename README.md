@@ -9,7 +9,7 @@ TypeScript / Vite / 素のDOM / Vitest / PWA。外部の実行時依存は無い
 
 ```sh
 npm install
-npm run dev          # http://localhost:5173
+npm run dev          # http://localhost:5173(スマホから見るときは npm run dev -- --host で、同じ Wi-Fi の http://<PCのアドレス>:5173)
 npm test             # 単体テスト(Vitest)
 npm run build        # 型検査 + 本番ビルド(dist/。sw.js と manifest も出る)
 npm run preview      # ビルドの確認

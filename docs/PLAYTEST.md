@@ -6,7 +6,8 @@ bot(`npm run sim`)で測れる数字は測った。ここから先は**人が遊
 ## 始める
 
 ```sh
-npm run dev       # http://localhost:5173(スマホなら同じ Wi-Fi から http://<PCのアドレス>:5173 、または npm run preview)
+npm run dev                  # http://localhost:5173
+npm run dev -- --host        # スマホから見るとき。同じ Wi-Fi の http://<PCのアドレス>:5173
 ```
 
 - 新しく始める: ブラウザの開発者ツールのコンソールで `localStorage.removeItem('miechau-guild-master.save.v1'); location.reload()`
