@@ -1,0 +1,140 @@
+[
+ {
+  "id": "t_deliver_herb",
+  "type": "deliver",
+  "name": "薬草の納品",
+  "desc": "学院の薬学科が{item}を{n}個ほしがっている。",
+  "town": "academy_town",
+  "target": { "item": "herb" },
+  "nRange": [3, 6],
+  "rewardGold": 0,
+  "rewardRep": 1,
+  "minRep": 0
+ },
+ {
+  "id": "t_deliver_fang",
+  "type": "deliver",
+  "name": "魔物の牙の納品",
+  "desc": "道具屋が{item}を{n}個買い取りたいそうだ。",
+  "town": "base",
+  "target": { "item": "fang" },
+  "nRange": [3, 5],
+  "rewardGold": 0,
+  "rewardRep": 1,
+  "minRep": 0
+ },
+ {
+  "id": "t_deliver_ore",
+  "type": "deliver",
+  "name": "鉱石の納品",
+  "desc": "鍛冶屋が{item}を{n}個待っている。",
+  "town": "forge_town",
+  "target": {},
+  "itemOptions": ["moss_ore", "iron_ore"],
+  "nRange": [2, 4],
+  "rewardGold": 0,
+  "rewardRep": 1,
+  "minRep": 8
+ },
+ {
+  "id": "t_hunt_goblin",
+  "type": "hunt",
+  "name": "ゴブリン退治",
+  "desc": "{dungeon}で{enemy}を{n}体倒してほしい。",
+  "town": "base",
+  "target": { "enemy": "goblin", "dungeon": "forest_cave" },
+  "nRange": [3, 6],
+  "rewardGold": 0,
+  "rewardRep": 1,
+  "minRep": 0
+ },
+ {
+  "id": "t_hunt_skeleton",
+  "type": "hunt",
+  "name": "骸骨兵退治",
+  "desc": "{dungeon}の{enemy}を{n}体片付けてほしい。",
+  "town": "forge_town",
+  "target": { "enemy": "skeleton", "dungeon": "old_mine" },
+  "nRange": [2, 4],
+  "rewardGold": 0,
+  "rewardRep": 2,
+  "minRep": 8
+ },
+ {
+  "id": "t_explore_cave",
+  "type": "explore",
+  "name": "森の洞窟の調査",
+  "desc": "{dungeon}を探索率{percent}%まで調べてほしい。",
+  "town": "academy_town",
+  "target": { "dungeon": "forest_cave" },
+  "percentOptions": [
+   { "percent": 50, "rewardGold": 150, "minRep": 0 },
+   { "percent": 80, "rewardGold": 250, "minRep": 8 },
+   { "percent": 100, "rewardGold": 400, "minRep": 20 }
+  ],
+  "rewardGold": 0,
+  "rewardRep": 2,
+  "minRep": 0
+ },
+ {
+  "id": "t_explore_mine",
+  "type": "explore",
+  "name": "古い坑道の調査",
+  "desc": "{dungeon}を探索率{percent}%まで調べてほしい。",
+  "town": "academy_town",
+  "target": { "dungeon": "old_mine" },
+  "percentOptions": [
+   { "percent": 50, "rewardGold": 250, "minRep": 8 },
+   { "percent": 80, "rewardGold": 350, "minRep": 20 }
+  ],
+  "rewardGold": 0,
+  "rewardRep": 2,
+  "minRep": 8
+ },
+ {
+  "id": "t_escort_village",
+  "type": "escort",
+  "name": "山村までの護衛",
+  "desc": "行商人を拠点から山村まで送り届けてほしい。",
+  "town": "base",
+  "target": { "from": "base", "to": "mountain_village" },
+  "rewardGold": 0,
+  "rewardRep": 2,
+  "minRep": 0
+ },
+ {
+  "id": "t_escort_forge",
+  "type": "escort",
+  "name": "鍛冶の街までの護衛",
+  "desc": "職人の一行を拠点から鍛冶の街まで守ってほしい。",
+  "town": "forge_town",
+  "target": { "from": "base", "to": "forge_town" },
+  "rewardGold": 0,
+  "rewardRep": 2,
+  "minRep": 8
+ },
+ {
+  "id": "t_transport_village",
+  "type": "transport",
+  "name": "山村からの運搬",
+  "desc": "山村の荷(重さ{cargo})を拠点まで運んでほしい。",
+  "town": "mountain_village",
+  "target": { "from": "mountain_village", "to": "base" },
+  "cargo": 8,
+  "rewardGold": 0,
+  "rewardRep": 1,
+  "minRep": 0
+ },
+ {
+  "id": "u_forge_iron",
+  "type": "unlock",
+  "name": "職人の頼み: 鉄鉱石",
+  "desc": "鍛冶の街の職人「{item}を{n}個納めてくれ。鉄の剣と鉄の鎧の作り方を教えよう」",
+  "town": "forge_town",
+  "target": { "item": "iron_ore", "n": 5 },
+  "rewardGold": 100,
+  "rewardRep": 2,
+  "minRep": 0,
+  "unlocks": ["r_iron_sword", "r_iron_armor"]
+ }
+]

@@ -18,6 +18,7 @@ import type { PassKnowledge } from '../src/core/dungeon';
 // - [ ] looksLikeWall: 未発見 hidden と wall
 // - [ ] forest_cave: 通行可能 60〜75、全マス到達、hidden 閉でも symbol 到達、内訳
 // - [ ] old_mine: 14×14、通行可能 80〜100、全マス到達、hidden 閉でも symbol 到達、symbol まで 閉28〜34/開20〜24歩
+// - [ ] ruined_tower: 16×16×2フロア、内訳、到達性、階段の to が相互参照、敵と素材
 
 const legend: FloorDef['legend'] = {
   '#': { kind: 'wall' },
@@ -435,5 +436,143 @@ describe('古い坑道の敵と素材', () => {
 describe('personalities.json', () => {
   it('全性格に exploreDesc(隊長のときの埋まり方)がある', () => {
     for (const p of PERSONALITIES) expect(p.exploreDesc, p.id).toMatch(/\S/);
+  });
+});
+
+describe('ruined_tower', () => {
+  const dungeon = () => DUNGEON.ruined_tower;
+  const floorOf = (id: string) => parseFloor(dungeon().floors.find((f) => f.id === id)!);
+  const ofKind = (g: ReturnType<typeof floorOf>, kind: CellKind) =>
+    g.cells.map((c, i) => (c.kind === kind ? i : -1)).filter((i) => i >= 0);
+  const openCells = (g: ReturnType<typeof floorOf>) =>
+    g.cells.map((c, i) => (c.kind === 'wall' ? -1 : i)).filter((i) => i >= 0);
+  const allFound = (g: ReturnType<typeof floorOf>) => ({ keys: [], hiddenFound: ofKind(g, 'hidden') });
+  const everything = (g: ReturnType<typeof floorOf>) => new Set(g.cells.map((_, i) => i));
+  const kinds = (g: ReturnType<typeof floorOf>, kind: CellKind, key: 'item' | 'enemy') =>
+    ofKind(g, kind).map((i) => g.cells[i][key]).sort();
+
+  it('フロア f1 / f2、どちらも 16×16', () => {
+    expect(dungeon().floors.map((f) => f.id)).toEqual(['f1', 'f2']);
+    for (const id of ['f1', 'f2']) {
+      const g = floorOf(id);
+      expect([g.width, g.height], id).toEqual([16, 16]);
+    }
+  });
+  it('通行可能マスは f1 90〜110 / f2 70〜90', () => {
+    const n1 = openCells(floorOf('f1')).length;
+    const n2 = openCells(floorOf('f2')).length;
+    expect(n1).toBeGreaterThanOrEqual(90);
+    expect(n1).toBeLessThanOrEqual(110);
+    expect(n2).toBeGreaterThanOrEqual(70);
+    expect(n2).toBeLessThanOrEqual(90);
+  });
+  it('f1 のマスの内訳がプラン通り', () => {
+    const g = floorOf('f1');
+    const count = (kind: CellKind) => ofKind(g, kind).length;
+    expect(count('entrance')).toBe(1);
+    expect(count('stairs_down')).toBe(1);
+    expect(count('stairs_up')).toBe(0);
+    expect(count('gather')).toBe(4);
+    expect(count('nest')).toBe(3);
+    expect(count('symbol')).toBe(0);
+    expect(count('treasure')).toBe(2);
+    expect(count('trap')).toBe(2);
+    expect(count('hidden')).toBe(2);
+    expect(kinds(g, 'gather', 'item')).toEqual(['ancient_cloth', 'ancient_cloth', 'crystal', 'crystal']);
+    expect(kinds(g, 'nest', 'enemy')).toEqual(['gargoyle', 'ghoul', 'ghoul']);
+    expect(ofKind(g, 'trap').every((i) => g.cells[i].trap === 'glyph')).toBe(true);
+  });
+  it('f2 のマスの内訳がプラン通り', () => {
+    const g = floorOf('f2');
+    const count = (kind: CellKind) => ofKind(g, kind).length;
+    expect(count('entrance')).toBe(1);
+    expect(count('stairs_up')).toBe(1);
+    expect(count('stairs_down')).toBe(0);
+    expect(count('gather')).toBe(3);
+    expect(count('nest')).toBe(2);
+    expect(count('symbol')).toBe(1);
+    expect(count('treasure')).toBe(1);
+    expect(count('trap')).toBe(2);
+    expect(kinds(g, 'gather', 'item')).toEqual(['crystal', 'crystal', 'wisp_ember']);
+    expect(kinds(g, 'nest', 'enemy')).toEqual(['wisp', 'wisp']);
+    expect(kinds(g, 'symbol', 'enemy')).toEqual(['tower_keeper']);
+    expect(ofKind(g, 'trap').every((i) => g.cells[i].trap === 'glyph')).toBe(true);
+  });
+  it('f1 は隠し通路を開ければ全マスへ、閉じていても下り階段へ到達できる', () => {
+    const g = floorOf('f1');
+    for (const i of openCells(g)) expect(shortestPath(g, g.entrance, i, everything(g), allFound(g)), `${i}`).not.toBeNull();
+    expect(shortestPath(g, g.entrance, ofKind(g, 'stairs_down')[0], everything(g), none)).not.toBeNull();
+  });
+  it('隠し通路は下り階段への近道になる', () => {
+    const g = floorOf('f1');
+    const stairs = ofKind(g, 'stairs_down')[0];
+    const closed = shortestPath(g, g.entrance, stairs, everything(g), none)!.length;
+    const open = shortestPath(g, g.entrance, stairs, everything(g), allFound(g))!.length;
+    expect(open).toBeLessThan(closed);
+  });
+  it('下り階段は f1 の最奥(入口から最も遠い通行可能マスの近く)', () => {
+    const g = floorOf('f1');
+    const dist = (i: number) => shortestPath(g, g.entrance, i, everything(g), none)?.length ?? 0;
+    const far = Math.max(...openCells(g).map(dist));
+    expect(dist(ofKind(g, 'stairs_down')[0])).toBeGreaterThanOrEqual(far - 4);
+  });
+  it('f2 は入口(上り階段の位置)から全マスへ到達できる', () => {
+    const g = floorOf('f2');
+    for (const i of openCells(g)) expect(shortestPath(g, g.entrance, i, everything(g), allFound(g)), `${i}`).not.toBeNull();
+  });
+  it('階段の to が互いを指す', () => {
+    const f1 = floorOf('f1');
+    const f2 = floorOf('f2');
+    const down = ofKind(f1, 'stairs_down')[0];
+    const up = ofKind(f2, 'stairs_up')[0];
+    expect(f1.cells[down].to).toEqual({ floor: 'f2', ...xy(f2, up) });
+    expect(f2.cells[up].to).toEqual({ floor: 'f1', ...xy(f1, down) });
+    // f2 は上り階段を降りた位置から始まる(入口は上り階段の隣)
+    expect(neighbors(f2, up, none)).toContain(f2.entrance);
+  });
+  it('出現敵・推奨戦力・救助費用・遭遇率', () => {
+    const d = dungeon();
+    expect(d.node).toBe('ruined_tower');
+    expect(d.enemies).toEqual([
+      { id: 'ghoul', weight: 4, group: [1, 2] },
+      { id: 'gargoyle', weight: 3, group: [1, 1] },
+      { id: 'wisp', weight: 3, group: [2, 3] },
+    ]);
+    expect(d.recommended).toBe(480);
+    expect(d.rescueCost).toBe(400);
+    expect(d.encounterRate).toBe(0.05);
+  });
+});
+
+describe('廃れた塔の敵と素材', () => {
+  it('敵4種がプランの表どおり', () => {
+    const pick = (id: string) => {
+      const e = ENEMY[id];
+      return e && [e.name, e.hp, e.atk, e.def, e.mag, e.spd, e.exp, e.ai];
+    };
+    expect(pick('ghoul')).toEqual(['グール', 90, 40, 12, 0, 7, 14, 'weakest']);
+    expect(pick('gargoyle')).toEqual(['ガーゴイル', 140, 46, 22, 0, 6, 22, 'strongest']);
+    expect(pick('wisp')).toEqual(['鬼火', 40, 36, 4, 0, 20, 10, 'random']);
+    expect(pick('tower_keeper')).toEqual(['塔の番人', 700, 52, 26, 0, 8, 120, 'strongest']);
+    expect(ENEMY.ghoul.loot).toEqual([{ item: 'ancient_cloth', chance: 0.5 }]);
+    expect(ENEMY.gargoyle.loot).toEqual([{ item: 'crystal', chance: 0.3 }]);
+    expect(ENEMY.gargoyle.resist).toEqual({ thunder: 0.5, earth: 0.5 });
+    expect(ENEMY.wisp.element).toBe('fire');
+    expect(ENEMY.wisp.loot).toEqual([{ item: 'wisp_ember', chance: 0.6 }]);
+    expect(ENEMY.wisp.resist).toEqual({ fire: 0.8, ice: -0.5 });
+    expect(ENEMY.tower_keeper.symbol).toBe(true);
+    expect(ENEMY.tower_keeper.element).toBe('earth');
+    expect(ENEMY.tower_keeper.resist).toEqual({ earth: 0.5 });
+    expect(ENEMY.tower_keeper.loot).toEqual([{ item: 'crystal', chance: 1 }, { item: 'ancient_cloth', chance: 1 }]);
+    expect(ENEMY.tower_keeper.skill).toEqual({ name: '崩落', mult: 1.3, cd: 3, aoe: true });
+  });
+  it('素材3種がプランの表どおり', () => {
+    const pick = (id: string) => {
+      const it = ITEM[id];
+      return it && [it.name, it.kind, it.price, it.weight, it.source];
+    };
+    expect(pick('ancient_cloth')).toEqual(['古布', 'material', 28, 1, 'ruined_tower']);
+    expect(pick('crystal')).toEqual(['水晶', 'material', 60, 2, 'ruined_tower']);
+    expect(pick('wisp_ember')).toEqual(['鬼火の残り火', 'material', 45, 1, undefined]);
   });
 });

@@ -1,0 +1,47 @@
+[
+ {
+  "id": "m_hire_talent",
+  "tag": "hire_talent",
+  "rep": 3,
+  "scene": [
+   "宿の主人「新入りの伸びしろを見抜いたって評判だよ(仮)」"
+  ],
+  "thought": "(仮)成長の欄が気になっただけなんだけど。"
+ },
+ {
+  "id": "m_dispatch_safe_weak",
+  "tag": "dispatch_safe_weak",
+  "rep": 2,
+  "scene": [
+   "門番「無理をさせないギルドだって、駆け出しが噂してたぞ(仮)」"
+  ],
+  "thought": "(仮)危なそうな所に行かせる勇気がなかっただけです。"
+ },
+ {
+  "id": "m_return_first_success",
+  "tag": "return_first_success",
+  "rep": 4,
+  "scene": [
+   "酒場の客「初仕事で無事に帰ってきたんだってな。大したもんだ(仮)」"
+  ],
+  "thought": "(仮)帰ってくるまで生きた心地がしなかった。"
+ },
+ {
+  "id": "m_facility_built",
+  "tag": "facility_built",
+  "rep": 2,
+  "scene": [
+   "大工「先のことまで考えた建て方だって、親方が褒めてたよ(仮)」"
+  ],
+  "thought": "(仮)空いていた場所に置いただけなんだ。"
+ },
+ {
+  "id": "m_rep_milestone",
+  "tag": "rep_milestone",
+  "rep": 5,
+  "scene": [
+   "役場の書記「最近よく名前を聞くギルドですね(仮)」"
+  ],
+  "thought": "(仮)名前が知られるほど、失敗できなくなる気がする。"
+ }
+]

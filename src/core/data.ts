@@ -12,7 +12,12 @@ import tuningJson from '../data/tuning.json';
 import facilitiesJson from '../data/facilities.json';
 import synergiesJson from '../data/synergies.json';
 import recipesJson from '../data/recipes.json';
+import questTemplatesJson from '../data/quest-templates.json';
+import misunderstandingsJson from '../data/misunderstandings.json';
+import worldJson from '../data/world.json';
 import type { DungeonDef, EnemyDef, FacilityDef, ItemDef, JobDef, PersonalityDef, PolicyDef, RecipeDef, RoleSkillDef, SynergyDef, TraitDef } from './types';
+import type { QuestTemplateDef } from './types';
+import type { WorldEdgeDef, WorldNodeDef } from './types';
 
 /** sim で調整する値。中身は src/data/tuning.json */
 export interface Tuning {
@@ -114,6 +119,10 @@ export const TUNING = tuningJson as Tuning;
 export const FACILITIES = facilitiesJson as unknown as FacilityDef[];
 export const SYNERGIES = synergiesJson as unknown as SynergyDef[];
 export const RECIPES = recipesJson as unknown as RecipeDef[];
+export const QUEST_TEMPLATES = questTemplatesJson as unknown as QuestTemplateDef[];
+/** 勘違いイベント(行動タグ→噂→評判)。台詞はフェーズ4では仮 */
+export const MISUNDERSTANDINGS = misunderstandingsJson as { id: string; tag: string; rep: number; scene: string[]; thought: string }[];
+export const WORLD = worldJson as unknown as { nodes: WorldNodeDef[]; edges: WorldEdgeDef[] };
 
 export const JOB = byId(JOBS);
 export const PERSONALITY = byId(PERSONALITIES);
@@ -125,6 +134,9 @@ export const DUNGEON = byId(DUNGEONS);
 export const ROLE_SKILL = byId(ROLE_SKILLS);
 export const FACILITY = byId(FACILITIES);
 export const RECIPE = byId(RECIPES);
+export const QUEST_TEMPLATE = byId(QUEST_TEMPLATES);
+export const NODE = byId(WORLD.nodes);
+export const EDGE = byId(WORLD.edges);
 
 export const LOWER_JOBS = JOBS.filter((j) => j.tier === 'lower');
 export const UPPER_JOBS = JOBS.filter((j) => j.tier === 'upper');

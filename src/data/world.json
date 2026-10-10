@@ -1,0 +1,168 @@
+{
+ "nodes": [
+  {
+   "id": "base",
+   "name": "拠点の街",
+   "desc": "ギルドを構える街。どの方面へも道が通じ、雑多な依頼が集まる。",
+   "kind": "base",
+   "x": 5,
+   "y": 5,
+   "town": {
+    "boardMax": 4,
+    "questWeights": {
+     "deliver": 2,
+     "hunt": 2,
+     "explore": 1,
+     "escort": 2,
+     "transport": 1
+    }
+   }
+  },
+  {
+   "id": "forest_cave",
+   "name": "森の洞窟",
+   "desc": "拠点の南の森に口を開ける洞窟。街から歩いてすぐ着く。",
+   "kind": "dungeon",
+   "x": 5,
+   "y": 7,
+   "dungeon": "forest_cave"
+  },
+  {
+   "id": "mountain_village",
+   "name": "山村",
+   "desc": "西の山あいの村。薬草採りと荷運びの手が足りていない。",
+   "kind": "village",
+   "x": 2,
+   "y": 5,
+   "town": {
+    "boardMax": 2,
+    "questWeights": {
+     "deliver": 2,
+     "transport": 3
+    }
+   }
+  },
+  {
+   "id": "old_mine",
+   "name": "古い坑道",
+   "desc": "山村の先の山腹に残る廃坑。村人が近道を知っているらしい。",
+   "kind": "dungeon",
+   "x": 1,
+   "y": 7,
+   "dungeon": "old_mine",
+   "rumored": true
+  },
+  {
+   "id": "forge_town",
+   "name": "鍛冶の街",
+   "desc": "東の街道沿いの職人街。鉱石の買い付けと魔物退治の依頼が多い。",
+   "kind": "town",
+   "x": 8,
+   "y": 5,
+   "town": {
+    "boardMax": 3,
+    "questWeights": {
+     "deliver": 3,
+     "hunt": 3,
+     "escort": 1
+    },
+    "crafts": [
+     "r_iron_sword",
+     "r_iron_armor"
+    ]
+   }
+  },
+  {
+   "id": "ruined_tower",
+   "name": "廃れた塔",
+   "desc": "鍛冶の街の北に立つ崩れかけの塔。夜ごと鬼火が窓を横切るという。",
+   "kind": "dungeon",
+   "x": 9,
+   "y": 2,
+   "dungeon": "ruined_tower",
+   "rumored": true
+  },
+  {
+   "id": "camp_north",
+   "name": "北の野営地",
+   "desc": "拠点と学院の街の中ほどにある野営地。旅人が火を囲む。",
+   "kind": "waypoint",
+   "x": 5,
+   "y": 3
+  },
+  {
+   "id": "academy_town",
+   "name": "学院の街",
+   "desc": "北の学院を中心にした街。薬草の買い付けとダンジョンの調査依頼が出る。",
+   "kind": "town",
+   "x": 5,
+   "y": 1,
+   "town": {
+    "boardMax": 3,
+    "questWeights": {
+     "deliver": 3,
+     "explore": 3
+    }
+   }
+  }
+ ],
+ "edges": [
+  {
+   "id": "base__forest_cave",
+   "a": "base",
+   "b": "forest_cave",
+   "days": 0,
+   "danger": 0.05
+  },
+  {
+   "id": "base__mountain_village",
+   "a": "base",
+   "b": "mountain_village",
+   "days": 1,
+   "danger": 0.15
+  },
+  {
+   "id": "mountain_village__old_mine",
+   "a": "mountain_village",
+   "b": "old_mine",
+   "days": 1,
+   "danger": 0.25
+  },
+  {
+   "id": "base__forge_town",
+   "a": "base",
+   "b": "forge_town",
+   "days": 2,
+   "danger": 0.2
+  },
+  {
+   "id": "forge_town__ruined_tower",
+   "a": "forge_town",
+   "b": "ruined_tower",
+   "days": 1,
+   "danger": 0.35
+  },
+  {
+   "id": "base__camp_north",
+   "a": "base",
+   "b": "camp_north",
+   "days": 1,
+   "danger": 0.1
+  },
+  {
+   "id": "academy_town__camp_north",
+   "a": "academy_town",
+   "b": "camp_north",
+   "days": 1,
+   "danger": 0.1
+  },
+  {
+   "id": "mountain_village__old_mine_short",
+   "a": "mountain_village",
+   "b": "old_mine",
+   "days": 0,
+   "danger": 0.3,
+   "hidden": true
+  }
+ ]
+}

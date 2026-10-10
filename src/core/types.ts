@@ -211,6 +211,8 @@ export interface SynergyDef { id: string; a: string; b: string; name: string; de
 export interface QuestTarget {
   item?: string; n?: number; enemy?: string; dungeon?: string; percent?: number;
   from?: string; to?: string;
+  /** 運搬: 荷の重さ(積載に含める) */
+  cargo?: number;
 }
 export interface QuestTemplateDef {
   id: string; type: QuestType; name: string; desc: string;
@@ -218,7 +220,7 @@ export interface QuestTemplateDef {
   town: string | null;
   target: QuestTarget;
   rewardGold: number; rewardRep: number;
-  /** 解放に必要な評判Lv */
+  /** 解放に必要な評判(生の値。しきい値 0/8/20/35/55 と比べる) */
   minRep: number;
   /** 解放依頼: 達成で開くもの */
   unlocks?: string[];

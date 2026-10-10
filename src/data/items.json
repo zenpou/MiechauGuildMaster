@@ -205,5 +205,31 @@
     "dark": 0.3
    }
   }
+ },
+ {
+  "id": "ancient_cloth",
+  "name": "古布",
+  "desc": "廃れた塔に残る古い織物。丈夫で、防具の裏地に使われる。",
+  "kind": "material",
+  "price": 28,
+  "weight": 1,
+  "source": "ruined_tower"
+ },
+ {
+  "id": "crystal",
+  "name": "水晶",
+  "desc": "塔の石壁から析出した澄んだ結晶。魔具の材料として学院が欲しがる。",
+  "kind": "material",
+  "price": 60,
+  "weight": 2,
+  "source": "ruined_tower"
+ },
+ {
+  "id": "wisp_ember",
+  "name": "鬼火の残り火",
+  "desc": "倒した鬼火が残す、冷めない小さな火。灯りや火薬の種になる。",
+  "kind": "material",
+  "price": 45,
+  "weight": 1
  }
 ]

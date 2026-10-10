@@ -200,5 +200,173 @@
   "recommended": 320,
   "rescueCost": 260,
   "encounterRate": 0.05
+ },
+ {
+  "id": "ruined_tower",
+  "name": "廃れた塔",
+  "desc": "鍛冶の街の北に立つ、崩れかけた石の塔。上の階には塔を守る番人がまだ立っているという。",
+  "node": "ruined_tower",
+  "floors": [
+   {
+    "id": "f1",
+    "name": "1階",
+    "rows": [
+     "################",
+     "#x.........^..D#",
+     "#...#####.####.#",
+     "#...#####T####H#",
+     "##.###########H#",
+     "##.########....#",
+     "##.###.g.##..y.#",
+     "##...c...##....#",
+     "##.###T..###.###",
+     "##.####.####.###",
+     "##.####.####.###",
+     "##........^..###",
+     "##.####.####.###",
+     "#..g.##.##.....#",
+     "#x...##.##...c.#",
+     "#######E########"
+    ],
+    "legend": {
+     "#": {
+      "kind": "wall"
+     },
+     ".": {
+      "kind": "floor"
+     },
+     "E": {
+      "kind": "entrance"
+     },
+     "T": {
+      "kind": "treasure"
+     },
+     "^": {
+      "kind": "trap",
+      "trap": "glyph"
+     },
+     "x": {
+      "kind": "gather",
+      "item": "crystal"
+     },
+     "D": {
+      "kind": "stairs_down",
+      "to": {
+       "floor": "f2",
+       "x": 14,
+       "y": 1
+      }
+     },
+     "H": {
+      "kind": "hidden"
+     },
+     "c": {
+      "kind": "gather",
+      "item": "ancient_cloth"
+     },
+     "g": {
+      "kind": "nest",
+      "enemy": "ghoul"
+     },
+     "y": {
+      "kind": "nest",
+      "enemy": "gargoyle"
+     }
+    }
+   },
+   {
+    "id": "f2",
+    "name": "2階",
+    "rows": [
+     "################",
+     "###..........EU#",
+     "###.####.####.##",
+     "###.####x####.##",
+     "###.#########.##",
+     "###^#########.##",
+     "###.######....w#",
+     "###.........v..#",
+     "###.##.###.....#",
+     "###.##.#########",
+     "###.##Tx########",
+     "###.#######....#",
+     "###.#######..K.#",
+     "###..v...^.....#",
+     "###########....#",
+     "################"
+    ],
+    "legend": {
+     "#": {
+      "kind": "wall"
+     },
+     ".": {
+      "kind": "floor"
+     },
+     "E": {
+      "kind": "entrance"
+     },
+     "T": {
+      "kind": "treasure"
+     },
+     "^": {
+      "kind": "trap",
+      "trap": "glyph"
+     },
+     "x": {
+      "kind": "gather",
+      "item": "crystal"
+     },
+     "U": {
+      "kind": "stairs_up",
+      "to": {
+       "floor": "f1",
+       "x": 14,
+       "y": 1
+      }
+     },
+     "w": {
+      "kind": "gather",
+      "item": "wisp_ember"
+     },
+     "v": {
+      "kind": "nest",
+      "enemy": "wisp"
+     },
+     "K": {
+      "kind": "symbol",
+      "enemy": "tower_keeper"
+     }
+    }
+   }
+  ],
+  "enemies": [
+   {
+    "id": "ghoul",
+    "weight": 4,
+    "group": [
+     1,
+     2
+    ]
+   },
+   {
+    "id": "gargoyle",
+    "weight": 3,
+    "group": [
+     1,
+     1
+    ]
+   },
+   {
+    "id": "wisp",
+    "weight": 3,
+    "group": [
+     2,
+     3
+    ]
+   }
+  ],
+  "recommended": 480,
+  "rescueCost": 400,
+  "encounterRate": 0.05
  }
 ]

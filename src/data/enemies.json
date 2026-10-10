@@ -145,5 +145,97 @@
    "cd": 3,
    "aoe": true
   }
+ },
+ {
+  "id": "ghoul",
+  "name": "グール",
+  "hp": 90,
+  "atk": 40,
+  "def": 12,
+  "mag": 0,
+  "spd": 7,
+  "exp": 14,
+  "ai": "weakest",
+  "loot": [
+   {
+    "item": "ancient_cloth",
+    "chance": 0.5
+   }
+  ]
+ },
+ {
+  "id": "gargoyle",
+  "name": "ガーゴイル",
+  "hp": 140,
+  "atk": 46,
+  "def": 22,
+  "mag": 0,
+  "spd": 6,
+  "exp": 22,
+  "ai": "strongest",
+  "resist": {
+   "thunder": 0.5,
+   "earth": 0.5
+  },
+  "loot": [
+   {
+    "item": "crystal",
+    "chance": 0.3
+   }
+  ]
+ },
+ {
+  "id": "wisp",
+  "name": "鬼火",
+  "hp": 40,
+  "atk": 36,
+  "def": 4,
+  "mag": 0,
+  "spd": 20,
+  "exp": 10,
+  "ai": "random",
+  "element": "fire",
+  "resist": {
+   "fire": 0.8,
+   "ice": -0.5
+  },
+  "loot": [
+   {
+    "item": "wisp_ember",
+    "chance": 0.6
+   }
+  ]
+ },
+ {
+  "id": "tower_keeper",
+  "name": "塔の番人",
+  "hp": 700,
+  "atk": 52,
+  "def": 26,
+  "mag": 0,
+  "spd": 8,
+  "exp": 120,
+  "ai": "strongest",
+  "element": "earth",
+  "resist": {
+   "earth": 0.5
+  },
+  "loot": [
+   {
+    "item": "crystal",
+    "chance": 1
+   },
+   {
+    "item": "ancient_cloth",
+    "chance": 1
+   }
+  ],
+  "symbol": true,
+  "skill": {
+   "name": "崩落",
+   "mult": 1.3,
+   "cd": 3,
+   "aoe": true
+  }
  }
 ]
