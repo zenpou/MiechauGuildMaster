@@ -5,9 +5,9 @@ import { resolveScenes } from '../src/core/scenes';
 import { emptyState } from '../src/core/state';
 
 describe('勘違いイベント', () => {
-  it('台詞は5件、すべて(仮)付き', () => {
+  it('台詞は6件、すべて(仮)付き', () => {
     expect(MISUNDERSTANDINGS.map((m) => m.tag).sort()).toEqual(
-      ['dispatch_safe_weak', 'facility_built', 'hire_talent', 'rep_milestone', 'return_first_success'],
+      ['dispatch_safe_weak', 'facility_built', 'hire_talent', 'job_change_big', 'rep_milestone', 'return_first_success'],
     );
     for (const m of MISUNDERSTANDINGS) expect([...m.scene, m.thought].every((l) => l.includes('(仮)'))).toBe(true);
   });

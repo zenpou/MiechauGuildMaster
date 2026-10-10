@@ -57,7 +57,7 @@ function send(s: GameState, kind: MailKind, a: Adventurer | null, vars: Vars, pa
   const seq = num(s.flags.mailSeq) + 1;
   s.flags.mailSeq = seq;
   const mail: Mail = {
-    id: `m${seq}`, day: s.day, kind, from: a ? a.id : 'guild',
+    id: `m${seq}`, day: s.day, kind, from: a ? a.id : 'guild', ...(a ? { fromName: a.name } : {}),
     ...composeMail(kind, a, vars),
     answered: null, read: false, payload,
   };

@@ -3,15 +3,17 @@ import { DUNGEON, ENEMY, FACILITY, ITEM, NODE } from '../core/data';
 import { newGame, type DayReport } from '../core/game';
 import type { Readiness } from '../core/readiness';
 import { load, save } from '../core/save';
-import type { ActionKind, Adventurer, DispatchOrder, EquipSlot, Expedition, GameState, StatKey, WorldStep } from '../core/types';
+import type { ActionKind, Adventurer, DispatchOrder, EquipSlot, Expedition, GameState, Persona, StatKey, WorldStep } from '../core/types';
 
-export type Tab = 'home' | 'quests' | 'dispatch' | 'world' | 'recruit' | 'base' | 'map' | 'log';
+export type Tab = 'home' | 'inbox' | 'quests' | 'dispatch' | 'world' | 'recruit' | 'base' | 'map' | 'log';
 
 export let state: GameState = load(localStorage) ?? newGame(Date.now() >>> 0);
 
 export const ui = {
   tab: 'home' as Tab,
   selLog: null as string | null,
+  /** 受信箱で開いているメール */
+  selMail: null as string | null,
   /** 施設タブで選んだマス */
   selCell: null as null | { x: number; y: number },
   /** 名簿で装備パネルを開いている冒険者 */
@@ -39,6 +41,7 @@ export function commit() {
 export function replaceState(s: GameState) {
   state = s;
   ui.selLog = null;
+  ui.selMail = null;
   ui.selCell = null;
   ui.selAdv = null;
   ui.lastReport = null;
@@ -72,10 +75,22 @@ export function statusText(a: Adventurer): string {
     const f = a.assignment && 'facility' in a.assignment ? FACILITY[a.assignment.facility]?.name : undefined;
     return f ? `勤務(${f})` : '勤務';
   }
+  if (a.status === 'training') {
+    const left = a.assignment && 'training' in a.assignment ? a.assignment.untilDay - state.day : 0;
+    return left > 0 ? `訓練中(あと${left}日)` : '訓練中';
+  }
   if (a.injuryDays > 0) return `負傷(あと${a.injuryDays}日)`;
   if (a.fatigue >= 70) return '疲労大';
   return '待機';
 }
+
+/** 趣味・特技・好き・嫌い。数字に見えない人となり */
+export function personaText(p: Persona | undefined): string {
+  if (!p) return '';
+  return `趣味: ${p.hobby} / 特技: ${p.talent} / 好き: ${p.likes} / 嫌い: ${p.dislikes}`;
+}
+
+export const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
 export const ACTION_NAME: Record<ActionKind, string> = {
   explore: '探索', gather: '採集', hunt: '討伐', boss: 'ボス', survey: '踏査', escort: '護衛', transport: '輸送',
@@ -119,9 +134,8 @@ export function edgeName(edgeId: string): string {
   return `${NODE[a]?.name ?? a}–${NODE[b]?.name ?? b}${edgeId.endsWith('_short') ? '(近道)' : ''}`;
 }
 
-export const STAT_LABEL: Record<StatKey, string> = {
-  hp: 'HP', atk: '攻撃', def: '防御', mag: '魔力', spd: '素早さ', dex: '器用さ', scout: '斥候', gather: '採取',
-};
+// 能力名は core の表記(腕力・守備・探索)に揃える。UI で別の呼び方をすると、スキルの説明文や設計書と食い違う
+export { STAT_LABEL } from '../core/types';
 
 export const SLOTS: { id: EquipSlot; name: string; short: string }[] = [
   { id: 'weapon', name: '武器', short: '武' },

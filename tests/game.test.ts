@@ -785,3 +785,45 @@ describe('訓練・親友・ユニークの日送りへの組み込み', () => {
     if (r.ok) expect(r.expedition.result.returnDialogue).toHaveLength(s.adventurers.length);
   });
 });
+
+describe('実績・竜の討伐の組み込み', () => {
+  const totalExp = (a: { level: number; exp: number }) => a.exp + Array.from({ length: a.level - 1 }, (_, i) => 40 * (i + 1)).reduce((t, n) => t + n, 0);
+  const FIVE = ['m_gold1', 'm_gold2', 'm_rep3', 'm_rep5', 'd_10'];
+
+  const returnWithExp = (stageIds: string[]) => {
+    const s = newGame(41);
+    s.achievements = [...stageIds];
+    const r = dispatch(s, order(s, { days: 1 }));
+    expect(r.ok).toBe(true);
+    const e = s.expeditions[0];
+    for (const id of e.order.partyIds) e.result.expGain[id] = 100;
+    for (let i = 0; i < 6 && s.expeditions.length; i++) advanceDay(s);
+    return totalExp(s.adventurers[0]);
+  };
+
+  it('日送りで実績が判定される', () => {
+    const s = newGame(40);
+    s.gold = 2000;
+    advanceDay(s);
+    expect(s.achievements).toContain('m_gold1');
+    expect(s.notices.some((n) => n.text.includes('実績'))).toBe(true);
+  });
+
+  it('実績が5つ以上あると、帰還の経験値が+10%になる', () => {
+    const base = returnWithExp([]);
+    const boosted = returnWithExp(FIVE);
+    expect(boosted - base).toBeGreaterThanOrEqual(10 * 0.5);
+    expect(boosted).toBeGreaterThan(base);
+  });
+
+  it('竜を倒した帰還で討伐済みになり、竜鱗装備が解放され、同じ日に s_dragon が付く', () => {
+    const s = newGame(42);
+    const r = dispatch(s, order(s, { days: 1 }));
+    expect(r.ok).toBe(true);
+    s.expeditions[0].result.kills = { dragon: 1 };
+    for (let i = 0; i < 6 && s.expeditions.length; i++) advanceDay(s);
+    expect(s.dragonDefeated).toBe(true);
+    expect(s.flags['unlock:dragon_slain']).toBe(true);
+    expect(s.achievements).toContain('s_dragon');
+  });
+});

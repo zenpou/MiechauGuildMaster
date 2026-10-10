@@ -1,7 +1,7 @@
 // セーブの直列化と読み込み。DOM非依存にするため、保存先は Storage 風の口を外から渡す。
 import { emptyState, initialDungeonProgress } from './state';
 import { DUNGEONS } from './data';
-import { SAVE_VERSION, type GameState } from './types';
+import { SAVE_VERSION, type Adventurer, type GameState } from './types';
 
 export interface KeyValueStore {
   getItem(key: string): string | null;
@@ -14,6 +14,18 @@ export const SAVE_KEY = 'miechau-guild-master.save.v1';
  * 読み込んだ状態に、後から足した項目の既定値を埋める。
  * GameState に項目を足したら、ここに既定値を書く。版番号を上げたら移行処理も書く。
  */
+/** 冒険者に後から足した項目の既定値。skills・persona などが無い古いセーブで、能力計算やメールが落ちないようにする */
+function fillAdventurer(a: Adventurer) {
+  a.skills ??= [];
+  a.persona ??= { hobby: '', talent: '', likes: '', dislikes: '' };
+  a.equipment ??= { weapon: null, armor: null, accessory: null };
+  a.assignment ??= null;
+  a.history ??= { hiredDay: 0, expeditions: 0, kills: 0, visits: {}, raisesRefused: 0, warnedDay: null };
+  a.history.visits ??= {};
+  a.history.raisesRefused ??= 0;
+  a.history.warnedDay ??= null;
+}
+
 export function migrate(raw: unknown): GameState | null {
   if (!raw || typeof raw !== 'object') return null;
   const s = raw as Partial<GameState>;
@@ -27,7 +39,10 @@ export function migrate(raw: unknown): GameState | null {
   for (const e of [...merged.expeditions, ...merged.history]) {
     e.result.maxDepth ??= 0;
     e.result.daysSpent ??= e.returnDay - e.startDay;
+    e.result.returnDialogue ??= [];
   }
+  for (const a of merged.adventurers) fillAdventurer(a);
+  for (const c of merged.candidates) fillAdventurer(c.adv);
   // 後から足したダンジョンは、古いセーブでは進捗が無いので初期値(噂)で埋める
   merged.dungeons = { ...merged.dungeons };
   for (const d of DUNGEONS) merged.dungeons[d.id] ??= initialDungeonProgress(d.id);

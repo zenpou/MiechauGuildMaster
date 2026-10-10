@@ -2,7 +2,7 @@ import { effectiveStats, growthRank, rankOf } from '../core/adventurer';
 import { JOB, PERSONALITY, TRAIT, TUNING } from '../core/data';
 import { capacity, hire, hireFee } from '../core/recruit';
 import { ROLE_IDS, ROLE_LABEL, STAT_KEYS, type Candidate } from '../core/types';
-import { commit, STAT_LABEL, state, toast } from './app';
+import { commit, personaText, STAT_LABEL, state, toast } from './app';
 import { div, h, span } from './dom';
 
 export function recruitTab(): HTMLElement {
@@ -23,16 +23,19 @@ export function recruitTab(): HTMLElement {
 
 function candCard(c: Candidate, full: boolean): HTMLElement {
   const a = c.adv;
-  const fee = hireFee(a.salary);
+  // ユニークは契約金なし(core の hire と同じ条件)
+  const fee = a.unique ? 0 : hireFee(a.salary);
   const st = effectiveStats(a);
   const traits = a.traits.filter((t) => t.revealed);
   const reason = full ? '雇用の上限に達しています' : state.gold < fee ? `契約金が${fee - state.gold}G足りません` : '';
   const leftDays = c.expiresDay - state.day;
   return div('detail cand',
     div('row tight',
-      span('big', a.name),
+      span('big', a.unique ? `★${a.name}` : a.name),
       span('small', `${JOB[a.job]?.name ?? a.job} Lv${a.level} / ${PERSONALITY[a.personality]?.name ?? a.personality} / ${a.age}歳`),
     ),
+    a.unique ? div('small pos', '★ユニーク冒険者。契約金なしで雇えます。') : null,
+    div('small persona', personaText(a.persona)),
     div('small stats', ...STAT_KEYS.map((k) => span(null, `${STAT_LABEL[k]}${st[k]}`))),
     div('small stats', '適性: ', ...ROLE_IDS.map((r) => span(null, `${ROLE_LABEL[r]}${rankOf(a.apt[r])}(${a.apt[r]})`))),
     div('small', `成長率 ${growthRank(a.growth)}(×${a.growth.toFixed(2)})`),
@@ -40,7 +43,7 @@ function candCard(c: Candidate, full: boolean): HTMLElement {
       ? traits.map((t) => span(null, { title: TRAIT[t.id]?.desc ?? '' }, `${TRAIT[t.id]?.name ?? t.id} `))
       : span('dim', 'なし')),
     div('row tight',
-      span('small', `日給 ${a.salary}G / 契約金 `, span(state.gold >= fee ? '' : 'neg', `${fee}G`)),
+      span('small', `日給 ${a.salary}G / 契約金 `, span(state.gold >= fee ? '' : 'neg', fee ? `${fee}G` : 'なし')),
       span(leftDays <= 1 ? 'small neg' : 'small dim', `${c.expiresDay}日目まで(あと${leftDays}日)`),
     ),
     h('button', { class: 'primary', disabled: !!reason, onclick: () => doHire(c) }, '雇う'),

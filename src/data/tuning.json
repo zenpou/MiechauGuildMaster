@@ -117,6 +117,9 @@
     "gold": 150,
     "maxSkills": 2
   },
+  "jobs": {
+    "promotionGold": 300
+  },
   "mail": {
     "raiseThreshold": 0.85,
     "raiseResendDays": 7,
@@ -137,5 +140,14 @@
       "split": 2,
       "keep": -3
     }
+  },
+  "achievements": {
+    "stages": [
+      5,
+      10,
+      20,
+      30
+    ],
+    "expPerStage": 0.1
   }
 }

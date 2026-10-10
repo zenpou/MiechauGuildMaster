@@ -374,6 +374,8 @@ export interface Mail {
   id: string; day: number; kind: MailKind;
   /** 差出人: 冒険者ID、または town:<id> / guild */
   from: string;
+  /** 差出人の名前の控え。本人が去った後も「誰からか」を出せるように、送る時点で残す(古いセーブには無い) */
+  fromName?: string;
   subject: string; body: string;
   choices: MailChoice[];
   answered: string | null;

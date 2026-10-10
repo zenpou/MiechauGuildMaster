@@ -1,18 +1,28 @@
 import { effectiveStats } from '../core/adventurer';
+import { facilityLevel } from '../core/base';
 import { canEquip, equip, unequip } from '../core/equipment';
 import { advanceDay, buyItem, dailyCost, newGame, sellMaterial } from '../core/game';
-import { ITEM, JOB, PERSONALITY } from '../core/data';
+import { ITEM, JOB, PERSONALITY, TRAINED_SKILL, TUNING, type TrainedSkillDef } from '../core/data';
+import { unreadCount } from '../core/mail';
 import { REP_LEVELS, repLevel } from '../core/quests';
 import { capacity, dismiss } from '../core/recruit';
-import { STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type Result } from '../core/types';
-import { advById, commit, render, replaceState, SLOTS, STAT_LABEL, state, statusText, toast, ui } from './app';
+import { canTrain, trainableSkills, trainSkill } from '../core/training';
+import { LOYALTY_MILESTONES, STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type Result } from '../core/types';
+import { advById, commit, personaText, render, replaceState, sign, SLOTS, STAT_LABEL, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
 
 const ELEMENT_NAME: Record<string, string> = { fire: '火', ice: '氷', thunder: '雷', earth: '土', dark: '闇' };
 const EFFECT_NAME: Record<string, string> = { gather: '採取量', carry: '積載' };
 const ARMOR_NAME: Record<string, string> = { light: '軽装', medium: '中装', heavy: '重装' };
-const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 const slotsOf = (a: Adventurer) => a.equipment ?? { weapon: null, armor: null, accessory: null };
+const skillsOf = (a: Adventurer) => a.skills ?? [];
+const ROSTER_HEAD = ['名前', '職', '武器', '防具', '装飾', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態', ''];
+
+/** 「攻撃+2 採取+2」のような訓練スキルの効果文 */
+function skillText(def: TrainedSkillDef | undefined): string {
+  if (!def) return '';
+  return Object.entries(def.mods).map(([k, v]) => `${STAT_LABEL[k as keyof typeof STAT_LABEL] ?? k}${sign(v as number)}`).join(' ');
+}
 
 /** 「攻撃+3 闇耐性30%」のような装備の効果文 */
 function equipText(def: ItemDef | undefined): string {
@@ -27,7 +37,12 @@ function equipText(def: ItemDef | undefined): string {
 export function homeTab(): HTMLElement {
   const s = state;
   const potion = ITEM.potion;
+  const unread = unreadCount(s);
   return div('tab-body',
+    unread ? div('row tight inbox-note',
+      span('badge unread', `未読${unread}`),
+      h('button', { class: 'link', onclick: () => { ui.tab = 'inbox'; render(); } }, 'メールが届いています(受信箱へ)'),
+    ) : null,
     div('summary',
       span('big', `${s.day}日目`),
       span(s.gold < 0 ? 'big neg' : 'big', `${s.gold}G`),
@@ -38,23 +53,23 @@ export function homeTab(): HTMLElement {
     sceneBlock(),
     noticesBlock(),
     h('h2', null, `名簿(${s.adventurers.length}/${capacity(s)}人)`),
-    div('dim small', '名前を押すと装備を付け替えられます。解雇は待機中の者だけ(費用なし)。'),
+    div('dim small', `名前を押すと装備の付け替えと訓練ができます。解雇は待機中の者だけ(費用なし)。★はユニーク。忠誠が節目(${LOYALTY_MILESTONES.join('/')})に届くとメールが来ます。`),
     div('scroll',
-      h('table', null,
-        h('thead', null, h('tr', null, ...['名前', '職', '武器', '防具', '装飾', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態', ''].map((t) => h('th', null, t)))),
-        h('tbody', null, ...s.adventurers.map((a) => h('tr', { class: ui.selAdv === a.id ? 'sel' : '' },
-          h('td', null, h('button', { class: 'link', onclick: () => pickAdv(a.id) }, a.name)),
+      h('table', { class: 'roster' },
+        h('thead', null, h('tr', null, ...ROSTER_HEAD.map((t) => h('th', null, t)))),
+        h('tbody', null, ...s.adventurers.flatMap((a) => [h('tr', { class: ui.selAdv === a.id ? 'sel has-sub' : 'has-sub' },
+          h('td', null, h('button', { class: 'link', onclick: () => pickAdv(a.id) }, a.unique ? `★${a.name}` : a.name)),
           h('td', null, JOB[a.job].name),
           ...SLOTS.map((sl) => { const id = slotsOf(a)[sl.id]; return h('td', id ? null : { class: 'dim' }, id ? ITEM[id]?.name ?? id : '—'); }),
           h('td', null, PERSONALITY[a.personality]?.name ?? a.personality),
           h('td', { class: 'num' }, a.level),
           h('td', { class: 'num' }, a.fatigue),
           h('td', { class: 'num' }, a.injuryDays || '-'),
-          h('td', { class: 'num' }, a.loyalty),
+          h('td', { class: 'num' }, loyaltyCell(a)),
           h('td', { class: 'num' }, `${a.salary}G`),
           h('td', null, statusText(a)),
           h('td', null, a.status === 'idle' ? h('button', { class: 'small danger', onclick: () => fire(a) }, '解雇') : null),
-        ))),
+        ), profileRow(a)])),
       ),
     ),
     equipPanel(),
@@ -69,6 +84,24 @@ export function homeTab(): HTMLElement {
     div('row footer',
       span('dim small', `seed ${s.seed}`),
       h('button', { class: 'danger', onclick: restart }, '新しく始める'),
+    ),
+  );
+}
+
+function loyaltyCell(a: Adventurer): HTMLElement {
+  const next = LOYALTY_MILESTONES.find((m) => a.loyalty < m);
+  return span(null, String(a.loyalty), next === undefined ? null : span('dim tiny', ` 次の節目 ${next}`));
+}
+
+/** 名簿の2行目: 所持スキルと人となり */
+function profileRow(a: Adventurer): HTMLElement {
+  const names = skillsOf(a).map((id) => TRAINED_SKILL[id]?.name ?? id);
+  return h('tr', { class: ui.selAdv === a.id ? 'sub sel' : 'sub' },
+    h('td', { colspan: ROSTER_HEAD.length },
+      div('profile small',
+        span(names.length ? 'skills' : 'dim', names.length ? `スキル: ${names.join('・')}` : 'スキルなし'),
+        span('dim', personaText(a.persona)),
+      ),
     ),
   );
 }
@@ -176,6 +209,37 @@ function equipPanel(): HTMLElement | null {
         })) : div('dim small', '在庫に着けられる物がありません'),
       );
     }),
+    trainingBlock(a),
+  );
+}
+
+/** 訓練所があるときだけ出す */
+function trainingBlock(a: Adventurer): HTMLElement | null {
+  if (facilityLevel(state, 'training') < 1) return null;
+  const T = TUNING.training;
+  const as = a.assignment;
+  const doing = a.status === 'training' && as && 'training' in as ? as : null;
+  const owned = skillsOf(a);
+  const checks = trainableSkills(state, a.id).map((d) => ({ d, c: canTrain(state, a.id, d.id) }));
+  const reasons = new Set(checks.map(({ c }) => (c.ok ? '' : c.reason)));
+  // 同じ理由(待機中でない・費用不足)が全行に並ぶと読みにくいので、そのときは1回だけ出す
+  const common = reasons.size === 1 ? [...reasons][0] : '';
+  return div('slot training',
+    h('h3', null, '訓練'),
+    div('dim small', `1回${T.days}日・${T.gold}G。訓練で覚えられるのは1人${T.maxSkills}つまで(固有スキルは数えない)。訓練中は派遣や勤務に出せません。`),
+    owned.length
+      ? div('small', '覚えているスキル: ', owned.map((id, i) => `${i ? '、' : ''}${TRAINED_SKILL[id]?.name ?? id}(${skillText(TRAINED_SKILL[id])})`).join(''))
+      : null,
+    doing ? div('small pos', `「${TRAINED_SKILL[doing.training]?.name ?? doing.training}」を訓練中(${doing.untilDay}日目に終わる)`) : null,
+    common ? div('small neg', common) : null,
+    checks.length ? h('ul', { class: 'plain' }, ...checks.map(({ d, c }) => h('li', { class: c.ok ? '' : 'dim' },
+      div('row tight',
+        span(null, d.name), span('small', skillText(d)), span('dim small', `${T.days}日・${T.gold}G`),
+        h('button', { class: 'small', disabled: !c.ok, onclick: () => act(trainSkill(state, a.id, d.id), `${a.name}が「${d.name}」の訓練を始めました(${T.days}日)`) }, '訓練する'),
+      ),
+      d.desc ? div('dim small', d.desc) : null,
+      c.ok || common ? null : div('small neg', c.reason),
+    ))) : div('dim small', `訓練で覚えられる上限(${T.maxSkills}つ)に達しています`),
   );
 }
 
@@ -189,8 +253,11 @@ function nextDay() {
   const r = advanceDay(state);
   ui.lastReport = r;
   commit();
-  if (r.returned.length) toast(`${r.returned.length}隊が帰還しました。ログで報告を読めます。`);
-  else if (r.scene) toast('街で噂が立っています');
+  const msgs: string[] = [];
+  if (r.returned.length) msgs.push(`${r.returned.length}隊が帰還しました。ログで報告を読めます。`);
+  else if (r.scene) msgs.push('街で噂が立っています。');
+  if (r.mails.length) msgs.push(`メールが届きました(${r.mails.length}通)`);
+  if (msgs.length) toast(msgs.join(' '));
 }
 
 function fire(a: Adventurer) {

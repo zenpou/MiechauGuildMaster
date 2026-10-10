@@ -21,9 +21,10 @@ button.danger { background: #5a3434; border-color: #7d4a4a; }
 button.wide { display: block; width: 100%; padding: 10px; margin: 8px 0; }
 select { font: inherit; }
 
-.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
 .tabs button { padding: 8px 0; }
 .tabs button.on { background: #57916d; border-color: #6fb088; }
+.tabs .badge { margin-left: 4px; }
 
 .scroll { overflow-x: auto; }
 table { border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; }
@@ -133,3 +134,27 @@ ul.quests li { padding: 6px 0; }
 .cand .stats { display: flex; flex-wrap: wrap; gap: 0 8px; }
 .scene .scene-line { margin: 2px 0; }
 .scene .thought { margin-top: 4px; color: #e5b5ff; font-size: 0.9rem; }
+
+.badge.unread { background: #b5523b; font-weight: bold; }
+.badge.waiting { background: #7a6a2f; }
+.badge.kind-warning, .badge.kind-resign { background: #7d3a3a; }
+.badge.kind-raise { background: #7a6a2f; }
+.badge.kind-rumor, .badge.kind-quest { background: #3d5d6b; }
+.inbox-note { margin: 0 0 6px; }
+.maillist > li > button { width: 100%; text-align: left; }
+.maillist > li > button.unread { font-weight: bold; border-left: 4px solid #f0c25a; }
+.maillist > li > button.sel { background: #57916d; }
+.maillist .mail-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.maillist .mail-head .subject { overflow-wrap: anywhere; }
+.mail .mail-text { margin: 8px 0; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mail .choices { border-top: 1px solid #3a4a4d; padding-top: 6px; }
+.mail .choices button.small { margin-left: 0; }
+.tiny { font-size: 0.75rem; }
+.roster tr.has-sub > td { border-bottom-style: hidden; }
+.roster tr.sub td { white-space: normal; padding-top: 0; }
+.roster .profile { position: sticky; left: 6px; max-width: calc(100vw - 48px); display: flex; flex-wrap: wrap; gap: 0 10px; }
+.roster .profile .skills { color: #f0c25a; }
+.persona { color: #c8e6a0; }
+.training ul li { padding: 4px 0; }
+.return-lines { margin-top: 10px; border-top: 1px solid #3a4a4d; }
+.return-lines .talk-name { color: #c8e6a0; font-weight: bold; }

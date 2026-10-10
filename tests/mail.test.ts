@@ -338,3 +338,18 @@ describe('受信箱', () => {
     expect(run()).toBe(run());
   });
 });
+
+describe('差出人名の控え', () => {
+  it('冒険者のメールには差出人の名前が残り、本人が去った後も名前が引ける', () => {
+    const s = newGame(51);
+    const a = s.adventurers[0];
+    a.salary = 1;
+    a.level = 5;
+    for (let i = 0; i < 3 && !s.mails.some((m) => m.from === a.id); i++) advanceDay(s);
+    const m = s.mails.find((x) => x.from === a.id);
+    expect(m).toBeDefined();
+    expect(m!.fromName).toBe(a.name);
+    s.adventurers = s.adventurers.filter((x) => x.id !== a.id);
+    expect(m!.fromName).toBe(a.name);
+  });
+});

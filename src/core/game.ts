@@ -1,10 +1,12 @@
 // ゲーム状態の進行。派遣は出発時に 往路・現地・復路 を全部確定し、帰還日に applyReturn で開示する。
 import { addExp, carryCapacity, generateAdventurer, powerOf, salaryOf } from './adventurer';
+import { achievementExpMult, checkAchievements } from './achievements';
 import { build, completeConstructions, facilityEffect, facilityUpkeep, synergyValue } from './base';
 import { completeCrafts } from './craft';
 import { completeTraining } from './training';
 import { DUNGEON, EDGE, ITEM, JOB, NODE, POLICY, QUEST_TEMPLATES, TUNING, type ReturnOutcome } from './data';
 import { exploredRate, parseFloor } from './dungeon';
+import { onDragonDefeated } from './ending';
 import { onReturn, advanceUniqueChain } from './events';
 import { returnDialogue, simulateExploration } from './explore';
 import {
@@ -448,7 +450,7 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
       if (r.success) addLoyalty(m, T.loyaltySuccess);
       if (inj) addLoyalty(m, T.loyaltyInjured);
     }
-    const ups = addExp(m, Math.round((r.expGain[m.id] ?? 0) * (1 + facilityEffect(s, 'training', 'expMult'))));
+    const ups = addExp(m, Math.round((r.expGain[m.id] ?? 0) * (1 + facilityEffect(s, 'training', 'expMult')) * achievementExpMult(s)));
     if (ups) notices.push(`${m.name}がLv${m.level}に上がった。`);
     for (const t of r.revealedTraits) {
       if (t.advId !== m.id) continue;
@@ -486,6 +488,9 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
       notices.push(`${place}を踏破した(探索率100%)。`);
     }
   }
+
+  // 竜の討伐は、どのダンジョンの帰還でも kills で見る(道中の戦闘で倒すことはないが、定義に依存しないため)
+  if ((r.kills.dragon ?? 0) > 0) onDragonDefeated(s, notices);
 
   // 帰りの道は、往路を最後まで行けたときだけ依頼の経路(to→拠点)を通る
   const fullOut = !!legs && reached.length === legs.outNodes.length;
@@ -584,6 +589,9 @@ export function advanceDay(s: GameState): DayReport {
     s.flags.repLevelNoticed = lv;
     notices.push(`ギルドの評判が上がった(Lv${lv}、評判${REP_LEVELS[lv - 1]}〜)。候補者の数と質、受けられる依頼が増える。`);
   }
+
+  // 竜の討伐と帰還・依頼・建設の反映が済んだ後に数える(竜を倒した日のうちに s_dragon が付く)
+  checkAchievements(s, notices);
 
   for (const n of notices) s.notices.unshift({ day: s.day, text: n });
   if (s.notices.length > NOTICES_MAX) s.notices.length = NOTICES_MAX;

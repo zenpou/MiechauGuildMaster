@@ -19,10 +19,13 @@ import mailTextJson from '../data/mail-text.json';
 import trainedSkillsJson from '../data/trained-skills.json';
 import returnLinesJson from '../data/return-lines.json';
 import uniquesJson from '../data/uniques.json';
+import achievementsJson from '../data/achievements.json';
+import endingJson from '../data/ending.json';
 import type { Aptitude, Persona, Stats } from './types';
 import type { DungeonDef, EnemyDef, FacilityDef, ItemDef, JobDef, PersonalityDef, PolicyDef, RecipeDef, RoleSkillDef, SynergyDef, TraitDef } from './types';
 import type { QuestTemplateDef } from './types';
 import type { WorldEdgeDef, WorldNodeDef } from './types';
+import type { QuestType } from './types';
 
 /** sim で調整する値。中身は src/data/tuning.json */
 export interface Tuning {
@@ -120,6 +123,9 @@ export interface Tuning {
     /** 1人が訓練で覚えられる数 */
     maxSkills: number;
   };
+  jobs: {
+    promotionGold: number;
+  };
   mail: {
     /** 日給が再計算値のこの割合未満で昇給要望 */
     raiseThreshold: number;
@@ -140,6 +146,11 @@ export interface Tuning {
     perDay: number;
     /** 返信の忠誠の増減(第6節の表) */
     reply: { accept: number; refuse: number; rest: number; deny: number; split: number; keep: number };
+  };
+  achievements: {
+    /** 達成数がこの数に届くごとに経験値ボーナスが1段上がる */
+    stages: number[];
+    expPerStage: number;
   };
 }
 
@@ -164,6 +175,17 @@ export interface UniqueDef {
   chain: UniqueChainStep[];
   chainLoyalty: number;
 }
+
+export type AchievementCategory = 'manage' | 'dispatch' | 'explore' | 'growth' | 'facility' | 'story';
+export type AchievementCondType =
+  | 'gold' | 'rep' | 'questsDone' | 'questTypeDone' | 'dispatches'
+  | 'dungeonRate' | 'confirmedCount' | 'bossCount'
+  | 'roster' | 'levelMax' | 'upperJobs' | 'friends'
+  | 'facilities' | 'facilityLv2' | 'synergies'
+  | 'flag' | 'flagPrefix' | 'keysHeld' | 'dragon';
+/** dungeonRate の n は百分率。flag は n が無ければ真かどうか、あれば値が n 以上か */
+export interface AchievementCond { type: AchievementCondType; n?: number; dungeon?: string; questType?: QuestType; flag?: string }
+export interface AchievementDef { id: string; category: AchievementCategory; name: string; desc: string; cond: AchievementCond }
 
 const byId = <T extends { id: string }>(arr: T[]): Record<string, T> => Object.fromEntries(arr.map((x) => [x.id, x]));
 
@@ -194,6 +216,9 @@ export const MAIL_TEXT = mailTextJson as {
   choices: Record<string, { id: string; label: string }[]>;
 };
 export const WORLD = worldJson as unknown as { nodes: WorldNodeDef[]; edges: WorldEdgeDef[] };
+export const ACHIEVEMENTS = achievementsJson as unknown as AchievementDef[];
+/** エンディングの文。フェーズ7で書き直す */
+export const ENDING_PAGES = (endingJson as { pages: string[] }).pages;
 
 export const JOB = byId(JOBS);
 export const PERSONALITY = byId(PERSONALITIES);
@@ -209,6 +234,7 @@ export const QUEST_TEMPLATE = byId(QUEST_TEMPLATES);
 export const NODE = byId(WORLD.nodes);
 export const EDGE = byId(WORLD.edges);
 export const UNIQUE = byId(UNIQUES);
+export const ACHIEVEMENT = byId(ACHIEVEMENTS);
 /** 訓練スキルと固有スキルを合わせた表。effectiveStats はこちらを引く */
 export const TRAINED_SKILL = byId([...TRAINED_SKILLS, ...UNIQUES.map((u) => u.skill)]);
 

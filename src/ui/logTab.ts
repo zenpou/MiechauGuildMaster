@@ -32,5 +32,16 @@ function detail(e: Expedition): HTMLElement {
     div('small', `持ち帰り: ${listItems(r.materials)} / 拾得金 ${r.gold}G${r.rescueCost ? ` / 救助費用 ${r.rescueCost}G` : ''}`),
     r.wiped ? div('small neg', `失った素材: ${listItems(r.lostMaterials)}`) : null,
     h('ol', { class: 'log' }, ...r.log.map((l) => h('li', { class: `log-${l.kind}` }, span('dim', `[${l.day}] `), l.text))),
+    returnLines(e),
+  );
+}
+
+/** 帰還のひとこと。フェーズ5より前の記録には無い */
+function returnLines(e: Expedition): HTMLElement | null {
+  const lines = e.result.returnDialogue ?? [];
+  if (!lines.length) return null;
+  return div('return-lines',
+    h('h3', null, '帰還のひとこと'),
+    h('ul', { class: 'plain small' }, ...lines.map((d) => h('li', null, span('talk-name', `${d.name}: `), d.text))),
   );
 }
