@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseFloor } from '../src/core/dungeon';
-import { DUNGEON, ENEMY, ITEM, QUEST_TEMPLATE } from '../src/core/data';
+import { DUNGEON, ENEMY, ITEM, QUEST_TEMPLATE, TUNING } from '../src/core/data';
 import {
   accept, completeQuest, createQuest, deliver, expireQuests, generateDailyQuests, progressFromReturn,
   recipeUnlocked, repLevel, seedUnlockQuests, visibleBoards, visibleQuests, type RoadInfo,
@@ -113,18 +113,19 @@ describe('依頼の生成', () => {
     }
   });
 
-  it('報酬: 納品=売値×2.5、討伐=exp×15、護衛=80×日数×(1+danger)、運搬=60×日数', () => {
+  it('報酬: 納品=売値×係数、討伐=exp×係数、護衛=日額×日数×(1+danger)、運搬=日額×日数(係数は tuning.quests)', () => {
+    const Q = TUNING.quests;
     const s = emptyState(1);
     const d = make(s, 't_deliver_fang');
-    expect(d.rewardGold).toBe(Math.round(ITEM.fang.price * d.target.n! * 2.5));
+    expect(d.rewardGold).toBe(Math.round(ITEM.fang.price * d.target.n! * Q.deliverPriceMul));
     const h = make(s, 't_hunt_goblin');
-    expect(h.rewardGold).toBe(ENEMY.goblin.exp * h.target.n! * 15);
+    expect(h.rewardGold).toBe(Math.round(ENEMY.goblin.exp * h.target.n! * Q.huntExpMul));
     const e = make(s, 't_escort_village');
-    expect(e.rewardGold).toBe(Math.round(80 * 1 * 1.15));
+    expect(e.rewardGold).toBe(Math.round(Q.escortGoldPerDay * 1 * 1.15));
     const t = make(s, 't_transport_village');
-    expect(t.rewardGold).toBe(60);
+    expect(t.rewardGold).toBe(Q.transportGoldPerDay);
     const noRoad = createQuest(s, 't_escort_forge', rngFor(1, 'x'));
-    expect(noRoad.rewardGold).toBe(Math.round(80 * 1 * 1.2));
+    expect(noRoad.rewardGold).toBe(Math.round(Q.escortGoldPerDay * 1 * 1.2));
   });
 });
 

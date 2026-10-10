@@ -77,6 +77,10 @@ export interface Tuning {
     /** 勤務者の能力がこれ以上なら完成日数−1 */
     workerStatMin: number;
   };
+  quests: {
+    /** 依頼報酬の係数。納品=売値合計×、討伐=敵exp×、護衛・運搬=1日あたり */
+    deliverPriceMul: number; huntExpMul: number; escortGoldPerDay: number; transportGoldPerDay: number;
+  };
   readiness: {
     runs: number;
     /** 余裕 / 適正 / 厳しい の境(戦力比) */

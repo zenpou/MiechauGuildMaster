@@ -105,5 +105,11 @@
     "candidateDays": 5,
     "hireSalaryDays": 4,
     "baseCapacity": 6
+  },
+  "quests": {
+    "deliverPriceMul": 3.75,
+    "huntExpMul": 22,
+    "escortGoldPerDay": 120,
+    "transportGoldPerDay": 90
   }
 }

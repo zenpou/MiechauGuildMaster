@@ -1,6 +1,6 @@
 // 依頼: 掲示板への発生・受注・納品・帰還での達成・期限切れ、評判Lv。
 // world.json は読まない。道の日数と危険度は呼び出し側が roadInfo で渡す。
-import { DUNGEON, ENEMY, ITEM, QUEST_TEMPLATE, QUEST_TEMPLATES, RECIPE } from './data';
+import { DUNGEON, ENEMY, ITEM, QUEST_TEMPLATE, QUEST_TEMPLATES, RECIPE, TUNING } from './data';
 import { exploredRate, parseFloor } from './dungeon';
 import { addInventory, ledger } from './ledger';
 import type { Rng } from './rng';
@@ -18,13 +18,14 @@ const BOARD_MAX: Record<TownKind, number> = { base: 4, town: 3, village: 2 };
 const ACCEPT_DAYS: [number, number] = [5, 7];
 const ACCEPT_DAYS_EXPLORE: [number, number] = [7, 10];
 /** 護衛の出発日 = 掲示日 + この幅 */
+const T = TUNING.quests;
 const ESCORT_DEPART_DAYS: [number, number] = [3, 5];
 /** 同時に受けられる件数(受付施設はフェーズ6) */
 const ACTIVE_MAX = 3;
-const DELIVER_PRICE_MUL = 2.5;
-const HUNT_EXP_MUL = 15;
-const ESCORT_GOLD_PER_DAY = 80;
-const TRANSPORT_GOLD_PER_DAY = 60;
+const DELIVER_PRICE_MUL = T.deliverPriceMul;
+const HUNT_EXP_MUL = T.huntExpMul;
+const ESCORT_GOLD_PER_DAY = T.escortGoldPerDay;
+const TRANSPORT_GOLD_PER_DAY = T.transportGoldPerDay;
 /** 納期 = 受注日 + 最短所要 × 倍率 */
 const DUE_MUL: Partial<Record<QuestType, number>> = { deliver: 2, hunt: 1.5, transport: 2 };
 /** 探索の納期: 目標50%で下限、100%で上限 */
