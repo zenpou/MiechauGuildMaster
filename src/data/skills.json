@@ -1,1 +1,12 @@
-[]
+[
+  {"role":"attacker","id":"power_strike","name":"強打","desc":"力を溜めて叩きつける。3ターンに1度、1.7倍の一撃。","kind":"active",
+   "params":{"mult":1.7,"cd":3}},
+  {"role":"tank","id":"guard","name":"かばう","desc":"傷ついた仲間の前に出やすくなり、かばった時の被ダメージを3割減らす。","kind":"passive",
+   "params":{"coverBonus":0.35,"damageTaken":0.7}},
+  {"role":"healer","id":"heal","name":"癒し","desc":"HPが半分を切った仲間を癒す。魔力が高いほどよく効く。","kind":"active",
+   "params":{"ratio":0.3,"magScale":0.4,"threshold":0.5,"chance":0.65,"cd":2}},
+  {"role":"scout","id":"first_strike","name":"先制","desc":"戦闘の最初のターンに誰よりも早く動く。罠も見抜きやすい。","kind":"passive",
+   "params":{"trapDisarm":0.5}},
+  {"role":"gatherer","id":"pack","name":"荷造り","desc":"多く背負い、多く採る。戦闘では働かない。","kind":"passive",
+   "params":{"carryMult":1.5,"gatherBonus":1}}
+]

@@ -1,4 +1,4 @@
-import { JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, TRAIT, TRAITS } from './data';
+import { JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, ROLE_SKILL, TRAIT, TRAITS } from './data';
 import type { Rng } from './rng';
 import {
   ROLE_IDS, STAT_KEYS,
@@ -98,13 +98,10 @@ export function isTalent(a: Adventurer): boolean {
   return a.growth >= 1.2 || Math.max(...Object.values(a.apt)) >= 90;
 }
 
-// skills.json の pack.carryMult と同じ値。戦闘タスクの所有ファイルなので、読み込みの依存を作らず手元に置く
-const GATHERER_CARRY_MULT = 1.5;
-
-/** 持ち帰れる荷の重さ */
+/** 持ち帰れる荷の重さ。ギャザラー役は荷造り(pack)の倍率で増える */
 export function carryCapacity(a: Adventurer): number {
   const base = 10 + effectiveStats(a).atk * 0.5;
-  return Math.round(JOB[a.job].roles.includes('gatherer') ? base * GATHERER_CARRY_MULT : base);
+  return Math.round(JOB[a.job].roles.includes('gatherer') ? base * ROLE_SKILL.pack.params.carryMult : base);
 }
 
 /** 五角形の並び(剣士→戦士→僧侶→採取士→斥候)を役割で。隣同士が上級職の組になる */

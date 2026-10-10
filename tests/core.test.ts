@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { JOBS, LOWER_JOBS, PERSONALITIES, UPPER_JOBS, upperJobsFrom } from '../src/core/data';
+import { DUNGEONS, ENEMIES, ENEMY, ITEM, JOBS, LOWER_JOBS, PERSONALITIES, ROLE_SKILLS, UPPER_JOBS, upperJobsFrom } from '../src/core/data';
 import { Rng, rngFor } from '../src/core/rng';
 import { deserialize, load, migrate, save, serialize, type KeyValueStore } from '../src/core/save';
 import { emptyState } from '../src/core/state';
@@ -88,5 +88,23 @@ describe('save', () => {
     const s = emptyState(9);
     expect(save(store, s)).toBe(true);
     expect(load(store)).toEqual(s);
+  });
+});
+
+describe('データの整合(JSON同士の参照)', () => {
+  it('役割スキルは5役に1つずつ', () => {
+    expect([...ROLE_SKILLS.map((s) => s.role)].sort()).toEqual([...ROLE_IDS].sort());
+  });
+  it('敵のドロップは実在するアイテム', () => {
+    for (const e of ENEMIES) for (const l of e.loot) expect(ITEM[l.item], `${e.id} の loot ${l.item}`).toBeDefined();
+  });
+  it('ダンジョンの巣・シンボル・採取点・敵表は実在するIDを指す', () => {
+    for (const d of DUNGEONS) {
+      for (const e of d.enemies) expect(ENEMY[e.id], `${d.id} の enemies ${e.id}`).toBeDefined();
+      for (const f of d.floors) for (const c of Object.values(f.legend)) {
+        if (c.enemy) expect(ENEMY[c.enemy], `${d.id}/${f.id} の enemy ${c.enemy}`).toBeDefined();
+        if (c.item) expect(ITEM[c.item], `${d.id}/${f.id} の item ${c.item}`).toBeDefined();
+      }
+    }
   });
 });
