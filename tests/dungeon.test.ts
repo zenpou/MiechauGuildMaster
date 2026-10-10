@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  exploredRate, frontier, idx, isPassable, looksLikeWall, neighbors, parseFloor, searchSpots, shortestPath, visibleFrom, xy,
+  exploredRate, frontier, idx, isPassable, looksLikeWall, needsSearch, neighbors, parseFloor, searchSpots, shortestPath, visibleFrom, xy,
 } from '../src/core/dungeon';
 import { DUNGEON, ENEMY, ITEM, PERSONALITIES } from '../src/core/data';
 import type { CellKind, FloorDef } from '../src/core/types';
@@ -233,6 +233,36 @@ describe('searchSpots', () => {
     const visited = new Set([idx(g, 2, 1), idx(g, 2, 1) + 1]);
     const out = searchSpots(g, visited, []);
     expect(out).toEqual([...out].sort((a, b) => a - b));
+  });
+});
+
+describe('needsSearch', () => {
+  // E . . H . .  (H は隠しマス。右の2マスは隠しマスの奥)
+  const g = parseFloor(floor(['########', 'E..H..##', '########']));
+  const row = (xs: number[]) => xs.map((x) => idx(g, x, 1));
+
+  it('歩ける所を踏み尽くし、隠しマスに接するマスがあれば true(探索を出すと壁を調べ直す)', () => {
+    expect(needsSearch(g, row([0, 1, 2]), [], [])).toBe(true);
+  });
+  it('未踏の通れるマスが残っていれば false(先にそちらを歩く)', () => {
+    expect(needsSearch(g, row([0, 1]), [], [])).toBe(false);
+  });
+  it('隠しマスを見つけ済みなら、その先が未踏のあいだは false、踏み尽くせば false', () => {
+    const h = idx(g, 3, 1);
+    expect(needsSearch(g, row([0, 1, 2]), [h], [])).toBe(false);
+    expect(needsSearch(g, row([0, 1, 2, 3, 4, 5]), [h], [])).toBe(false);
+  });
+  it('隠しマスが無いフロアでは、踏み尽くしても false', () => {
+    const plain = parseFloor(floor(['#####', 'E..##', '#####']));
+    expect(needsSearch(plain, [idx(plain, 0, 1), idx(plain, 1, 1), idx(plain, 2, 1)], [], [])).toBe(false);
+  });
+  it('鍵の要る扉の先は、鍵を持っていれば未踏のマスとして数える', () => {
+    const d = parseFloor(floor(['#######', 'E.D..H#', '#######']));
+    const walked = [idx(d, 0, 1), idx(d, 1, 1)];
+    expect(needsSearch(d, walked, [], [])).toBe(false);
+    expect(needsSearch(d, walked, [], ['rusty_key'])).toBe(false);
+    const beyond = [...walked, idx(d, 2, 1), idx(d, 3, 1), idx(d, 4, 1)];
+    expect(needsSearch(d, beyond, [], ['rusty_key'])).toBe(true);
   });
 });
 

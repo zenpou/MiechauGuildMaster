@@ -119,6 +119,17 @@ export function searchSpots(grid: Grid, visited: Set<number>, hiddenFound: numbe
   return out.sort((a, b) => a - b);
 }
 
+/**
+ * 歩ける所(今の鍵と見つけた隠し通路で入れる未踏のマス)を踏み尽くし、隠し通路を調べ直す余地が残っている。
+ * 探索を出すと、隊は壁を調べ直しに戻る。画面で「残りは隠し通路の先」と知らせ、bot が探索を出し続けるかを決めるのに使う
+ */
+export function needsSearch(grid: Grid, visited: number[], hiddenFound: number[], keys: string[]): boolean {
+  const walked = new Set(visited);
+  const know = { keys, hiddenFound };
+  for (const i of walked) for (const n of visibleFrom(grid, i)) if (!walked.has(n) && isPassable(grid, n, know)) return false;
+  return searchSpots(grid, walked, hiddenFound).length > 0;
+}
+
 /** 未発見の hidden マスは「壁に見える」。この判定を1か所に */
 export function looksLikeWall(grid: Grid, i: number, hiddenFound: number[]): boolean {
   const kind = grid.cells[i]?.kind;

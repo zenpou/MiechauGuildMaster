@@ -1,6 +1,6 @@
 import { carryCapacity } from '../core/adventurer';
 import { DUNGEON, DUNGEONS, ENEMY, ITEM, JOB, NODE, POLICIES, PERSONALITY, TUNING } from '../core/data';
-import { parseFloor } from '../core/dungeon';
+import { needsSearch, parseFloor } from '../core/dungeon';
 import { floorTransit } from '../core/explore';
 import { dispatch, exploredRateOf, recall } from '../core/game';
 import { heldKeys } from '../core/ledger';
@@ -53,7 +53,9 @@ function choicesFor(dungeonId: string, floorId: string) {
   if (confirmed && !items.length) reason.gather = 'このフロアに採取点が無い';
   if (confirmed && !visited.some((i) => BOSS_KINDS.includes(grid.cells[i]?.kind))) reason.boss = 'まだ巣の主の部屋に着いていない';
   const knownGather = (item: string) => visited.filter((i) => grid.cells[i]?.kind === 'gather' && grid.cells[i].item === item).length;
-  return { confirmed, full, items, enemies, reason, knownGather };
+  // 歩ける所は踏み尽くしたが探索率が100%にならない = 残りは隠し通路の先。探索を出すと壁を調べ直す
+  const searching = confirmed && needsSearch(grid, visited, prog?.floors[floorId]?.hiddenFound ?? [], heldKeys(state));
+  return { confirmed, full, items, enemies, reason, knownGather, searching };
 }
 type Choices = ReturnType<typeof choicesFor>;
 
@@ -194,6 +196,7 @@ function dungeonBlock(c: Choices): HTMLElement {
       }),
       ` ${ACTION_NAME[a]}`))),
     h('ul', { class: 'plain reasons small dim' }, ...ACTIONS.filter((a) => c.reason[a]).map((a) => h('li', null, `${ACTION_NAME[a]}: ${c.reason[a]}`))),
+    c.searching ? div('small', '歩ける所は踏み尽くしました。残りは隠し通路の先です。探索を出すと、隊は行き止まりの壁を調べ直します(見つかるかは斥候の腕しだい)。') : null,
     targetBlock(c),
   );
 }

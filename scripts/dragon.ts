@@ -86,7 +86,7 @@ for (const id of [POLICY_ID, POLICY_HUNT, POLICY_SAFE]) if (!POLICY[id]) fail(`�
 const { effectiveStats, equipResist, jobAptitude, powerOf } = await import('../src/core/adventurer');
 const { activeSynergies, assignWorker, facilityLevel, unassignWorker, upgrade } = await import('../src/core/base');
 const { canCraft, craftGold, startCraft } = await import('../src/core/craft');
-const { isPassable, parseFloor, searchSpots, visibleFrom } = await import('../src/core/dungeon');
+const { isPassable, needsSearch, parseFloor, searchSpots, visibleFrom } = await import('../src/core/dungeon');
 const { equip } = await import('../src/core/equipment');
 const { cellDepths, floorTransit } = await import('../src/core/explore');
 const { acceptQuest, advanceDay, buildFacility, dailyCost, dispatch, exploredRateOf, newGame, sellMaterial } = await import('../src/core/game');
@@ -346,7 +346,7 @@ function runSeed(seed: number, log: boolean): Run {
     const visited = new Set(fp.visited);
     const know = { keys: heldKeys(s), hiddenFound: fp.hiddenFound };
     for (const i of visited) for (const n of visibleFrom(g, i)) if (!visited.has(n) && isPassable(g, n, know)) return false;
-    return searchSpots(g, visited, fp.hiddenFound).length === 0;
+    return !needsSearch(g, fp.visited, fp.hiddenFound, know.keys);
   };
   /**
    * 探索で広げられるところは広げた。入れる未踏のマスが残っていても、探索の目標選びが深いマスや巣を優先して
