@@ -12,6 +12,7 @@ import { canTrain, trainDays, trainableSkills, trainSkill } from '../core/traini
 import { LOYALTY_MILESTONES, STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type JobDef, type Result } from '../core/types';
 import { advById, commit, personaText, render, replaceState, sign, SLOTS, STAT_LABEL, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
+import { saveTransferRow } from './saveTransfer';
 
 const ELEMENT_NAME: Record<string, string> = { fire: '火', ice: '氷', thunder: '雷', earth: '土', dark: '闇' };
 const EFFECT_NAME: Record<string, string> = { gather: '採取量', carry: '積載' };
@@ -96,6 +97,7 @@ export function homeTab(): HTMLElement {
       h('button', { onclick: () => buy(1) }, `${potion.name}を買う(${potion.price}G)`),
     ),
     div('dim small', '台帳(お金の出入り)と実績は記録タブにあります。'),
+    saveTransferRow(),
     div('row footer',
       span('dim small', `seed ${s.seed}`),
       h('button', { class: 'danger', onclick: restart }, '新しく始める'),

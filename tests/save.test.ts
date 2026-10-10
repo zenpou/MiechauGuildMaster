@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveStats } from '../src/core/adventurer';
 import { advanceDay, dispatch, newGame } from '../src/core/game';
-import { migrate } from '../src/core/save';
-import { storyDue } from '../src/core/story';
+import { deserialize, migrate, serialize } from '../src/core/save';
+import { markStorySeen, storyDue } from '../src/core/story';
 import type { GameState } from '../src/core/types';
 
 const clone = (s: GameState) => JSON.parse(JSON.stringify(s));
@@ -106,5 +106,21 @@ describe('物語の導入前から遊んでいたセーブ', () => {
     old.dungeons.old_mine.confirmed = true;
     const s = migrate(old)!;
     expect(storyDue(s).map((c) => c.id)).toEqual(['ch2']);
+  });
+});
+
+describe('セーブの書き出しと読み込み(deserialize / serialize)', () => {
+  it('書き出した文字列を読み込むと、同じ状態に戻る', () => {
+    const s = newGame(7);
+    // 画面は序章を読み終えてから日を送れる。読み込みは、章の旗が無い途中のセーブだけ過ぎた章を既読にするので、旗を付けておく
+    markStorySeen(s, 'prologue');
+    for (let i = 0; i < 12; i++) advanceDay(s);
+    expect(deserialize(serialize(s))).toEqual(s);
+  });
+
+  it('セーブでない JSON・壊れた文字列・空は null(上書きしない)', () => {
+    for (const bad of ['', 'not json', '{}', '[]', 'null', '{"seed": "x", "day": 1}', '{"seed": 1}', '123']) {
+      expect(deserialize(bad), JSON.stringify(bad)).toBeNull();
+    }
   });
 });

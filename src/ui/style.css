@@ -178,3 +178,4 @@ ul.quests li { padding: 6px 0; }
 .hint { margin: 10px 0; padding: 10px 12px; border-left: 3px solid #6fb088; background: #243234; border-radius: 4px; }
 .hint-text { line-height: 1.6; overflow-wrap: anywhere; }
 .hint .row { margin-top: 6px; }
+.filebtn { font: inherit; color: inherit; background: #34474a; border: 1px solid #4b6266; border-radius: 6px; padding: 6px 12px; cursor: pointer; }

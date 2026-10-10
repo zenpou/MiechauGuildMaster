@@ -1,10 +1,11 @@
 'use strict';
 // ビルドした画面(dist)を、インストール済みの Chrome で通して確かめる。npm run build の後に npm run test:browser で回す。
-// 引数にシナリオ名(new tabs dispatch day60 day100 clear pwa)を並べると、それだけを回す。
+// 引数にシナリオ名(new tabs dispatch day60 day100 clear transfer pwa)を並べると、それだけを回す。
 // 結果は artifacts/browser-check.json、画面は artifacts/screens/phase7-*.png。失敗が1つでもあれば終了コード1。
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const os = require('node:os');
 const { execSync } = require('node:child_process');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -49,6 +50,7 @@ const SCENARIOS = [
   { id: 'day60', title: '途中のセーブ(60日)', fixture: 'day60', run: (t) => midGame(t, 'day60') },
   { id: 'day100', title: '途中のセーブ(100日)', fixture: 'day100', run: (t) => midGame(t, 'day100') },
   { id: 'clear', title: '竜を倒したセーブ', fixture: 'clear', run: dragonCleared },
+  { id: 'transfer', title: 'セーブの書き出しと読み込み', fixture: 'day60', run: saveTransfer },
   { id: 'pwa', title: 'PWA', run: pwa, skip: (env) => (env.files.has('/sw.js') ? null : '未実装(dist に sw.js が無い)') },
 ];
 const RESULT_LABEL = { pass: '合格', fail: '不合格', skip: '飛ばした' };
@@ -445,6 +447,57 @@ async function day100Details(t, s) {
   t.note(`廃れた塔の2階は${upper ? '選べる' : 'まだ選べない'}`);
   await t.shot('day100-dispatch-tower');
   t.flush('100日目の詳しい確認');
+}
+
+/** 書き出したファイルで、日を進めたあとの進行を元に戻せる。セーブでないファイルは読み込まず、今の進行に触らない */
+async function saveTransfer(t) {
+  const { page } = t;
+  const fx = t.fixture('day60');
+  if (!fx) return;
+  await t.open(fx);
+  await skipStories(t, '開いた直後');
+  await openTab(page, '拠点');
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 10_000 }),
+    page.getByRole('button', { name: 'セーブを書き出す', exact: true }).click(),
+  ]);
+  const name = download.suggestedFilename();
+  t.check(/^miechau-save-day\d+\.json$/.test(name), `書き出したファイル名が想定と違う: ${name}`);
+  const file = path.join(os.tmpdir(), `mgm-check-${process.pid}-${name}`);
+  await download.saveAs(file);
+  const exported = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const here = await t.save();
+  t.check(exported.seed === here.seed && exported.day === here.day, `書き出した内容が今のセーブと違う(${exported.day}日目 / ${here.day}日目)`);
+  t.flush('書き出し');
+
+  await nextDay(t);
+  const later = await t.save();
+  if (!t.check(later.day === here.day + 1, `日が進まない(${later.day}日目)`)) return;
+
+  // 書き出したファイルを読み込むと、進める前の日に戻る(置き換えの確認に答える)
+  const asked = [];
+  page.on('dialog', (d) => { asked.push(d.message()); void d.accept(); });
+  await page.locator('input[data-save-input]').setInputFiles(file);
+  await page.waitForFunction(([key, day]) => JSON.parse(localStorage.getItem(key))?.day === day, [SAVE_KEY, here.day], { timeout: 10_000 })
+    .catch(() => t.fail(`書き出したセーブを読み込んでも${here.day}日目に戻らない(今 ${here.day + 1}日目のまま?)`));
+  t.check(asked.length === 1 && asked[0].includes(`${here.day + 1}日目`) && asked[0].includes(`${here.day}日目`),
+    `置き換えの確認が想定と違う: ${JSON.stringify(asked)}`);
+  t.flush('読み込み');
+
+  // セーブでないファイルは読み込まず、確認も出さない
+  asked.length = 0;
+  const bad = path.join(os.tmpdir(), `mgm-check-${process.pid}-bad.json`);
+  fs.writeFileSync(bad, '{"これは": "セーブではない"}');
+  await page.locator('input[data-save-input]').setInputFiles(bad);
+  await page.locator('.toast.err', { hasText: 'セーブとして読めません' }).waitFor({ timeout: 5000 })
+    .catch(() => t.fail('セーブでないファイルを読んでも、読めなかったという知らせが出ない'));
+  const kept = await t.save();
+  t.check(kept.day === here.day && asked.length === 0, `セーブでないファイルで進行が変わった/確認が出た(${kept.day}日目、確認 ${asked.length}回)`);
+  await t.shot('transfer');
+  t.flush('壊れたファイル');
+  fs.rmSync(file, { force: true });
+  fs.rmSync(bad, { force: true });
 }
 
 async function dragonCleared(t) {
