@@ -8,7 +8,7 @@ import { rngFor } from './rng';
 import { emptyState } from './state';
 import {
   LOYALTY_MAX, PARTIES_MAX, PARTY_MAX,
-  type ActionKind, type Adventurer, type DispatchOrder, type Expedition, type GameState,
+  type ActionKind, type Adventurer, type DispatchOrder, type Expedition, type GameState, type Result,
 } from './types';
 
 // sim で調整する値は src/data/tuning.json
@@ -25,7 +25,7 @@ const HISTORY_MAX = 40;
 const ACTIONS: ActionKind[] = ['explore', 'gather', 'hunt', 'boss', 'survey'];
 const BOSS_KINDS = ['symbol', 'boss'];
 
-export type Result = { ok: true } | { ok: false; reason: string };
+export type { Result } from './types';
 export interface DayReport { day: number; returned: Expedition[]; notices: string[] }
 
 const ok = (): Result => ({ ok: true });
