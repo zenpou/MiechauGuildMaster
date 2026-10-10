@@ -61,6 +61,8 @@
     "loyaltySuccess": 3,
     "loyaltyInjured": -3,
     "loyaltyWipe": -20,
-    "daysMax": 7
+    "daysMax": 7,
+    "supportGold": 60,
+    "supportDays": 5
   }
 }

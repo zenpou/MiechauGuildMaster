@@ -1,10 +1,13 @@
 // ゲーム状態の進行。派遣は出発時に simulateExploration で全部確定し、帰還日に applyReturn で開示する。
 import { addExp, generateAdventurer, salaryOf } from './adventurer';
+import { completeConstructions, facilityEffect, facilityUpkeep, synergyValue } from './base';
+import { completeCrafts } from './craft';
 import { DUNGEON, ITEM, JOB, POLICY, TUNING } from './data';
 import { exploredRate, parseFloor } from './dungeon';
 import { simulateExploration } from './explore';
 import { addRelation } from './relations';
 import { rngFor } from './rng';
+import { addInventory, ledger } from './ledger';
 import { emptyState } from './state';
 import {
   LOYALTY_MAX, PARTIES_MAX, PARTY_MAX,
@@ -18,7 +21,6 @@ export const START_POTIONS = T.startPotions;
 export const UPKEEP_PER_DAY = T.upkeepPerDay;
 const START_JOBS = ['fighter', 'warrior', 'priest', 'scout'];
 const BUYABLE = ['potion'];
-const LEDGER_MAX = 300;
 const NOTICES_MAX = 80;
 const HISTORY_MAX = 40;
 /** 今出せる行動。escort / transport はフェーズ4 */
@@ -34,21 +36,11 @@ const has = <V>(table: Record<string, V>, key: string) => Object.prototype.hasOw
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const isCount = (n: unknown): n is number => Number.isInteger(n) && (n as number) >= 0;
 
-function ledger(s: GameState, label: string, amount: number) {
-  if (amount === 0) return;
-  s.ledger.unshift({ day: s.day, label, amount });
-  if (s.ledger.length > LEDGER_MAX) s.ledger.length = LEDGER_MAX;
-}
 
 function addLoyalty(a: Adventurer, delta: number) {
   a.loyalty = clamp(a.loyalty + delta, 0, LOYALTY_MAX);
 }
 
-function addInventory(s: GameState, item: string, n: number) {
-  const v = (s.inventory[item] ?? 0) + n;
-  if (v > 0) s.inventory[item] = v;
-  else delete s.inventory[item];
-}
 
 export const dailyCost = (s: GameState) => s.adventurers.reduce((t, a) => t + a.salary, 0) + UPKEEP_PER_DAY;
 
@@ -171,7 +163,8 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
   for (const m of members) {
     m.status = 'idle';
     m.fatigue = clamp(m.fatigue + (r.fatigue[m.id] ?? 0), 0, 100);
-    const inj = r.injuries[m.id] ?? 0;
+    const rawInj = r.injuries[m.id] ?? 0;
+    const inj = rawInj ? Math.max(1, rawInj + facilityEffect(s, 'clinic', 'injuryDays')) : 0;
     if (inj) m.injuryDays = Math.max(m.injuryDays, inj);
     // 全滅は全員が負傷扱いになるので、負傷の−3を重ねず全滅の−20だけにする
     if (r.wiped) addLoyalty(m, T.loyaltyWipe);
@@ -179,7 +172,7 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
       if (r.success) addLoyalty(m, T.loyaltySuccess);
       if (inj) addLoyalty(m, T.loyaltyInjured);
     }
-    const ups = addExp(m, r.expGain[m.id] ?? 0);
+    const ups = addExp(m, Math.round((r.expGain[m.id] ?? 0) * (1 + facilityEffect(s, 'training', 'expMult'))));
     if (ups) notices.push(`${m.name}がLv${m.level}に上がった。`);
     for (const t of r.revealedTraits) {
       if (t.advId !== m.id) continue;
@@ -228,10 +221,17 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
 export function advanceDay(s: GameState): DayReport {
   const notices: string[] = [];
 
+  if (s.day <= T.supportDays) {
+    s.gold += T.supportGold;
+    ledger(s, '初期支援金', T.supportGold);
+  }
   const wages = s.adventurers.reduce((t, a) => t + a.salary, 0);
   s.gold -= wages + UPKEEP_PER_DAY;
   ledger(s, '日給(全冒険者)', -wages);
   ledger(s, 'ギルド維持費', -UPKEEP_PER_DAY);
+  const facilityCost = facilityUpkeep(s);
+  s.gold -= facilityCost;
+  ledger(s, '施設維持費', -facilityCost);
   if (s.gold < 0) {
     const interest = Math.ceil(-s.gold * T.debtInterest);
     s.gold -= interest;
@@ -247,12 +247,17 @@ export function advanceDay(s: GameState): DayReport {
   const returned = s.expeditions.filter((e) => e.returnDay <= s.day);
   s.expeditions = s.expeditions.filter((e) => e.returnDay > s.day);
   for (const e of returned) applyReturn(s, e, notices);
+  completeConstructions(s, notices);
+  completeCrafts(s, notices);
 
   const returnedIds = new Set(returned.flatMap((e) => e.order.partyIds));
+  const rest = T.restFatigue - facilityEffect(s, 'clinic', 'fatigueRecover') - synergyValue(s, 'fatigueRecover');
+  const idleExp = synergyValue(s, 'idleExp');
   for (const a of s.adventurers) {
-    if (a.status !== 'idle' || returnedIds.has(a.id)) continue;
-    a.fatigue = Math.max(0, a.fatigue + T.restFatigue);
+    if ((a.status !== 'idle' && a.status !== 'working') || returnedIds.has(a.id)) continue;
+    a.fatigue = Math.max(0, a.fatigue + rest);
     if (a.injuryDays > 0) a.injuryDays--;
+    if (idleExp && a.status === 'idle' && addExp(a, idleExp)) notices.push(`${a.name}がLv${a.level}に上がった。`);
   }
   for (const a of s.adventurers) addLoyalty(a, T.dailyLoyalty);
 

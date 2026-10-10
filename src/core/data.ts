@@ -9,7 +9,10 @@ import skillsJson from '../data/skills.json';
 import namesJson from '../data/names.json';
 import personaJson from '../data/persona.json';
 import tuningJson from '../data/tuning.json';
-import type { DungeonDef, EnemyDef, ItemDef, JobDef, PersonalityDef, PolicyDef, RoleSkillDef, TraitDef } from './types';
+import facilitiesJson from '../data/facilities.json';
+import synergiesJson from '../data/synergies.json';
+import recipesJson from '../data/recipes.json';
+import type { DungeonDef, EnemyDef, FacilityDef, ItemDef, JobDef, PersonalityDef, PolicyDef, RecipeDef, RoleSkillDef, SynergyDef, TraitDef } from './types';
 
 /** sim で調整する値。中身は src/data/tuning.json */
 export interface Tuning {
@@ -78,6 +81,8 @@ export interface Tuning {
     loyaltyInjured: number;
     loyaltyWipe: number;
     daysMax: number;
+    supportGold: number;
+    supportDays: number;
   };
 }
 
@@ -94,6 +99,9 @@ export const ROLE_SKILLS = skillsJson as unknown as RoleSkillDef[];
 export const NAMES = namesJson as { given: string[] };
 export const PERSONA = personaJson as { hobby: string[]; talent: string[]; likes: string[]; dislikes: string[] };
 export const TUNING = tuningJson as Tuning;
+export const FACILITIES = facilitiesJson as unknown as FacilityDef[];
+export const SYNERGIES = synergiesJson as unknown as SynergyDef[];
+export const RECIPES = recipesJson as unknown as RecipeDef[];
 
 export const JOB = byId(JOBS);
 export const PERSONALITY = byId(PERSONALITIES);
@@ -103,6 +111,8 @@ export const ENEMY = byId(ENEMIES);
 export const ITEM = byId(ITEMS);
 export const DUNGEON = byId(DUNGEONS);
 export const ROLE_SKILL = byId(ROLE_SKILLS);
+export const FACILITY = byId(FACILITIES);
+export const RECIPE = byId(RECIPES);
 
 export const LOWER_JOBS = JOBS.filter((j) => j.tier === 'lower');
 export const UPPER_JOBS = JOBS.filter((j) => j.tier === 'upper');

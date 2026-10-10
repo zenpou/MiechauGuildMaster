@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { generateAdventurer } from '../src/core/adventurer';
+import { addExp, generateAdventurer } from '../src/core/adventurer';
+import { assignWorker } from '../src/core/base';
+import { startCraft } from '../src/core/craft';
 import { DUNGEON, JOB } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
 import { advanceDay, buyItem, dispatch, exploredRateOf, newGame, recall, sellMaterial } from '../src/core/game';
@@ -89,13 +91,13 @@ describe('dispatch の検証', () => {
 });
 
 describe('advanceDay', () => {
-  it('日給と維持費30が引かれ、台帳に載る', () => {
+  it('日給と維持費30が引かれ、台帳に載る(1日目は初期支援金60Gが入る)', () => {
     const s = newGame(9);
     const w = wages(s);
     const r = advanceDay(s);
     expect(r.day).toBe(2);
     expect(s.day).toBe(2);
-    expect(s.gold).toBe(500 - w - 30);
+    expect(s.gold).toBe(500 + 60 - w - 30);
     expect(s.ledger.some((l) => l.amount === -w && l.label.includes('日給'))).toBe(true);
     expect(s.ledger.some((l) => l.amount === -30 && l.label.includes('維持費'))).toBe(true);
   });
@@ -107,7 +109,7 @@ describe('advanceDay', () => {
     const loyal = s.adventurers.map((a) => a.loyalty);
     const w = wages(s);
     advanceDay(s);
-    const deficit = 1000 + w + 30;
+    const deficit = 1000 + w + 30 - 60;
     expect(s.gold).toBe(-deficit - Math.ceil(deficit * 0.02));
     expect(s.rep).toBe(4);
     expect(s.debt).toBe(true);
@@ -194,7 +196,7 @@ describe('advanceDay', () => {
     const loyal = s.adventurers.map((a) => a.loyalty);
     const w = wages(s);
     advanceDay(s);
-    expect(s.gold).toBe(500 - w - 30 - 120);
+    expect(s.gold).toBe(500 + 60 - w - 30 - 120);
     expect(s.ledger.some((l) => l.amount === -120)).toBe(true);
     expect(s.inventory.herb ?? 0).toBe(0);
     s.adventurers.forEach((a, i) => expect(a.loyalty).toBe(loyal[i] - 20 + 1));
@@ -306,5 +308,124 @@ describe('行動種別の検証', () => {
     expect(s.dungeons.forest_cave.bossDefeated).toBe(1);
     expect(s.dungeons.forest_cave.fullCleared).toBe(true);
     expect(r.notices.some((n) => n.includes('踏破'))).toBe(true);
+  });
+});
+
+function place(s: GameState, id: string, x: number, y: number, level = 1) {
+  s.base.facilities.push({ id, level, x, y, builtDay: 1, construction: null });
+}
+
+describe('初期支援金', () => {
+  it('1〜5日目の日送りで60Gずつ台帳「初期支援金」に載り、6日目からは無い', () => {
+    const s = newGame(13);
+    for (let i = 0; i < 7; i++) advanceDay(s);
+    const support = s.ledger.filter((l) => l.label === '初期支援金');
+    expect(support.map((l) => l.day)).toEqual([5, 4, 3, 2, 1]);
+    expect(support.every((l) => l.amount === 60)).toBe(true);
+  });
+});
+
+describe('施設の維持費', () => {
+  it('完成済みの施設の upkeep 合計が台帳「施設維持費」に載る。建設中は掛からない', () => {
+    const s = newGame(13);
+    place(s, 'dorm', 0, 0);
+    place(s, 'workshop', 1, 0);
+    s.base.facilities.push({ id: 'clinic', level: 0, x: 2, y: 0, builtDay: 1, construction: { toLevel: 1, untilDay: 9 } });
+    const gold = s.gold;
+    const w = wages(s);
+    advanceDay(s);
+    expect(s.ledger.some((l) => l.label === '施設維持費' && l.amount === -13)).toBe(true);
+    expect(s.gold).toBe(gold + 60 - w - 30 - 13);
+  });
+});
+
+describe('施設勤務と派遣', () => {
+  it('勤務中の者は派遣できず、待機者と同じく回復する', () => {
+    const s = newGame(17);
+    place(s, 'workshop', 0, 0);
+    const a = s.adventurers[0];
+    expect(assignWorker(s, a.id, 'workshop').ok).toBe(true);
+    expect(dispatch(s, order(s)).ok).toBe(false);
+    a.fatigue = 50;
+    a.injuryDays = 2;
+    advanceDay(s);
+    expect(a.fatigue).toBe(25);
+    expect(a.injuryDays).toBe(1);
+    expect(a.status).toBe('working');
+  });
+});
+
+describe('治療所', () => {
+  it('帰還時の負傷日数を −Lv(最低1)、待機者の疲労回復 +5×Lv', () => {
+    const s = newGame(19);
+    place(s, 'clinic', 0, 0);
+    const ids = s.adventurers.map((a) => a.id);
+    const e = sent(s, { partyIds: ids.slice(0, 2), days: 1, items: {} });
+    e.result.injuries = { [ids[0]]: 3, [ids[1]]: 1 };
+    s.adventurers[3].fatigue = 50;
+    advanceDay(s);
+    expect(s.adventurers[0].injuryDays).toBe(2);
+    expect(s.adventurers[1].injuryDays).toBe(1);
+    expect(s.adventurers[3].fatigue).toBe(50 - 25 - 5);
+    s.base.facilities[0].level = 2;
+    s.adventurers[3].fatigue = 50;
+    advanceDay(s);
+    expect(s.adventurers[3].fatigue).toBe(50 - 25 - 10);
+  });
+
+  it('静かな寮(治療所×宿舎)で待機者の疲労回復がさらに+10', () => {
+    const s = newGame(19);
+    place(s, 'clinic', 0, 0);
+    place(s, 'dorm', 0, 1);
+    s.adventurers[0].fatigue = 60;
+    advanceDay(s);
+    expect(s.adventurers[0].fatigue).toBe(60 - 25 - 5 - 10);
+  });
+});
+
+describe('訓練所', () => {
+  it('帰還時の経験値が ×(1+0.2×Lv)', () => {
+    const run = (level: number) => {
+      const s = newGame(23);
+      if (level) place(s, 'training', 0, 0, level);
+      const ids = s.adventurers.map((a) => a.id);
+      const e = sent(s, { partyIds: ids.slice(0, 1), days: 1, items: {} });
+      e.result.expGain = { [ids[0]]: 50 };
+      const ref = structuredClone(s.adventurers[0]);
+      advanceDay(s);
+      return { got: s.adventurers[0], ref };
+    };
+    for (const [level, gain] of [[0, 50], [1, 60], [2, 70]]) {
+      const { got, ref } = run(level);
+      addExp(ref, gain);
+      expect([got.level, got.exp]).toEqual([ref.level, ref.exp]);
+    }
+  });
+
+  it('朝練(訓練所×宿舎)で待機者に毎日経験値+2', () => {
+    const s = newGame(23);
+    place(s, 'training', 0, 0);
+    place(s, 'dorm', 1, 0);
+    const exp = s.adventurers.map((a) => a.exp);
+    advanceDay(s);
+    s.adventurers.forEach((a, i) => expect(a.exp).toBe(exp[i] + 2));
+  });
+});
+
+describe('施設込みの決定論', () => {
+  it('建設・クラフト・勤務・派遣を混ぜても同seedで同じ状態', () => {
+    const play = () => {
+      const s = newGame(42);
+      s.gold = 3000;
+      s.inventory = { ...s.inventory, moss_ore: 10, herb: 10, slime_gel: 5 };
+      place(s, 'alchemy', 2, 2);
+      assignWorker(s, s.adventurers[3].id, 'alchemy');
+      startCraft(s, 'r_potion');
+      const ids = s.adventurers.map((a) => a.id).slice(0, 3);
+      sent(s, { partyIds: ids, leaderId: ids[0], days: 3, items: {} });
+      for (let i = 0; i < 5; i++) advanceDay(s);
+      return s;
+    };
+    expect(play()).toEqual(play());
   });
 });

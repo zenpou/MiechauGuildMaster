@@ -1,0 +1,5 @@
+[
+  {"id":"craft_street","a":"workshop","b":"alchemy","name":"職人通り","desc":"工房と調合所が隣り合うと、どちらも完成日数−1。","effect":{"craftDaysOff":1}},
+  {"id":"quiet_dorm","a":"clinic","b":"dorm","name":"静かな寮","desc":"治療所と宿舎が隣り合うと、待機中の疲労回復+10/日。","effect":{"fatigueRecover":10}},
+  {"id":"morning_drill","a":"training","b":"dorm","name":"朝練","desc":"訓練所と宿舎が隣り合うと、待機中に経験値+2/日。","effect":{"idleExp":2}}
+]
