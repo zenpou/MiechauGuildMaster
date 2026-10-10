@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
-  addExp, aptFactor, bestJob, carryCapacity, effectiveStats, expToNext, fatigueFactor, generateAdventurer, jobAptitude,
-  PENTAGON, rollAptitude, salaryOf,
+  addExp, aptFactor, bestJob, carryCapacity, effectiveStats, equipEffect, equipResist, expToNext, fatigueFactor,
+  generateAdventurer, jobAptitude, PENTAGON, rollAptitude, salaryOf,
 } from '../src/core/adventurer';
-import { JOB, LOWER_JOBS, PERSONA, PERSONALITY, TRAIT } from '../src/core/data';
+import { ITEM, JOB, LOWER_JOBS, PERSONA, PERSONALITY, TRAIT } from '../src/core/data';
 import { Rng, rngFor } from '../src/core/rng';
 import { ROLE_IDS, type Adventurer, type RoleId } from '../src/core/types';
 
@@ -17,6 +17,10 @@ import { ROLE_IDS, type Adventurer, type RoleId } from '../src/core/types';
 // [x] addExp でレベルが上がり、日給は変わらない
 // [x] carryCapacity はギャザラー役で1.5倍
 // [x] 日給は最低8G
+// [x] 装備の mods が実効能力に加算される(atk/def が増え、spd−1 も効く)
+// [x] equipResist は装備の合計で、各属性 0.8 が上限
+// [x] equipEffect は gather / carry の合計。carry は積載に足される
+// [x] equipment が無い旧データでも落ちない
 
 /** 適性・能力を固定した冒険者。乱数を通さずに式だけを確かめる */
 function fixture(over: Partial<Adventurer> = {}): Adventurer {
@@ -110,6 +114,66 @@ describe('積載', () => {
     expect(carryCapacity(a)).toBe(Math.round((10 + effectiveStats(a).atk * 0.5) * 1.5));
     const th = fixture({ job: 'treasure_hunter' });
     expect(carryCapacity(th)).toBe(Math.round((10 + effectiveStats(th).atk * 0.5) * 1.5));
+  });
+});
+
+describe('装備', () => {
+  const eq = (weapon: string | null, armor: string | null, accessory: string | null) => ({ weapon, armor, accessory });
+  // 上限と carry を確かめるための試験用の装備。実データには無い値
+  beforeAll(() => {
+    ITEM.test_res_armor = { id: 'test_res_armor', name: '試験鎧', desc: '', kind: 'armor', price: 0, weight: 1,
+      equip: { slot: 'armor', armorClass: 'light', mods: {}, resist: { fire: 0.6 } } };
+    ITEM.test_res_charm = { id: 'test_res_charm', name: '試験飾り', desc: '', kind: 'accessory', price: 0, weight: 1,
+      equip: { slot: 'accessory', mods: {}, resist: { fire: 0.5 }, effects: { carry: 4 } } };
+  });
+  afterAll(() => {
+    delete ITEM.test_res_armor;
+    delete ITEM.test_res_charm;
+  });
+
+  it('武器と防具で atk/def が mods の分だけ増える', () => {
+    const bare = effectiveStats(fixture());
+    const geared = effectiveStats(fixture({ equipment: eq('iron_sword', 'leather_armor', 'fang_necklace') }));
+    expect(geared.atk).toBe(bare.atk + 5 + 1);
+    expect(geared.def).toBe(bare.def + 3);
+    expect(geared.hp).toBe(bare.hp);
+  });
+
+  it('鉄の鎧は def+6 と spd−1', () => {
+    const bare = effectiveStats(fixture());
+    const geared = effectiveStats(fixture({ equipment: eq(null, 'iron_armor', null) }));
+    expect(geared.def).toBe(bare.def + 6);
+    expect(geared.spd).toBe(bare.spd - 1);
+  });
+
+  it('equipResist は装備の resist の合計', () => {
+    expect(equipResist(fixture())).toEqual({});
+    expect(equipResist(fixture({ equipment: eq(null, 'iron_armor', 'moss_charm') }))).toEqual({ earth: 0.2, dark: 0.3 });
+  });
+
+  it('equipResist は各属性 0.8 で頭打ち', () => {
+    const a = fixture({ equipment: eq(null, 'test_res_armor', 'test_res_charm') });
+    expect(equipResist(a).fire).toBe(0.8);
+  });
+
+  it('equipEffect は gather / carry の合計。carry は積載に足される', () => {
+    const bare = fixture();
+    const neck = fixture({ equipment: eq(null, null, 'fang_necklace') });
+    expect(equipEffect(bare, 'gather')).toBe(0);
+    expect(equipEffect(neck, 'gather')).toBe(1);
+    expect(equipEffect(neck, 'carry')).toBe(0);
+    const pack = fixture({ equipment: eq(null, null, 'test_res_charm') });
+    expect(equipEffect(pack, 'carry')).toBe(4);
+    expect(carryCapacity(pack)).toBe(carryCapacity(bare) + 4);
+  });
+
+  it('equipment が無い旧データでも落ちない', () => {
+    const old = fixture();
+    delete (old as Partial<Adventurer>).equipment;
+    expect(() => effectiveStats(old)).not.toThrow();
+    expect(equipResist(old)).toEqual({});
+    expect(equipEffect(old, 'gather')).toBe(0);
+    expect(carryCapacity(old)).toBe(carryCapacity(fixture()));
   });
 });
 

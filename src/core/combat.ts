@@ -1,6 +1,7 @@
 import { ITEM, JOB, PERSONALITY, ROLE_SKILL } from './data';
 import type { Rng } from './rng';
-import type { Adventurer, EnemyDef, LogKind, RoleId, Stats } from './types';
+import { equipResist } from './adventurer';
+import type { Adventurer, ElementId, EnemyDef, LogKind, Resist, RoleId, Stats } from './types';
 
 export interface Unit {
   id: string; name: string; side: 'ally' | 'enemy';
@@ -14,6 +15,8 @@ export interface Unit {
   /** スキルIDごとの残りCT。0または未設定なら使える */
   skillCd: Record<string, number>;
   down: boolean;
+  /** 被弾側の属性耐性。味方は装備の合計、敵は定義 */
+  resist: Resist;
 }
 
 export interface CombatCtx {
@@ -49,7 +52,7 @@ export function makeAllyUnit(a: Adventurer, stats: Stats): Unit {
   return {
     id: a.id, name: a.name, side: 'ally',
     hp: stats.hp, maxHp: stats.hp, atk: stats[job.attackStat], def: stats.def, mag: stats.mag, spd: stats.spd,
-    roles: [...job.roles], personality: a.personality, skillCd: {}, down: false,
+    roles: [...job.roles], personality: a.personality, skillCd: {}, down: false, resist: equipResist(a),
   };
 }
 
@@ -59,7 +62,7 @@ export function makeEnemies(def: EnemyDef, count: number): Unit[] {
     out.push({
       id: `e_${def.id}_${i}`, name: count > 1 ? `${def.name}${String.fromCharCode(65 + i)}` : def.name, side: 'enemy',
       hp: def.hp, maxHp: def.hp, atk: def.atk, def: def.def, mag: def.mag, spd: def.spd, roles: [], enemy: def,
-      skillCd: def.skill ? { [ENEMY_SKILL]: def.skill.cd } : {}, down: false,
+      skillCd: def.skill ? { [ENEMY_SKILL]: def.skill.cd } : {}, down: false, resist: { ...def.resist },
     });
   }
   return out;
@@ -89,6 +92,12 @@ function damage(rng: Rng, atk: number, mult: number, def: number): { dmg: number
   const crit = rng.chance(0.08);
   const raw = atk * mult * (crit ? 1.5 : 1) - def * 0.5;
   return { dmg: Math.max(1, Math.round(raw * rng.range(0.9, 1.1))), crit };
+}
+
+/** 属性付きの攻撃は ×(1 − 耐性)。属性なしはそのまま */
+function elemental(dmg: number, element: ElementId | undefined, target: Unit): number {
+  const r = element ? target.resist[element] ?? 0 : 0;
+  return r === 0 ? dmg : Math.max(1, Math.round(dmg * (1 - r)));
 }
 
 function hitChance(att: number, def: number, timidBonus = 0): number {
@@ -200,7 +209,8 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
           u.skillCd[ENEMY_SKILL] = def.skill.cd;
           say('combat', `${u.name}の${def.skill.name}!全員が巻き込まれた!`);
           for (const t of mates) {
-            const { dmg } = damage(rng, u.atk, def.skill.mult, t.def);
+            // EnemyDef.skill の型に element が無いので、範囲スキルも敵本体の属性で打つ
+            const dmg = elemental(damage(rng, u.atk, def.skill.mult, t.def).dmg, def.element, t);
             t.hp -= dmg;
             if (t.hp <= 0) ko(t);
           }
@@ -227,7 +237,7 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
         summary.push(`${u.name}→${target.name}(回避)`);
         return;
       }
-      const hit = damage(rng, u.atk, 1, target.def).dmg;
+      const hit = elemental(damage(rng, u.atk, 1, target.def).dmg, def.element, target);
       const dmg = coverer && hasSkill(coverer, guard.id) ? Math.max(1, Math.round(hit * guard.params.damageTaken)) : hit;
       target.hp -= dmg;
       summary.push(`${u.name}→${target.name}(-${dmg})`);

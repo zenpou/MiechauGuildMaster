@@ -1,8 +1,10 @@
-import { JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, ROLE_SKILL, TRAIT, TRAITS } from './data';
+import { ITEM, JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, ROLE_SKILL, TRAIT, TRAITS } from './data';
+import { RESIST_CAP } from './equipment';
 import type { Rng } from './rng';
 import {
   ROLE_IDS, STAT_KEYS,
-  type Adventurer, type Aptitude, type Persona, type RoleId, type Stats, type TraitDef, type TraitInstance,
+  type Adventurer, type Aptitude, type ItemDef, type Persona, type Resist, type RoleId, type Stats, type TraitDef,
+  type TraitInstance,
 } from './types';
 
 const LEVEL_GAIN: Stats = { hp: 8, atk: 1.2, def: 1.0, mag: 1.2, spd: 0.8, dex: 0.8, scout: 0.8, gather: 0.8 };
@@ -23,6 +25,28 @@ export function traitDefs(a: Adventurer): TraitDef[] {
   return a.traits.map((t) => TRAIT[t.id]);
 }
 
+/** 着けている装備の定義。旧セーブには equipment が無い */
+export function equippedDefs(a: Adventurer): NonNullable<ItemDef['equip']>[] {
+  const e = a.equipment;
+  return [e?.weapon, e?.armor, e?.accessory].flatMap((id) => (id && ITEM[id]?.equip ? [ITEM[id].equip!] : []));
+}
+
+/** 装備の耐性の合計。属性ごとに上限で頭打ち(負=弱点は下限なし) */
+export function equipResist(a: Adventurer): Resist {
+  const out: Resist = {};
+  for (const eq of equippedDefs(a)) {
+    for (const [k, v] of Object.entries(eq.resist ?? {}) as [keyof Resist, number][]) {
+      out[k] = Math.min(RESIST_CAP, (out[k] ?? 0) + v);
+    }
+  }
+  return out;
+}
+
+/** 装備の effects の合計(gather=採取量+N / carry=積載+N) */
+export function equipEffect(a: Adventurer, key: 'gather' | 'carry'): number {
+  return equippedDefs(a).reduce((s, eq) => s + (eq.effects?.[key] ?? 0), 0);
+}
+
 export function fatigueFactor(fatigue: number): number {
   return 1 - Math.max(0, fatigue - 40) / 150;
 }
@@ -32,11 +56,13 @@ export function effectiveStats(a: Adventurer, job: string = a.job, withFatigue =
   const j = JOB[job];
   const apt = aptFactor(jobAptitude(a, job));
   const ff = withFatigue ? fatigueFactor(a.fatigue) : 1;
+  const equipped = equippedDefs(a);
   const out = {} as Stats;
   for (const k of STAT_KEYS) {
     let v = (a.base[k] + (a.level - 1) * LEVEL_GAIN[k] * a.growth) * j.statMult[k];
     if ((COMBAT_STATS as readonly string[]).includes(k)) v *= apt;
     for (const t of traitDefs(a)) v += t.mods[k] ?? 0;
+    for (const eq of equipped) v += eq.mods[k] ?? 0;
     out[k] = Math.max(1, Math.round(v * ff));
   }
   return out;
@@ -98,10 +124,10 @@ export function isTalent(a: Adventurer): boolean {
   return a.growth >= 1.2 || Math.max(...Object.values(a.apt)) >= 90;
 }
 
-/** 持ち帰れる荷の重さ。ギャザラー役は荷造り(pack)の倍率で増える */
+/** 持ち帰れる荷の重さ。ギャザラー役は荷造り(pack)の倍率で増える。装備の carry は倍率の外で足す */
 export function carryCapacity(a: Adventurer): number {
   const base = 10 + effectiveStats(a).atk * 0.5;
-  return Math.round(JOB[a.job].roles.includes('gatherer') ? base * ROLE_SKILL.pack.params.carryMult : base);
+  return Math.round(JOB[a.job].roles.includes('gatherer') ? base * ROLE_SKILL.pack.params.carryMult : base) + equipEffect(a, 'carry');
 }
 
 /** 五角形の並び(剣士→戦士→僧侶→採取士→斥候)を役割で。隣同士が上級職の組になる */

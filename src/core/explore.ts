@@ -1,6 +1,6 @@
 // 探索シミュレーション。出発時に全行程をマス単位で確定し、帰還日に開示する(DESIGN 第3節)。
 // 乱数は inp.rng だけを使う。inp.progress は読むだけで、差分は mapDeltas で返す。
-import { carryCapacity, effectiveStats, traitNum } from './adventurer';
+import { carryCapacity, effectiveStats, equipEffect, traitNum } from './adventurer';
 import { hasSkill, makeAllyUnit, makeEnemies, runCombat, type Unit } from './combat';
 import { ENEMY, ITEM, PERSONALITY, POLICY, ROLE_SKILL, TRAIT, TUNING } from './data';
 import { exploredRate, frontier, isPassable, neighbors, parseFloor, shortestPath, visibleFrom, xy, type Grid, type PassKnowledge } from './dungeon';
@@ -125,6 +125,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   const units: Unit[] = members.map((m) => makeAllyUnit(m, stats[m.id]));
   const byId = Object.fromEntries(members.map((m) => [m.id, m]));
   const capacity = members.reduce((s, m) => s + carryCapacity(m), 0);
+  const gatherBonus = members.reduce((s, m) => s + equipEffect(m, 'gather'), 0);
   const potions = { n: inp.items.potion ?? 0, used: 0 };
   const luck = members.reduce((s, m) => s + traitNum(m, 'luck'), 0) / members.length;
   const best = (k: StatKey) => members.reduce((b, m) => (stats[m.id][k] > stats[b.id][k] ? m : b));
@@ -329,7 +330,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
           return;
         }
         const focus = inp.action === 'gather' && (!targetItem || targetItem === item) ? T.gatherFocusBonus : 0;
-        const qty = rng.int(T.gatherQty[0], T.gatherQty[1]) + (skilled('pack') ? ROLE_SKILL.pack.params.gatherBonus : 0) + focus;
+        const qty = rng.int(T.gatherQty[0], T.gatherQty[1]) + (skilled('pack') ? ROLE_SKILL.pack.params.gatherBonus : 0) + focus + gatherBonus;
         const kept = addMaterial(item, qty);
         if (kept > 0) say('event', `${g.name}が${ITEM[item].name}を${kept}個採った。`);
         return;

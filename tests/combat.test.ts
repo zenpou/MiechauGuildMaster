@@ -22,7 +22,7 @@ function ally(roles: RoleId[], v: Partial<Unit> = {}): Unit {
   const id = v.id ?? `a${seq++}`;
   return {
     id, name: id, side: 'ally', hp: 100, maxHp: 100, atk: 20, def: 10, mag: 10, spd: 10,
-    roles, personality: 'cautious', skillCd: {}, down: false, ...v,
+    roles, personality: 'cautious', skillCd: {}, down: false, resist: {}, ...v,
   };
 }
 
@@ -223,5 +223,60 @@ describe('makeAllyUnit', () => {
     const warlord = makeAllyUnit(adv('warlord'), s);
     expect(warlord.atk).toBe(7);
     expect(warlord.roles).toEqual(['attacker', 'tank']);
+  });
+});
+
+describe('属性と耐性', () => {
+  /** 打たれ強い1人と、倒れない敵1体を30ターン戦わせ、受けた総ダメージを返す */
+  function taken(enemyId: string, resist: Unit['resist'], seed: number): { dmg: number; log: string[] } {
+    const me = ally(['attacker'], { id: 'me', hp: 100000, maxHp: 100000, resist });
+    const e = foe({ ...makeEnemies(ENEMY[enemyId], 1)[0], hp: 100000, maxHp: 100000 });
+    const c = ctx(seed);
+    runCombat([me], [e], c);
+    return { dmg: 100000 - me.hp, log: c.log };
+  }
+
+  it('敵の resist は定義から、味方の resist は装備から', () => {
+    expect(makeEnemies(ENEMY.skeleton, 1)[0].resist).toEqual({ dark: 0.5 });
+    expect(makeEnemies(ENEMY.goblin, 1)[0].resist).toEqual({});
+    const a = adv('fighter');
+    a.equipment = { weapon: null, armor: 'iron_armor', accessory: 'moss_charm' };
+    expect(makeAllyUnit(a, stats()).resist).toEqual({ earth: 0.2, dark: 0.3 });
+  });
+
+  it('enemies.json の属性は表どおり', () => {
+    expect(ENEMY.skeleton.element).toBe('dark');
+    expect(ENEMY.golem.element).toBe('earth');
+    expect(ENEMY.golem.resist).toEqual({ earth: 0.5, thunder: 0.3 });
+    expect(ENEMY.slime.resist).toEqual({ thunder: -0.5 });
+    for (const id of ['goblin', 'wolf', 'goblin_chief', 'cave_bat']) expect(ENEMY[id].element).toBeUndefined();
+  });
+
+  it('闇耐性0.5で骸骨兵の与ダメがほぼ半分になる(同seedで決定論)', () => {
+    for (const seed of [1, 2, 3]) {
+      const bare = taken('skeleton', {}, seed);
+      const half = taken('skeleton', { dark: 0.5 }, seed);
+      expect(taken('skeleton', { dark: 0.5 }, seed)).toEqual(half);
+      expect(bare.dmg).toBeGreaterThan(0);
+      // 1発ごとの四捨五入で最大0.5ずれる。30ターン×1発
+      expect(Math.abs(half.dmg - bare.dmg / 2)).toBeLessThanOrEqual(15);
+    }
+  });
+
+  it('負の耐性(弱点)は被ダメを増やす', () => {
+    const bare = taken('skeleton', {}, 4);
+    const weak = taken('skeleton', { dark: -0.5 }, 4);
+    expect(Math.abs(weak.dmg - bare.dmg * 1.5)).toBeLessThanOrEqual(15);
+  });
+
+  it('属性の無い攻撃は耐性の影響を受けない', () => {
+    expect(taken('goblin', { dark: 0.8, earth: 0.8 }, 5)).toEqual(taken('goblin', {}, 5));
+  });
+
+  it('ゴーレムの岩砕き(範囲)も土属性', () => {
+    const bare = taken('golem', {}, 6);
+    const half = taken('golem', { earth: 0.5 }, 6);
+    expect(bare.log.some((l) => l.includes('岩砕き'))).toBe(true);
+    expect(Math.abs(half.dmg - bare.dmg / 2)).toBeLessThanOrEqual(15);
   });
 });
