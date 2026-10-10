@@ -13,6 +13,7 @@ import { initPwa } from './pwa';
 import { questsTab } from './questsTab';
 import { recordsTab } from './recordsTab';
 import { recruitTab } from './recruitTab';
+import { storyOverlay } from './storyHost';
 import { worldTab } from './worldTab';
 
 const TABS: { id: Tab; label: string; view: () => HTMLElement }[] = [
@@ -41,15 +42,22 @@ function render() {
     ui.saveWarning ? div('warn', ui.saveWarning) : null,
     tab.view(),
   ].filter((x): x is HTMLElement => !!x);
+  // 物語の章はエンディングの後に重ねる。竜の後の章は、エンディングを読み終えてから開く
+  const story = pages.length ? null : storyOverlay(commit);
+  const modal = pages.length > 0 || story !== null;
   // モーダルの間は後ろの画面を操作・読み上げの対象から外す
-  if (pages.length) for (const el of body) el.inert = true;
+  if (modal) for (const el of body) el.inert = true;
   // 下のバー(インストール・更新)にも、モーダルの後ろからキーボードで届かないようにする
   const bar = document.getElementById('pwa');
-  if (bar) bar.inert = pages.length > 0;
+  if (bar) bar.inert = modal;
+  // 描き直しでプレイヤーを付け直すとフォーカスが外れる。音量などを触っている途中なら、そこへ戻す
+  const focused = story?.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
   app.replaceChildren(...body,
     ...(pages.length ? [endingModal(pages)] : []),
+    ...(story ? [story] : []),
     ...(ui.toast ? [div(`toast ${ui.toast.err ? 'err' : ''}`, ui.toast.text)] : []));
   if (pages.length) app.querySelector<HTMLButtonElement>('.modal button')?.focus();
+  else if (story) (focused ?? story.querySelector<HTMLElement>('[data-story-next]'))?.focus({ preventScroll: true });
 }
 
 // render のたびに endingPending を見るので、日送りの後でも読み込み直後でも、未読なら出る

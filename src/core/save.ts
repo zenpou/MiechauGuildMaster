@@ -1,6 +1,7 @@
 // セーブの直列化と読み込み。DOM非依存にするため、保存先は Storage 風の口を外から渡す。
 import { emptyState, initialDungeonProgress } from './state';
 import { DUNGEONS } from './data';
+import { markStorySeen, storyDue } from './story';
 import { SAVE_VERSION, type Adventurer, type GameState } from './types';
 
 export interface KeyValueStore {
@@ -46,6 +47,11 @@ export function migrate(raw: unknown): GameState | null {
   // 後から足したダンジョンは、古いセーブでは進捗が無いので初期値(噂)で埋める
   merged.dungeons = { ...merged.dungeons };
   for (const d of DUNGEONS) merged.dungeons[d.id] ??= initialDungeonProgress(d.id);
+  // 物語の導入前から遊んでいたセーブ(章の旗が1つも無く、1日目を過ぎている)は、過ぎた章を開いた直後に
+  // 連続で出さず、既読にする。出す・出さないを章ごとに選ばせないのは、台本があとから増えても同じ扱いで済ませるため
+  if (merged.day > 1 && !Object.keys(merged.flags).some((k) => k.startsWith('story:'))) {
+    for (const c of storyDue(merged)) markStorySeen(merged, c.id);
+  }
   merged.version = SAVE_VERSION;
   return merged;
 }

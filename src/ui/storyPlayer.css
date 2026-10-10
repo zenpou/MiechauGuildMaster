@@ -1,0 +1,581 @@
+/* 紙芝居プレイヤー。前作から持ち込み。セレクタはすべて .vn-player / .vn-overlay / .story- の下に閉じる */
+.vn-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  overscroll-behavior: contain;
+  background: rgba(5, 9, 10, 0.92);
+}
+.vn-overlay > .vn-player { max-width: 1100px; }
+
+.vn-player {
+  --vn-bg: #0e1719;
+  --vn-panel: #142326;
+  --vn-panel-strong: #1d3033;
+  --vn-line: #8e7650;
+  --vn-text: #f7f0df;
+  --vn-dim: #b7c0b7;
+  --vn-accent: #efc878;
+  --vn-focus: #f8dc95;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto minmax(220px, 1fr) auto auto auto;
+  width: 100%;
+  height: calc(100dvh - 16px);
+  max-height: calc(100dvh - 8px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow: auto;
+  color: var(--vn-text);
+  background: var(--vn-bg);
+  border: 1px solid var(--vn-line);
+  border-radius: 12px;
+  box-shadow: 0 22px 90px #000b;
+  isolation: isolate;
+}
+
+.vn-player,
+.vn-player * { color: var(--vn-text); }
+.vn-player [hidden] { display: none !important; }
+.vn-player button,
+.vn-player input { font: inherit; }
+.vn-player button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 7px 12px;
+  color: var(--vn-text);
+  background: var(--vn-panel-strong);
+  border: 1px solid #5b665e;
+  border-radius: 7px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.vn-player button:hover:not(:disabled) { border-color: var(--vn-accent); }
+.vn-player button:focus-visible,
+.vn-player input:focus-visible { outline: 3px solid var(--vn-focus); outline-offset: 2px; }
+.vn-player button:disabled { opacity: .45; cursor: not-allowed; }
+
+.vn-player-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 8px 14px;
+  background: #102023;
+  border-bottom: 1px solid #34484a;
+}
+.vn-player-title {
+  min-width: 0;
+  margin: 0 auto 0 0;
+  overflow: hidden;
+  color: var(--vn-accent) !important;
+  font-size: 16px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vn-player-progress { color: var(--vn-dim) !important; font-size: 12px; white-space: nowrap; }
+.vn-player-close { white-space: nowrap; }
+
+.vn-player-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 8px;
+  min-height: 50px;
+  padding: 6px 14px;
+  background: #102023;
+  border-bottom: 1px solid #34484a;
+  white-space: nowrap;
+}
+.vn-player-tool-button { min-width: 72px; min-height: 44px !important; padding: 4px 9px !important; font-size: 12px; white-space: nowrap; flex: 0 0 auto; }
+.vn-player-audio {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+}
+.vn-player-audio legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.vn-player-audio label { color: var(--vn-dim) !important; font-size: 12px; }
+.vn-player-audio-mute { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; cursor: pointer; }
+.vn-player-audio-volume { margin-left: 2px; }
+.vn-player-audio input[type='range'] { width: 92px; accent-color: var(--vn-accent); }
+.vn-player-audio output { min-width: 34px; color: var(--vn-dim) !important; font-size: 11px; text-align: right; }
+
+/* 背景の絵が無いあいだ(art.json が null)は、背景IDごとのグラデーションが見える */
+.vn-player-stage {
+  position: relative;
+  min-height: 220px;
+  height: 100%;
+  overflow: hidden;
+  background: #26393b;
+  isolation: isolate;
+}
+.vn-player-stage[data-background='guild'] { background: linear-gradient(#5f4228, #93683d 58%, #634324 58%); }
+.vn-player-stage[data-background='town'] { background: linear-gradient(#6c9fc9 0 49%, #a4815d 49% 100%); }
+.vn-player-stage[data-background='night'] { background: radial-gradient(circle at 72% 18%, #5767a5 0, #1b2853 34%, #080f23 82%); }
+.vn-player-stage[data-background='tavern'] { background: linear-gradient(#341b0d, #6b3515 55%, #24170f 55%); }
+.vn-player-stage[data-background='office'] { background: linear-gradient(#202d42 0 55%, #535862 55%); }
+.vn-player-scene,
+.vn-player-scene-snapshot {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+.vn-player-scene { z-index: 1; }
+.vn-player-scene-snapshot {
+  z-index: 3;
+  animation-fill-mode: both;
+}
+.vn-player-scene-content,
+.vn-player-transition-scene-content {
+  position: absolute;
+  inset: 0;
+}
+.vn-player-background,
+.vn-player-transition-background {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.vn-player-background-fallback,
+.vn-player-transition-background-fallback {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 0;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  color: #e3d6bb !important;
+  background: #121a1bb3;
+  border: 1px dashed #8e7650;
+  border-radius: 5px;
+  padding: 2px 8px;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vn-player-characters,
+.vn-player-transition-characters { position: absolute; inset: 0; z-index: 1; }
+.vn-player-character,
+.vn-player-transition-character {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 33.333%;
+  height: 100%;
+  margin: 0;
+  text-align: center;
+  transition: opacity .2s ease, filter .2s ease, transform .2s ease;
+}
+.vn-player-character-left { left: 0; }
+.vn-player-character-center { left: 33.333%; }
+.vn-player-character-right { right: 0; }
+.vn-player-character-motion,
+.vn-player-transition-character-motion {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.vn-player-character-image,
+.vn-player-transition-character-image {
+  /* 全身の絵を胸から上で切り取る。去っていく場面の写しも同じ切り方にする */
+  position: absolute;
+  top: -4%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: block;
+  width: auto;
+  max-width: none;
+  height: 280%;
+  object-fit: contain;
+  object-position: top center;
+  filter: drop-shadow(0 5px 5px #0008);
+}
+/* 名札は台詞枠の話し手の札(上へはみ出す)に隠れない高さに置き、隣の人物の名札と重ならないよう中身の幅にする */
+.vn-player-character-name,
+.vn-player-transition-character-name {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  max-width: calc(100% - 8px);
+  overflow: hidden;
+  transform: translateX(-50%);
+  color: #fff7e6 !important;
+  background: #101a1dcc;
+  border: 1px solid var(--vn-cast-color, #8e7650);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 立ち絵が無いあいだのシルエットカード。輪郭・頭・肩を cast.json の色で描く */
+.vn-player-character-card,
+.vn-player-transition-character-card {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: 1;
+  width: min(72%, 160px);
+  height: 86%;
+  overflow: hidden;
+  transform: translateX(-50%);
+  background: linear-gradient(to top, #0b1214f2, #0b121480);
+  border: 3px solid var(--vn-cast-color, #8e7650);
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+  box-shadow: 0 6px 18px #0009;
+}
+.vn-player-card-head,
+.vn-player-card-body {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--vn-cast-color, #8e7650);
+  opacity: .62;
+}
+.vn-player-card-head { top: 17%; width: 36%; aspect-ratio: 1; border-radius: 50%; }
+.vn-player-card-body { bottom: 0; width: 78%; height: 44%; border-radius: 48% 48% 0 0; }
+.vn-player-card-pose {
+  position: absolute;
+  bottom: 30%;
+  left: 50%;
+  max-width: 92%;
+  overflow: hidden;
+  transform: translateX(-50%);
+  color: #fff7e6 !important;
+  background: #101a1dcc;
+  border-radius: 999px;
+  padding: 0 7px;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vn-player-character.is-listener,
+.vn-player-transition-character.is-listener { opacity: 1; filter: brightness(.70) saturate(.75); transform: scale(.97); }
+.vn-player-character.is-speaker,
+.vn-player-transition-character.is-speaker { z-index: 2; filter: drop-shadow(0 0 12px #f2c87166); }
+.vn-player-still,
+.vn-player-transition-still {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: #101a1d;
+}
+/* 一枚絵が無いあいだは地の色で舞台を覆う */
+.vn-player-still-fallback,
+.vn-player-transition-still-fallback {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  color: #cbbd9f !important;
+  background: #3a3128;
+  font-size: 12px;
+  letter-spacing: .05em;
+  text-align: center;
+}
+.vn-player-flash,
+.vn-player-blackout {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.vn-player-flash { z-index: 4; }
+.vn-player-blackout { z-index: 5; background: #020406; opacity: 0; }
+
+@keyframes vn-player-transition-fade { from { opacity: 1; } to { opacity: 0; } }
+@keyframes vn-player-transition-wipe { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 100% 0 0); } }
+@keyframes vn-player-transition-reveal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes vn-player-transition-reveal-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes vn-player-transition-blackout { 0% { opacity: 0; } 38% { opacity: 1; } 68% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes vn-player-effect-shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-7px, 2px, 0); }
+  40% { transform: translate3d(7px, -2px, 0); }
+  60% { transform: translate3d(-5px, 1px, 0); }
+  80% { transform: translate3d(4px, 0, 0); }
+}
+@keyframes vn-player-effect-impact {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  15% { transform: translate3d(-12px, 2px, 0) scale(1.015); }
+  30% { transform: translate3d(11px, -2px, 0) scale(1.01); }
+  50% { transform: translate3d(-7px, 1px, 0) scale(1.005); }
+  75% { transform: translate3d(4px, 0, 0) scale(1); }
+}
+@keyframes vn-player-effect-flash { 0% { background: #fff8d955; } 100% { background: transparent; } }
+@keyframes vn-player-effect-impact-flash { 0% { background: #fff8d9f2; } 22% { background: #ffd75b8a; } 100% { background: transparent; } }
+@keyframes vn-player-motion-enter-left { from { opacity: .15; transform: translate3d(-32%, 0, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes vn-player-motion-enter-right { from { opacity: .15; transform: translate3d(32%, 0, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes vn-player-motion-jump { 0%, 100% { transform: translateY(0); } 38% { transform: translateY(var(--vn-jump-rise, -6%)); } 64% { transform: translateY(1%); } }
+@keyframes vn-player-motion-nod { 0%, 100% { transform: translateY(0) scaleY(1); } 42% { transform: translateY(1.5%) scaleY(.985); } }
+@keyframes vn-player-motion-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.5%); } 60% { transform: translateX(1.5%); } }
+@keyframes vn-player-motion-recoil { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 28% { transform: translate3d(-9%, 0, 0) scale(.98); } 62% { transform: translate3d(2%, 0, 0) scale(1); } }
+
+.vn-player-scene-snapshot.is-transition-fade { animation: vn-player-transition-fade .46s ease both; }
+.vn-player-scene-snapshot.is-transition-wipe { animation: vn-player-transition-wipe .56s cubic-bezier(.2, .75, .2, 1) both; }
+.vn-player-scene.is-reveal-fade { animation: vn-player-transition-reveal-fade .46s ease both; }
+.vn-player-scene.is-reveal-wipe { animation: vn-player-transition-reveal-wipe .56s cubic-bezier(.2, .75, .2, 1) both; }
+.vn-player-stage.is-blackout .vn-player-blackout.is-active { animation: vn-player-transition-blackout .64s ease both; }
+.vn-player-stage.is-shake .vn-player-scene-content,
+.vn-player-scene-content.is-effect-shake { animation: vn-player-effect-shake .42s ease both; }
+.vn-player-stage.is-impact .vn-player-scene-content,
+.vn-player-scene-content.is-effect-impact { animation: vn-player-effect-impact .56s cubic-bezier(.18, .75, .25, 1) both; }
+.vn-player-stage.is-flash .vn-player-flash.is-active { animation: vn-player-effect-flash .48s ease-out both; }
+.vn-player-stage.is-impact .vn-player-flash.is-impact { animation: vn-player-effect-impact-flash .56s ease-out both; }
+.vn-player-character-motion.is-motion-enter-left { animation: vn-player-motion-enter-left .54s cubic-bezier(.2, .8, .25, 1) both; }
+.vn-player-character-motion.is-motion-enter-right { animation: vn-player-motion-enter-right .54s cubic-bezier(.2, .8, .25, 1) both; }
+.vn-player-character-motion.is-motion-jump { animation: vn-player-motion-jump .54s cubic-bezier(.25, .8, .3, 1) both; }
+.vn-player-character-motion.is-motion-nod { animation: vn-player-motion-nod .54s ease both; }
+.vn-player-character-motion.is-motion-shake { animation: vn-player-motion-shake .54s ease both; }
+.vn-player-character-motion.is-motion-recoil { animation: vn-player-motion-recoil .54s cubic-bezier(.25, .8, .3, 1) both; }
+
+.vn-player-dialogue {
+  position: relative;
+  z-index: 4;
+  min-height: 150px;
+  padding: 22px 24px 12px;
+  background: linear-gradient(120deg, #172c2f, #111d20);
+  border-top: 2px solid var(--vn-line);
+  cursor: pointer;
+}
+.vn-player-dialogue.has-portrait { padding-left: 112px; }
+.vn-player-portrait {
+  position: absolute;
+  left: 18px;
+  top: 22px;
+  z-index: 1;
+  width: 76px;
+  height: 76px;
+  margin: 0;
+  overflow: hidden;
+  background: #0f1c1e;
+  border: 2px solid var(--vn-cast-color, var(--vn-line));
+  border-radius: 12px;
+  box-shadow: 0 4px 12px #0008;
+  pointer-events: none;
+}
+.vn-player-portrait-image {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: auto;
+  max-width: none;
+  height: 650%;
+  transform: translateX(-50%);
+  object-fit: contain;
+  object-position: top center;
+}
+/* 顔の絵が無いあいだは、名前の頭文字を人物の色で出す */
+.vn-player-portrait-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--vn-cast-color, var(--vn-dim)) !important;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+}
+.vn-player-speaker {
+  position: absolute;
+  top: -17px;
+  left: 20px;
+  max-width: calc(100% - 40px);
+  overflow: hidden;
+  color: #2c210c !important;
+  background: var(--vn-accent);
+  border-radius: 999px;
+  padding: 2px 16px;
+  font-size: 14px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vn-player-line {
+  min-height: 3.8em;
+  margin: 0;
+  color: var(--vn-text) !important;
+  font-size: clamp(15px, 1.8vw, 18px);
+  line-height: 1.85;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.vn-player-line-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: normal;
+  border: 0;
+}
+.vn-player-typing-hint {
+  display: block;
+  margin-top: 4px;
+  color: var(--vn-accent) !important;
+  font-size: 11px;
+  text-align: right;
+}
+.vn-player-history {
+  max-height: 180px;
+  overflow: auto;
+  padding: 10px 20px;
+  background: #0f1c1e;
+  border-top: 1px solid #34484a;
+}
+.vn-player-history h3 { margin: 0 0 5px; color: var(--vn-accent) !important; font-size: 13px; }
+.vn-player-history ol { margin: 0; padding-left: 25px; }
+.vn-player-history-row { padding: 3px 5px; color: var(--vn-dim) !important; font-size: 12px; line-height: 1.55; }
+.vn-player-history-row.is-current { background: #2a3b3dcc; border-radius: 4px; }
+.vn-player-history-speaker { margin-right: 7px; color: var(--vn-accent) !important; }
+.vn-player-history-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.vn-player-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
+  background: #102023;
+}
+.vn-player-next { min-width: 112px; color: #2d210c !important; background: var(--vn-accent) !important; border-color: var(--vn-accent) !important; font-weight: 700; }
+
+/* 絵を眺めるときは舞台だけを残し、台詞の段をすべて外す */
+.vn-player.is-dialogue-hidden { grid-template-rows: auto auto minmax(0, 1fr); }
+.vn-player.is-dialogue-hidden .vn-player-stage { height: 100%; min-height: 0; }
+
+@media (max-width: 600px) {
+  .vn-overlay { padding: 0; }
+  .vn-player { --vn-jump-rise: -4%; }
+  .vn-player {
+    width: 100%;
+    height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: none;
+    border-radius: 0;
+    grid-template-rows: auto auto minmax(210px, 46dvh) auto auto auto;
+  }
+  .vn-player-top { min-height: 52px; padding: 7px 10px; gap: 7px; }
+  .vn-player-title { font-size: 14px; }
+  .vn-player-close { min-height: 44px !important; padding: 5px 7px !important; font-size: 12px; }
+  .vn-player-toolbar { justify-content: flex-start; gap: 4px; padding: 4px 8px; flex-wrap: wrap; }
+  .vn-player-audio { margin-left: auto; flex-shrink: 0; }
+  .vn-player-audio input[type='range'] { width: 68px; }
+  .vn-player-stage { height: auto; min-height: 210px; }
+  .vn-player-character,
+  .vn-player-transition-character {
+    left: 20%;
+    width: 60%;
+    height: 100%;
+    overflow: visible;
+  }
+  .vn-player-character-left { left: 0; }
+  .vn-player-character-center { left: 20%; }
+  .vn-player-character-right { right: 0; left: auto; }
+  /* 狭い画面では隣の人物の顔が隠れないよう、絵を小さくする */
+  .vn-player-stage[data-cast-count='2'] .vn-player-character-image,
+  .vn-player-stage[data-cast-count='3'] .vn-player-character-image,
+  .vn-player-scene-snapshot.vn-player-transition-cast-2 .vn-player-transition-character-image,
+  .vn-player-scene-snapshot.vn-player-transition-cast-3 .vn-player-transition-character-image { height: 240%; }
+  .vn-player-stage[data-cast-count='3'] .vn-player-character,
+  .vn-player-scene-snapshot.vn-player-transition-cast-3 .vn-player-transition-character { width: 48%; }
+  .vn-player-stage[data-cast-count='3'] .vn-player-character.vn-player-character-left,
+  .vn-player-scene-snapshot.vn-player-transition-cast-3 .vn-player-character-left { left: -4%; }
+  .vn-player-stage[data-cast-count='3'] .vn-player-character.vn-player-character-center,
+  .vn-player-scene-snapshot.vn-player-transition-cast-3 .vn-player-character-center { left: 26%; }
+  .vn-player-stage[data-cast-count='3'] .vn-player-character.vn-player-character-right,
+  .vn-player-scene-snapshot.vn-player-transition-cast-3 .vn-player-character-right { right: -4%; left: auto; }
+  .vn-player-stage[data-cast-count='3'] .vn-player-character-card,
+  .vn-player-scene-snapshot.vn-player-transition-cast-3 .vn-player-transition-character-card { width: min(64%, 150px); }
+  .vn-player-character-name,
+  .vn-player-transition-character-name { bottom: 22px; font-size: 10px; }
+  .vn-player-dialogue { min-height: 142px; padding: 19px 14px 9px; }
+  .vn-player-dialogue.has-portrait { padding-left: 82px; }
+  .vn-player-portrait { left: 10px; top: 19px; width: 58px; height: 58px; border-radius: 10px; }
+  .vn-player-portrait-fallback { font-size: 24px; }
+  .vn-player-line { min-height: 5em; font-size: 15px; line-height: 1.75; }
+  .vn-player-navigation { padding-right: 10px; padding-left: 10px; }
+}
+
+/* 横にしたスマートフォンは高さが無いが、舞台の幅は取れる */
+@media (max-height: 600px) and (orientation: landscape) {
+  .vn-overlay { padding: 0; }
+  .vn-player { --vn-jump-rise: -3%; }
+  .vn-player {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    grid-template-rows: auto auto minmax(120px, 1fr) auto auto auto;
+  }
+  .vn-player-top { min-height: 44px; padding: 4px 10px; gap: 7px; }
+  .vn-player-toolbar { min-height: 48px; padding: 3px 10px; }
+  .vn-player-tool-button { min-height: 44px !important; }
+  .vn-player-stage { height: auto; min-height: 120px; }
+  .vn-player-character,
+  .vn-player-transition-character { width: 33.333%; height: 100%; overflow: visible; }
+  .vn-player-character-left { left: 0; }
+  .vn-player-character-center { left: 33.333%; }
+  .vn-player-character-right { right: 0; left: auto; }
+  .vn-player-dialogue { min-height: 90px; padding: 18px 16px 7px; }
+  .vn-player-dialogue.has-portrait { padding-left: 72px; }
+  .vn-player-portrait { left: 10px; top: 18px; width: 48px; height: 48px; border-radius: 8px; }
+  .vn-player-portrait-fallback { font-size: 20px; }
+  .vn-player-line { min-height: 2.8em; font-size: 14px; line-height: 1.55; }
+  .vn-player-navigation { padding: 5px 10px calc(5px + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 360px) {
+  .vn-player { grid-template-rows: max-content max-content minmax(160px, 1fr) max-content max-content max-content; }
+  .vn-player-toolbar { font-size: 11px; }
+  .vn-player-tool-button { padding: 3px 6px !important; }
+  .vn-player-audio-volume { display: none; }
+  .vn-player-stage { min-height: 160px; }
+  .vn-player-dialogue { min-height: 134px; }
+  .vn-player-line { min-height: 4.5em; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vn-player-stage,
+  .vn-player-character { transition: none; }
+  .vn-player-stage * { animation: none !important; }
+}
+
+.vn-player.is-motion-static .vn-player-character { transition: none !important; }
+
+/* 記録タブの「物語」節 */
+.story-chapters li { display: flex; align-items: center; gap: 10px; }
+.story-chapter-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.story-chapters button.small { flex: 0 0 auto; margin-left: 0; }
+.story-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 36px;
+  object-fit: cover;
+  background: #3a3128;
+  border: 1px solid #8e7650;
+  border-radius: 4px;
+}

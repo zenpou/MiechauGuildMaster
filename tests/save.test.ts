@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { effectiveStats } from '../src/core/adventurer';
 import { advanceDay, dispatch, newGame } from '../src/core/game';
 import { migrate } from '../src/core/save';
+import { storyDue } from '../src/core/story';
 import type { GameState } from '../src/core/types';
 
 const clone = (s: GameState) => JSON.parse(JSON.stringify(s));
@@ -75,5 +76,33 @@ describe('古いセーブの読み込み(セーブ互換)', () => {
       expect(e.result.maxDepth).toBe(0);
       expect(e.result.daysSpent).toBe(e.returnDay - e.startDay);
     }
+  });
+});
+
+describe('物語の導入前から遊んでいたセーブ', () => {
+  const storyFlags = (s: GameState) => Object.keys(s.flags).filter((k) => k.startsWith('story:'));
+
+  it('章の旗が1つも無く1日目を過ぎているセーブは、すでに過ぎた章を連続で出さない', () => {
+    const old = clone(newGame(5));
+    old.day = 60;
+    old.dungeons.old_mine.confirmed = true;
+    expect(storyDue(old).length).toBeGreaterThan(1);
+    const s = migrate(old)!;
+    expect(storyDue(s)).toEqual([]);
+    expect(storyFlags(s).length).toBeGreaterThan(1);
+  });
+
+  it('1日目の新規セーブは序章がまだ出る', () => {
+    const s = migrate(clone(newGame(5)))!;
+    expect(storyDue(s).map((c) => c.id)).toEqual(['prologue']);
+  });
+
+  it('章の旗がすでにあるセーブには手を付けない(あとから足した章は出る)', () => {
+    const old = clone(newGame(5));
+    old.day = 60;
+    old.flags['story:prologue'] = 1;
+    old.dungeons.old_mine.confirmed = true;
+    const s = migrate(old)!;
+    expect(storyDue(s).map((c) => c.id)).toEqual(['ch2']);
   });
 });

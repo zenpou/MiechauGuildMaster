@@ -1,0 +1,78 @@
+[
+  {
+    "id": "prologue",
+    "title": "序章(仮) · ギルドの朝",
+    "trigger": {"day": 1},
+    "art": "founding",
+    "draft": true,
+    "lines": [
+      {"text": "(仮)街はずれの古い建物に、今日からギルドの看板が掛かる。", "background": "town", "transition": "fade", "sfx": "step"},
+      {"speaker": "受付(仮)", "text": "(仮)おはようございます、マスター。看板、ちゃんと真っすぐですよ。", "background": "guild", "cast": [{"character": "clerk", "pose": "happy", "position": "left", "motion": "enter-left"}, {"character": "master", "pose": "neutral", "position": "right"}], "transition": "wipe", "sfx": "door"},
+      {"speaker": "ギルドマスター(仮)", "text": "(仮)よし。今日から、ここで冒険者を迎えて送り出す。", "background": "guild", "cast": [{"character": "clerk", "pose": "neutral", "position": "left"}, {"character": "master", "pose": "happy", "position": "right", "motion": "nod", "motionAt": "送り出す"}], "transition": "cut", "sfx": "paper", "sfxAt": "よし"},
+      {"text": "(仮)ここに一枚絵が入る。ギルドの最初の朝。", "background": "guild", "still": "founding", "transition": "fade", "sfx": "chime"},
+      {"speaker": "受付(仮)", "text": "(仮)まずは掲示板の依頼を一枚、受けるところから始めましょう。", "background": "guild", "cast": [{"character": "clerk", "pose": "neutral", "position": "center"}], "transition": "cut"}
+    ]
+  },
+  {
+    "id": "ch1",
+    "title": "第一章(仮) · 最初の依頼",
+    "trigger": {"questsDone": 1},
+    "draft": true,
+    "lines": [
+      {"text": "(仮)最初の依頼を終えた隊が、酒場で祝杯を上げている。", "background": "tavern", "transition": "fade", "sfx": "cup"},
+      {"speaker": "ユニーク冒険者(仮)", "text": "(仮)乾杯! 初仕事、ちゃんと終わったぞ!", "background": "tavern", "cast": [{"character": "unique", "pose": "happy", "position": "center", "motion": "jump"}], "transition": "cut", "effect": "flash", "effectAt": "乾杯"},
+      {"speaker": "ギルドマスター(仮)", "text": "(仮)よくやった。報告は明日、受付でまとめて聞こう。", "background": "tavern", "cast": [{"character": "unique", "pose": "happy", "position": "left"}], "portrait": {"character": "master", "pose": "happy"}, "transition": "cut"},
+      {"speaker": "受付(仮)", "text": "(仮)お二人とも、帳簿に書くまでが仕事ですよ。", "background": "tavern", "cast": [{"character": "unique", "pose": "neutral", "position": "left"}, {"character": "clerk", "pose": "worried", "position": "right", "motion": "enter-right"}], "transition": "cut", "sfx": "paper", "sfxAt": "帳簿"}
+    ]
+  },
+  {
+    "id": "ch2",
+    "title": "第二章(仮) · 古い坑道",
+    "trigger": {"dungeonConfirmed": "old_mine"},
+    "draft": true,
+    "lines": [
+      {"text": "(仮)踏査の隊が戻り、古い坑道の入口が確かめられた。", "background": "office", "transition": "wipe", "sfx": "step"},
+      {"speaker": "ユニーク冒険者(仮)", "text": "(仮)中は崩れかけてた。奥から、何かが掘る音がしたんだ。", "background": "office", "cast": [{"character": "unique", "pose": "angry", "position": "left"}], "transition": "cut", "effect": "shake", "effectAt": "掘る音"},
+      {"speaker": "受付(仮)", "text": "(仮)えっ……誰も入っていないはずの坑道ですよね。", "background": "office", "cast": [{"character": "unique", "pose": "neutral", "position": "left"}, {"character": "clerk", "pose": "worried", "position": "right", "motion": "recoil", "motionAt": "えっ"}], "transition": "cut"},
+      {"speaker": "ギルドマスター(仮)", "text": "(仮)まずは装備を整えてからだ。無理はさせない。", "background": "office", "cast": [{"character": "unique", "pose": "neutral", "position": "left"}, {"character": "master", "pose": "thoughtful", "position": "center"}, {"character": "clerk", "pose": "neutral", "position": "right"}], "transition": "cut"}
+    ]
+  },
+  {
+    "id": "ch3",
+    "title": "第三章(仮) · 遺跡の鍵",
+    "trigger": {"keyHeld": "ruin_key"},
+    "draft": true,
+    "lines": [
+      {"text": "(仮)廃れた塔の隠し部屋から、古い鍵が持ち帰られた。沈んだ遺跡の扉に合うらしい。", "background": "night", "transition": "blackout", "sfx": "water"},
+      {"speaker": "ギルドマスター(仮)", "text": "(仮)この鍵で、沈んだ遺跡の扉が開くはずだ。", "background": "night", "cast": [{"character": "master", "pose": "thoughtful", "position": "center"}], "transition": "cut", "sfx": "chime", "sfxAt": "扉が開く"},
+      {"speaker": "ユニーク冒険者(仮)", "text": "(仮)開けるのは俺たちだ。……誰にも譲らない。", "background": "night", "cast": [{"character": "master", "pose": "neutral", "position": "left"}, {"character": "unique", "pose": "angry", "position": "right", "motion": "shake", "motionAt": "誰にも"}], "transition": "cut"},
+      {"speaker": "受付(仮)", "text": "(仮)その前に、今夜はちゃんと休んでくださいね。", "background": "night", "cast": [{"character": "clerk", "pose": "happy", "position": "left", "motion": "enter-left"}, {"character": "unique", "pose": "neutral", "position": "right"}], "transition": "fade", "sfx": "door"}
+    ]
+  },
+  {
+    "id": "ch4",
+    "title": "第四章(仮) · 竜の紋章",
+    "trigger": {"keyHeld": "dragon_crest"},
+    "draft": true,
+    "lines": [
+      {"text": "(仮)遺跡の守護像が守っていた竜の紋章が、ギルドの金庫に収まった。", "background": "guild", "transition": "fade", "sfx": "paper"},
+      {"speaker": "ギルドマスター(仮)", "text": "(仮)これで竜の寝床の封印が解ける。あとは、全員で帰ってくることだ。", "background": "guild", "cast": [{"character": "master", "pose": "neutral", "position": "center"}], "transition": "cut", "effect": "impact", "effectAt": "全員で"},
+      {"speaker": "ユニーク冒険者(仮)", "text": "(仮)任せろ。竜の鱗を土産にしてやる。", "background": "guild", "cast": [{"character": "master", "pose": "happy", "position": "left"}, {"character": "unique", "pose": "happy", "position": "right", "motion": "jump", "motionAt": "任せろ"}], "transition": "cut"},
+      {"speaker": "受付(仮)", "text": "(仮)……いってらっしゃい。必ず、おかえりを言わせてください。", "background": "guild", "cast": [{"character": "clerk", "pose": "worried", "position": "center", "motion": "nod", "motionAt": "いってらっしゃい"}], "transition": "cut", "sfx": "bow", "sfxAt": "いってらっしゃい"}
+    ]
+  },
+  {
+    "id": "ch5",
+    "title": "終章(仮) · おかえり",
+    "trigger": {"all": [{"dragonDefeated": true}, {"endingSeen": true}]},
+    "art": "dragon",
+    "draft": true,
+    "lines": [
+      {"text": "(仮)ここに一枚絵が入る。倒れた竜と、帰ってきた隊。", "background": "night", "still": "dragon", "transition": "blackout", "sfx": "chime"},
+      {"speaker": "受付(仮)", "text": "(仮)おかえりなさい! みなさん、本当におかえりなさい!", "background": "guild", "cast": [{"character": "clerk", "pose": "happy", "position": "center", "motion": "jump"}], "transition": "wipe", "effect": "flash", "sfx": "door"},
+      {"speaker": "ユニーク冒険者(仮)", "text": "(仮)言っただろ。全員で帰るって。", "background": "guild", "cast": [{"character": "unique", "pose": "happy", "position": "left", "motion": "enter-left"}, {"character": "clerk", "pose": "happy", "position": "right"}], "transition": "cut"},
+      {"speaker": "ギルドマスター(仮)", "text": "(仮)ギルドは続く。明日も、掲示板に次の依頼を貼ろう。", "background": "guild", "cast": [{"character": "unique", "pose": "neutral", "position": "left"}, {"character": "clerk", "pose": "neutral", "position": "right"}], "portrait": {"character": "master", "pose": "happy"}, "transition": "cut", "sfx": "paper", "sfxAt": "掲示板"},
+      {"text": "(仮)物語はここで一区切り。本編の文に差し替える。", "background": "town", "transition": "fade", "sfx": "step"}
+    ]
+  }
+]

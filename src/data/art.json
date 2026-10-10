@@ -1,0 +1,9 @@
+{
+  "backgrounds": {"guild": null, "town": null, "night": null, "tavern": null, "office": null},
+  "characters": {
+    "master": {"neutral": null, "happy": null, "thoughtful": null},
+    "clerk": {"neutral": null, "happy": null, "worried": null},
+    "unique": {"neutral": null, "happy": null, "angry": null}
+  },
+  "stills": {"founding": null, "dragon": null}
+}

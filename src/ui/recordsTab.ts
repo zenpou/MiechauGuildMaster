@@ -1,7 +1,9 @@
 import { achievementExpMult, achievementProgress, achievementStage } from '../core/achievements';
 import { ACHIEVEMENTS, TUNING, type AchievementDef } from '../core/data';
-import { state } from './app';
+import { STORY, storySeen, storySeenDay } from '../core/story';
+import { render, state } from './app';
 import { bar, div, h, span } from './dom';
+import { chapterThumb, rereadChapter } from './storyHost';
 
 const CATEGORY_NAME: Record<AchievementDef['category'], string> = {
   manage: '経営', dispatch: '派遣', explore: '探索', growth: '育成', facility: '施設', story: '物語',
@@ -19,6 +21,7 @@ export function recordsTab(): HTMLElement {
   const clearDay = s.flags.clearDay;
   return div('tab-body',
     s.dragonDefeated ? div('detail cleared', span('big', '竜を討伐しました'), typeof clearDay === 'number' ? span('dim small', ` ${clearDay}日目`) : null) : null,
+    storySection(),
     h('h2', null, `実績(${count}/${ACHIEVEMENTS.length})`),
     div('summary small',
       span('badge', `段 ${achievementStage(s)}/${stages.length}`),
@@ -40,6 +43,20 @@ export function recordsTab(): HTMLElement {
       ? h('ul', { class: 'plain small' }, ...s.ledger.slice(0, LEDGER_MAX).map((l) =>
         h('li', null, span('dim', `${l.day}日目 `), l.label, ' ', span(l.amount < 0 ? 'neg' : 'pos', `${l.amount > 0 ? '+' : ''}${l.amount}G`))))
       : div('dim', 'まだお金の出入りはありません'),
+  );
+}
+
+/** 読み終えた章と読み返し。未読の章の題は出さない(先の展開を明かさない) */
+function storySection(): HTMLElement {
+  const seen = storySeen(state);
+  return div(null,
+    h('h2', null, `物語(${seen.length}/${STORY.length})`),
+    seen.length
+      ? h('ul', { class: 'plain story-chapters' }, ...seen.map((c) => h('li', null,
+        chapterThumb(c),
+        span('story-chapter-title', c.title, span('dim small', ` ${storySeenDay(state, c.id)}日目`)),
+        h('button', { class: 'small', onclick: () => rereadChapter(c.id, render) }, '読み返す'))))
+      : div('dim', 'まだ読んだ章はありません'),
   );
 }
 
