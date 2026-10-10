@@ -275,6 +275,8 @@ export interface ExpeditionResult {
   mapDeltas: MapDelta[];
   /** 今回入ったマスの最大深度(入口からの経路長)。地図が埋まると奥へ行けるかを測る */
   maxDepth: number;
+  /** 実際に現地で過ごした日数。採り尽くし・討伐完了で早帰りすると days より短い */
+  daysSpent: number;
   materials: Record<string, number>;
   items: Record<string, number>;
   gold: number;

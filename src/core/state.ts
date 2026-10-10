@@ -1,4 +1,19 @@
-import { SAVE_VERSION, type GameState } from './types';
+import { DUNGEONS } from './data';
+import { SAVE_VERSION, type DungeonProgress, type GameState } from './types';
+
+/** 最初から入口が分かっているダンジョン。他は噂だけで、踏査で確認する */
+const CONFIRMED_AT_START = ['forest_cave'];
+
+export function initialDungeonProgress(dungeonId: string): DungeonProgress {
+  const def = DUNGEONS.find((d) => d.id === dungeonId);
+  const floors = Object.fromEntries((def?.floors ?? []).map((f) => [f.id, { visited: [], hiddenFound: [] }]));
+  return { confirmed: CONFIRMED_AT_START.includes(dungeonId), floors, bossDefeated: 0, fullCleared: false };
+}
+
+/** 全ダンジョンの初期進捗 */
+export function initialDungeons(): Record<string, DungeonProgress> {
+  return Object.fromEntries(DUNGEONS.map((d) => [d.id, initialDungeonProgress(d.id)]));
+}
 
 /** 何も持たない初期状態。初期資金・初期メンバーなどはフェーズ1以降で game.ts の newGame が足す */
 export function emptyState(seed: number, playerName = ''): GameState {
@@ -13,7 +28,7 @@ export function emptyState(seed: number, playerName = ''): GameState {
     inventory: {},
     crafts: [],
     world: { visitedNodes: [], foundEdges: [], measuredDanger: {} },
-    dungeons: {},
+    dungeons: initialDungeons(),
     quests: [],
     expeditions: [],
     history: [],

@@ -1,5 +1,6 @@
 // セーブの直列化と読み込み。DOM非依存にするため、保存先は Storage 風の口を外から渡す。
-import { emptyState } from './state';
+import { emptyState, initialDungeonProgress } from './state';
+import { DUNGEONS } from './data';
 import { SAVE_VERSION, type GameState } from './types';
 
 export interface KeyValueStore {
@@ -23,7 +24,13 @@ export function migrate(raw: unknown): GameState | null {
   merged.base = { ...base.base, ...(s.base ?? {}) };
   merged.world = { ...base.world, ...(s.world ?? {}) };
   merged.counters = { ...base.counters, ...(s.counters ?? {}) };
-  for (const e of [...merged.expeditions, ...merged.history]) e.result.maxDepth ??= 0;
+  for (const e of [...merged.expeditions, ...merged.history]) {
+    e.result.maxDepth ??= 0;
+    e.result.daysSpent ??= e.returnDay - e.startDay;
+  }
+  // 後から足したダンジョンは、古いセーブでは進捗が無いので初期値(噂)で埋める
+  merged.dungeons = { ...merged.dungeons };
+  for (const d of DUNGEONS) merged.dungeons[d.id] ??= initialDungeonProgress(d.id);
   merged.version = SAVE_VERSION;
   return merged;
 }

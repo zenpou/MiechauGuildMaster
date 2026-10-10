@@ -255,6 +255,14 @@ describe('探索シミュレーション', () => {
     expect(avg(rates)).toBeGreaterThanOrEqual(0.55);
   });
 
+  it('result.daysSpent は実際に現地で過ごした日数(予定どおりなら days に等しい)', () => {
+    for (const seed of SEEDS.slice(0, 5)) {
+      const { result, trace } = runExploration(input(seed, { leader: 'cautious', days: 3 }));
+      expect(result.daysSpent).toBe(trace.days.length);
+      if (!result.wiped && !result.retreated) expect(result.daysSpent).toBe(3);
+    }
+  });
+
   it('result.maxDepth は今回入ったマスの最大深度(trace と同じ)', () => {
     for (const seed of SEEDS.slice(0, 5)) {
       const { result, trace } = runExploration(input(seed, { leader: 'brave', days: 3 }));

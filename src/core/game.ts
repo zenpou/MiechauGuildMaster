@@ -62,7 +62,6 @@ export function newGame(seed: number, playerName = ''): GameState {
     a.history.hiredDay = 1;
     s.adventurers.push(a);
   });
-  s.dungeons.forest_cave = { confirmed: true, floors: { f1: { visited: [], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false };
   s.world.visitedNodes = ['base'];
   s.inventory.potion = START_POTIONS;
   return s;
@@ -106,7 +105,8 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   const expedition: Expedition = {
     id: `e${s.counters.nextId++}`,
     order: structuredClone({ ...o, items }),
-    startDay: s.day, returnDay: s.day + o.days,
+    // 採り尽くし・討伐完了で早帰りした隊は、予定日数ではなく実際の日数で戻る
+    startDay: s.day, returnDay: s.day + Math.max(1, result.daysSpent),
     steps: [], result, recalledDay: null, claimed: false,
   };
   s.counters.dispatches++;

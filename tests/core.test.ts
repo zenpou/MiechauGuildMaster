@@ -79,6 +79,13 @@ describe('save', () => {
     expect(s.mails).toEqual([]);
     expect(s.base.width).toBe(5);
   });
+  it('古いセーブに無いダンジョンの進捗は初期値で埋まる(forest_cave は確認済み、他は噂)', () => {
+    const s = migrate({ seed: 3, day: 5, dungeons: { forest_cave: { confirmed: true, floors: { f1: { visited: [0, 1], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false } } })!;
+    expect(s.dungeons.forest_cave.floors.f1.visited).toEqual([0, 1]);
+    expect(s.dungeons.old_mine).toBeDefined();
+    expect(s.dungeons.old_mine.confirmed).toBe(false);
+    expect(s.dungeons.old_mine.floors.f1.visited).toEqual([]);
+  });
   it('壊れたデータは null', () => {
     expect(deserialize('{nope')).toBeNull();
     expect(migrate({})).toBeNull();
