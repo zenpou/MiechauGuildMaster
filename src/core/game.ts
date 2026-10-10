@@ -42,7 +42,7 @@ function addLoyalty(a: Adventurer, delta: number) {
 }
 
 
-export const dailyCost = (s: GameState) => s.adventurers.reduce((t, a) => t + a.salary, 0) + UPKEEP_PER_DAY;
+export const dailyCost = (s: GameState) => s.adventurers.reduce((t, a) => t + a.salary, 0) + UPKEEP_PER_DAY + facilityUpkeep(s);
 
 export function newGame(seed: number, playerName = ''): GameState {
   const s = emptyState(seed, playerName);

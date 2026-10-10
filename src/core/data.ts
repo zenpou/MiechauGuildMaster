@@ -60,6 +60,14 @@ export interface Tuning {
     returnRelation: number;
     gatherFocusBonus: number;
   };
+  equipment: {
+    /** 装備の耐性合計の上限 */
+    resistCap: number;
+  };
+  craft: {
+    /** 勤務者の能力がこれ以上なら完成日数−1 */
+    workerStatMin: number;
+  };
   readiness: {
     runs: number;
     /** 余裕 / 適正 / 厳しい の境(戦力比) */

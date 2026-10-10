@@ -2,8 +2,6 @@
 import { ITEM, JOB } from './data';
 import type { Adventurer, EquipSlot, Equipment, GameState, Result } from './types';
 
-/** 装備の耐性合計の上限(属性ごと)。sim で調整する値 */
-export const RESIST_CAP = 0.8;
 
 const EQUIP_KINDS = ['weapon', 'armor', 'accessory'];
 

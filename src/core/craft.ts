@@ -1,12 +1,11 @@
 // クラフト: 施設+素材+資金+日数 → 完成品を在庫へ。完成は advanceDay で doneDay を迎えたとき。
 import { effectiveStats } from './adventurer';
 import { facilityEffect, facilityLevel, synergyValue, workersOf } from './base';
-import { FACILITY, ITEM, RECIPE, RECIPES } from './data';
+import { FACILITY, ITEM, RECIPE, RECIPES, TUNING } from './data';
 import { addInventory, ledger } from './ledger';
 import type { GameState, RecipeDef, Result } from './types';
 
-/** 勤務者の能力がこれ以上なら完成日数−1 */
-const WORKER_STAT_MIN = 12;
+const WORKER_STAT_MIN = TUNING.craft.workerStatMin;
 
 const ok = (): Result => ({ ok: true });
 const fail = (reason: string): Result => ({ ok: false, reason });

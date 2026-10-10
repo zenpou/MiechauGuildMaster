@@ -1,5 +1,4 @@
-import { ITEM, JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, ROLE_SKILL, TRAIT, TRAITS } from './data';
-import { RESIST_CAP } from './equipment';
+import { ITEM, JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, ROLE_SKILL, TRAIT, TRAITS, TUNING } from './data';
 import type { Rng } from './rng';
 import {
   ROLE_IDS, STAT_KEYS,
@@ -36,7 +35,7 @@ export function equipResist(a: Adventurer): Resist {
   const out: Resist = {};
   for (const eq of equippedDefs(a)) {
     for (const [k, v] of Object.entries(eq.resist ?? {}) as [keyof Resist, number][]) {
-      out[k] = Math.min(RESIST_CAP, (out[k] ?? 0) + v);
+      out[k] = Math.min(TUNING.equipment.resistCap, (out[k] ?? 0) + v);
     }
   }
   return out;

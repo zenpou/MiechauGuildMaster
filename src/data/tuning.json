@@ -43,6 +43,12 @@
     "returnRelation": 1,
     "gatherFocusBonus": 1
   },
+  "equipment": {
+    "resistCap": 0.8
+  },
+  "craft": {
+    "workerStatMin": 12
+  },
   "readiness": {
     "runs": 40,
     "gradeEdges": [1.3, 1.0, 0.8],
