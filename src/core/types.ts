@@ -147,6 +147,8 @@ export interface DungeonDef {
   recommended: number;
   /** 全滅時の救助費用の基準 */
   rescueCost: number;
+  /** 床マスを1歩進むごとの遭遇確率。未指定なら 0.04 */
+  encounterRate?: number;
 }
 
 // ---- ワールド(ノードと道) ----

@@ -1,1 +1,13 @@
-[]
+[
+  {"id":"strongarm","name":"怪力","desc":"腕力が人並み外れている。","mods":{"atk":3},"hiddenChance":0.5},
+  {"id":"keen","name":"鋭い目","desc":"小さな異変に気づく。","mods":{"scout":4},"hiddenChance":0.5},
+  {"id":"herbalist","name":"薬草博士","desc":"草木に詳しい。","mods":{"gather":5},"hiddenChance":0.4},
+  {"id":"lucky","name":"幸運児","desc":"なぜか良いことが起きる。","mods":{},"luck":0.5,"hiddenChance":0.8},
+  {"id":"unlucky","name":"不運体質","desc":"なぜか悪いことが起きる。","mods":{},"luck":-0.5,"hiddenChance":0.8},
+  {"id":"directionless","name":"方向音痴","desc":"道に迷いやすい。","mods":{},"lostBias":0.6,"hiddenChance":0.7},
+  {"id":"sturdy","name":"頑丈","desc":"打たれ強い。","mods":{"hp":15,"def":2},"hiddenChance":0.4},
+  {"id":"quick_learner","name":"早熟","desc":"経験を吸収するのが早い。","mods":{},"expRate":1.4,"hiddenChance":0.7},
+  {"id":"glutton","name":"大食い","desc":"燃費が悪く、疲れやすい。","mods":{},"fatigueRate":1.35,"hiddenChance":0.6},
+  {"id":"night_owl","name":"夜目が利く","desc":"暗がりでも動ける。","mods":{"scout":2,"spd":2},"hiddenChance":0.5},
+  {"id":"lazy","name":"怠け癖","desc":"成長が鈍いが、日給は安め。","mods":{},"expRate":0.8,"salaryMult":0.85,"hiddenChance":0.6}
+]

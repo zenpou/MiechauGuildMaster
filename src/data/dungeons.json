@@ -1,1 +1,41 @@
-[]
+[
+  {"id":"forest_cave","name":"森の洞窟","desc":"ギルドの裏手の森に口を開ける浅い洞窟。奥にはゴブリンの頭が巣を構えている。",
+   "node":"forest_cave",
+   "floors":[
+     {"id":"f1","name":"地下1階",
+      "rows":[
+        "############",
+        "#h....^...s#",
+        "#...#.##.w.#",
+        "#...#.##h..#",
+        "##.#######.#",
+        "E......HHH.#",
+        "##.#######^#",
+        "##.#######.#",
+        "#...####...#",
+        "#......#.g.#",
+        "#T..####BTm#",
+        "############"
+      ],
+      "legend":{
+        "#":{"kind":"wall"},
+        ".":{"kind":"floor"},
+        "E":{"kind":"entrance"},
+        "h":{"kind":"gather","item":"herb"},
+        "s":{"kind":"gather","item":"slime_gel"},
+        "m":{"kind":"gather","item":"moss_ore"},
+        "w":{"kind":"nest","enemy":"wolf"},
+        "g":{"kind":"nest","enemy":"goblin"},
+        "B":{"kind":"symbol","enemy":"goblin_chief"},
+        "T":{"kind":"treasure"},
+        "^":{"kind":"trap","trap":"spike"},
+        "H":{"kind":"hidden"}
+      }}
+   ],
+   "enemies":[
+     {"id":"goblin","weight":5,"group":[1,3]},
+     {"id":"wolf","weight":3,"group":[1,2]},
+     {"id":"slime","weight":3,"group":[1,2]}
+   ],
+   "recommended":180,"rescueCost":120,"encounterRate":0.04}
+]
