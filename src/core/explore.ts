@@ -3,7 +3,7 @@
 import { carryCapacity, effectiveStats, equipEffect, traitNum } from './adventurer';
 import { hasSkill, makeAllyUnit, makeEnemies, runCombat, type Unit } from './combat';
 import { ENEMY, ITEM, PERSONALITY, POLICY, RETURN_LINES, ROLE_SKILL, TRAIT, TUNING, type ReturnOutcome } from './data';
-import { exploredRate, frontier, isPassable, neighbors, parseFloor, shortestPath, visibleFrom, xy, type Grid, type PassKnowledge } from './dungeon';
+import { exploredRate, frontier, isPassable, neighbors, parseFloor, searchSpots, shortestPath, visibleFrom, xy, type Grid, type PassKnowledge } from './dungeon';
 import type { Rng } from './rng';
 import type {
   ActionKind, Adventurer, CellKind, DungeonDef, DungeonProgress, ExpeditionResult, LogKind, ReturnDialogue, StatKey,
@@ -520,6 +520,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     }
     return out;
   };
+  /** 直近の目標選びで、未踏が尽きて隠し通路の調べ直しだけが残ったか */
+  let searching = false;
   /** 行動種別ごとの目標候補。値は寄り道先か(加点の有無) */
   const candidates = (): Map<number, boolean> => {
     const cands = new Map<number, boolean>();
@@ -547,6 +549,12 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       }
     }
     if (avoid) for (const i of [...cands.keys()]) if (isDanger(i)) cands.delete(i);
+    // 歩き尽くしたら、通りがかりの判定に外れた隠し通路を調べ直しに戻る。戻らないと、行き止まりの先の鍵に二度と届かない
+    searching = false;
+    if (!knownOnly && cands.size === 0) {
+      for (const i of searchSpots(grid, visited, hiddenFound, tried)) if (!(avoid && isDanger(i))) cands.set(i, false);
+      searching = cands.size > 0;
+    }
     return cands;
   };
   const exhaustedText = (): string => {
@@ -699,6 +707,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         target = t;
         route = r;
         ri = 0;
+        if (searching) {
+          flush();
+          say('narration', '行き止まりの壁が気になり、調べ直しに戻った。');
+        }
       }
       if (owed > 0) {
         const pay = Math.min(owed, left);

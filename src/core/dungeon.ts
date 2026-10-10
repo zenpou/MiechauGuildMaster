@@ -104,6 +104,21 @@ export function frontier(grid: Grid, visited: Set<number>, seen: Set<number>, kn
   return [...seen].filter((i) => !visited.has(i) && isPassable(grid, i, know)).sort((a, b) => a - b);
 }
 
+/**
+ * 再調査の行き先: 未発見の隠しマスに接する、踏んだ通れるマス。歩き尽くした隊が隠し通路を探しに戻る先。
+ * 通りがかりの1回の判定に外れると、その先へ二度と届かなくなる(行き止まりの鍵など)ので、戻れる場所を示す。
+ * exclude は今日もう判定した隠しマス。昇順で返す
+ */
+export function searchSpots(grid: Grid, visited: Set<number>, hiddenFound: number[], exclude: Set<number> = new Set()): number[] {
+  const out: number[] = [];
+  for (const i of visited) {
+    const cell = grid.cells[i];
+    if (!cell || cell.kind === 'wall' || cell.kind === 'hidden') continue;
+    if (visibleFrom(grid, i).some((n) => grid.cells[n].kind === 'hidden' && !hiddenFound.includes(n) && !exclude.has(n))) out.push(i);
+  }
+  return out.sort((a, b) => a - b);
+}
+
 /** 未発見の hidden マスは「壁に見える」。この判定を1か所に */
 export function looksLikeWall(grid: Grid, i: number, hiddenFound: number[]): boolean {
   const kind = grid.cells[i]?.kind;

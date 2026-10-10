@@ -681,3 +681,66 @@ describe('経験値の深さ補正', () => {
     expect(gain(Math.floor(ref / 2))).toBe(gain(ref));
   });
 });
+
+describe('隠し通路の再調査', () => {
+  // 一本道の途中に隠しマス。手前は踏み尽くしてあり、通りがかりの判定には外れた想定
+  const blocked = tower('blocked', [['###########', 'E....H.K..#', '###########']]);
+  const grid = parseFloor(blocked.floors[0]);
+  const at = (x: number, y = 1) => y * grid.width + x;
+  const walked = [0, 1, 2, 3, 4].map((x) => at(x));
+  const run = (seed: number, o: Parameters<typeof input>[1] = {}) => runExploration(input(seed, {
+    dungeon: blocked, progress: progressOf(walked), days: 3, jobs: ['scout', 'fighter', 'warrior', 'priest'], ...o,
+  }));
+  const moveCells = (trace: { days: { moves: { cell: number }[] }[] }) => trace.days.flatMap((d) => d.moves.map((m) => m.cell));
+
+  it('歩き尽くしても、未発見の隠し通路に接するマスへ戻って発見を試みる', () => {
+    const found = SEEDS.filter((seed) => run(seed, { hiddenBonus: 1 }).trace.events.some((e) => e.kind === 'hidden' && e.cell === at(5)));
+    expect(found.length).toBeGreaterThanOrEqual(15);
+  });
+
+  it('見つけたら、その先の未踏のマスまで歩く', () => {
+    const { result } = run(1, { hiddenBonus: 1, leader: 'brave' });
+    expect(result.mapDeltas[0].hidden).toEqual([at(5)]);
+    expect(result.mapDeltas[0].cells).toEqual(expect.arrayContaining([at(6), at(7)]));
+  });
+
+  it('戻った理由をログに残す', () => {
+    const { result } = run(1, { hiddenBonus: 1 });
+    expect(result.log.some((l) => l.text.includes('調べ直し'))).toBe(true);
+  });
+
+  it('見つからなかったら、同じ場所を繰り返さず1度で引き返す', () => {
+    for (const seed of SEEDS.slice(0, 8)) {
+      const { result, trace } = run(seed, { hiddenBonus: -1 });
+      expect(result.mapDeltas[0].hidden).toEqual([]);
+      expect(trace.end).toBe('mapFull');
+      expect(moveCells(trace).filter((c) => c === at(4))).toHaveLength(1);
+    }
+  });
+
+  it('knownOnly(見込み)では戻らない', () => {
+    for (const seed of SEEDS.slice(0, 5)) {
+      const { result, trace } = run(seed, { hiddenBonus: 1, knownOnly: true });
+      expect(moveCells(trace)).toEqual([]);
+      expect(result.mapDeltas[0].hidden).toEqual([]);
+    }
+  });
+
+  it('未踏のマスが残っている間は、再調査より未踏を先に歩く', () => {
+    // 入口の脇の袋小路(1,2)の先に隠しマス(1,3)。東に未踏の一本道が続く
+    const spur = tower('spur', [['#########', 'E.......#', '#.#######', '#H#######', '#m#######', '#########']]);
+    const g = parseFloor(spur.floors[0]);
+    const cell = (x: number, y: number) => y * g.width + x;
+    const known = [cell(0, 1), cell(1, 1), cell(1, 2)];
+    for (const seed of SEEDS.slice(0, 8)) {
+      const { trace } = runExploration(input(seed, {
+        dungeon: spur, progress: progressOf(known), days: 3, hiddenBonus: 1, jobs: ['scout', 'fighter', 'warrior', 'priest'], leader: 'brave',
+      }));
+      const moves = moveCells(trace);
+      const east = moves.indexOf(cell(7, 1));
+      const back = moves.indexOf(cell(1, 2));
+      expect(east).toBeGreaterThanOrEqual(0);
+      expect(back).toBeGreaterThan(east);
+    }
+  });
+});

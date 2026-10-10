@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  exploredRate, frontier, idx, isPassable, looksLikeWall, neighbors, parseFloor, shortestPath, visibleFrom, xy,
+  exploredRate, frontier, idx, isPassable, looksLikeWall, neighbors, parseFloor, searchSpots, shortestPath, visibleFrom, xy,
 } from '../src/core/dungeon';
 import { DUNGEON, ENEMY, ITEM, PERSONALITIES } from '../src/core/data';
 import type { CellKind, FloorDef } from '../src/core/types';
@@ -202,6 +202,37 @@ describe('frontier', () => {
     expect(frontier(g, visited, seen, none)).toEqual([idx(g, 1, 1)]);
     expect(frontier(g, visited, seen, { keys: ['rusty_key'], hiddenFound: [h] }).sort((a, b) => a - b))
       .toEqual([idx(g, 1, 1), d, h].sort((a, b) => a - b));
+  });
+});
+
+describe('searchSpots', () => {
+  // 3行目の H(2,2) は E 側から (2,1) で接する。(4,1) の先に H(5,1) がある
+  const g = parseFloor(floor(['#######', 'E..H...', '##H####', '#######']));
+  const h1 = idx(g, 3, 1);
+  const h2 = idx(g, 2, 2);
+
+  it('未発見の隠しマスに接する、踏んだ通れるマスだけを返す', () => {
+    const visited = new Set([idx(g, 0, 1), idx(g, 1, 1), idx(g, 2, 1)]);
+    expect(searchSpots(g, visited, [])).toEqual([idx(g, 2, 1)]);
+  });
+  it('踏んでいないマスと、隠しマスに接しないマスは返さない', () => {
+    expect(searchSpots(g, new Set([idx(g, 0, 1)]), [])).toEqual([]);
+    expect(searchSpots(g, new Set(), [])).toEqual([]);
+  });
+  it('見つけた隠しマスは対象から外れ、残りの隠しマスだけが対象になる', () => {
+    const visited = new Set([idx(g, 2, 1)]);
+    expect(searchSpots(g, visited, [h1])).toEqual([idx(g, 2, 1)]);
+    expect(searchSpots(g, visited, [h1, h2])).toEqual([]);
+  });
+  it('除外(今日もう調べた隠しマス)に含まれるものしか接していないマスは返さない', () => {
+    const visited = new Set([idx(g, 2, 1)]);
+    expect(searchSpots(g, visited, [], new Set([h1, h2]))).toEqual([]);
+    expect(searchSpots(g, visited, [], new Set([h1]))).toEqual([idx(g, 2, 1)]);
+  });
+  it('index の昇順で返す', () => {
+    const visited = new Set([idx(g, 2, 1), idx(g, 2, 1) + 1]);
+    const out = searchSpots(g, visited, []);
+    expect(out).toEqual([...out].sort((a, b) => a - b));
   });
 });
 

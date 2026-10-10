@@ -5,7 +5,7 @@
 //   --rich は毎日、所持金を50000Gまで補う(経済を切り離して進みの速さだけを測る)
 //   --set はゲームの数値をメモリ上で上書きする(ファイルは書き換えない)。パスは tuning / enemy / item / recipe / facility / dungeon
 //   で始まる点区切り(配列は添字)、値は数値か true/false。例 --set tuning.game.debtInterest=0.01 --set enemy.dragon.hp=2000
-import { DUNGEON, ENEMY, FACILITY, ITEM, JOB, PERSONALITY, POLICY, RECIPE, RECIPES, TUNING } from '../src/core/data';
+import { DUNGEON, ENEMY, FACILITY, ITEM, JOB, PERSONALITY, POLICY, RECIPE, RECIPES, TUNING, WORLD } from '../src/core/data';
 import type { Readiness } from '../src/core/readiness';
 import type { ActionKind, Adventurer, CellDef, DispatchOrder, GameState, LedgerEntry, Mail, Quest } from '../src/core/types';
 
@@ -44,7 +44,7 @@ const SEEDS = ONE_SEED === null ? nums[0] ?? 10 : 1;
 const LAST_DAY = (ONE_SEED === null ? nums[1] : nums[0]) ?? 200;
 
 // ---- 数値の上書き(--set) ----
-const ROOTS: Record<string, object> = { tuning: TUNING, enemy: ENEMY, item: ITEM, recipe: RECIPE, facility: FACILITY, dungeon: DUNGEON };
+const ROOTS: Record<string, object> = { tuning: TUNING, enemy: ENEMY, item: ITEM, recipe: RECIPE, facility: FACILITY, dungeon: DUNGEON, world: WORLD };
 const own = (o: object, k: string) => (Array.isArray(o) ? /^\d+$/.test(k) && Number(k) < o.length : Object.prototype.hasOwnProperty.call(o, k));
 const applySet = (spec: string): string => {
   const eq = spec.indexOf('=');
@@ -80,7 +80,7 @@ for (const id of [POLICY_ID, POLICY_HUNT, POLICY_SAFE]) if (!POLICY[id]) fail(`�
 const { effectiveStats, equipResist, jobAptitude, powerOf } = await import('../src/core/adventurer');
 const { activeSynergies, assignWorker, facilityLevel, unassignWorker, upgrade } = await import('../src/core/base');
 const { canCraft, craftGold, startCraft } = await import('../src/core/craft');
-const { isPassable, parseFloor, visibleFrom } = await import('../src/core/dungeon');
+const { isPassable, parseFloor, searchSpots, visibleFrom } = await import('../src/core/dungeon');
 const { equip } = await import('../src/core/equipment');
 const { cellDepths, floorTransit } = await import('../src/core/explore');
 const { acceptQuest, advanceDay, buildFacility, dailyCost, dispatch, exploredRateOf, newGame, sellMaterial } = await import('../src/core/game');
@@ -327,8 +327,9 @@ function runSeed(seed: number, log: boolean): Run {
   // ---- 進行 ----
   const rateOf = (st: Stage) => exploredRateOf(s, st.dungeon, st.floor);
   /**
-   * 見える範囲を歩き尽くした = 踏んだマスの隣に、今の知識(鍵・見つけた隠し通路)で入れる未踏のマスが無い。
-   * 探索の隊は歩き尽くすと即日引き返して隠し通路の発見を試さないので、100%を待つと隠し通路を見逃した seed が永久に止まる
+   * 見える範囲を歩き尽くした = 踏んだマスの隣に、今の知識(鍵・見つけた隠し通路)で入れる未踏のマスが無く、
+   * 調べ直せる隠し通路(searchSpots)も残っていない。探索の隊は歩き尽くしても隠し通路を調べ直しに戻るので、
+   * 調べ直せる間は歩き尽くしたとみなさず、探索を出し続ける(探索率が増えない探索は STALL_TRIPS で打ち切る)
    */
   const exhausted = (st: Stage) => cached(`ex:${st.dungeon}:${st.floor}`, () => isExhausted(st));
   const isExhausted = (st: Stage) => {
@@ -338,7 +339,7 @@ function runSeed(seed: number, log: boolean): Run {
     const visited = new Set(fp.visited);
     const know = { keys: heldKeys(s), hiddenFound: fp.hiddenFound };
     for (const i of visited) for (const n of visibleFrom(g, i)) if (!visited.has(n) && isPassable(g, n, know)) return false;
-    return true;
+    return searchSpots(g, visited, fp.hiddenFound).length === 0;
   };
   /**
    * 探索で広げられるところは広げた。入れる未踏のマスが残っていても、探索の目標選びが深いマスや巣を優先して
@@ -399,7 +400,12 @@ function runSeed(seed: number, log: boolean): Run {
         default: return false;
       }
     };
-    const ds = g.cells.flatMap((c, i) => (DEPTH[k][i] >= 0 && want(c, i) ? [DEPTH[k][i]] : []));
+    let ds = g.cells.flatMap((c, i) => (DEPTH[k][i] >= 0 && want(c, i) ? [DEPTH[k][i]] : []));
+    // 未踏が尽きた探索は、隠し通路の調べ直しの行き先(searchSpots)まで歩く
+    if (!ds.length && action === 'explore') {
+      const hiddenFound = s.dungeons[st.dungeon]?.floors[st.floor]?.hiddenFound ?? [];
+      ds = searchSpots(g, visited, hiddenFound).flatMap((i) => (DEPTH[k][i] >= 0 ? [DEPTH[k][i]] : []));
+    }
     if (!ds.length) return 0;
     return action === 'explore' ? Math.max(...ds) : Math.min(...ds);
   };
@@ -437,7 +443,8 @@ function runSeed(seed: number, log: boolean): Run {
     const visited = new Set(s.dungeons[st.dungeon]?.floors[st.floor]?.visited ?? []);
     if (g.cells.some((c, i) => c.kind === 'gather' && c.item === item && visited.has(i))) return dungeonPlan(st, 'gather', { item });
     const nest = g.cells.findIndex((c, i) => c.kind === 'nest' && !!c.enemy && drops(c.enemy, item) && visited.has(i));
-    return nest >= 0 ? dungeonPlan(st, 'hunt', { enemy: g.cells[nest].enemy }) : null;
+    // 敵の指定は探索率100%の階だけ(core の出発条件)。そうでない階は指定せず、踏んだ巣を回る
+    return nest >= 0 ? dungeonPlan(st, 'hunt', rateOf(st) >= 1 ? { enemy: g.cells[nest].enemy } : {}) : null;
   };
   /** 素材を取りに行く先。確認済みで行ける階のうち、進行の並びで最初に見つかるもの。採取点 > 巣 > 道中の敵 */
   const sourcePlan = (item: string): Plan | null => cached(`src:${item}`, () => findSource(item));
@@ -460,7 +467,11 @@ function runSeed(seed: number, log: boolean): Run {
       const seen = nests.find((i) => visited.has(i));
       if (seen !== undefined) return dungeonPlan(st, 'hunt', full ? { enemy: g.cells[seen].enemy } : {});
       if ((gathers.length || nests.length) && !full) return dungeonPlan(st, 'explore');
-      if (DUNGEON[st.dungeon].enemies.some((e) => drops(e.id, item))) return dungeonPlan(st, full ? 'hunt' : 'explore');
+    }
+    // 道中の敵だけが落とす階は、採取点・巣のある階をすべて見てから。先に選ぶと、未踏の奥の階の巣を使わず手前で粘る
+    for (const st of STAGES) {
+      if (!s.dungeons[st.dungeon]?.confirmed || transitOf(st) === null) continue;
+      if (DUNGEON[st.dungeon].enemies.some((e) => drops(e.id, item))) return dungeonPlan(st, rateOf(st) >= 1 ? 'hunt' : 'explore');
     }
     return null;
   };
@@ -660,6 +671,12 @@ function runSeed(seed: number, log: boolean): Run {
   const buildOne = () => {
     if (inDebt()) return;
     const built = (id: string) => s.base.facilities.find((f) => f.id === id);
+    // 宿舎のLv2は名簿(=同時に出せる隊の数)を増やす唯一の道なので、残りの施設を建てる前に済ませる
+    const dorm = built('dorm');
+    if (dorm && !dorm.construction && dorm.level >= 1 && dorm.level < FACILITY.dorm.maxLevel && spare(FACILITY.dorm.costs[dorm.level].gold) && upgrade(s, 'dorm').ok) {
+      acts.push(`増築 ${FACILITY.dorm.name}`);
+      return;
+    }
     // 資金が足りないときは安い施設で抜かさず待つ(抜かすと工房が後回しになる)。建材・素材が無いものだけ飛ばす
     for (const id of BUILD_ORDER) {
       if (built(id)) continue;
