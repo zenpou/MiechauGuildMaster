@@ -100,6 +100,10 @@ export interface Tuning {
     daysMax: number;
     supportGold: number;
     supportDays: number;
+    candidateMax: number;
+    candidateDays: number;
+    hireSalaryDays: number;
+    baseCapacity: number;
   };
 }
 

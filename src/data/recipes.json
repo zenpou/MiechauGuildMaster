@@ -39,7 +39,8 @@
    }
   ],
   "days": 3,
-  "gold": 80
+  "gold": 80,
+  "unlockedBy": "u_forge_iron"
  },
  {
   "id": "r_leather_armor",
@@ -102,7 +103,8 @@
    }
   ],
   "days": 4,
-  "gold": 120
+  "gold": 120,
+  "unlockedBy": "u_forge_iron"
  },
  {
   "id": "r_fang_necklace",

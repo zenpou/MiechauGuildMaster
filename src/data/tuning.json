@@ -100,6 +100,10 @@
     "loyaltyWipe": -20,
     "daysMax": 7,
     "supportGold": 100,
-    "supportDays": 10
+    "supportDays": 10,
+    "candidateMax": 8,
+    "candidateDays": 5,
+    "hireSalaryDays": 4,
+    "baseCapacity": 6
   }
 }

@@ -7,9 +7,14 @@ import { DUNGEON, JOB, TUNING } from '../src/core/data';
 const G0 = TUNING.game.startGold;
 const SUP = TUNING.game.supportGold;
 import { parseFloor } from '../src/core/dungeon';
-import { advanceDay, buyItem, dispatch, exploredRateOf, newGame, recall, sellMaterial } from '../src/core/game';
+import {
+  acceptQuest, advanceDay, buildFacility, buyItem, dispatch, exploredRateOf, newGame, recall, sellMaterial,
+} from '../src/core/game';
+import { availableRecipes, canCraft } from '../src/core/craft';
+import { createQuest, deliver } from '../src/core/quests';
 import { rngFor } from '../src/core/rng';
-import type { DispatchOrder, Expedition, GameState } from '../src/core/types';
+import { planSteps, route } from '../src/core/world';
+import type { DispatchOrder, Expedition, GameState, Quest } from '../src/core/types';
 
 function order(s: GameState, o: Partial<DispatchOrder> = {}): DispatchOrder {
   const ids = s.adventurers.map((a) => a.id);
@@ -43,7 +48,7 @@ describe('newGame', () => {
     expect(new Set(s.adventurers.map((a) => a.name)).size).toBe(4);
     expect(s.inventory.potion).toBe(2);
     expect(s.dungeons.forest_cave).toEqual({ confirmed: true, floors: { f1: { visited: [], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false });
-    expect(s.world.visitedNodes).toEqual(['base']);
+    expect(s.world.visitedNodes).toEqual(['base', 'forest_cave']);
     expect(s.ledger.some((l) => l.amount === G0)).toBe(true);
     expect(exploredRateOf(s, 'forest_cave', 'f1')).toBe(0);
   });
@@ -86,11 +91,6 @@ describe('dispatch の検証', () => {
     expect(s.dungeons.forest_cave.floors.f1.visited).toEqual([]);
   });
 
-  it('呼び戻しはフェーズ1では不可', () => {
-    const s = newGame(5);
-    const e = sent(s);
-    expect(recall(s, e.id).ok).toBe(false);
-  });
 });
 
 describe('advanceDay', () => {
@@ -250,10 +250,11 @@ const caveSymbol = caveCells((k) => k === 'symbol')[0];
 const caveAll = caveCells((k) => k !== 'wall');
 
 describe('行動種別の検証', () => {
-  it('護衛・輸送はまだ出せない', () => {
+  it('護衛・運搬は受注中の依頼が無ければ出せない', () => {
     const s = newGame(3);
     expect(dispatch(s, order(s, { action: 'escort' })).ok).toBe(false);
     expect(dispatch(s, order(s, { action: 'transport' })).ok).toBe(false);
+    expect(dispatch(s, order(s, { action: 'escort', target: { questId: 'nope' } })).ok).toBe(false);
   });
 
   it('踏査は未確認のダンジョンにだけ、他は確認済みにだけ出せる', () => {
@@ -267,10 +268,12 @@ describe('行動種別の検証', () => {
   it('踏査から帰ると(全滅でも)入口が確認済みになり、お知らせが出る', () => {
     const s = newGame(3);
     const e = sent(s, { action: 'survey', target: { dungeon: 'old_mine', floor: 'f1' }, days: 1, items: {} });
+    expect(e.order.target.route).toEqual(['base', 'mountain_village', 'old_mine']);
     Object.assign(e.result, { success: false, wiped: true, materials: {}, rescueCost: 0 });
-    const r = advanceDay(s);
+    const notices: string[] = [];
+    while (s.day < e.returnDay) notices.push(...advanceDay(s).notices);
     expect(s.dungeons.old_mine.confirmed).toBe(true);
-    expect(r.notices).toContain('古い坑道の入口を確認した。');
+    expect(notices).toContain('古い坑道の入口を確認した。');
   });
 
   it('採集は対象素材が必須で、そのフロアの採取点にある素材だけ', () => {
@@ -431,5 +434,306 @@ describe('施設込みの決定論', () => {
       return s;
     };
     expect(play()).toEqual(play());
+  });
+});
+
+describe('newGame(フェーズ4)', () => {
+  it('候補者2人・拠点の依頼2件・解放依頼が置かれる', () => {
+    const s = newGame(7);
+    expect(s.candidates.length).toBe(2);
+    expect(s.quests.filter((q) => q.town === 'base' && q.status === 'posted').length).toBe(2);
+    expect(s.quests.some((q) => q.templateId === 'u_forge_iron')).toBe(true);
+    expect(newGame(7)).toEqual(s);
+  });
+});
+
+/** 拠点から2日の古い坑道へ出せるようにする */
+function mineReady(seed: number): GameState {
+  const s = newGame(seed);
+  s.dungeons.old_mine.confirmed = true;
+  return s;
+}
+
+describe('移動込みの派遣', () => {
+  it('returnDay = 出発日 + 往路 + 現地 + 復路、steps は planSteps と同じ', () => {
+    const s = mineReady(21);
+    const e = sent(s, { target: { dungeon: 'old_mine', floor: 'f1' }, days: 2 });
+    const nodes = route('base', 'old_mine', s.world)!;
+    expect(nodes).toEqual(['base', 'mountain_village', 'old_mine']);
+    expect(e.result.wiped).toBe(false);
+    const stay = Math.max(1, e.result.daysSpent);
+    expect(e.returnDay).toBe(1 + 2 + stay + 2);
+    expect(e.steps).toEqual(planSteps(nodes, stay, 1, s.world));
+    expect(e.steps[e.steps.length - 1]).toEqual({ day: e.returnDay, node: 'base', edge: null, phase: 'return' });
+  });
+
+  it('森は0日の道なので returnDay は従来どおり', () => {
+    const s = newGame(5);
+    const e = sent(s, { days: 3 });
+    expect(e.returnDay).toBe(1 + Math.max(1, e.result.daysSpent));
+    expect(e.steps.filter((x) => x.phase === 'stay').length).toBe(Math.max(1, e.result.daysSpent));
+  });
+
+  it('帰還で経路のノードが訪問済みに、通った道の危険度が実測値になる', () => {
+    const s = mineReady(22);
+    const e = sent(s, { target: { dungeon: 'old_mine', floor: 'f1' }, days: 1 });
+    while (s.day < e.returnDay) advanceDay(s);
+    expect(s.world.visitedNodes).toEqual(expect.arrayContaining(['base', 'forest_cave', 'mountain_village']));
+    expect(s.world.measuredDanger.base__mountain_village).toBe(0.15);
+  });
+
+  it('往路で全滅したら現地に行かず、救助費用付きで引き返す', () => {
+    let found: { s: GameState; e: Expedition } | null = null;
+    for (let seed = 1; seed < 400 && !found; seed++) {
+      const s = mineReady(seed);
+      const a = s.adventurers[0];
+      a.base = { ...a.base, hp: 1, atk: 1, def: 0, spd: 1 };
+      const e = sent(s, { partyIds: [a.id], leaderId: a.id, target: { dungeon: 'old_mine', floor: 'f1' }, days: 3, items: {} });
+      if (e.result.wiped && e.result.mapDeltas.length === 0) found = { s, e };
+    }
+    expect(found).not.toBeNull();
+    const { e } = found!;
+    expect(e.result.daysSpent).toBe(0);
+    expect(e.result.rescueCost).toBeGreaterThan(0);
+    expect(e.result.log.some((l) => l.text.includes('道中'))).toBe(true);
+    expect(e.steps.some((x) => x.phase === 'stay')).toBe(false);
+    expect(e.returnDay).toBeLessThanOrEqual(1 + 4);
+    expect(e.steps[e.steps.length - 1]).toMatchObject({ day: e.returnDay, node: 'base' });
+  });
+
+  it('行き先のダンジョンが無ければ出せない', () => {
+    const s = newGame(3);
+    expect(dispatch(s, order(s, { target: { dungeon: 'nowhere', floor: 'f1' } })).ok).toBe(false);
+  });
+});
+
+function postQuest(s: GameState, templateId: string): Quest {
+  const q = createQuest(s, templateId, rngFor(1, 'test', templateId));
+  s.quests.push(q);
+  return q;
+}
+
+describe('護衛・運搬', () => {
+  it('護衛は出発日だけ出せ、拠点→山村→拠点で戻り、着けば達成', () => {
+    const s = newGame(31);
+    const q = postQuest(s, 't_escort_village');
+    expect(acceptQuest(s, q.id).ok).toBe(true);
+    expect(dispatch(s, order(s, { action: 'escort', target: { questId: q.id }, items: {} })).ok).toBe(false);
+    while (s.day < q.departDay!) advanceDay(s);
+    const r = dispatch(s, order(s, { action: 'escort', target: { questId: q.id }, items: {} }));
+    expect(r.ok).toBe(true);
+    const e = (r as { expedition: Expedition }).expedition;
+    expect(e.returnDay).toBe(s.day + 2);
+    expect(e.result.daysSpent).toBe(0);
+    expect(e.order.target.route).toEqual(['base', 'mountain_village']);
+    while (s.day < e.returnDay) advanceDay(s);
+    expect(e.result.wiped).toBe(false);
+    expect(s.quests.find((x) => x.id === q.id)!.status).toBe('done');
+    expect(s.world.visitedNodes).toContain('mountain_village');
+  });
+
+  it('同じ依頼に2隊は出せない', () => {
+    const s = newGame(34);
+    s.world.visitedNodes.push('mountain_village');
+    const q = postQuest(s, 't_transport_village');
+    acceptQuest(s, q.id);
+    const ids = s.adventurers.map((a) => a.id);
+    sent(s, { partyIds: ids.slice(0, 2), leaderId: ids[0], action: 'transport', target: { questId: q.id }, items: {} });
+    expect(dispatch(s, order(s, { partyIds: ids.slice(2), leaderId: ids[2], action: 'transport', target: { questId: q.id }, items: {} })).ok).toBe(false);
+  });
+
+  it('運搬は荷の重さが積載を超えると出せず、山村経由で拠点に戻る', () => {
+    const s = newGame(32);
+    s.world.visitedNodes.push('mountain_village');
+    const q = postQuest(s, 't_transport_village');
+    expect(acceptQuest(s, q.id).ok).toBe(true);
+    (q.target as { cargo?: number }).cargo = 10000;
+    expect(dispatch(s, order(s, { action: 'transport', target: { questId: q.id }, items: {} })).ok).toBe(false);
+    (q.target as { cargo?: number }).cargo = 8;
+    const r = dispatch(s, order(s, { action: 'transport', target: { questId: q.id }, items: {} }));
+    expect(r.ok).toBe(true);
+    const e = (r as { expedition: Expedition }).expedition;
+    expect(e.order.target.route).toEqual(['base', 'mountain_village', 'base']);
+    expect(e.returnDay).toBe(1 + 2);
+    expect(e.steps.map((x) => [x.day, x.edge ?? x.node])).toEqual([
+      [1, 'base__mountain_village'], [2, 'base__mountain_village'], [3, 'base'],
+    ]);
+    while (s.day < e.returnDay) advanceDay(s);
+    expect(e.result.wiped).toBe(false);
+    expect(s.quests.find((x) => x.id === q.id)!.status).toBe('done');
+  });
+
+  it('持ち物は道中で使わず、そのまま戻る', () => {
+    const s = newGame(33);
+    s.world.visitedNodes.push('mountain_village');
+    const q = postQuest(s, 't_transport_village');
+    acceptQuest(s, q.id);
+    const e = sent(s, { action: 'transport', target: { questId: q.id }, items: { potion: 1 } });
+    expect(s.inventory.potion).toBe(1);
+    while (s.day < e.returnDay) advanceDay(s);
+    expect(s.inventory.potion).toBe(2);
+  });
+});
+
+describe('呼び戻し', () => {
+  it('現地にいる隊は即復路。現地の成果は捨て、ログに「呼び戻し」', () => {
+    const s = newGame(41);
+    const e = sent(s, { days: 3 });
+    expect(recall(s, e.id)).toEqual({ ok: true });
+    expect(e.recalledDay).toBe(1);
+    expect(e.returnDay).toBe(2);
+    expect(e.steps[e.steps.length - 1]).toEqual({ day: 2, node: 'base', edge: null, phase: 'return' });
+    expect(e.result.mapDeltas).toEqual([]);
+    expect(e.result.daysSpent).toBe(0);
+    expect(e.result.success).toBe(false);
+    expect(e.result.log.some((l) => l.text.includes('呼び戻し'))).toBe(true);
+    expect(recall(s, e.id).ok).toBe(false);
+    advanceDay(s);
+    expect(s.expeditions).toEqual([]);
+    expect(s.dungeons.forest_cave.floors.f1.visited).toEqual([]);
+    expect(s.adventurers.every((a) => a.status === 'idle')).toBe(true);
+  });
+
+  it('往路の隊は今日の位置から引き返す', () => {
+    const s = mineReady(42);
+    const e = sent(s, { target: { dungeon: 'old_mine', floor: 'f1' }, days: 2, items: {} });
+    expect(e.result.wiped).toBe(false);
+    expect(recall(s, e.id).ok).toBe(true);
+    expect(e.steps.map((x) => [x.day, x.edge ?? x.node, x.phase])).toEqual([
+      [1, 'base__mountain_village', 'outbound'], [2, 'base__mountain_village', 'return'], [3, 'base', 'return'],
+    ]);
+    expect(e.returnDay).toBe(3);
+    expect(e.order.target.route).toEqual(['base']);
+  });
+
+  it('派遣中でない隊は呼び戻せない', () => {
+    const s = newGame(43);
+    expect(recall(s, 'nope').ok).toBe(false);
+  });
+});
+
+describe('依頼の日次処理', () => {
+  it('日送りで依頼が出て、受注期限を過ぎた掲示は消える', () => {
+    const s = newGame(51);
+    s.gold = 100000;
+    const first = s.quests.find((q) => q.town === 'base')!;
+    first.acceptBy = s.day;
+    for (let i = 0; i < 6; i++) advanceDay(s);
+    expect(s.quests.some((q) => q.id === first.id)).toBe(false);
+    expect(s.quests.some((q) => q.postedDay > 1)).toBe(true);
+  });
+
+  it('帰還で討伐の進捗が進む', () => {
+    const s = newGame(52);
+    const q = postQuest(s, 't_hunt_goblin');
+    expect(acceptQuest(s, q.id).ok).toBe(true);
+    const e = sent(s, { days: 3 });
+    while (s.day < e.returnDay) advanceDay(s);
+    const kills = e.result.kills.goblin ?? 0;
+    const after = s.quests.find((x) => x.id === q.id)!;
+    expect(after.status).toBe(kills >= q.target.n! ? 'done' : 'accepted');
+    expect(after.progress).toBe(kills);
+  });
+
+  it('評判Lvが上がった日にお知らせが出る', () => {
+    const s = newGame(53);
+    s.rep = 8;
+    const r = advanceDay(s);
+    expect(r.notices.some((n) => n.includes('評判'))).toBe(true);
+    expect(advanceDay(s).notices.some((n) => n.includes('評判'))).toBe(false);
+  });
+
+  it('候補者は日送りで到着し、期限で入れ替わる', () => {
+    const s = newGame(54);
+    const firstIds = s.candidates.map((c) => c.adv.id);
+    advanceDay(s);
+    expect(s.candidates.length).toBeGreaterThan(2);
+    for (let i = 0; i < TUNING.game.candidateDays; i++) advanceDay(s);
+    expect(s.candidates.some((c) => firstIds.includes(c.adv.id))).toBe(false);
+  });
+});
+
+describe('解放依頼とレシピ', () => {
+  it('解放前は鉄の剣が作れず、鉄鉱石5個を納めると作れる', () => {
+    const s = newGame(61);
+    s.gold = 5000;
+    s.inventory = { ...s.inventory, iron_ore: 20, fang: 20, bone_shard: 20, slime_gel: 20, moss_ore: 20 };
+    s.base.facilities.push({ id: 'workshop', level: 1, x: 0, y: 0, builtDay: 1, construction: null });
+    expect(canCraft(s, 'r_iron_sword').ok).toBe(false);
+    expect(availableRecipes(s).some((r) => r.id === 'r_iron_sword')).toBe(false);
+    s.world.visitedNodes.push('forge_town');
+    const u = s.quests.find((q) => q.templateId === 'u_forge_iron')!;
+    expect(acceptQuest(s, u.id).ok).toBe(true);
+    expect(deliver(s, u.id).ok).toBe(true);
+    expect(canCraft(s, 'r_iron_sword').ok).toBe(true);
+    expect(canCraft(s, 'r_iron_armor').ok).toBe(true);
+    expect(availableRecipes(s).some((r) => r.id === 'r_iron_sword')).toBe(true);
+  });
+});
+
+describe('勘違いの種', () => {
+  it('buildFacility は建てて facility_built を積み、日送りで噂になる', () => {
+    const s = newGame(71);
+    s.gold = 5000;
+    s.inventory = { ...s.inventory, moss_ore: 20, iron_ore: 20, slime_gel: 20, glow_moss: 20, herb: 20 };
+    expect(buildFacility(s, 'dorm', 0, 0)).toEqual({ ok: true });
+    expect(s.pendingTags).toContain('facility_built');
+    advanceDay(s);
+    expect(s.scenes.length).toBe(1);
+    expect(buildFacility(s, 'dorm', 1, 1).ok).toBe(false);
+  });
+
+  it('安全第一で低Lvの隊を出すと dispatch_safe_weak', () => {
+    const s = newGame(72);
+    sent(s, { policy: 'safe' });
+    expect(s.pendingTags).toContain('dispatch_safe_weak');
+  });
+});
+
+describe('フェーズ4込みの決定論', () => {
+  it('護衛・運搬・呼び戻し・候補者・依頼を混ぜても同seedで同じ状態', () => {
+    const play = () => {
+      const s = newGame(77);
+      s.gold = 5000;
+      s.world.visitedNodes.push('mountain_village');
+      const q = postQuest(s, 't_transport_village');
+      acceptQuest(s, q.id);
+      const ids = s.adventurers.map((a) => a.id);
+      sent(s, { partyIds: ids.slice(0, 2), leaderId: ids[0], action: 'transport', target: { questId: q.id }, items: {} });
+      const e = sent(s, { partyIds: ids.slice(2), leaderId: ids[2], days: 3, items: {} });
+      advanceDay(s);
+      recall(s, e.id);
+      for (let i = 0; i < 12; i++) advanceDay(s);
+      return s;
+    };
+    expect(play()).toEqual(play());
+  });
+});
+
+describe('近道の発見', () => {
+  it('山村を3回訪れると、山村と古い坑道の近道が開く', () => {
+    const s = newGame(21);
+    s.gold = 5000;
+    const go = () => {
+      const ids = s.adventurers.filter((a) => a.status === 'idle' && a.injuryDays === 0).map((a) => a.id);
+      const r = dispatch(s, { partyIds: ids, leaderId: ids[0], action: 'survey', target: { dungeon: 'old_mine', floor: 'f1' }, policy: 'safe', days: 1, items: {} });
+      if (!r.ok) throw new Error(r.reason);
+      while (s.expeditions.length) advanceDay(s);
+      for (const a of s.adventurers) { a.injuryDays = 0; a.fatigue = 0; }
+      if (s.dungeons.old_mine.confirmed) { /* 2回目以降は探索でよい */ }
+    };
+    for (let i = 0; i < 3; i++) {
+      // 2回目以降は確認済みなので探索に切り替える
+      const ids = s.adventurers.map((a) => a.id);
+      const action = s.dungeons.old_mine.confirmed ? 'explore' : 'survey';
+      const r = dispatch(s, { partyIds: ids, leaderId: ids[0], action, target: { dungeon: 'old_mine', floor: 'f1' }, policy: 'safe', days: 1, items: {} });
+      if (!r.ok) throw new Error(r.reason);
+      while (s.expeditions.length) advanceDay(s);
+      for (const a of s.adventurers) { a.injuryDays = 0; a.fatigue = 0; a.status = 'idle'; }
+      if (i < 2) expect(s.world.foundEdges).not.toContain('mountain_village__old_mine_short');
+    }
+    void go;
+    expect(s.world.foundEdges).toContain('mountain_village__old_mine_short');
+    expect(s.notices.some((n) => n.text.includes('近道'))).toBe(true);
   });
 });

@@ -3,6 +3,7 @@ import { effectiveStats } from './adventurer';
 import { facilityEffect, facilityLevel, synergyValue, workersOf } from './base';
 import { FACILITY, ITEM, RECIPE, RECIPES, TUNING } from './data';
 import { addInventory, ledger } from './ledger';
+import { recipeUnlocked } from './quests';
 import type { GameState, RecipeDef, Result } from './types';
 
 const WORKER_STAT_MIN = TUNING.craft.workerStatMin;
@@ -12,7 +13,7 @@ const fail = (reason: string): Result => ({ ok: false, reason });
 const has = <V>(table: Record<string, V>, key: string) => Object.prototype.hasOwnProperty.call(table, key);
 
 export function availableRecipes(s: GameState): RecipeDef[] {
-  return RECIPES.filter((r) => facilityLevel(s, r.facility) >= 1);
+  return RECIPES.filter((r) => facilityLevel(s, r.facility) >= 1 && recipeUnlocked(s, r.id));
 }
 
 export function craftDays(s: GameState, recipeId: string): number {
@@ -28,6 +29,7 @@ export function canCraft(s: GameState, recipeId: string): Result {
   const r = RECIPE[recipeId];
   const facility = FACILITY[r.facility];
   if (facilityLevel(s, r.facility) < 1) return fail(`${facility?.name ?? r.facility}がありません`);
+  if (!recipeUnlocked(s, recipeId)) return fail(`${r.name}の作り方をまだ知りません`);
   if (s.crafts.some((j) => RECIPE[j.recipeId]?.facility === r.facility)) return fail(`${facility.name}は他の品を作っています`);
   if (s.gold < r.gold) return fail('資金が足りません');
   for (const i of r.inputs) {

@@ -8,6 +8,10 @@ function rich(seed = 9): GameState {
   const s = newGame(seed);
   s.gold = 5000;
   s.inventory = { ...s.inventory, iron_ore: 20, fang: 20, herb: 20, slime_gel: 20, bone_shard: 20, moss_ore: 20, glow_moss: 20 };
+  // 鉄の装備は鍛冶の街の解放依頼で開く。ここは製作の仕組みのテストなので解放済みにする
+  s.flags['unlock:u_forge_iron'] = true;
+  s.flags['unlock:r_iron_sword'] = true;
+  s.flags['unlock:r_iron_armor'] = true;
   return s;
 }
 
