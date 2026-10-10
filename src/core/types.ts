@@ -271,6 +271,8 @@ export interface ExpeditionResult {
   success: boolean; retreated: boolean; wiped: boolean;
   log: LogEntry[];
   mapDeltas: MapDelta[];
+  /** 今回入ったマスの最大深度(入口からの経路長)。地図が埋まると奥へ行けるかを測る */
+  maxDepth: number;
   materials: Record<string, number>;
   items: Record<string, number>;
   gold: number;

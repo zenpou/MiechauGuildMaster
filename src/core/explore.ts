@@ -165,7 +165,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   let day = 1;
   const result: ExpeditionResult = {
     success: false, retreated: false, wiped: false, log: [],
-    mapDeltas: [], materials: {}, items: {}, gold: 0,
+    mapDeltas: [], maxDepth: 0, materials: {}, items: {}, gold: 0,
     injuries: {}, expGain: {}, fatigue: {}, relationDeltas: [], revealedTraits: [],
     kills: {}, itemsUsed: {}, repGain: 0, rescueCost: 0, lostMaterials: {},
     questProgress: {}, returnDialogue: [],
@@ -683,6 +683,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   }
 
   result.mapDeltas = [{ dungeon: dungeon.id, floor: inp.floorId, cells: newCells, hidden: newHidden }];
+  result.maxDepth = trace.maxDepth;
   result.items = { ...inp.items };
   if ('potion' in result.items || potions.n > 0) result.items.potion = potions.n;
   if (potions.used > 0) result.itemsUsed.potion = potions.used;

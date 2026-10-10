@@ -255,6 +255,14 @@ describe('探索シミュレーション', () => {
     expect(avg(rates)).toBeGreaterThanOrEqual(0.55);
   });
 
+  it('result.maxDepth は今回入ったマスの最大深度(trace と同じ)', () => {
+    for (const seed of SEEDS.slice(0, 5)) {
+      const { result, trace } = runExploration(input(seed, { leader: 'brave', days: 3 }));
+      expect(result.maxDepth).toBe(trace.maxDepth);
+      expect(result.maxDepth).toBeGreaterThan(0);
+    }
+  });
+
   it('前回までに見つけた隠し通路は最初から通れ、新発見には数えない', () => {
     const hidden = GRID.cells.flatMap((c, i) => (c.kind === 'hidden' ? [i] : []));
     const prior = [...knownWithin(14), ...hidden];
