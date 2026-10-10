@@ -1,4 +1,4 @@
-import { ITEM, JOB, PERSONALITY, ROLE_SKILL } from './data';
+import { ITEM, JOB, PERSONALITY, ROLE_SKILL, TUNING } from './data';
 import type { Rng } from './rng';
 import { equipResist } from './adventurer';
 import type { Adventurer, ElementId, EnemyDef, LogKind, Resist, RoleId, Stats } from './types';
@@ -90,7 +90,7 @@ export function actionOrder(units: Unit[], round: number, rng: Rng): Unit[] {
 
 function damage(rng: Rng, atk: number, mult: number, def: number): { dmg: number; crit: boolean } {
   const crit = rng.chance(0.08);
-  const raw = atk * mult * (crit ? 1.5 : 1) - def * 0.5;
+  const raw = atk * mult * (crit ? 1.5 : 1) - def * TUNING.combat.defScale;
   return { dmg: Math.max(1, Math.round(raw * rng.range(0.9, 1.1))), crit };
 }
 

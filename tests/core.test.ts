@@ -127,7 +127,7 @@ describe('データの整合(JSON同士の参照)', () => {
 
 describe('tuning', () => {
   it('全値が number か number[]', () => {
-    for (const section of [TUNING.explore, TUNING.game, TUNING.readiness, TUNING.equipment, TUNING.craft]) {
+    for (const section of [TUNING.explore, TUNING.game, TUNING.readiness, TUNING.equipment, TUNING.craft, TUNING.combat]) {
       for (const [key, v] of Object.entries(section)) {
         const ok = typeof v === 'number' || (Array.isArray(v) && v.every((x) => typeof x === 'number'));
         expect(ok, key).toBe(true);

@@ -60,6 +60,10 @@ export interface Tuning {
     returnRelation: number;
     gatherFocusBonus: number;
   };
+  combat: {
+    /** 被ダメージ = 攻撃×倍率 − 守備×defScale。大きいほど守備(防具)が効く */
+    defScale: number;
+  };
   equipment: {
     /** 装備の耐性合計の上限 */
     resistCap: number;
