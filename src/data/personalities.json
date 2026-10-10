@@ -9,7 +9,7 @@
    "likes":["caring","brave"],"dislikes":["timid"]},
   {"id":"greedy","name":"強欲","desc":"宝箱と高報酬に目がない。宝と採取点のある方へ地図が伸びる。",
    "retreatBias":0,"fightBias":0.05,"lootBias":0.3,"trapCare":-0.05,"cover":0,
-   "explore":{"venture":0.8,"thorough":0.2,"speed":1.0,"restHp":0.45,"restMode":"average","hesitate":0.3,"forkRandom":false,"detour":"treasure"},
+   "explore":{"venture":0.8,"thorough":0.2,"speed":1.0,"restHp":0.45,"restMode":"average","hesitate":0.15,"forkRandom":false,"detour":"treasure"},
    "likes":["proud"],"dislikes":["caring","cautious"]},
   {"id":"caring","name":"仲間思い","desc":"負傷者を助け、仲間をかばう。誰かが傷つくと休み、引き返す。",
    "retreatBias":0.05,"fightBias":0,"lootBias":-0.1,"trapCare":0.05,"cover":0.35,

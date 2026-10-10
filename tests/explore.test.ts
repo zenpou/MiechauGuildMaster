@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { carryCapacity, generateAdventurer } from '../src/core/adventurer';
 import { DUNGEON, ITEM, JOB, PERSONALITY } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
-import { cellDepths, runExploration, simulateExploration, type ExploreInput } from '../src/core/explore';
+import { BASE_STEPS, cellDepths, runExploration, simulateExploration, type ExploreInput } from '../src/core/explore';
 import { rngFor } from '../src/core/rng';
 import type { Adventurer, DungeonDef, DungeonProgress } from '../src/core/types';
 
@@ -80,9 +80,9 @@ describe('探索シミュレーション', () => {
     expect(progress).toEqual(before);
   });
 
-  it('1日の歩数は 12×隊長の速度係数 に収まる', () => {
+  it('1日の歩数は 基準歩数×隊長の速度係数 に収まる', () => {
     for (const leader of ['cautious', 'brave']) {
-      const budget = Math.round(12 * PERSONALITY[leader].explore.speed);
+      const budget = Math.round(BASE_STEPS * PERSONALITY[leader].explore.speed);
       for (const seed of SEEDS.slice(0, 8)) {
         const { trace } = runExploration(input(seed, { leader, days: 3 }));
         for (const d of trace.days) {
@@ -94,7 +94,7 @@ describe('探索シミュレーション', () => {
         }
       }
     }
-    expect(Math.round(12 * PERSONALITY.brave.explore.speed)).toBeGreaterThan(Math.round(12 * PERSONALITY.cautious.explore.speed));
+    expect(Math.round(BASE_STEPS * PERSONALITY.brave.explore.speed)).toBeGreaterThan(Math.round(BASE_STEPS * PERSONALITY.cautious.explore.speed));
   });
 
   it('未踏マスへの移動は2歩、既踏マスへは1歩', () => {
@@ -216,6 +216,43 @@ describe('探索シミュレーション', () => {
     }
     expect(found).toBeGreaterThan(0);
     expect(walked).toBeGreaterThan(0);
+  });
+
+  it('隠し通路は1マス見つけると、つながった隠しマスがまとめて開く', () => {
+    const hidden = GRID.cells.flatMap((c, i) => (c.kind === 'hidden' ? [i] : []));
+    let trips = 0;
+    for (const seed of SEEDS) {
+      const visited = new Set<number>();
+      for (let trip = 0; trip < 6; trip++) {
+        const { result } = runExploration(input(seed * 100 + trip, {
+          members: party(seed, 'brave'), leaderId: 'm0', progress: progressOf([...visited]), days: 3,
+        }));
+        const delta = result.mapDeltas[0];
+        if (delta.hidden.length > 0) {
+          expect([...delta.hidden].sort((a, b) => a - b)).toEqual(hidden);
+          trips++;
+          break;
+        }
+        for (const i of delta.cells) visited.add(i);
+      }
+    }
+    expect(trips).toBeGreaterThan(0);
+  });
+
+  it('強欲は既知の採取点に留まらず、地図を埋め続ける(3日×6回で平均55%以上)', () => {
+    const rates = SEEDS.map((seed) => {
+      const visited = new Set<number>();
+      const known = new Set<number>();
+      for (let trip = 0; trip < 6; trip++) {
+        const { result } = runExploration(input(seed * 100 + trip, {
+          members: party(seed, 'greedy'), leaderId: 'm0', progress: progressOf([...visited], [...known]), days: 3,
+        }));
+        for (const i of result.mapDeltas[0].cells) visited.add(i);
+        for (const i of result.mapDeltas[0].hidden) known.add(i);
+      }
+      return visited.size / GRID.cells.filter((c) => c.kind !== 'wall').length;
+    });
+    expect(avg(rates)).toBeGreaterThanOrEqual(0.55);
   });
 
   it('前回までに見つけた隠し通路は最初から通れ、新発見には数えない', () => {

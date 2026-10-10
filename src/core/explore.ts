@@ -10,7 +10,7 @@ import type {
 } from './types';
 
 // ---- sim で調整する値(フェーズ2で JSON へ移す) ----
-const BASE_STEPS = 12;
+export const BASE_STEPS = 16;
 const COST_KNOWN = 1;
 const COST_UNKNOWN = 2;
 const REST_STEPS = 3;
@@ -34,6 +34,8 @@ const HIDDEN_SCALE = 50;
 const NEST_GROUP: [number, number] = [2, 3];
 const DEFAULT_ENCOUNTER = 0.04;
 const DETOUR_BONUS = 0.5;
+// 前の派遣で踏んだ寄り道先は加点を弱める。強欲が入口近くの採取点だけを毎回往復して地図が止まったため
+const DETOUR_BONUS_KNOWN = 0.05;
 const SCORE_NOISE = 0.05;
 const FORK_NEIGHBORS = 3;
 const FORK_TOP = 3;
@@ -394,6 +396,14 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     }
   };
 
+  /** つながった隠しマスは1本の通路として、まとめて開く */
+  const hiddenRun = (start: number): number[] => {
+    const run = [start];
+    for (let h = 0; h < run.length; h++) {
+      for (const n of visibleFrom(grid, run[h])) if (kindOf(n) === 'hidden' && !run.includes(n)) run.push(n);
+    }
+    return run.sort((a, b) => a - b);
+  };
   /** 隣の隠し通路は、通りがかった時に1日1度だけ発見を試みる */
   const tryHidden = (i: number) => {
     for (const n of visibleFrom(grid, i)) {
@@ -401,8 +411,11 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       tried.add(n);
       const s = best('scout');
       if (!rng.chance(clamp(HIDDEN_BASE + stats[s.id].scout / HIDDEN_SCALE, 0.1, 0.9))) continue;
-      hiddenFound.push(n);
-      newHidden.push(n);
+      for (const h of hiddenRun(n)) {
+        if (hiddenFound.includes(h)) continue;
+        hiddenFound.push(h);
+        newHidden.push(h);
+      }
       event(n, 'hidden');
       say('event', `${s.name}が壁の継ぎ目に気づいた。隠し通路だ!`);
     }
@@ -479,7 +492,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     const dAll = bfs(pos, (i) => visited.has(i));
     const dSafe = avoid ? bfs(pos, (i) => visited.has(i) && !isDanger(i)) : dAll;
     const dEnt = bfs(entrance, (i) => visited.has(i));
-    const scored: { cell: number; dist: number; depth: number; detour: boolean }[] = [];
+    const scored: { cell: number; dist: number; depth: number; detour: number }[] = [];
     let far = false;
     for (const cell of [...cands.keys()].sort((a, b) => a - b)) {
       let dist = costVia(dSafe, cell, COST_UNKNOWN);
@@ -491,7 +504,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         far = true;
         continue;
       }
-      scored.push({ cell, dist, depth, detour: cands.get(cell)! });
+      scored.push({ cell, dist, depth, detour: cands.get(cell)! ? (visited.has(cell) ? DETOUR_BONUS_KNOWN : DETOUR_BONUS) : 0 });
     }
     if (!scored.length) return far ? 'far' : null;
     const maxDist = Math.max(1, ...scored.map((s) => s.dist));
@@ -499,7 +512,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       .map((s) => ({
         cell: s.cell,
         score: ex.venture * Math.min(1, s.depth / maxDepthAll) - ex.thorough * (s.dist / maxDist)
-          + (s.detour ? DETOUR_BONUS : 0) + rng.range(0, SCORE_NOISE),
+          + s.detour + rng.range(0, SCORE_NOISE),
       }))
       .sort((a, b) => b.score - a.score || a.cell - b.cell);
     return fork && ex.forkRandom ? rng.pick(ranked.slice(0, FORK_TOP)).cell : ranked[0].cell;
