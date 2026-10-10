@@ -202,7 +202,7 @@
   "loot": [
    {
     "item": "wisp_ember",
-    "chance": 0.6
+    "chance": 1
    }
   ]
  },

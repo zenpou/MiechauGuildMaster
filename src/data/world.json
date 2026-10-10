@@ -170,7 +170,7 @@
    "id": "base__forge_town",
    "a": "base",
    "b": "forge_town",
-   "days": 2,
+   "days": 1,
    "danger": 0.2
   },
   {
@@ -184,7 +184,7 @@
    "id": "base__camp_north",
    "a": "base",
    "b": "camp_north",
-   "days": 1,
+   "days": 0,
    "danger": 0.1
   },
   {
@@ -220,7 +220,7 @@
    "id": "high_pass__mountain_village",
    "a": "high_pass",
    "b": "mountain_village",
-   "days": 1,
+   "days": 0,
    "danger": 0.3
   },
   {

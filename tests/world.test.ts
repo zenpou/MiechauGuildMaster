@@ -44,14 +44,14 @@ describe('world.json', () => {
     expect(e('base__forest_cave')).toEqual([0, 0.05, false]);
     expect(e('base__mountain_village')).toEqual([1, 0.15, false]);
     expect(e('mountain_village__old_mine')).toEqual([1, 0.25, false]);
-    expect(e('base__forge_town')).toEqual([2, 0.2, false]);
+    expect(e('base__forge_town')).toEqual([1, 0.2, false]);
     expect(e('forge_town__ruined_tower')).toEqual([1, 0.35, false]);
-    expect(e('base__camp_north')).toEqual([1, 0.1, false]);
+    expect(e('base__camp_north')).toEqual([0, 0.1, false]);
     expect(e('academy_town__camp_north')).toEqual([1, 0.1, false]);
     expect(e('mountain_village__old_mine_short')).toEqual([0, 0.3, true]);
     expect(e('academy_town__sunken_ruins')).toEqual([1, 0.3, false]);
     expect(e('academy_town__frost_valley')).toEqual([2, 0.35, false]);
-    expect(e('high_pass__mountain_village')).toEqual([1, 0.3, false]);
+    expect(e('high_pass__mountain_village')).toEqual([0, 0.3, false]);
     expect(e('dragon_lair__high_pass')).toEqual([1, 0.5, false]);
     expect(WORLD.edges).toHaveLength(12);
   });
@@ -111,14 +111,14 @@ describe('travelDays / route', () => {
     expect(travelDays('base', 'forest_cave', known)).toBe(0);
     expect(travelDays('base', 'mountain_village', known)).toBe(1);
     expect(travelDays('base', 'old_mine', known)).toBe(2);
-    expect(travelDays('base', 'forge_town', known)).toBe(2);
-    expect(travelDays('base', 'ruined_tower', known)).toBe(3);
-    expect(travelDays('base', 'academy_town', known)).toBe(2);
-    expect(travelDays('ruined_tower', 'academy_town', known)).toBe(5);
-    expect(travelDays('base', 'frost_valley', known)).toBe(4);
-    expect(travelDays('base', 'sunken_ruins', known)).toBe(3);
-    expect(travelDays('base', 'dragon_lair', known)).toBe(3);
-    expect(travelDays('base', 'high_pass', known)).toBe(2);
+    expect(travelDays('base', 'forge_town', known)).toBe(1);
+    expect(travelDays('base', 'ruined_tower', known)).toBe(2);
+    expect(travelDays('base', 'academy_town', known)).toBe(1);
+    expect(travelDays('ruined_tower', 'academy_town', known)).toBe(3);
+    expect(travelDays('base', 'frost_valley', known)).toBe(3);
+    expect(travelDays('base', 'sunken_ruins', known)).toBe(2);
+    expect(travelDays('base', 'dragon_lair', known)).toBe(2);
+    expect(travelDays('base', 'high_pass', known)).toBe(1);
   });
   it('新しいダンジョンへの経路(谷・遺跡は学院の街、寝床は山村と高山の関を通る)', () => {
     expect(route('base', 'frost_valley', known)).toEqual(['base', 'camp_north', 'academy_town', 'frost_valley']);
@@ -154,19 +154,19 @@ describe('travelDays / route', () => {
 describe('planSteps', () => {
   const contiguous = (days: number[]) => days.every((d, i) => i === 0 || d - days[i - 1] === 0 || d - days[i - 1] === 1);
 
-  it('塔: 往路3日・滞在3日・復路3日。日付が連続し、最後は拠点に帰着', () => {
+  it('塔: 往路2日・滞在3日・復路2日。日付が連続し、最後は拠点に帰着', () => {
     const steps = planSteps(route('base', 'ruined_tower', known)!, 3, 10, known);
-    expect(steps.map((s) => s.day)).toEqual([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+    expect(steps.map((s) => s.day)).toEqual([10, 11, 12, 13, 14, 15, 16, 17]);
     expect(steps.map((s) => s.phase)).toEqual([
-      'outbound', 'outbound', 'outbound', 'stay', 'stay', 'stay', 'return', 'return', 'return', 'return',
+      'outbound', 'outbound', 'stay', 'stay', 'stay', 'return', 'return', 'return',
     ]);
     expect(steps.map((s) => s.edge ?? s.node)).toEqual([
-      'base__forge_town', 'base__forge_town', 'forge_town__ruined_tower',
+      'base__forge_town', 'forge_town__ruined_tower',
       'ruined_tower', 'ruined_tower', 'ruined_tower',
-      'forge_town__ruined_tower', 'base__forge_town', 'base__forge_town', 'base',
+      'forge_town__ruined_tower', 'base__forge_town', 'base',
     ]);
     for (const s of steps) expect((s.node === null) !== (s.edge === null)).toBe(true);
-    expect(steps.at(-1)!.day).toBe(10 + 3 + 3 + 3);
+    expect(steps.at(-1)!.day).toBe(10 + 2 + 3 + 2);
   });
   it('days=0 の道は同日。森の洞窟は出発日から滞在', () => {
     const steps = planSteps(['base', 'forest_cave'], 3, 10, known);
@@ -199,7 +199,7 @@ describe('simulateTravel', () => {
   };
 
   it('1日ごとの遭遇は danger に比例する(固定seed・1000回)', () => {
-    const low = count(['base', 'camp_north'], strong(), 1000, 'low'); // 0.1
+    const low = count(['camp_north', 'academy_town'], strong(), 1000, 'low'); // 0.1
     const mid = count(['base', 'mountain_village'], strong(), 1000, 'mid'); // 0.15
     const high = count(['forge_town', 'ruined_tower'], strong(), 1000, 'high'); // 0.35
     expect(low).toBeGreaterThan(70);
@@ -210,9 +210,9 @@ describe('simulateTravel', () => {
     expect(high).toBeLessThan(390);
   });
   it('2日の道は1日ごとに引く', () => {
-    const two = count(['base', 'forge_town'], strong(), 1000, 'two'); // 0.2 × 2日
-    expect(two).toBeGreaterThan(350);
-    expect(two).toBeLessThan(450);
+    const two = count(['academy_town', 'frost_valley'], strong(), 1000, 'two'); // 0.35 × 2日
+    expect(two).toBeGreaterThan(640);
+    expect(two).toBeLessThan(760);
   });
   it('days=0 の道では遭遇しない', () => {
     expect(count(['base', 'forest_cave'], strong(), 200, 'zero')).toBe(0);

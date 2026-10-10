@@ -1,6 +1,6 @@
 {
   "explore": {
-    "baseSteps": 16,
+    "baseSteps": 48,
     "costKnown": 1,
     "costUnknown": 2,
     "restSteps": 3,
@@ -18,8 +18,8 @@
     "trapBase": 0.4,
     "trapDexScale": 40,
     "treasureGold": [
-      30,
-      80
+      90,
+      240
     ],
     "treasureTrap": 0.3,
     "gatherBase": 0.35,
@@ -58,16 +58,16 @@
       2,
       4
     ],
-    "expPerCell": 2,
-    "expPerDay": 5,
+    "expPerCell": 4,
+    "expPerDay": 12,
     "expRefPower": 180,
     "traitReveal": 0.25,
     "returnRelation": 1,
     "gatherFocusBonus": 1
   },
   "growth": {
-    "expPerLevel": 40,
-    "wageSlope": 0.6
+    "expPerLevel": 14,
+    "wageSlope": 0.1
   },
   "combat": {
     "defScale": 1.0
@@ -95,7 +95,7 @@
     "startPotions": 2,
     "upkeepPerDay": 30,
     "startApt": 70,
-    "debtInterest": 0.02,
+    "debtInterest": 0.005,
     "debtLoyalty": -2,
     "debtRep": -1,
     "restFatigue": -25,
@@ -110,14 +110,14 @@
     "candidateDays": 5,
     "hireSalaryDays": 4,
     "baseCapacity": 6,
-    "sellScale": 1,
-    "facilityUpkeepScale": 1
+    "sellScale": 3,
+    "facilityUpkeepScale": 0.5
   },
   "quests": {
-    "deliverPriceMul": 3.75,
-    "huntExpMul": 22,
-    "escortGoldPerDay": 120,
-    "transportGoldPerDay": 90
+    "deliverPriceMul": 5.6,
+    "huntExpMul": 33,
+    "escortGoldPerDay": 180,
+    "transportGoldPerDay": 135
   },
   "training": {
     "days": 3,

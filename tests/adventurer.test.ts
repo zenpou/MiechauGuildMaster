@@ -81,7 +81,9 @@ describe('成長と日給', () => {
   });
   it('addExp でレベルが上がり、日給は変わらない', () => {
     const a = fixture({ salary: 12 });
-    expect(addExp(a, 40 + 80 + 5)).toBe(2);
+    const per = TUNING.growth.expPerLevel;
+    // Lv1→2 に per、Lv2→3 に 2×per。余りの5は次のレベルへ持ち越す
+    expect(addExp(a, per + 2 * per + 5)).toBe(2);
     expect(a.level).toBe(3);
     expect(a.exp).toBe(5);
     expect(a.salary).toBe(12);

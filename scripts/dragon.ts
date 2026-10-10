@@ -529,7 +529,9 @@ function runSeed(seed: number, log: boolean): Run {
     for (const list of lists()) {
       const slot = slotOf(list[0]);
       const pool = new Map(list.map((it) => [it, have(it) + crafting(it)]));
-      for (const a of byPower(s.adventurers)) {
+      // 火耐性の品は竜と戦う先端Aの分だけ作る。名簿全員の分まで素材を集めると、竜の前に日数を食いつぶす
+      const wearers = list === ACCESSORIES_FIRE ? byPower(s.adventurers).slice(0, PARTY_MAX) : byPower(s.adventurers);
+      for (const a of wearers) {
         const cur = rankIn(list, a.equipment[slot]);
         if (cur < 0) continue;
         const got = list.find((it, r) => r < cur && canUse(a, it) && (pool.get(it) ?? 0) > 0);

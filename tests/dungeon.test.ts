@@ -606,7 +606,7 @@ describe('廃れた塔の敵と素材', () => {
     expect(ENEMY.gargoyle.loot).toEqual([{ item: 'crystal', chance: 0.3 }]);
     expect(ENEMY.gargoyle.resist).toEqual({ thunder: 0.5, earth: 0.5 });
     expect(ENEMY.wisp.element).toBe('fire');
-    expect(ENEMY.wisp.loot).toEqual([{ item: 'wisp_ember', chance: 0.6 }]);
+    expect(ENEMY.wisp.loot).toEqual([{ item: 'wisp_ember', chance: 1 }]);
     expect(ENEMY.wisp.resist).toEqual({ fire: 0.8, ice: -0.5 });
     expect(ENEMY.tower_keeper.symbol).toBe(true);
     expect(ENEMY.tower_keeper.element).toBe('earth');

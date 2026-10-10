@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { addExp, generateAdventurer } from '../src/core/adventurer';
 import { assignWorker } from '../src/core/base';
 import { startCraft } from '../src/core/craft';
-import { DUNGEON, ITEM, JOB, TUNING } from '../src/core/data';
+import { DUNGEON, FACILITY, ITEM, JOB, TUNING } from '../src/core/data';
 
 const G0 = TUNING.game.startGold;
 const SUP = TUNING.game.supportGold;
@@ -109,7 +109,7 @@ describe('advanceDay', () => {
     expect(s.ledger.some((l) => l.amount === -30 && l.label.includes('維持費'))).toBe(true);
   });
 
-  it('赤字なら利息2%・忠誠(debtLoyalty)・評判−1', () => {
+  it('赤字なら利息(debtInterest)・忠誠(debtLoyalty)・評判−1', () => {
     const s = newGame(9);
     s.gold = -1000;
     s.rep = 5;
@@ -117,7 +117,7 @@ describe('advanceDay', () => {
     const w = wages(s);
     advanceDay(s);
     const deficit = 1000 + w + 30 - SUP;
-    expect(s.gold).toBe(-deficit - Math.ceil(deficit * 0.02));
+    expect(s.gold).toBe(-deficit - Math.ceil(deficit * TUNING.game.debtInterest));
     expect(s.rep).toBe(4);
     expect(s.debt).toBe(true);
     s.adventurers.forEach((a, i) => expect(a.loyalty).toBe(loyal[i] + TUNING.game.debtLoyalty + 1));
@@ -219,8 +219,9 @@ describe('売買', () => {
     expect(sellMaterial(s, 'potion', 1).ok).toBe(false);
     expect(sellMaterial(s, 'fang', 2).ok).toBe(true);
     expect(s.inventory.fang).toBe(1);
-    expect(s.gold).toBe(G0 + 36);
-    expect(s.ledger[0].amount).toBe(36);
+    const price = Math.round(ITEM.fang.price * 2 * TUNING.game.sellScale);
+    expect(s.gold).toBe(G0 + price);
+    expect(s.ledger[0].amount).toBe(price);
   });
 
   it('回復薬だけ買える。資金不足では買えない', () => {
@@ -344,9 +345,11 @@ describe('施設の維持費', () => {
     s.base.facilities.push({ id: 'clinic', level: 0, x: 2, y: 0, builtDay: 1, construction: { toLevel: 1, untilDay: 9 } });
     const gold = s.gold;
     const w = wages(s);
+    // 完成済みの dorm(5)と workshop(8)。建設中の clinic は数えない
+    const upkeep = Math.round((FACILITY.dorm.upkeep + FACILITY.workshop.upkeep) * TUNING.game.facilityUpkeepScale);
     advanceDay(s);
-    expect(s.ledger.some((l) => l.label === '施設維持費' && l.amount === -13)).toBe(true);
-    expect(s.gold).toBe(gold + SUP - w - 30 - 13);
+    expect(s.ledger.some((l) => l.label === '施設維持費' && l.amount === -upkeep)).toBe(true);
+    expect(s.gold).toBe(gold + SUP - w - 30 - upkeep);
   });
 });
 
@@ -889,15 +892,16 @@ describe('新しい施設の効果(売却・日送りの産出・派遣)', () =>
       expect(sellMaterial(s, 'fang', n)).toEqual({ ok: true });
       return s.gold - g;
     };
-    expect(sell(3)).toBe(p * 3);
+    const k = TUNING.game.sellScale;
+    expect(sell(3)).toBe(Math.round(p * 3 * k));
     place(s, 'market', 0, 0);
-    expect(sellGold(s, 'fang', 3)).toBe(Math.round(p * 3 * 1.1));
-    expect(sell(3)).toBe(Math.round(p * 3 * 1.1));
-    expect(s.ledger[0]).toMatchObject({ label: `素材売却: ${ITEM.fang.name}×3`, amount: Math.round(p * 3 * 1.1) });
+    expect(sellGold(s, 'fang', 3)).toBe(Math.round(p * 3 * k * 1.1));
+    expect(sell(3)).toBe(Math.round(p * 3 * k * 1.1));
+    expect(s.ledger[0]).toMatchObject({ label: `素材売却: ${ITEM.fang.name}×3`, amount: Math.round(p * 3 * k * 1.1) });
     s.base.facilities[0].level = 2;
-    expect(sell(1)).toBe(Math.round(p * 1.2));
+    expect(sell(1)).toBe(Math.round(p * k * 1.2));
     place(s, 'smithy', 1, 0);
-    expect(sell(5)).toBe(Math.round(p * 5 * 1.3));
+    expect(sell(5)).toBe(Math.round(p * 5 * k * 1.3));
   });
 
   it('日送りで製材所・石切場の産出が在庫に入る。完成した日から産み、台帳とお知らせには出ない', () => {
