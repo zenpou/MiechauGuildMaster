@@ -188,6 +188,23 @@ describe('runCombat', () => {
   });
 });
 
+describe('30ターンで決着がつかない戦い', () => {
+  it('どちらも倒れないまま上限に達したら、全滅ではなく撤退(fled)になる', () => {
+    // 与ダメージが1でも、回復量が追いつく: 倒しきれず倒されもしない
+    const wall = foe({ hp: 100000, maxHp: 100000, def: 9999, atk: 1, spd: 1 });
+    const tough = ally(['tank'], { hp: 100000, maxHp: 100000, def: 9999, atk: 1 });
+    const r = runCombat([tough], [wall], ctx(1, { canFlee: false, fleeBelow: 0 }));
+    expect(r.rounds).toBe(30);
+    expect(r.outcome).toBe('fled');
+  });
+
+  it('味方が全員倒れたら lost のまま', () => {
+    const weakling = ally(['attacker'], { hp: 1, maxHp: 1, def: 0 });
+    const boss = foe({ hp: 100000, maxHp: 100000, atk: 999, spd: 99 });
+    expect(runCombat([weakling], [boss], ctx(2, { canFlee: false, fleeBelow: 0 })).outcome).toBe('lost');
+  });
+});
+
 describe('actionOrder', () => {
   it('first_strike 持ちは1ターン目に最初に動く', () => {
     const scout = ally(['scout'], { id: 's', spd: 1 });

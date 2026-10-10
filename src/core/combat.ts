@@ -246,5 +246,10 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
   }
 
   const won = alive(enemies).length === 0 && alive(allies).length > 0;
+  // 上限まで決着がつかなかった戦いは、全滅ではなく撤退にする(死なない方針。高守備のボスに削り切れない隊を全滅扱いにしない)
+  if (!won && alive(allies).length > 0 && alive(enemies).length > 0) {
+    say('combat', '決着がつかないまま時間が過ぎ、隊は引き上げた。');
+    return { outcome: 'fled', kills, rounds: round, downed: [...downed] };
+  }
   return { outcome: won ? 'won' : 'lost', kills, rounds: round, downed: [...downed] };
 }
