@@ -22,7 +22,7 @@ describe('レシピ', () => {
     expect(canCraft(s, 'r_iron_sword').ok).toBe(false);
     place(s, 'workshop', 0, 0);
     expect(availableRecipes(s).map((r) => r.id)).toEqual([
-      'r_bone_dagger', 'r_iron_sword', 'r_leather_armor', 'r_iron_armor', 'r_fang_necklace', 'r_moss_charm',
+      'r_bone_dagger', 'r_iron_sword', 'r_leather_armor', 'r_studded_armor', 'r_iron_armor', 'r_fang_necklace', 'r_moss_charm',
     ]);
     s.base.facilities.push({ id: 'alchemy', level: 0, x: 3, y: 3, builtDay: 1, construction: { toLevel: 1, untilDay: 9 } });
     expect(availableRecipes(s).some((r) => r.facility === 'alchemy')).toBe(false);

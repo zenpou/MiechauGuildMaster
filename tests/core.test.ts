@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DUNGEONS, ENEMIES, ENEMY, ITEM, JOBS, LOWER_JOBS, PERSONALITIES, ROLE_SKILLS, TUNING, UPPER_JOBS, upperJobsFrom } from '../src/core/data';
+import { DUNGEONS, ENEMIES, ENEMY, FACILITIES, FACILITY, ITEM, JOBS, LOWER_JOBS, PERSONALITIES, RECIPES, ROLE_SKILLS, SYNERGIES, TUNING, UPPER_JOBS, upperJobsFrom } from '../src/core/data';
 import { Rng, rngFor } from '../src/core/rng';
 import { deserialize, load, migrate, save, serialize, type KeyValueStore } from '../src/core/save';
 import { emptyState } from '../src/core/state';
@@ -104,6 +104,15 @@ describe('データの整合(JSON同士の参照)', () => {
   });
   it('敵のドロップは実在するアイテム', () => {
     for (const e of ENEMIES) for (const l of e.loot) expect(ITEM[l.item], `${e.id} の loot ${l.item}`).toBeDefined();
+  });
+  it('レシピの施設・出力・素材、施設の建材、シナジーの施設は実在するIDを指す', () => {
+    for (const r of RECIPES) {
+      expect(FACILITY[r.facility], `${r.id} の facility`).toBeDefined();
+      expect(ITEM[r.output.item], `${r.id} の output`).toBeDefined();
+      for (const i of r.inputs) expect(ITEM[i.item], `${r.id} の input ${i.item}`).toBeDefined();
+    }
+    for (const f of FACILITIES) for (const c of f.costs) for (const m of Object.keys(c.materials)) expect(ITEM[m], `${f.id} の建材 ${m}`).toBeDefined();
+    for (const sy of SYNERGIES) { expect(FACILITY[sy.a], sy.id).toBeDefined(); expect(FACILITY[sy.b], sy.id).toBeDefined(); }
   });
   it('ダンジョンの巣・シンボル・採取点・敵表は実在するIDを指す', () => {
     for (const d of DUNGEONS) {
