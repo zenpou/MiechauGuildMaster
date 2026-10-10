@@ -31,19 +31,25 @@ export interface ExploreInput {
   target?: { item?: string; enemy?: string };
   /** 見込み用: 既知のマスだけを歩き、未踏には踏み込まない */
   knownOnly?: boolean;
+  /** 前の階を通り抜ける歩数(片道。floorTransit)。往路と復路で1回ずつ払う。省略時 0 */
+  transit?: number;
+  /** 出発時に持っている鍵。扉はこの鍵があるときだけ通れる。省略時 [] */
+  keys?: string[];
+  /** 隠し通路の発見率への加算。省略時 0 */
+  hiddenBonus?: number;
 }
 
 /** 1歩の記録。cost は既踏1・未踏2 */
 export interface ExploreMove { cell: number; cost: number }
 export interface ExploreDayTrace {
   day: number; budget: number;
-  /** 移動・迷い・休憩で使った歩数 */
+  /** 移動・迷い・休憩・前の階の通り抜けで使った歩数 */
   used: number;
   moves: ExploreMove[];
   /** その日の終わりの位置 */
   camp: number;
 }
-export interface ExploreEvent { day: number; cell: number; kind: CellKind | 'encounter' | 'hidden' }
+export interface ExploreEvent { day: number; cell: number; kind: CellKind | 'encounter' | 'hidden' | 'stairs' }
 /** 計測(sim)とテスト用の行程記録。ExpeditionResult には入れない */
 export interface ExploreTrace {
   days: ExploreDayTrace[];
@@ -57,16 +63,18 @@ export interface ExploreTrace {
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-const ONCE_KINDS: CellKind[] = ['gather', 'treasure', 'trap', 'nest', 'symbol', 'boss'];
+const ONCE_KINDS: CellKind[] = ['gather', 'treasure', 'trap', 'nest', 'symbol', 'boss', 'stairs_down'];
 const DANGER_KINDS: CellKind[] = ['nest', 'symbol', 'boss'];
 const LOOT_KINDS: CellKind[] = ['treasure', 'gather'];
 
 /**
  * マスの深度 = 入口からの経路長。隠し通路を閉じた形で測り、隠し通路のマス自体は開けた形で測る。
  * 近道を見つけても「奥にあるマス」の深さは変わらない方が、計測の物差しとして比べやすいため。
+ * 扉の奥だけのマスは鍵を全部持った形で測る(鍵の有無で深度が -1 になると、奥へ届いたかを比べられない)。
  */
 export function cellDepths(grid: Grid): number[] {
   const hidden = grid.cells.flatMap((c, i) => (c.kind === 'hidden' ? [i] : []));
+  const keys = [...new Set(grid.cells.flatMap((c) => (c.kind === 'door' && c.key !== undefined ? [c.key] : [])))];
   const walk = (know: PassKnowledge) => {
     const d = new Array<number>(grid.cells.length).fill(-1);
     d[grid.entrance] = 0;
@@ -81,8 +89,34 @@ export function cellDepths(grid: Grid): number[] {
     return d;
   };
   const closed = walk({ keys: [], hiddenFound: [] });
-  const open = walk({ keys: [], hiddenFound: hidden });
-  return closed.map((v, i) => (v >= 0 ? v : open[i]));
+  const keyed = walk({ keys, hiddenFound: [] });
+  const open = walk({ keys, hiddenFound: hidden });
+  return closed.map((v, i) => (v >= 0 ? v : keyed[i] >= 0 ? keyed[i] : open[i]));
+}
+
+/**
+ * 階 floorId への派遣で、前の階を通り抜ける片道の歩数(各1歩)。1階は 0。
+ * 前の階の入口から、踏んだ下り階段までの既知の最短経路の長さに、それより上の階の分を足す。
+ * 前の階の下り階段を踏んでいない・既知の道で届かない・階が無いときは null。
+ */
+export function floorTransit(dungeon: DungeonDef, floorId: string, progress: DungeonProgress, keys: string[] = []): number | null {
+  const n = dungeon.floors.findIndex((f) => f.id === floorId);
+  if (n < 0) return null;
+  if (n === 0) return 0;
+  const prevDef = dungeon.floors[n - 1];
+  const above = floorTransit(dungeon, prevDef.id, progress, keys);
+  const prev = progress.floors[prevDef.id];
+  if (above === null || !prev) return null;
+  const grid = parseFloor(prevDef);
+  const known = new Set(prev.visited);
+  const know: PassKnowledge = { keys, hiddenFound: prev.hiddenFound };
+  let best = Infinity;
+  for (let i = 0; i < grid.cells.length; i++) {
+    if (grid.cells[i].kind !== 'stairs_down' || !known.has(i)) continue;
+    const p = shortestPath(grid, grid.entrance, i, known, know);
+    if (p) best = Math.min(best, p.length - 1);
+  }
+  return best === Infinity ? null : above + best;
 }
 
 /** 帰還のひとこと。隊員全員分を性格と結果の種類から1つずつ選ぶ */
@@ -112,6 +146,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   const targetItem = inp.target?.item;
   const targetEnemy = inp.target?.enemy;
   const entrance = grid.entrance;
+  const transit = inp.transit ?? 0;
+  const hiddenBonus = inp.hiddenBonus ?? 0;
 
   // ---- 知識 ----
   const prior = inp.progress.floors[inp.floorId];
@@ -119,7 +155,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   const newCells: number[] = [];
   const hiddenFound = [...(prior?.hiddenFound ?? [])];
   const newHidden: number[] = [];
-  const know: PassKnowledge = { keys: [], hiddenFound };
+  // 扉は出発時に持っていた鍵だけで開く。現地で拾った鍵は帰還して在庫に入ってから使える
+  const know: PassKnowledge = { keys: inp.keys ?? [], hiddenFound };
+  const heldKeys = new Set(know.keys);
+  const foundKeys: string[] = [];
   const seen = new Set<number>();
   const look = (i: number) => { for (const n of visibleFrom(grid, i)) seen.add(n); };
   for (const v of visited) look(v);
@@ -193,9 +232,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     }
     return shortestPath(grid, from, to, set, know);
   };
+  /** 外へ出るまでの歩数。前の階を抜ける復路の分も常に予約しておく */
   const homeDist = (i: number) => {
     const p = pathTo(i, entrance);
-    return p ? p.length - 1 : Infinity;
+    return p ? p.length - 1 + transit : Infinity;
   };
   const bfs = (from: number, ok: (i: number) => boolean) => {
     const d = new Array<number>(grid.cells.length).fill(-1);
@@ -223,6 +263,11 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   let left = 0;
   let future = 0;
   let rests = 0;
+  /** 往路で前の階をまだ抜けきっていない歩数。最初の目標を決めてから払う(出直すなら払わない) */
+  let owed = transit;
+  /** 復路で前の階を抜け始めたら true。back はその残りの歩数 */
+  let leaving = false;
+  let back = 0;
   const tried = new Set<number>();
   let today: ExploreDayTrace = { day: 0, budget: 0, used: 0, moves: [], camp: entrance };
   let seg = { from: pos, steps: 0, fresh: 0, hes: 0, home: false };
@@ -345,6 +390,18 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       }
       case 'treasure': {
         event(i, 'treasure');
+        if (cell.item !== undefined) {
+          // 鍵の宝箱。データ側に定義が無い鍵でも止めない
+          const name = ITEM[cell.item]?.name ?? cell.item;
+          if (heldKeys.has(cell.item)) {
+            say('event', `宝箱に${name}があったが、もう持っている。`);
+            return;
+          }
+          heldKeys.add(cell.item);
+          foundKeys.push(cell.item);
+          say('event', `宝箱から${name}を手に入れた。`);
+          return;
+        }
         const gold = rng.int(T.treasureGold[0], T.treasureGold[1]);
         if (rng.chance(T.treasureTrap)) springTrap('宝箱に罠が仕掛けられていた。');
         result.gold += gold;
@@ -354,6 +411,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       case 'trap':
         event(i, 'trap');
         springTrap('足元に仕掛けがある。');
+        return;
+      case 'stairs_down':
+        event(i, 'stairs');
+        say('event', '下り階段を見つけた。');
         return;
       case 'nest': {
         const entry = dungeon.enemies.find((e) => e.id === cell.enemy);
@@ -391,7 +452,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       if (kindOf(n) !== 'hidden' || hiddenFound.includes(n) || tried.has(n)) continue;
       tried.add(n);
       const s = best('scout');
-      if (!rng.chance(clamp(T.hiddenBase + stats[s.id].scout / T.hiddenScale, 0.1, 0.9))) continue;
+      if (!rng.chance(Math.min(0.95, clamp(T.hiddenBase + stats[s.id].scout / T.hiddenScale, 0.1, 0.9) + hiddenBonus))) continue;
       for (const h of hiddenRun(n)) {
         if (hiddenFound.includes(h)) continue;
         hiddenFound.push(h);
@@ -432,7 +493,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       startRetreat(`隊の消耗が激しい。${leader.name}は撤退を決めた。`);
     }
     const low = ex.restMode === 'any' ? minHp() : avgHp();
-    if (rests < T.restMaxPerDay && low < ex.restHp && left - T.restSteps + future >= homeDist(pos)) {
+    // 休憩も歩数を使う。その日の残りが足りないときは取らない(翌日分を前借りして負の歩数にしない)
+    if (rests < T.restMaxPerDay && low < ex.restHp && left >= T.restSteps && left - T.restSteps + future >= homeDist(pos)) {
       rests++;
       left -= T.restSteps;
       today.used += T.restSteps;
@@ -480,7 +542,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     if (ex.detour === 'nest' || ex.detour === 'treasure') {
       const kinds = ex.detour === 'nest' ? DANGER_KINDS : LOOT_KINDS;
       for (const i of knownOnly ? [...visited] : [...visited, ...seen]) {
-        if (kinds.includes(kindOf(i)) && unspent(i) && isPassable(grid, i, know)) cands.set(i, true);
+        // 持っている鍵の宝箱は、行っても何も起きない
+        if (kinds.includes(kindOf(i)) && unspent(i) && isPassable(grid, i, know) && !(grid.cells[i].item && know.keys.includes(grid.cells[i].item!))) cands.set(i, true);
       }
     }
     if (avoid) for (const i of [...cands.keys()]) if (isDanger(i)) cands.delete(i);
@@ -502,7 +565,9 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     if (cands.size === 0) return null;
 
     const fork = neighbors(grid, pos, know).length >= T.forkNeighbors;
-    if (fork && ex.hesitate > 0 && rng.chance(ex.hesitate) && left - 1 + future >= homeDist(pos)) {
+    // 前の階を抜ける前は、まだこの階の分かれ道に立っていない
+    // 判定の乱数は先に引く(列を変えない)。歩数が残っていない日は迷わない: 予算を超えて歩数が負になっていた
+    if (owed === 0 && fork && ex.hesitate > 0 && rng.chance(ex.hesitate) && left >= 1 && left - 1 + future >= homeDist(pos)) {
       left--;
       today.used++;
       seg.hes++;
@@ -519,7 +584,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       const depth = costVia(dEnt, cell, 1);
       if (dist < 0 || depth < 0) continue;
       // 往復できない目標を選ぶと帰路の制約に当たって足踏みするだけなので、最初から外す
-      if (dist + depth > left + future) {
+      if (dist + depth + owed + transit > left + future) {
         far = true;
         continue;
       }
@@ -569,14 +634,34 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     let ri = 0;
 
     while (end === null) {
-      const homeward = retreating || mapFull || homeReason !== null;
+      const homeward = leaving || retreating || mapFull || homeReason !== null;
       if (homeward) {
         if (!seg.home) {
           flush();
           seg.home = true;
         }
         const toEntrance = retreating || mapFull || homeIs('injured') || last;
-        if (homeDist(pos) <= (toEntrance ? 0 : future)) {
+        // 入口で野営すると残りの日数で前の階を抜けきれないときは、今日のうちに抜け始める
+        if (pos === entrance && owed < transit && (leaving || retreating || mapFull || last || transit > future)) {
+          if (!leaving) {
+            leaving = true;
+            back = transit - owed;
+          }
+          flush();
+          // 分かれ道の迷いで left が負になることがある(既存の挙動)。負の支払いで back を増やさない
+          const pay = Math.max(0, Math.min(back, left));
+          back -= pay;
+          left -= pay;
+          today.used += pay;
+          if (back > 0) {
+            if (pay > 0) say('narration', `前の階を${pay}歩戻った(残り${back}歩)。`);
+            break;
+          }
+          say('narration', `前の階を抜けて${transit - owed}歩戻った。`);
+          end = retreating ? 'retreat' : mapFull ? 'mapFull' : 'done';
+          break;
+        }
+        if (homeDist(pos) <= (toEntrance ? transit : future)) {
           if (pos === entrance && (retreating || mapFull || last)) end = retreating ? 'retreat' : mapFull ? 'mapFull' : 'done';
           break;
         }
@@ -614,6 +699,17 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         target = t;
         route = r;
         ri = 0;
+      }
+      if (owed > 0) {
+        const pay = Math.min(owed, left);
+        owed -= pay;
+        left -= pay;
+        today.used += pay;
+        if (owed > 0) {
+          say('narration', `前の階を${pay}歩進んだ(残り${owed}歩)。`);
+          break;
+        }
+        say('narration', `前の階を抜けて${transit}歩。`);
       }
       const next = route[ri + 1];
       const cost = visited.has(next) ? T.costKnown : T.costUnknown;
@@ -719,5 +815,6 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   result.items = { ...inp.items };
   if ('potion' in result.items || potions.n > 0) result.items.potion = potions.n;
   if (potions.used > 0) result.itemsUsed.potion = potions.used;
+  for (const k of foundKeys) result.items[k] = 1;
   return { result, trace };
 }

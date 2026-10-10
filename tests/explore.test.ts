@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { carryCapacity, generateAdventurer } from '../src/core/adventurer';
 import { DUNGEON, ITEM, JOB, PERSONALITY, RETURN_LINES, TUNING, type ReturnOutcome } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
-import { cellDepths, runExploration, simulateExploration, type ExploreInput } from '../src/core/explore';
+import { cellDepths, floorTransit, runExploration, simulateExploration, type ExploreInput } from '../src/core/explore';
 import { rngFor } from '../src/core/rng';
 import type { Adventurer, DungeonDef, DungeonProgress } from '../src/core/types';
 
@@ -463,5 +463,201 @@ describe('行動種別', () => {
     const far = Math.max(...known.map((i) => DEPTH[i]));
     const reached = SEEDS.filter((seed) => runExploration(input(seed, { progress: progressOf(known), knownOnly: true })).trace.maxDepth === far);
     expect(reached.length).toBeGreaterThan(0);
+  });
+});
+
+/** 鍵・扉・階段の試験用。floors は階ごとの rows。S は次の階への下り階段 */
+function tower(name: string, floors: string[][], o: Partial<DungeonDef> = {}): DungeonDef {
+  return corridor(name, [], {
+    floors: floors.map((rows, n) => ({
+      id: `f${n + 1}`, name: `${n + 1}階`, rows,
+      legend: {
+        '#': { kind: 'wall' }, '.': { kind: 'floor' }, E: { kind: 'entrance' },
+        m: { kind: 'gather', item: 'moss_ore' },
+        D: { kind: 'door', key: 'k' }, K: { kind: 'treasure', item: 'k' }, H: { kind: 'hidden' },
+        S: { kind: 'stairs_down', to: { floor: `f${n + 2}`, x: 0, y: 1 } },
+      },
+    })),
+    ...o,
+  });
+}
+const floorsProgress = (floors: Record<string, number[]>): DungeonProgress => ({
+  confirmed: true, bossDefeated: 0, fullCleared: false,
+  floors: Object.fromEntries(Object.entries(floors).map(([id, visited]) => [id, { visited, hiddenFound: [] }])),
+});
+/** 2行目(y=1)の x=0..maxX のマス */
+const row1 = (d: DungeonDef, floor: number, maxX: number) => {
+  const g = parseFloor(d.floors[floor]);
+  return Array.from({ length: maxX + 1 }, (_, x) => g.width + x);
+};
+const BRAVE_BUDGET = Math.round(TUNING.explore.baseSteps * PERSONALITY.brave.explore.speed);
+
+describe('複数フロア・鍵・扉', () => {
+  const long = tower('long', [['################################', 'E..............................#', '################################']]);
+  const moveCost = (d: { moves: { cost: number }[] }) => d.moves.reduce((s, m) => s + m.cost, 0);
+
+  it('transit: 初日の歩数予算から前の階の通り抜けを払う', () => {
+    const day1 = (transit: number) => runExploration(input(1, { dungeon: long, days: 3, transit }));
+    const a = day1(0);
+    const b = day1(6);
+    expect(b.trace.days[0].used).toBeLessThanOrEqual(BRAVE_BUDGET);
+    expect(moveCost(b.trace.days[0])).toBeLessThanOrEqual(BRAVE_BUDGET - 6);
+    expect(moveCost(b.trace.days[0])).toBe(moveCost(a.trace.days[0]) - 6);
+    expect(b.result.log.some((l) => l.text.includes('前の階を抜けて6歩'))).toBe(true);
+    expect(a.result.log.some((l) => l.text.includes('前の階'))).toBe(false);
+  });
+
+  it('transit: 1日で払いきれない分は翌日に繰り越す', () => {
+    const { trace } = runExploration(input(1, { dungeon: long, days: 4, transit: BRAVE_BUDGET + 3 }));
+    expect(trace.days[0].moves).toEqual([]);
+    expect(trace.days[0].used).toBe(BRAVE_BUDGET);
+    expect(moveCost(trace.days[1])).toBeLessThanOrEqual(BRAVE_BUDGET - 3);
+    expect(trace.days[1].moves.length).toBeGreaterThan(0);
+    for (const d of trace.days) expect(d.used).toBeLessThanOrEqual(BRAVE_BUDGET);
+  });
+
+  it('transit: 往復できない日数なら、前の階を抜けずに初日に出直す', () => {
+    for (const seed of SEEDS.slice(0, 5)) {
+      // 往復だけで2日分の予算を使い切るので、1マスも往復できない
+      const { result, trace } = runExploration(input(seed, { dungeon: long, days: 2, transit: BRAVE_BUDGET }));
+      expect(trace.days[0].moves).toEqual([]);
+      expect(trace.days[0].used).toBe(0);
+      expect(result.daysSpent).toBe(1);
+      expect(result.log.some((l) => l.text.includes('出直す'))).toBe(true);
+      expect(result.log.some((l) => l.text.includes('前の階を抜けて'))).toBe(false);
+    }
+    expect(runExploration(input(1, { dungeon: long, days: 2 })).result.log.some((l) => l.text.includes('出直す'))).toBe(false);
+  });
+
+  it('transit: 最終日は 入口までの距離+transit を残して戻り、帰りにも前の階を抜ける', () => {
+    const transit = 4;
+    const width = parseFloor(long.floors[0]).width;
+    for (const days of [1, 2]) {
+      const { result, trace } = runExploration(input(1, { dungeon: long, days, transit }));
+      const d = trace.days[days - 1];
+      let left = d.budget - (days === 1 ? transit : 0);
+      for (const m of d.moves) {
+        left -= m.cost;
+        // 一本道なので x が入口までの距離
+        expect(left).toBeGreaterThanOrEqual(m.cell % width + transit);
+      }
+      expect(trace.finalCell).toBe(parseFloor(long.floors[0]).entrance);
+      expect(trace.forcedReturn).toBe(false);
+      expect(d.used).toBe(d.budget - left + transit);
+      expect(result.log.some((l) => l.text.includes(`前の階を抜けて${transit}歩戻った`))).toBe(true);
+    }
+    const reach = (transit: number) => runExploration(input(1, { dungeon: long, days: 1, transit })).trace.maxDepth;
+    expect(reach(transit)).toBeLessThan(reach(0));
+  });
+
+  const gate = tower('gate', [['########', 'E.D....#', '########']]);
+
+  it('扉: 鍵を持たずに出ると奥へ行けず、持って出ると通れる', () => {
+    const [door] = cellsOf(gate, 'door');
+    const beyond = row1(gate, 0, 6).filter((i) => i > door);
+    for (const seed of SEEDS.slice(0, 5)) {
+      const locked = runExploration(input(seed, { dungeon: gate, days: 2 })).result.mapDeltas[0].cells;
+      expect(locked).not.toContain(door);
+      expect(locked.some((i) => beyond.includes(i))).toBe(false);
+      const open = runExploration(input(seed, { dungeon: gate, days: 2, keys: ['k'] })).result.mapDeltas[0].cells;
+      expect(open).toEqual(expect.arrayContaining([door, ...beyond]));
+    }
+  });
+
+  it('cellDepths: 扉の奥のマスも深度を持つ(-1 を残さない)', () => {
+    const g = parseFloor(gate.floors[0]);
+    const depth = cellDepths(g);
+    g.cells.forEach((c, i) => {
+      if (c.kind !== 'wall') expect(depth[i]).toBeGreaterThanOrEqual(0);
+    });
+    expect(depth[g.width + 6]).toBe(6);
+  });
+
+  const vault = tower('vault', [['######', 'E.K..#', '######']]);
+
+  it('鍵の宝箱: 金も罠も無く鍵が1個手に入り、持っていれば取らない', () => {
+    const [chest] = cellsOf(vault, 'treasure');
+    for (const seed of SEEDS.slice(0, 5)) {
+      const got = runExploration(input(seed, { dungeon: vault, days: 1 }));
+      expect(got.trace.events.filter((e) => e.kind === 'treasure').map((e) => e.cell)).toEqual([chest]);
+      expect(got.result.items.k).toBe(1);
+      expect(got.result.gold).toBe(0);
+      expect(got.result.log.some((l) => l.text.includes('罠'))).toBe(false);
+      expect(got.result.log.some((l) => l.text.includes('を手に入れた'))).toBe(true);
+
+      const had = runExploration(input(seed, { dungeon: vault, days: 1, keys: ['k'] }));
+      expect(had.trace.events.filter((e) => e.kind === 'treasure')).toHaveLength(1);
+      expect(had.result.items.k).toBeUndefined();
+      expect(had.result.gold).toBe(0);
+      expect(had.result.log.some((l) => l.text.includes('もう持っている'))).toBe(true);
+    }
+  });
+
+  it('下り階段に入るとログに残し、trace に stairs を1度だけ記録する', () => {
+    const stairs = tower('stairs', [['######', 'E..S.#', '######'], ['###', 'E.#', '###']]);
+    const [s] = cellsOf(stairs, 'stairs_down');
+    for (const seed of SEEDS.slice(0, 5)) {
+      const { result, trace } = runExploration(input(seed, { dungeon: stairs, days: 1 }));
+      expect(trace.events.filter((e) => e.kind === 'stairs').map((e) => e.cell)).toEqual([s]);
+      expect(result.log.filter((l) => l.text.includes('下り階段を見つけた'))).toHaveLength(1);
+      expect(result.mapDeltas[0].cells).toContain(s);
+    }
+  });
+
+  it('hiddenBonus: 隠し通路の発見率に足される', () => {
+    // 既知の一本道の奥の採取点へ通う。発見した隠しマスへは寄り道しないので、試す回数は同じ
+    const niches = tower('niches', [['#H#H#H#H##', 'E.......m#', '##########']]);
+    const known = parseFloor(niches.floors[0]).cells.flatMap((c, i) => (c.kind === 'wall' || c.kind === 'hidden' ? [] : [i]));
+    const found = (hiddenBonus: number) => SEEDS.reduce((s, seed) => s + runExploration(input(seed, {
+      dungeon: niches, progress: progressOf(known), days: 1, action: 'gather', jobs: ['fighter'], hiddenBonus,
+    })).result.mapDeltas[0].hidden.length, 0);
+    const base = found(0);
+    const boosted = found(0.5);
+    expect(boosted).toBeGreaterThan(base);
+    expect(boosted).toBeLessThanOrEqual(SEEDS.length * 4);
+  });
+
+  it('floorTransit: 1階は0、下の階は前の階の階段を踏んでいれば入口からの既知の歩数', () => {
+    const stack = tower('stack', [
+      ['#######', 'E....S#', '#######'],
+      ['#######', 'E..S..#', '#######'],
+      ['#######', 'E.....#', '#######'],
+    ]);
+    expect(floorTransit(stack, 'f1', floorsProgress({}))).toBe(0);
+    expect(floorTransit(stack, 'f2', floorsProgress({}))).toBeNull();
+    expect(floorTransit(stack, 'f2', floorsProgress({ f1: row1(stack, 0, 4) }))).toBeNull();
+    expect(floorTransit(stack, 'f2', floorsProgress({ f1: row1(stack, 0, 5) }))).toBe(5);
+    expect(floorTransit(stack, 'f3', floorsProgress({ f1: row1(stack, 0, 5) }))).toBeNull();
+    expect(floorTransit(stack, 'f3', floorsProgress({ f1: row1(stack, 0, 5), f2: row1(stack, 1, 3) }))).toBe(8);
+    expect(floorTransit(stack, 'f9', floorsProgress({}))).toBeNull();
+  });
+
+  it('floorTransit: 前の階の階段が扉の奥なら、鍵を持つときだけ通れる', () => {
+    const locked = tower('locked', [['#######', 'E..D.S#', '#######'], ['###', 'E.#', '###']]);
+    const progress = floorsProgress({ f1: row1(locked, 0, 5) });
+    expect(floorTransit(locked, 'f2', progress)).toBeNull();
+    expect(floorTransit(locked, 'f2', progress, ['k'])).toBe(5);
+  });
+});
+
+describe('探索の細部', () => {
+  it('分かれ道で迷う隊長でも、1日の歩数は予算を超えない', () => {
+    for (const leader of ['timid', 'greedy', 'caring']) {
+      for (const seed of SEEDS) {
+        const { trace } = runExploration(input(seed, { leader, days: 3 }));
+        for (const d of trace.days) expect(d.used, `${leader} seed${seed} ${d.day}日目`).toBeLessThanOrEqual(d.budget);
+      }
+    }
+  });
+
+  it('持っている鍵の宝箱には、強欲な隊長も寄り道しない(持っていなければ取りに行く)', () => {
+    const vault2 = tower('vault2', [['########', 'E.K....#', '########']]);
+    const progress = floorsProgress({ f1: row1(vault2, 0, 6) });
+    for (const seed of SEEDS.slice(0, 5)) {
+      const held = runExploration(input(seed, { dungeon: vault2, leader: 'greedy', days: 2, progress, keys: ['k'] }));
+      expect(held.trace.events.filter((e) => e.kind === 'treasure')).toEqual([]);
+      const none = runExploration(input(seed, { dungeon: vault2, leader: 'greedy', days: 2, progress, keys: [] }));
+      expect(none.trace.events.some((e) => e.kind === 'treasure')).toBe(true);
+    }
   });
 });
