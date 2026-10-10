@@ -819,11 +819,13 @@ describe('フェーズ6の敵と素材', () => {
     expect(pick('drowned')).toEqual(['溺れた亡者', 160, 56, 12, 0, 6, 'random', 'dark']);
     expect(pick('stone_sentinel')).toEqual(['石の歩哨', 260, 60, 32, 0, 5, 'strongest', 'earth']);
     expect(pick('wraith')).toEqual(['水霊', 110, 64, 6, 0, 20, 'weakest', 'dark']);
-    expect(pick('ruin_warden')).toEqual(['遺跡の守護像', 1200, 72, 34, 0, 8, 'strongest', 'earth']);
+    // 2026-10-10 ボス戦の計測(scripts/boss.ts)で、基準の隊が G4 装備で勝率70%に届く Lv が 13 になる値
+    expect(pick('ruin_warden')).toEqual(['遺跡の守護像', 1050, 70, 32, 0, 8, 'strongest', 'earth']);
     expect(pick('drake')).toEqual(['幼竜', 380, 78, 26, 0, 14, 'strongest', 'fire']);
     expect(pick('fire_imp')).toEqual(['火の小鬼', 120, 70, 10, 0, 22, 'random', 'fire']);
     expect(pick('magma_slug')).toEqual(['溶岩ナメクジ', 300, 62, 28, 0, 4, 'random', 'fire']);
-    expect(pick('dragon')).toEqual(['竜', 2800, 84, 36, 0, 12, 'strongest', 'fire']);
+    // 同じく G4 装備で Lv18(G3 で 21、装備の弱い G2 では 27 = 火耐性の装備が実質必須)
+    expect(pick('dragon')).toEqual(['竜', 2200, 84, 32, 0, 12, 'strongest', 'fire']);
   });
   it('耐性・技・シンボルとボス', () => {
     expect(ENEMY.frost_giant.resist).toEqual({ ice: 0.8, fire: -0.4 });
