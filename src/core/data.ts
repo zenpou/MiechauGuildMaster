@@ -69,6 +69,8 @@ export interface Tuning {
     wipeInjuryDays: [number, number];
     expPerCell: number;
     expPerDay: number;
+    /** これ以上の推奨戦力のダンジョンでは、探索と日数の経験値が 推奨戦力÷この値 倍になる(深いほど敵が強く得るものが多い) */
+    expRefPower: number;
     traitReveal: number;
     returnRelation: number;
     gatherFocusBonus: number;

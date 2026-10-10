@@ -60,6 +60,7 @@
     ],
     "expPerCell": 2,
     "expPerDay": 5,
+    "expRefPower": 180,
     "traitReveal": 0.25,
     "returnRelation": 1,
     "gatherFocusBonus": 1

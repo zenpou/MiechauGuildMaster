@@ -661,3 +661,23 @@ describe('探索の細部', () => {
     }
   });
 });
+
+describe('経験値の深さ補正', () => {
+  const ref = TUNING.explore.expRefPower;
+  const flat = (recommended: number) => tower('exp', [['##########', 'E........#', '##########']], { recommended });
+  const gain = (recommended: number, seed = 3) => {
+    const { result } = runExploration(input(seed, { dungeon: flat(recommended), days: 2, leader: 'brave' }));
+    return result.expGain.m0;
+  };
+
+  it('探索と日数の経験値は、推奨戦力が基準(expRefPower)を超えるダンジョンほど多い(3倍の難度で約3倍)', () => {
+    const base = gain(ref);
+    expect(base).toBeGreaterThan(0);
+    expect(gain(ref * 3) / base).toBeGreaterThan(2.7);
+    expect(gain(ref * 3) / base).toBeLessThan(3.3);
+  });
+
+  it('基準以下のダンジョンでは増減しない(浅い森で減らさない)', () => {
+    expect(gain(Math.floor(ref / 2))).toBe(gain(ref));
+  });
+});

@@ -785,8 +785,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   }
 
   const killExp = Object.entries(result.kills).reduce((s, [k, n]) => s + ENEMY[k].exp * n, 0);
+  const depth = Math.max(1, dungeon.recommended / T.expRefPower);
   for (const m of members) {
-    const base = newCells.length * T.expPerCell + daysSpent * T.expPerDay + killExp / members.length;
+    // 探索と日数の分だけ難度で増やす。敵を倒した分(killExp)は敵の強さがすでに反映されているので増やさない
+    const base = (newCells.length * T.expPerCell + daysSpent * T.expPerDay) * depth + killExp / members.length;
     result.expGain[m.id] = Math.max(1, Math.round(base * policy.expMult * traitNum(m, 'expRate', 1)));
   }
 
