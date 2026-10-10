@@ -9,6 +9,7 @@ import { homeTab } from './home';
 import { inboxTab } from './inboxTab';
 import { logTab } from './logTab';
 import { mapTab } from './mapTab';
+import { initPwa } from './pwa';
 import { questsTab } from './questsTab';
 import { recordsTab } from './recordsTab';
 import { recruitTab } from './recruitTab';
@@ -42,6 +43,9 @@ function render() {
   ].filter((x): x is HTMLElement => !!x);
   // モーダルの間は後ろの画面を操作・読み上げの対象から外す
   if (pages.length) for (const el of body) el.inert = true;
+  // 下のバー(インストール・更新)にも、モーダルの後ろからキーボードで届かないようにする
+  const bar = document.getElementById('pwa');
+  if (bar) bar.inert = pages.length > 0;
   app.replaceChildren(...body,
     ...(pages.length ? [endingModal(pages)] : []),
     ...(ui.toast ? [div(`toast ${ui.toast.err ? 'err' : ''}`, ui.toast.text)] : []));
@@ -69,3 +73,4 @@ function finishEnding() {
 
 setRender(render);
 commit();
+initPwa();

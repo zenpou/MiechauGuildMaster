@@ -3,6 +3,7 @@ import { facilityLevel } from '../core/base';
 import { canEquip, equip, unequip } from '../core/equipment';
 import { advanceDay, buyItem, dailyCost, newGame, sellGold, sellMaterial } from '../core/game';
 import { ITEM, JOB, JOBS, PERSONALITY, TRAINED_SKILL, TUNING, type TrainedSkillDef } from '../core/data';
+import { dismissHint, hintFor, hintsOff } from '../core/hints';
 import { canChangeJob, changeJob, promotionCost, promotionOptions } from '../core/jobs';
 import { unreadCount } from '../core/mail';
 import { REP_LEVELS, repLevel } from '../core/quests';
@@ -36,6 +37,19 @@ function equipText(def: ItemDef | undefined): string {
   return parts.join(' ');
 }
 
+/** 最初の数日の「次にやること」。赤字のヒントは状態で消えるので閉じるボタンを出さない */
+function hintBlock(): HTMLElement | null {
+  const hint = hintFor(state);
+  if (!hint) return null;
+  return div('hint', { role: 'note' },
+    div('hint-text', hint.text),
+    div('row tight',
+      hint.id === 'debt' ? null : h('button', { class: 'small', onclick: () => { dismissHint(state, hint.id); commit(); } }, '閉じる'),
+      h('button', { class: 'link small', onclick: () => { hintsOff(state); commit(); } }, 'ヒントをすべて消す'),
+    ),
+  );
+}
+
 export function homeTab(): HTMLElement {
   const s = state;
   const potion = ITEM.potion;
@@ -52,6 +66,7 @@ export function homeTab(): HTMLElement {
     ),
     repBlock(),
     h('button', { class: 'primary wide', onclick: nextDay }, '次の日へ'),
+    hintBlock(),
     sceneBlock(),
     noticesBlock(),
     h('h2', null, `名簿(${s.adventurers.length}/${capacity(s)}人)`),

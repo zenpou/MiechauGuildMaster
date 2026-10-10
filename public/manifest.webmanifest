@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "見えちゃうギルドマスター",
+  "short_name": "見えギルド",
+  "description": "冒険者を集め、隊を組み、各地のダンジョンへ送り出す。見える才能で育てるギルド経営。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#151e20",
+  "theme_color": "#202c2e",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}
