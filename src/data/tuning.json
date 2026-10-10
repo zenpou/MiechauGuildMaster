@@ -91,7 +91,7 @@
     "upkeepPerDay": 30,
     "startApt": 70,
     "debtInterest": 0.02,
-    "debtLoyalty": -4,
+    "debtLoyalty": -2,
     "debtRep": -1,
     "restFatigue": -25,
     "dailyLoyalty": 1,
@@ -121,7 +121,7 @@
     "promotionGold": 300
   },
   "mail": {
-    "raiseThreshold": 0.85,
+    "raiseThreshold": 0.7,
     "raiseResendDays": 7,
     "holdMax": 2,
     "warnLoyalty": 30,

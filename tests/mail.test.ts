@@ -65,7 +65,7 @@ describe('忠誠の節目', () => {
 });
 
 describe('昇給', () => {
-  it('日給が再計算値の85%未満で要望が届き、以上なら届かない', () => {
+  it('日給が再計算値のしきい値(raiseThreshold)未満で要望が届き、以上なら届かない', () => {
     const s = rich();
     const a = s.adventurers[0];
     const desired = desiredSalary(a);
@@ -117,6 +117,22 @@ describe('昇給', () => {
     }
     const [m] = ofKind(check(s), 'raise', a.id);
     expect(replyMail(s, m.id, 'hold').ok).toBe(true);
+    expect(a.history.raisesRefused).toBe(1);
+    expect(a.loyalty).toBe(80);
+  });
+
+  it('返信しないまま期限切れを繰り返すと、明示的な保留と同じく3回目で断る扱い(無視が得にならない)', () => {
+    const s = rich();
+    const a = s.adventurers[0];
+    a.salary = 1;
+    a.loyalty = 100;
+    const raises = () => s.mails.filter((m) => m.kind === 'raise' && m.from === a.id);
+    check(s);
+    for (let i = 0; i < M.holdMax + 1; i++) {
+      s.day += M.raiseResendDays;
+      check(s);
+    }
+    expect(raises().slice(0, 3).map((m) => m.answered)).toEqual(['hold', 'hold', 'refuse']);
     expect(a.history.raisesRefused).toBe(1);
     expect(a.loyalty).toBe(80);
   });

@@ -109,7 +109,7 @@ describe('advanceDay', () => {
     expect(s.ledger.some((l) => l.amount === -30 && l.label.includes('維持費'))).toBe(true);
   });
 
-  it('赤字なら利息2%・忠誠−4・評判−1', () => {
+  it('赤字なら利息2%・忠誠(debtLoyalty)・評判−1', () => {
     const s = newGame(9);
     s.gold = -1000;
     s.rep = 5;
@@ -120,7 +120,7 @@ describe('advanceDay', () => {
     expect(s.gold).toBe(-deficit - Math.ceil(deficit * 0.02));
     expect(s.rep).toBe(4);
     expect(s.debt).toBe(true);
-    s.adventurers.forEach((a, i) => expect(a.loyalty).toBe(loyal[i] - 4 + 1));
+    s.adventurers.forEach((a, i) => expect(a.loyalty).toBe(loyal[i] + TUNING.game.debtLoyalty + 1));
   });
 
   it('忠誠は全員毎日+1(派遣中も)、上限255', () => {

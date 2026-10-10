@@ -188,13 +188,19 @@ function rumorOf(s: GameState, rng: Rng, voices: Adventurer[]): Pending | null {
   return null;
 }
 
-/** 返信しないまま日数が過ぎたものは保留扱い。昇給は再送される。警告は退職まで開いておく */
+/** 返信しないまま日数が過ぎたものは保留扱い。昇給は再送され、保留が上限を超えると断る扱い。警告は退職まで開いておく */
 function expireMails(s: GameState) {
   for (const m of s.mails) {
     if (m.answered !== null || m.choices.length === 0 || m.kind === 'warning' || s.day - m.day < M.raiseResendDays) continue;
     m.answered = 'hold';
-    // 返信しないだけで断る扱いにはしない。保留の回数は上限で止める
-    if (m.kind === 'raise') s.flags['raiseHolds:' + m.from] = Math.min(M.holdMax, num(s.flags['raiseHolds:' + m.from]) + 1);
+    if (m.kind !== 'raise') continue;
+    // 無視を明示的な保留より得にしない: 上限を超えた期限切れは、3回目の保留と同じく断る扱いにする
+    const holds = num(s.flags['raiseHolds:' + m.from]);
+    const a = s.adventurers.find((x) => x.id === m.from);
+    if (a && holds >= M.holdMax) {
+      refuseRaise(s, a);
+      m.answered = 'refuse';
+    } else s.flags['raiseHolds:' + m.from] = holds + 1;
   }
 }
 
