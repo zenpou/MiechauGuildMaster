@@ -5,11 +5,12 @@
 // 指定した方の詳細と、2通りの比較表を出す。
 import { build, facilityLevel } from '../src/core/base';
 import { canCraft, startCraft } from '../src/core/craft';
-import { DUNGEON, ITEM, JOB, PERSONALITIES } from '../src/core/data';
+import { DUNGEON, ENEMY, ITEM, JOB, PERSONALITIES } from '../src/core/data';
 import { equip } from '../src/core/equipment';
 import { parseFloor } from '../src/core/dungeon';
 import { cellDepths } from '../src/core/explore';
 import { advanceDay, dispatch, exploredRateOf, newGame, sellMaterial } from '../src/core/game';
+import { addInventory } from '../src/core/ledger';
 import { PARTY_MAX, type ActionKind, type Adventurer, type DispatchOrder, type Expedition } from '../src/core/types';
 
 const FLOOR_ID = 'f1';
@@ -41,7 +42,7 @@ const GATHER_ITEM = ACTION === 'gather'
   : undefined;
 if (ACTION === 'gather' && !GATHER_ITEM) throw new Error('採集する素材が決まらない');
 const isDefault = ACTION === 'explore' && DUNGEON_ID === 'forest_cave';
-const PLANS = ['mine-naked', 'forest-then-mine'] as const;
+const PLANS = ['mine-naked', 'mine-geared', 'forest-then-mine'] as const;
 type PlanId = (typeof PLANS)[number];
 const PLAN = flag('plan') as PlanId | undefined;
 const SWITCH_DAY = Number(flag('switch') ?? 14);
@@ -171,9 +172,11 @@ const GATHERABLE = ['moss_ore', 'slime_gel', 'herb'];
 const forestGrid = parseFloor(DUNGEON[FOREST].floors.find((f) => f.id === FLOOR_ID)!);
 const ARMORS = ['leather_armor', 'studded_armor'];
 const TRACKED_RECIPES = ['r_leather_armor', 'r_studded_armor', 'r_fang_necklace', 'r_potion'];
-const PLAN_NAME: Record<PlanId, string> = { 'mine-naked': '装備なしで坑道', 'forest-then-mine': '森で装備を整えて坑道' };
+const PLAN_NAME: Record<PlanId, string> = { 'mine-naked': '装備なしで坑道', 'mine-geared': '装備一式を支給して坑道(診断用)', 'forest-then-mine': '森で装備を整えて坑道' };
+/** 診断用の支給品。経済を切り離して装備の効き目だけを測る */
+const GEAR_KIT: Record<string, number> = { leather_armor: 3, studded_armor: 1, fang_necklace: 4, bone_dagger: 2, potion: 4 };
 
-interface MineRecord { members: number; injuryDays: number; wiped: boolean; retreated: boolean; golem: number }
+interface MineRecord { members: number; injuryDays: number; wiped: boolean; retreated: boolean; golem: number; golemMet: boolean }
 
 interface PlanRun {
   mine: MineRecord[];
@@ -190,6 +193,14 @@ interface PlanRun {
 function runPlan(plan: PlanId, seed: number): PlanRun {
   const s = newGame(seed);
   const prepare = plan === 'forest-then-mine';
+  if (plan === 'mine-geared') {
+    for (const [it, n] of Object.entries(GEAR_KIT)) addInventory(s, it, n);
+    for (const a of s.adventurers) {
+      for (const it of ARMORS) if ((s.inventory[it] ?? 0) > 0 && equip(s, a.id, it).ok) break;
+      if ((s.inventory.fang_necklace ?? 0) > 0) equip(s, a.id, 'fang_necklace');
+      if ((s.inventory.bone_dagger ?? 0) > 0 && JOB[a.job].roles.some((r) => r === 'attacker' || r === 'scout')) equip(s, a.id, 'bone_dagger');
+    }
+  }
   // 骨の短剣は骨片が森で取れないので省く
   const queue = prepare
     ? [
@@ -277,6 +288,8 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
         members: e.order.partyIds.length,
         injuryDays: e.order.partyIds.reduce((t, id) => t + (res.injuries[id] ?? 0), 0),
         wiped: res.wiped, retreated: res.retreated, golem: res.kills.golem ?? 0,
+        // ボスからの撤退は装備の有無に関係なく起きるので、装備の効き目は除いて見る
+        golemMet: res.log.some((l) => l.text.includes(ENEMY.golem.name)),
       });
     }
     for (const [item, n] of Object.entries(s.inventory)) {
@@ -291,7 +304,7 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
   };
 }
 
-interface PlanSummary { dispatches: number; wipe: number; retreat: number; injury: number; rate: number[]; gold: number[]; golem: number }
+interface PlanSummary { dispatches: number; wipe: number; retreat: number; injury: number; rate: number[]; gold: number[]; golem: number; failureNoGolem: number; golemMetRate: number }
 
 function summarize(runs: PlanRun[]): PlanSummary {
   const all = runs.flatMap((r) => r.mine);
@@ -304,6 +317,8 @@ function summarize(runs: PlanRun[]): PlanSummary {
     rate: runs.map((r) => r.mineRate),
     gold: runs.map((r) => r.gold),
     golem: all.reduce((t, d) => t + d.golem, 0),
+    failureNoGolem: (() => { const xs = all.filter((d) => !d.golemMet); return xs.length ? xs.filter((d) => d.wiped || d.retreated).length / xs.length : 0; })(),
+    golemMetRate: all.filter((d) => d.golemMet).length / Math.max(1, all.length),
   };
 }
 
@@ -359,20 +374,26 @@ function planReport(plan: PlanId): string {
   out.push('');
 
   const a = sums['mine-naked'];
+  const g = sums['mine-geared'];
   const b = sums['forest-then-mine'];
+  // 死なないゲームなので全滅は稀。装備の効き目は「撤退+全滅」(失敗率)と探索率で見る
+  const failure = (x: PlanSummary) => x.wipe + x.retreat;
   out.push(`#### 比較(${SEEDS}seed×${LAST_DAY}日、forest-then-mine は ${SWITCH_DAY}日目から坑道)`);
   out.push('');
-  out.push(table(['項目', 'mine-naked', 'forest-then-mine'], [
-    ['坑道の派遣数/seed', fix(a.dispatches / SEEDS), fix(b.dispatches / SEEDS)],
-    ['全滅率', pct(a.wipe), pct(b.wipe)],
-    ['撤退率', pct(a.retreat), pct(b.retreat)],
-    ['平均負傷日数(人・派遣あたり)', fix(a.injury, 2), fix(b.injury, 2)],
-    [`${LAST_DAY}日目の坑道の探索率 平均`, pct(mean(a.rate)), pct(mean(b.rate))],
-    [`${LAST_DAY}日目の所持金 平均`, `${Math.round(mean(a.gold))}G`, `${Math.round(mean(b.gold))}G`],
-    ['ゴーレム撃破数(合計)', `${a.golem}`, `${b.golem}`],
+  out.push(table(['項目', 'mine-naked', 'mine-geared(支給)', 'forest-then-mine'], [
+    ['坑道の派遣数/seed', fix(a.dispatches / SEEDS), fix(g.dispatches / SEEDS), fix(b.dispatches / SEEDS)],
+    ['失敗率(撤退+全滅)', pct(failure(a)), pct(failure(g)), pct(failure(b))],
+    ['失敗率(ゴーレム戦を除く)', pct(a.failureNoGolem), pct(g.failureNoGolem), pct(b.failureNoGolem)],
+    ['ゴーレムに遭った派遣の割合', pct(a.golemMetRate), pct(g.golemMetRate), pct(b.golemMetRate)],
+    ['全滅率', pct(a.wipe), pct(g.wipe), pct(b.wipe)],
+    ['撤退率', pct(a.retreat), pct(g.retreat), pct(b.retreat)],
+    ['平均負傷日数(人・派遣あたり)', fix(a.injury, 2), fix(g.injury, 2), fix(b.injury, 2)],
+    [`${LAST_DAY}日目の坑道の探索率 平均`, pct(mean(a.rate)), pct(mean(g.rate)), pct(mean(b.rate))],
+    [`${LAST_DAY}日目の所持金 平均`, `${Math.round(mean(a.gold))}G`, `${Math.round(mean(g.gold))}G`, `${Math.round(mean(b.gold))}G`],
+    ['ゴーレム撃破数(合計)', `${a.golem}`, `${g.golem}`, `${b.golem}`],
   ]));
   out.push('');
-  out.push(`目標: mine-naked 全滅率 30%以上 → ${pct(a.wipe)} ${a.wipe >= 0.3 ? '達成' : '未達'} / forest-then-mine 10%未満 → ${pct(b.wipe)} ${b.wipe < 0.1 ? '達成' : '未達'}`);
+  out.push(`目標(ゴーレム戦を除く失敗率): mine-naked 30%以上 → ${pct(a.failureNoGolem)} ${a.failureNoGolem >= 0.3 ? '達成' : '未達'} / mine-geared 10%未満 → ${pct(g.failureNoGolem)} ${g.failureNoGolem < 0.1 ? '達成' : '未達'} / 探索率の差(geared − naked) 10pt以上 → ${fix((mean(g.rate) - mean(a.rate)) * 100)}pt ${mean(g.rate) - mean(a.rate) >= 0.1 ? '達成' : '未達'}`);
   const armoredAtSwitch = mean(runs['forest-then-mine'].map((r) => r.armoredAtSwitch));
   if (armoredAtSwitch < PARTY_MAX) {
     out.push('');

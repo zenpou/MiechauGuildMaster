@@ -11,17 +11,29 @@
     "dayFatigue": 10,
     "combatFatigue": 4,
     "trapFatigue": 5,
-    "trapDamage": [0.1, 0.2],
+    "trapDamage": [
+      0.1,
+      0.2
+    ],
     "trapBase": 0.4,
     "trapDexScale": 40,
-    "treasureGold": [30, 80],
+    "treasureGold": [
+      30,
+      80
+    ],
     "treasureTrap": 0.3,
     "gatherBase": 0.35,
     "gatherScale": 40,
-    "gatherQty": [1, 2],
+    "gatherQty": [
+      1,
+      2
+    ],
     "hiddenBase": 0.2,
     "hiddenScale": 50,
-    "nestGroup": [2, 3],
+    "nestGroup": [
+      2,
+      3
+    ],
     "defaultEncounter": 0.04,
     "detourBonus": 0.5,
     "detourBonusKnown": 0.05,
@@ -34,14 +46,26 @@
     "retreatTiredAdd": 0.08,
     "fleeRatio": 0.55,
     "injuryLowHp": 0.3,
-    "injuryLowDays": [1, 3],
-    "injuryDownDays": [2, 4],
-    "wipeInjuryDays": [2, 4],
+    "injuryLowDays": [
+      1,
+      3
+    ],
+    "injuryDownDays": [
+      2,
+      4
+    ],
+    "wipeInjuryDays": [
+      2,
+      4
+    ],
     "expPerCell": 2,
     "expPerDay": 5,
     "traitReveal": 0.25,
     "returnRelation": 1,
     "gatherFocusBonus": 1
+  },
+  "combat": {
+    "defScale": 0.5
   },
   "equipment": {
     "resistCap": 0.8
@@ -51,8 +75,15 @@
   },
   "readiness": {
     "runs": 40,
-    "gradeEdges": [1.3, 1.0, 0.8],
-    "uncertaintyEdges": [0.7, 0.3]
+    "gradeEdges": [
+      1.3,
+      1.0,
+      0.8
+    ],
+    "uncertaintyEdges": [
+      0.7,
+      0.3
+    ]
   },
   "game": {
     "startGold": 500,
