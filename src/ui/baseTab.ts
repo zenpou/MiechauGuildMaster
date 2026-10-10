@@ -1,7 +1,8 @@
 import { effectiveStats } from '../core/adventurer';
-import { activeSynergies, assignWorker, build, canBuild, facilityLevel, listSynergies, unassignWorker, upgrade, workersOf } from '../core/base';
+import { activeSynergies, assignWorker, canBuild, facilityLevel, listSynergies, unassignWorker, upgrade, workersOf } from '../core/base';
 import { canCraft, craftDays, startCraft } from '../core/craft';
 import { FACILITIES, FACILITY, ITEM, RECIPE, RECIPES } from '../core/data';
+import { buildFacility } from '../core/game';
 import type { FacilityLevelCost, PlacedFacility, Result } from '../core/types';
 import { commit, render, STAT_LABEL, state, toast, ui } from './app';
 import { div, h, span } from './dom';
@@ -146,7 +147,7 @@ function done(r: Result, msg: string) {
   toast(msg);
 }
 
-const doBuild = (id: string, x: number, y: number) => done(build(state, id, x, y), `${FACILITY[id].name}の建設を始めました`);
+const doBuild = (id: string, x: number, y: number) => done(buildFacility(state, id, x, y), `${FACILITY[id].name}の建設を始めました`);
 const doUpgrade = (id: string) => done(upgrade(state, id), `${FACILITY[id].name}の増築を始めました`);
 const doAssign = (advId: string, facilityId: string) => done(assignWorker(state, advId, facilityId), `${FACILITY[facilityId].name}に勤務させました`);
 const doUnassign = (advId: string) => done(unassignWorker(state, advId), '勤務を解きました');

@@ -1,9 +1,12 @@
-import { DUNGEON, DUNGEONS, ENEMY, ITEM, JOB, POLICIES, PERSONALITY } from '../core/data';
+import { carryCapacity } from '../core/adventurer';
+import { DUNGEON, DUNGEONS, ENEMY, ITEM, JOB, NODE, POLICIES, PERSONALITY } from '../core/data';
 import { parseFloor } from '../core/dungeon';
-import { dispatch, exploredRateOf } from '../core/game';
+import { dispatch, exploredRateOf, recall } from '../core/game';
+import { activeQuests, questCargo } from '../core/quests';
 import { assessReadiness, type Readiness } from '../core/readiness';
-import { PARTY_MAX, PARTIES_MAX, type ActionKind, type DispatchOrder } from '../core/types';
-import { ACTION_NAME, actionText, advById, commit, nameOf, render, SLOTS, state, statusText, toast, ui } from './app';
+import { travelDays } from '../core/world';
+import { PARTY_MAX, PARTIES_MAX, type ActionKind, type DispatchOrder, type Expedition, type Quest } from '../core/types';
+import { ACTION_NAME, actionText, advById, commit, destText, nameOf, positionText, render, SLOTS, state, statusText, stepToday, toast, ui } from './app';
 import { div, h, span } from './dom';
 
 const FLOOR_ID = 'f1';
@@ -16,6 +19,14 @@ const available = () => state.adventurers.filter((a) => a.status === 'idle' && a
 const dungeonIds = () => DUNGEONS.map((d) => d.id).filter((id) => state.dungeons[id]);
 const uniq = <T>(xs: T[]) => [...new Set(xs)];
 const val = (ev: Event) => (ev.target as HTMLSelectElement).value;
+const HOME = 'base';
+const QUEST_PREFIX = 'q:';
+
+/** 行き先に選べる護衛・運搬の依頼。隊を出し済みのものは除く */
+const questDests = () => activeQuests(state).filter((q) =>
+  (q.type === 'escort' || q.type === 'transport') && !state.expeditions.some((e) => e.order.target.questId === q.id));
+const selQuest = (): Quest | undefined => (ui.d.questId ? questDests().find((q) => q.id === ui.d.questId) : undefined);
+const nodeName = (id: string | undefined) => (id ? NODE[id]?.name ?? id : '?');
 
 /** 行き先ごとの選択肢。可否の最終判断は dispatch の戻りに任せ、ここは出発前に見せるための再現 */
 function choicesFor(dungeonId: string) {
@@ -44,6 +55,9 @@ function tidy() {
   if (!d.leader || !d.members.includes(d.leader)) d.leader = d.members[0] ?? null;
   d.potions = Math.min(d.potions, state.inventory.potion ?? 0);
   if (!state.dungeons[d.dungeon]) d.dungeon = dungeonIds()[0];
+  if (d.questId && !selQuest()) d.questId = '';
+  const q = selQuest();
+  if (q) { d.action = q.type as ActionKind; return; }
   const c = choicesFor(d.dungeon);
   if (c.reason[d.action]) d.action = ACTIONS.find((a) => !c.reason[a]) ?? 'explore';
   if (d.action === 'gather' && !c.items.includes(d.item)) d.item = c.items[0] ?? '';
@@ -53,6 +67,13 @@ function tidy() {
 function currentOrder(): DispatchOrder | null {
   const d = ui.d;
   if (!d.leader || !d.members.length) return null;
+  const q = selQuest();
+  if (q) {
+    return {
+      partyIds: [...d.members], leaderId: d.leader, action: q.type as ActionKind, target: { questId: q.id },
+      policy: d.policy, days: 1, items: d.potions > 0 ? { potion: d.potions } : {},
+    };
+  }
   const target: DispatchOrder['target'] = { dungeon: d.dungeon, floor: FLOOR_ID };
   if (d.action === 'gather' && d.item) target.item = d.item;
   if (d.action === 'hunt' && d.enemy) target.enemy = d.enemy;
@@ -70,11 +91,12 @@ export function dispatchTab(): HTMLElement {
   const d = ui.d;
   const free = new Set(available().map((a) => a.id));
   const potionStock = state.inventory.potion ?? 0;
-  const dungeon = DUNGEON[d.dungeon];
+  const quest = selQuest();
   const c = choicesFor(d.dungeon);
   const leader = d.leader ? advById(d.leader) : undefined;
   const order = currentOrder();
   const forecast = ui.forecast && ui.forecast.key === orderKey(order) ? ui.forecast.r : null;
+  const blocker = quest?.type === 'escort' && quest.departDay !== state.day ? `この護衛は${quest.departDay}日目に出発します` : '';
 
   const memberRows = state.adventurers.map((a) => {
     const checked = d.members.includes(a.id);
@@ -100,19 +122,12 @@ export function dispatchTab(): HTMLElement {
 
   return div('tab-body',
     h('h2', null, '行き先'),
-    h('select', { class: 'wide', onchange: (ev: Event) => { d.dungeon = val(ev); render(); } },
-      ...dungeonIds().map((id) => h('option', { value: id, selected: id === d.dungeon ? true : undefined },
+    h('select', { class: 'wide', onchange: (ev: Event) => pickDest(val(ev)) },
+      h('optgroup', { label: 'ダンジョン' }, ...dungeonIds().map((id) => h('option', { value: id, selected: !quest && id === d.dungeon ? true : undefined },
         `${DUNGEON[id].name}${state.dungeons[id].confirmed ? '' : '(噂)'}`))),
-    div('dim small', dungeon.desc),
-    h('h2', null, '行動'),
-    div('actions', ...ACTIONS.map((a) => h('label', { class: c.reason[a] ? 'dim' : '' },
-      h('input', {
-        type: 'radio', name: 'action', value: a, checked: d.action === a ? true : undefined, disabled: !!c.reason[a],
-        onchange: () => { d.action = a; render(); },
-      }),
-      ` ${ACTION_NAME[a]}`))),
-    h('ul', { class: 'plain reasons small dim' }, ...ACTIONS.filter((a) => c.reason[a]).map((a) => h('li', null, `${ACTION_NAME[a]}: ${c.reason[a]}`))),
-    targetBlock(c),
+      questDests().length ? h('optgroup', { label: '受注中の依頼' }, ...questDests().map((q) => h('option', { value: QUEST_PREFIX + q.id, selected: quest?.id === q.id ? true : undefined },
+        `${ACTION_NAME[q.type as ActionKind]}: ${nodeName(q.target.from ?? HOME)}→${nodeName(q.target.to)}`))) : null),
+    quest ? questBlock(quest) : dungeonBlock(c),
     h('h2', null, `隊員(${d.members.length}/${PARTY_MAX})`),
     h('ul', { class: 'plain members' }, ...memberRows),
     leader ? div('small explore-desc', `地図の埋め方: ${PERSONALITY[leader.personality].exploreDesc}`) : null,
@@ -121,7 +136,7 @@ export function dispatchTab(): HTMLElement {
         h('select', { onchange: (ev: Event) => { d.policy = val(ev); render(); } },
           ...POLICIES.map((p) => h('option', { value: p.id, selected: p.id === d.policy ? true : undefined }, p.name))),
       ),
-      h('label', null, '日数 ',
+      quest ? null : h('label', null, '現地の日数 ',
         h('select', { onchange: (ev: Event) => { d.days = Number(val(ev)); render(); } },
           ...DAY_CHOICES.map((n) => h('option', { value: n, selected: n === d.days ? true : undefined }, `${n}日`))),
       ),
@@ -131,18 +146,91 @@ export function dispatchTab(): HTMLElement {
       ),
     ),
     div('dim small', POLICIES.find((p) => p.id === d.policy)?.desc ?? ''),
-    h('button', { class: 'wide', disabled: !order, onclick: showForecast }, '見込みを見る'),
-    forecast ? forecastBlock(forecast) : null,
-    h('button', { class: 'primary wide', disabled: !order, onclick: depart }, '出発'),
+    div('trip', tripText(quest)),
+    quest ? null : h('button', { class: 'wide', disabled: !order, onclick: showForecast }, '見込みを見る'),
+    !quest && forecast ? forecastBlock(forecast) : null,
+    blocker ? div('small neg', blocker) : null,
+    h('button', { class: 'primary wide', disabled: !order || !!blocker, onclick: depart }, '出発'),
     h('h2', null, `派遣中(${state.expeditions.length}/${PARTIES_MAX})`),
     state.expeditions.length
-      ? h('ul', { class: 'plain' }, ...state.expeditions.map((e) => h('li', null,
-        `${e.order.partyIds.map(nameOf).join('・')}`,
-        span('dim small', ` 隊長 ${nameOf(e.order.leaderId)} / ${DUNGEON[e.order.target.dungeon ?? '']?.name ?? '?'} / ${actionText(e.order)} / ${e.startDay}日目出発 → `),
-        span(null, `${e.returnDay}日目に帰還予定`),
-      )))
+      ? h('ul', { class: 'plain' }, ...state.expeditions.map(awayRow))
       : div('dim', '派遣中の隊はありません'),
   );
+}
+
+function awayRow(e: Expedition): HTMLElement {
+  const st = stepToday(e);
+  const canRecall = e.recalledDay === null && st?.phase !== 'return';
+  return h('li', null,
+    `${e.order.partyIds.map(nameOf).join('・')}`,
+    span('dim small', ` 隊長 ${nameOf(e.order.leaderId)} / ${destText(e)} / ${actionText(e.order)} / ${e.startDay}日目出発 → `),
+    span(null, `${e.returnDay}日目に帰還予定`),
+    div('small', `いま: ${positionText(st)}`, e.recalledDay !== null ? span('dim', `(${e.recalledDay}日目に呼び戻し)`) : '',
+      canRecall ? h('button', { class: 'small danger', onclick: () => doRecall(e) }, '呼び戻す') : null),
+  );
+}
+
+function dungeonBlock(c: Choices): HTMLElement {
+  const d = ui.d;
+  return div(null,
+    div('dim small', DUNGEON[d.dungeon]?.desc ?? ''),
+    h('h2', null, '行動'),
+    div('actions', ...ACTIONS.map((a) => h('label', { class: c.reason[a] ? 'dim' : '' },
+      h('input', {
+        type: 'radio', name: 'action', value: a, checked: d.action === a ? true : undefined, disabled: !!c.reason[a],
+        onchange: () => { d.action = a; render(); },
+      }),
+      ` ${ACTION_NAME[a]}`))),
+    h('ul', { class: 'plain reasons small dim' }, ...ACTIONS.filter((a) => c.reason[a]).map((a) => h('li', null, `${ACTION_NAME[a]}: ${c.reason[a]}`))),
+    targetBlock(c),
+  );
+}
+
+function questBlock(q: Quest): HTMLElement {
+  const cargo = questCargo(q);
+  const cap = ui.d.members.map(advById).reduce((t, a) => t + (a ? carryCapacity(a) : 0), 0);
+  return div(null,
+    div('dim small', q.desc),
+    h('h2', null, '行動'),
+    div('small', `${ACTION_NAME[q.type as ActionKind]}(依頼の種類で決まります)/ ${nodeName(q.target.from ?? HOME)}→${nodeName(q.target.to)}`),
+    q.type === 'escort' ? div(q.departDay === state.day ? 'small' : 'small neg', `出発日: ${q.departDay}日目`) : null,
+    cargo ? div(cap >= cargo ? 'small' : 'small neg', `荷の重さ ${cargo} / 隊の積載 ${Math.round(cap)}`) : null,
+    q.dueDay !== null ? div('small dim', `納期 ${q.dueDay}日目`) : null,
+  );
+}
+
+/** 「往復N日+現地M日=帰還X日目」。早帰りで実際の帰還は早まることがある */
+function tripText(q: Quest | undefined): string {
+  const k = state.world;
+  if (q) {
+    const from = q.target.from ?? HOME;
+    const to = q.target.to ?? HOME;
+    const out = [travelDays(HOME, from, k), travelDays(from, to, k)];
+    const back = travelDays(to, HOME, k);
+    if (out.some((x) => x === null) || back === null) return `${nodeName(to)}へ行く道が分かりません`;
+    const go = (out[0] ?? 0) + (out[1] ?? 0);
+    return `往路${go}日+復路${back}日=${state.day + go + back}日目に帰還`;
+  }
+  const node = DUNGEON[ui.d.dungeon]?.node;
+  const one = node ? travelDays(HOME, node, k) : null;
+  if (one === null) return '行き先への道が分かりません';
+  const stay = ui.d.days;
+  return `往復${one * 2}日+現地${stay}日=${state.day + one * 2 + stay}日目に帰還(予定。早く切り上げることもある)`;
+}
+
+function pickDest(v: string) {
+  if (v.startsWith(QUEST_PREFIX)) ui.d.questId = v.slice(QUEST_PREFIX.length);
+  else { ui.d.questId = ''; ui.d.dungeon = v; }
+  ui.forecast = null;
+  render();
+}
+
+function doRecall(e: Expedition) {
+  if (!window.confirm(`隊長 ${nameOf(e.order.leaderId)} の隊を呼び戻しますか? 現地の成果は持ち帰れません。`)) return;
+  const r = recall(state, e.id);
+  if (!r.ok) return toast(r.reason, true);
+  commit();
+  toast(`呼び戻しました。${e.returnDay}日目に帰還します。`);
 }
 
 function targetBlock(c: Choices): HTMLElement {

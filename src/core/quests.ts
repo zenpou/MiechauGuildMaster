@@ -21,7 +21,7 @@ const ACCEPT_DAYS_EXPLORE: [number, number] = [7, 10];
 const T = TUNING.quests;
 const ESCORT_DEPART_DAYS: [number, number] = [3, 5];
 /** 同時に受けられる件数(受付施設はフェーズ6) */
-const ACTIVE_MAX = 3;
+export const ACTIVE_MAX = 3;
 const DELIVER_PRICE_MUL = T.deliverPriceMul;
 const HUNT_EXP_MUL = T.huntExpMul;
 const ESCORT_GOLD_PER_DAY = T.escortGoldPerDay;
@@ -248,7 +248,7 @@ export function deliver(s: GameState, questId: string): Result {
 }
 
 /** ダンジョン全体の探索率(全フロアの通行可能マスの合計に対する割合) */
-function dungeonRate(s: GameState, dungeonId: string): number {
+export function dungeonRate(s: GameState, dungeonId: string): number {
   const def = DUNGEON[dungeonId];
   if (!def) return 0;
   let open = 0;

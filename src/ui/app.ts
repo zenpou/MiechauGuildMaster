@@ -1,11 +1,11 @@
 // 画面の共有状態。保存は操作ごとに core/save.ts へ。
-import { ENEMY, FACILITY, ITEM } from '../core/data';
+import { DUNGEON, ENEMY, FACILITY, ITEM, NODE } from '../core/data';
 import { newGame, type DayReport } from '../core/game';
 import type { Readiness } from '../core/readiness';
 import { load, save } from '../core/save';
-import type { ActionKind, Adventurer, DispatchOrder, EquipSlot, GameState, StatKey } from '../core/types';
+import type { ActionKind, Adventurer, DispatchOrder, EquipSlot, Expedition, GameState, StatKey, WorldStep } from '../core/types';
 
-export type Tab = 'home' | 'base' | 'dispatch' | 'map' | 'log';
+export type Tab = 'home' | 'quests' | 'dispatch' | 'world' | 'recruit' | 'base' | 'map' | 'log';
 
 export let state: GameState = load(localStorage) ?? newGame(Date.now() >>> 0);
 
@@ -20,6 +20,8 @@ export const ui = {
   /** 見込みと、それを出した時の条件。条件が変わったら表示しない */
   forecast: null as null | { key: string; r: Readiness },
   mapDungeon: 'forest_cave',
+  /** ワールドタブで選んだノード */
+  selNode: null as string | null,
   lastReport: null as DayReport | null,
   toast: null as null | { text: string; err: boolean },
   saveWarning: '',
@@ -43,13 +45,15 @@ export function replaceState(s: GameState) {
   ui.d = newDispatchForm();
   ui.forecast = null;
   ui.mapDungeon = 'forest_cave';
+  ui.selNode = null;
   commit();
 }
 
 function newDispatchForm() {
   return {
     members: [] as string[], leader: null as string | null, policy: 'standard', days: 3, potions: 0,
-    dungeon: 'forest_cave', action: 'explore' as ActionKind, item: '', enemy: '',
+    /** 護衛・運搬の依頼に出すときの依頼ID。空ならダンジョンへ */
+    dungeon: 'forest_cave', questId: '', action: 'explore' as ActionKind, item: '', enemy: '',
   };
 }
 
@@ -83,6 +87,36 @@ export function actionText(o: DispatchOrder): string {
   if (o.action === 'gather' && o.target.item) return `${name}: ${ITEM[o.target.item]?.name ?? o.target.item}`;
   if (o.action === 'hunt' && o.target.enemy) return `${name}: ${ENEMY[o.target.enemy]?.name ?? o.target.enemy}`;
   return name;
+}
+
+/** 隊の行き先。護衛・運搬は経路の終点の街 */
+export function destText(e: Expedition): string {
+  const qid = e.order.target.questId;
+  if (qid) {
+    const q = state.quests.find((x) => x.id === qid);
+    const to = q?.target.to ?? e.order.target.route?.at(-1) ?? '';
+    return NODE[to]?.name ?? q?.name ?? '?';
+  }
+  return DUNGEON[e.order.target.dungeon ?? '']?.name ?? '?';
+}
+
+/** 今日の位置。出発前の表や帰還日を過ぎた表なら端の件を返す */
+export function stepToday(e: Expedition): WorldStep | undefined {
+  return e.steps.filter((st) => st.day <= state.day).pop() ?? e.steps[0];
+}
+
+const PHASE_NAME: Record<WorldStep['phase'], string> = { outbound: '往路', stay: '現地', return: '帰路' };
+
+/** 「往路: 拠点の街–山村の道中」のような位置の文 */
+export function positionText(st: WorldStep | undefined): string {
+  if (!st) return '不明';
+  const place = st.edge ? edgeName(st.edge) + 'の道中' : NODE[st.node ?? '']?.name ?? st.node ?? '?';
+  return `${PHASE_NAME[st.phase]}: ${place}`;
+}
+
+export function edgeName(edgeId: string): string {
+  const [a, b] = edgeId.replace(/_short$/, '').split('__');
+  return `${NODE[a]?.name ?? a}–${NODE[b]?.name ?? b}${edgeId.endsWith('_short') ? '(近道)' : ''}`;
 }
 
 export const STAT_LABEL: Record<StatKey, string> = {

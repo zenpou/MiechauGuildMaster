@@ -33,3 +33,17 @@ export function bar(value: number, max: number, cls = ''): HTMLElement {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   return div(`bar ${cls}`, h('div', { class: 'bar-fill', style: `width:${pct}%` }));
 }
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** SVG 要素。className は SVG では読み取り専用なので、class も属性として書く */
+export function sv(tag: string, attrs?: Props | null, ...children: (Node | string | null | undefined | false)[]): SVGElement {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs ?? {})) {
+    if (v === undefined || v === null || v === false) continue;
+    if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else el.setAttribute(k, String(v));
+  }
+  for (const c of children) if (c) el.append(c);
+  return el;
+}

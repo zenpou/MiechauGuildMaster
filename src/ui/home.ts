@@ -2,6 +2,8 @@ import { effectiveStats } from '../core/adventurer';
 import { canEquip, equip, unequip } from '../core/equipment';
 import { advanceDay, buyItem, dailyCost, newGame, sellMaterial } from '../core/game';
 import { ITEM, JOB, PERSONALITY } from '../core/data';
+import { REP_LEVELS, repLevel } from '../core/quests';
+import { capacity, dismiss } from '../core/recruit';
 import { STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type Result } from '../core/types';
 import { advById, commit, render, replaceState, SLOTS, STAT_LABEL, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
@@ -31,13 +33,15 @@ export function homeTab(): HTMLElement {
       span(s.gold < 0 ? 'big neg' : 'big', `${s.gold}G`),
       span('dim', `1日の支出 ${dailyCost(s)}G`),
     ),
+    repBlock(),
     h('button', { class: 'primary wide', onclick: nextDay }, '次の日へ'),
+    sceneBlock(),
     noticesBlock(),
-    h('h2', null, '名簿'),
-    div('dim small', '名前を押すと装備を付け替えられます。'),
+    h('h2', null, `名簿(${s.adventurers.length}/${capacity(s)}人)`),
+    div('dim small', '名前を押すと装備を付け替えられます。解雇は待機中の者だけ(費用なし)。'),
     div('scroll',
       h('table', null,
-        h('thead', null, h('tr', null, ...['名前', '職', '武器', '防具', '装飾', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態'].map((t) => h('th', null, t)))),
+        h('thead', null, h('tr', null, ...['名前', '職', '武器', '防具', '装飾', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態', ''].map((t) => h('th', null, t)))),
         h('tbody', null, ...s.adventurers.map((a) => h('tr', { class: ui.selAdv === a.id ? 'sel' : '' },
           h('td', null, h('button', { class: 'link', onclick: () => pickAdv(a.id) }, a.name)),
           h('td', null, JOB[a.job].name),
@@ -49,6 +53,7 @@ export function homeTab(): HTMLElement {
           h('td', { class: 'num' }, a.loyalty),
           h('td', { class: 'num' }, `${a.salary}G`),
           h('td', null, statusText(a)),
+          h('td', null, a.status === 'idle' ? h('button', { class: 'small danger', onclick: () => fire(a) }, '解雇') : null),
         ))),
       ),
     ),
@@ -65,6 +70,27 @@ export function homeTab(): HTMLElement {
       span('dim small', `seed ${s.seed}`),
       h('button', { class: 'danger', onclick: restart }, '新しく始める'),
     ),
+  );
+}
+
+function repBlock(): HTMLElement {
+  const lv = repLevel(state.rep);
+  const next = REP_LEVELS[lv];
+  return div('summary small',
+    span(null, `評判 ${state.rep}`),
+    span('badge', `Lv${lv}/${REP_LEVELS.length}`),
+    span('dim', next === undefined ? '最高段階' : `次の段階まで ${next - state.rep}`),
+  );
+}
+
+/** 最新の噂。本音はギルドマスターにしか見えない */
+function sceneBlock(): HTMLElement | null {
+  const sc = state.scenes[0];
+  if (!sc) return null;
+  return div('detail scene',
+    div('small dim', `${sc.day}日目の噂(評判+${sc.rep})`),
+    ...sc.lines.map((l) => div('scene-line', l)),
+    div('thought', `(本音)${sc.thought}`),
   );
 }
 
@@ -164,6 +190,16 @@ function nextDay() {
   ui.lastReport = r;
   commit();
   if (r.returned.length) toast(`${r.returned.length}隊が帰還しました。ログで報告を読めます。`);
+  else if (r.scene) toast('街で噂が立っています');
+}
+
+function fire(a: Adventurer) {
+  if (!window.confirm(`${a.name}を解雇しますか? 取り消せません。`)) return;
+  const r = dismiss(state, a.id);
+  if (!r.ok) return toast(r.reason, true);
+  if (ui.selAdv === a.id) ui.selAdv = null;
+  commit();
+  toast(`${a.name}を解雇しました`);
 }
 
 function sell(id: string, n: number) {

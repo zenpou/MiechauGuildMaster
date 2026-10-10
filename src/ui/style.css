@@ -21,7 +21,7 @@ button.danger { background: #5a3434; border-color: #7d4a4a; }
 button.wide { display: block; width: 100%; padding: 10px; margin: 8px 0; }
 select { font: inherit; }
 
-.tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
 .tabs button { padding: 8px 0; }
 .tabs button.on { background: #57916d; border-color: #6fb088; }
 
@@ -97,3 +97,39 @@ button.link { background: none; border: none; padding: 0; text-decoration: under
 .gear { font-size: 0.8rem; letter-spacing: 1px; margin-right: 4px; }
 .gear .on { color: #f0c25a; font-weight: bold; }
 .gear .off { opacity: 0.3; }
+
+.world { width: 100%; max-width: 560px; background: #1a2426; border: 1px solid #3a4a4d; border-radius: 6px; }
+.world-map { display: block; width: 100%; height: auto; }
+.world-map .road { fill: none; stroke: #8a9a8e; stroke-width: 0.7; }
+.world-map .road.short { stroke: #f0c25a; }
+.world-map text { paint-order: stroke; stroke: #1a2426; stroke-width: 0.7px; stroke-linejoin: round; }
+.world-map .road-label { font-size: 2.6px; fill: #c9c3b0; }
+.world-map .node { cursor: pointer; }
+.world-map .node circle { stroke-width: 0.8; }
+.world-map .node.visited circle { stroke: #e8e6df; }
+.world-map .node.unvisited circle { fill: #202c2e; }
+.world-map .node.k-base circle { fill: #f0c25a; }
+.world-map .node.unvisited.k-town circle { stroke: #7fb2d8; }
+.world-map .node.visited.k-town circle { fill: #3d5d6b; }
+.world-map .node.unvisited.k-village circle { stroke: #9ad89a; }
+.world-map .node.visited.k-village circle { fill: #3d6b4f; }
+.world-map .node.unvisited.k-dungeon circle { stroke: #ff8f80; }
+.world-map .node.visited.k-dungeon circle { fill: #7d3a3a; }
+.world-map .node.unvisited.k-waypoint circle { stroke: #a0a0a0; }
+.world-map .node.visited.k-waypoint circle { fill: #5b5248; }
+.world-map .node.rumored circle { stroke-dasharray: 1.2 0.9; }
+.world-map .node.sel circle { stroke: #f0c25a; stroke-width: 1.4; }
+.world-map .node-label { font-size: 3.2px; fill: #e8e6df; text-anchor: middle; }
+.world-map .party rect { fill: #ffe08a; stroke: #2a2a2a; stroke-width: 0.4; }
+.world-map .party-label { font-size: 2.8px; fill: #ffe08a; font-weight: bold; }
+.lg.w-visited { background: #3d5d6b; border-radius: 50%; border-color: #e8e6df; }
+.lg.w-unvisited { background: #202c2e; border-radius: 50%; border-color: #7fb2d8; }
+.lg.w-rumored { background: #202c2e; border-radius: 50%; border: 1px dashed #ff8f80; }
+.lg.w-party { background: #ffe08a; transform: rotate(45deg) scale(0.7); }
+.badge.rumor { background: #7a6a2f; }
+.trip { margin: 8px 0 4px; padding: 6px 8px; background: #263437; border-radius: 6px; }
+ul.quests li { padding: 6px 0; }
+.cands .cand { margin-top: 8px; }
+.cand .stats { display: flex; flex-wrap: wrap; gap: 0 8px; }
+.scene .scene-line { margin: 2px 0; }
+.scene .thought { margin-top: 4px; color: #e5b5ff; font-size: 0.9rem; }

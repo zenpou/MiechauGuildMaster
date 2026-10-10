@@ -6,11 +6,17 @@ import { div, h } from './dom';
 import { homeTab } from './home';
 import { logTab } from './logTab';
 import { mapTab } from './mapTab';
+import { questsTab } from './questsTab';
+import { recruitTab } from './recruitTab';
+import { worldTab } from './worldTab';
 
 const TABS: { id: Tab; label: string; view: () => HTMLElement }[] = [
   { id: 'home', label: '拠点', view: homeTab },
-  { id: 'base', label: '施設', view: baseTab },
+  { id: 'quests', label: '依頼', view: questsTab },
   { id: 'dispatch', label: '派遣', view: dispatchTab },
+  { id: 'world', label: 'ワールド', view: worldTab },
+  { id: 'recruit', label: '募集', view: recruitTab },
+  { id: 'base', label: '施設', view: baseTab },
   { id: 'map', label: '地図', view: mapTab },
   { id: 'log', label: 'ログ', view: logTab },
 ];

@@ -1,6 +1,6 @@
-import { DUNGEON, ITEM, POLICY } from '../core/data';
+import { ITEM, POLICY } from '../core/data';
 import type { Expedition } from '../core/types';
-import { actionText, nameOf, render, state, ui } from './app';
+import { actionText, destText, nameOf, render, state, ui } from './app';
 import { div, h, span } from './dom';
 
 const outcome = (e: Expedition) => (e.result.wiped ? '全滅' : e.result.retreated ? '撤退' : '成功');
@@ -15,7 +15,7 @@ export function logTab(): HTMLElement {
     h('h2', null, '遠征の記録(新しい順)'),
     h('ul', { class: 'plain loglist' }, ...list.map((e) => h('li', null,
       h('button', { class: e.id === ui.selLog ? 'sel' : '', onclick: () => { ui.selLog = e.id === ui.selLog ? null : e.id; render(); } },
-        `${e.returnDay}日目 ${DUNGEON[e.order.target.dungeon ?? '']?.name ?? '?'} ${actionText(e.order)} 隊長${nameOf(e.order.leaderId)} `,
+        `${e.returnDay}日目 ${destText(e)} ${actionText(e.order)} 隊長${nameOf(e.order.leaderId)} `,
         span(`badge ${outcome(e)}`, outcome(e)),
       ),
     ))),
