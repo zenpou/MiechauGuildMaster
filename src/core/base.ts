@@ -1,6 +1,6 @@
-// 拠点の施設: 建設・増築・隣接シナジー・施設勤務・毎日の産出。
+// 拠点の施設: 建設・増築・解体・隣接シナジー・施設勤務・毎日の産出。
 import { effectiveStats } from './adventurer';
-import { FACILITY, ITEM, SYNERGIES, TUNING } from './data';
+import { FACILITY, ITEM, RECIPE, SYNERGIES, TUNING } from './data';
 import { addInventory, ledger } from './ledger';
 import type { FacilityLevelCost, GameState, PlacedFacility, Result, SynergyDef } from './types';
 
@@ -76,6 +76,61 @@ export function upgrade(s: GameState, facilityId: string): Result {
   if (err) return fail(err);
   payCost(s, cost, `増築: ${def.name}`);
   f.construction = { toLevel: f.level + 1, untilDay: s.day + cost.days };
+  return ok();
+}
+
+/** 解体で戻る金額。払った建設費・増築費(今の Lv までの costs)の合計 × demolishRefund を四捨五入 */
+export function demolishGold(s: GameState, facilityId: string): number {
+  const f = findFacility(s, facilityId);
+  if (!f || !has(FACILITY, facilityId)) return 0;
+  const paid = FACILITY[facilityId].costs.slice(0, f.level).reduce((t, c) => t + c.gold, 0);
+  return Math.round(paid * TUNING.game.demolishRefund);
+}
+
+/**
+ * 施設を使っている仕掛かり。作りかけの品や訓練を打ち切って解体しないのは、
+ * 払った費用と素材をどこまで戻すかを別に決めずに済ませるため(仕上がってから壊してもらう)
+ */
+function inUse(s: GameState, facilityId: string, name: string): string | null {
+  const job = s.crafts.find((j) => RECIPE[j.recipeId]?.facility === facilityId);
+  if (job) return `${name}では${RECIPE[job.recipeId].name}を作っています`;
+  const trainee = facilityId === 'training' ? s.adventurers.find((a) => a.status === 'training') : undefined;
+  if (trainee) return `${name}では${trainee.name}が訓練中です`;
+  return null;
+}
+
+/** その施設が無かったときの名簿の定員。recruit.ts の capacity と同じ式(あちらは base を読むので、循環を避けてここで再計算する) */
+function capacityWithout(s: GameState, facilityId: string): number {
+  return TUNING.game.baseCapacity
+    + s.base.facilities.filter((f) => f.id !== facilityId).reduce((t, f) => t + facilityEffect(s, f.id, 'capacity'), 0);
+}
+
+export function canDemolish(s: GameState, facilityId: string): Result {
+  const f = findFacility(s, facilityId);
+  if (!f || !has(FACILITY, facilityId)) return fail('その施設はありません');
+  const def = FACILITY[facilityId];
+  if (f.construction) return fail(`${def.name}は工事中です`);
+  const busy = inUse(s, facilityId, def.name);
+  if (busy) return fail(busy);
+  // 名簿を定員より多い状態に置かない。壊したあとに誰かを追い出す・雇えないまま残す、のどちらも選ばせない
+  const cap = capacityWithout(s, facilityId);
+  if (s.adventurers.length > cap) return fail(`${def.name}を壊すと定員が${cap}人になり、いまの${s.adventurers.length}人が住めません`);
+  return ok();
+}
+
+/** 施設を取り壊して区画を空ける。勤務者は待機に戻り、demolishGold を資金に戻す */
+export function demolish(s: GameState, facilityId: string): Result {
+  const r = canDemolish(s, facilityId);
+  if (!r.ok) return r;
+  const def = FACILITY[facilityId];
+  for (const a of workersOf(s, facilityId)) {
+    a.status = 'idle';
+    a.assignment = null;
+  }
+  const gold = demolishGold(s, facilityId);
+  s.gold += gold;
+  ledger(s, `解体: ${def.name}`, gold);
+  s.base.facilities = s.base.facilities.filter((f) => f.id !== facilityId);
   return ok();
 }
 

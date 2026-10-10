@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { DUNGEON, TUNING } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
 import { advanceDay, dispatch, newGame } from '../src/core/game';
-import { checkMails, desiredSalary, markRead, recordParty, replyMail, unreadCount } from '../src/core/mail';
+import { checkMails, composeMail, desiredSalary, markRead, pruneMails, recordParty, replyMail, unreadCount } from '../src/core/mail';
 import { hire } from '../src/core/recruit';
 import { pairKey } from '../src/core/relations';
 import { rngFor } from '../src/core/rng';
+import { deserialize, serialize } from '../src/core/save';
 import type { DispatchOrder, GameState, Mail } from '../src/core/types';
 
 const M = TUNING.mail;
@@ -352,6 +353,74 @@ describe('受信箱', () => {
       return JSON.stringify(s.mails);
     };
     expect(run()).toBe(run());
+  });
+});
+
+describe('受信箱の整理', () => {
+  let seq = 0;
+  /** 受信箱に直に積む。既定は昨日届いた既読の挨拶(選択肢なし) */
+  function put(s: GameState, o: Partial<Mail> = {}): Mail {
+    const kind = o.kind ?? 'greeting';
+    const m: Mail = {
+      id: `t${++seq}`, day: s.day - 1, kind, from: 'guild', ...composeMail(kind, null),
+      answered: null, read: true, payload: {}, ...o,
+    };
+    s.mails.push(m);
+    return m;
+  }
+  const many = (s: GameState, n: number, o: Partial<Mail> = {}) => Array.from({ length: n }, () => put(s, o));
+
+  it('残す通数の既定は40', () => {
+    expect(M.keep).toBe(40);
+  });
+
+  it('既読の返信済み・選択肢なしは、新しい順に keep 通を超えた古い分だけ消え、消した通数を返す。並びは古い順のまま', () => {
+    const s = rich();
+    const answered = many(s, 3, { kind: 'raise', answered: 'accept' });
+    const plain = many(s, M.keep);
+    expect(pruneMails(s)).toBe(3);
+    expect(s.mails).toEqual(plain);
+    expect(pruneMails(s)).toBe(0);
+    expect(answered.some((m) => s.mails.includes(m))).toBe(false);
+  });
+
+  it('keep 通以下なら1通も消さない', () => {
+    const s = rich();
+    const all = many(s, M.keep);
+    expect(pruneMails(s)).toBe(0);
+    expect(s.mails).toEqual(all);
+  });
+
+  it('未読・返信待ち(差出人が在籍中)・警告は、古くても数に入れず消さない', () => {
+    const s = rich();
+    const [a, b] = s.adventurers;
+    const unread = put(s, { read: false });
+    const waiting = put(s, { kind: 'raise', from: a.id });
+    const warned = put(s, { kind: 'warning', from: b.id });
+    const retained = put(s, { kind: 'warning', from: b.id, answered: 'retain' });
+    const old = put(s);
+    const fresh = many(s, M.keep);
+    expect(pruneMails(s)).toBe(1);
+    expect(s.mails).toEqual([unread, waiting, warned, retained, ...fresh]);
+    expect(s.mails.includes(old)).toBe(false);
+  });
+
+  it('checkMails の終わりに整理する。返信待ちは残る', () => {
+    const s = rich();
+    many(s, M.keep + 25);
+    const waiting = put(s, { kind: 'rest', from: s.adventurers[0].id, day: s.day });
+    check(s);
+    expect(s.mails.filter((m) => m.read && m.choices.length === 0)).toHaveLength(M.keep);
+    expect(s.mails.includes(waiting)).toBe(true);
+  });
+
+  it('整理の無かった頃のセーブも、読み込んで1日進めれば keep 通まで縮む', () => {
+    const s = rich();
+    many(s, M.keep + 25);
+    const loaded = deserialize(serialize(s))!;
+    expect(loaded.mails).toHaveLength(M.keep + 25);
+    advanceDay(loaded);
+    expect(loaded.mails.filter((m) => m.read)).toHaveLength(M.keep);
   });
 });
 

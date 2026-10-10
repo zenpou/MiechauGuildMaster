@@ -1,5 +1,8 @@
 import { effectiveStats } from '../core/adventurer';
-import { activeSynergies, assignWorker, canBuild, facilityLevel, listSynergies, unassignWorker, upgrade, workersOf } from '../core/base';
+import {
+  activeSynergies, assignWorker, canBuild, canDemolish, demolish, demolishGold, facilityLevel, listSynergies, unassignWorker, upgrade,
+  workersOf,
+} from '../core/base';
 import { canCraft, craftDays, craftGold, startCraft } from '../core/craft';
 import { FACILITIES, FACILITY, ITEM, ITEMS, RECIPE, RECIPES } from '../core/data';
 import { buildFacility } from '../core/game';
@@ -16,6 +19,10 @@ const CATEGORY_NAME: Record<FacilityDef['category'], string> = {
   housing: '住居', production: '生産', training: '育成', recovery: '回復', info: '情報', office: '事務',
 };
 const CATEGORIES = Object.keys(CATEGORY_NAME) as FacilityDef['category'][];
+
+/** 解体ボタンを一度押した施設。同じボタンをもう一度押すと解体し、ほかの場所に触れると取り消す */
+let armed: string | null = null;
+let watching = false;
 
 /** 毎日の産出(製材所・石切場)。効果の値そのまま。勤務者の上乗せは effectText に任せる */
 const PRODUCE: [key: string, item: string][] = [['produceLumber', 'lumber'], ['produceStone', 'stone']];
@@ -130,7 +137,37 @@ function facilityPanel(f: PlacedFacility): HTMLElement {
     ) : null,
     d.workSlots && lv ? workerBlock(f.id) : null,
     lv && RECIPES.some((r) => r.facility === f.id) ? recipeBlock(f.id) : null,
+    f.construction ? null : demolishRow(f.id),
   );
+}
+
+/** 誤って触れても壊さないよう2段階。1度目で戻る金額を見せ、同じボタンをもう一度押すと解体する */
+function demolishRow(facilityId: string): HTMLElement {
+  const on = armed === facilityId;
+  return div('row tight',
+    h('button', { class: 'small danger demolish', onclick: () => (on ? doDemolish(facilityId) : arm(facilityId)) },
+      on ? `本当に解体する?返金 ${demolishGold(state, facilityId)}G` : '解体'),
+  );
+}
+
+function arm(facilityId: string) {
+  const r = canDemolish(state, facilityId);
+  if (!r.ok) return toast(r.reason, true);
+  armed = facilityId;
+  watchOutside();
+  render();
+}
+
+/** 構えたあと、解体ボタンの外に触れたら構えを解く。2度目の押下はボタン自身の onclick が受ける */
+function watchOutside() {
+  if (watching) return;
+  watching = true;
+  document.addEventListener('pointerdown', (ev) => {
+    if (!armed || (ev.target instanceof Element && ev.target.closest('.demolish'))) return;
+    armed = null;
+    // その場で描き直すと、触れた先のボタンが click を受け取る前に差し替わってしまう
+    setTimeout(render);
+  }, true);
 }
 
 function workerBlock(facilityId: string): HTMLElement {
@@ -183,3 +220,9 @@ const doUpgrade = (id: string) => done(upgrade(state, id), `${FACILITY[id].name}
 const doAssign = (advId: string, facilityId: string) => done(assignWorker(state, advId, facilityId), `${FACILITY[facilityId].name}に勤務させました`);
 const doUnassign = (advId: string) => done(unassignWorker(state, advId), '勤務を解きました');
 const doCraft = (id: string) => done(startCraft(state, id), `${RECIPE[id].name}を作り始めました`);
+
+function doDemolish(facilityId: string) {
+  armed = null;
+  const gold = demolishGold(state, facilityId);
+  done(demolish(state, facilityId), `${FACILITY[facilityId].name}を解体しました。${gold}G戻りました`);
+}

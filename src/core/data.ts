@@ -109,6 +109,8 @@ export interface Tuning {
     sellScale: number;
     /** 施設の維持費の倍率 */
     facilityUpkeepScale: number;
+    /** 解体で戻る割合(払った建設費・増築費の合計に掛ける) */
+    demolishRefund: number;
     startGold: number;
     startPotions: number;
     upkeepPerDay: number;
@@ -156,6 +158,8 @@ export interface Tuning {
     /** 「分ける」と返信してから同じ隊に組めない日数 */
     splitDays: number;
     perDay: number;
+    /** 受信箱に残す、読んで用の済んだメールの通数。超えた古い分は checkMails の終わりに消す */
+    keep: number;
     /** 返信の忠誠の増減(第6節の表) */
     reply: { accept: number; refuse: number; rest: number; deny: number; split: number; keep: number };
   };

@@ -226,7 +226,22 @@ export function checkMails(s: GameState, rng: Rng, notices: string[]): Mail[] {
     out.push(send(s, p.kind, p.a, p.vars, p.payload));
   }
   if (out.length) notices.push(`メールが${out.length}通届いた。`);
+  pruneMails(s);
   return out;
+}
+
+/** 読んで用の済んだもの。警告は返信済みでも、誰がなぜ去りかけたかの記録なので残す */
+const finished = (m: Mail) => m.read && m.kind !== 'warning' && (m.answered !== null || m.choices.length === 0);
+
+/**
+ * 用の済んだメールを新しい順に keep 通だけ残し、古い分を消す。消した通数を返す。
+ * 受信箱全体の通数で数えないのは、未読や返信待ちが溜まったときに、読み終えた分まで全部消えてしまうため
+ */
+export function pruneMails(s: GameState): number {
+  const done = s.mails.filter(finished);
+  const drop = new Set(done.slice(0, Math.max(0, done.length - M.keep)));
+  if (drop.size) s.mails = s.mails.filter((m) => !drop.has(m));
+  return drop.size;
 }
 
 /** 警告から resignDays を過ぎた人が去る。派遣中・訓練中は戻ってから */

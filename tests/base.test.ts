@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { effectiveStats } from '../src/core/adventurer';
 import {
-  activeSynergies, assignWorker, bonus, build, canBuild, completeConstructions, dailyProduction, facilityEffect, facilityLevel,
-  listSynergies, synergyValue, unassignWorker, upgrade,
+  activeSynergies, assignWorker, bonus, build, canBuild, canDemolish, completeConstructions, dailyProduction, demolish,
+  demolishGold, facilityEffect, facilityLevel, listSynergies, synergyValue, unassignWorker, upgrade,
 } from '../src/core/base';
-import { FACILITIES, FACILITY, SYNERGIES, TUNING } from '../src/core/data';
+import { effectiveStats, generateAdventurer } from '../src/core/adventurer';
+import { FACILITIES, FACILITY, RECIPES, SYNERGIES, TUNING } from '../src/core/data';
 import { advanceDay, newGame } from '../src/core/game';
+import { accept, activeMax, activeQuests } from '../src/core/quests';
+import { rngFor } from '../src/core/rng';
+import { completeTraining, trainableSkills, trainDays, trainSkill } from '../src/core/training';
 import type { GameState } from '../src/core/types';
 
 function rich(seed = 5): GameState {
@@ -423,3 +426,159 @@ describe('毎日の産出', () => {
     expect([s.inventory.lumber, s.inventory.stone]).toEqual([3, 2]);
   });
 });
+
+describe('解体', () => {
+  it('返金の割合の既定は0.5', () => {
+    expect(TUNING.game.demolishRefund).toBe(0.5);
+  });
+
+  it('払った建設費と増築費の合計 × demolishRefund を資金に戻し、台帳に「解体: 施設名」で載せ、区画から消す。シナジーも消える', () => {
+    const s = rich();
+    place(s, 'dorm', 2, 2, 2);
+    place(s, 'clinic', 2, 1);
+    expect(activeSynergies(s).map((x) => x.id)).toEqual(['quiet_dorm']);
+    const paid = FACILITY.dorm.costs[0].gold + FACILITY.dorm.costs[1].gold;
+    expect(paid * TUNING.game.demolishRefund).toBe(300);
+    expect(demolishGold(s, 'dorm')).toBe(300);
+    expect(demolish(s, 'dorm')).toEqual({ ok: true });
+    expect(s.gold).toBe(5000 + 300);
+    expect(s.ledger[0]).toEqual({ day: s.day, label: '解体: 宿舎', amount: 300 });
+    expect(s.base.facilities.map((f) => f.id)).toEqual(['clinic']);
+    expect(facilityLevel(s, 'dorm')).toBe(0);
+    expect(activeSynergies(s)).toEqual([]);
+    expect(canBuild(s, 'dorm', 2, 2)).toEqual({ ok: true });
+  });
+
+  it('Lv1 なら建設費だけがもとになる。端数は四捨五入', () => {
+    const s = rich();
+    place(s, 'workshop', 0, 0);
+    expect(demolish(s, 'workshop')).toEqual({ ok: true });
+    expect(s.gold).toBe(5000 + 125);
+    const rate = TUNING.game.demolishRefund;
+    try {
+      TUNING.game.demolishRefund = 0.25;
+      place(s, 'workshop', 0, 0);
+      expect(demolish(s, 'workshop')).toEqual({ ok: true });
+      expect(s.gold).toBe(5000 + 125 + 63);
+    } finally {
+      TUNING.game.demolishRefund = rate;
+    }
+  });
+
+  it('勤務中の冒険者は待機に戻り、ほかの施設の勤務者はそのまま', () => {
+    const s = rich();
+    place(s, 'sawmill', 0, 0);
+    place(s, 'quarry', 1, 0);
+    const [a, b] = s.adventurers;
+    expect(assignWorker(s, a.id, 'sawmill').ok).toBe(true);
+    expect(assignWorker(s, b.id, 'quarry').ok).toBe(true);
+    expect(demolish(s, 'sawmill')).toEqual({ ok: true });
+    expect([a.status, a.assignment]).toEqual(['idle', null]);
+    expect([b.status, b.assignment]).toEqual(['working', { facility: 'quarry' }]);
+  });
+
+  it('工事中(新築・増築とも)は断り、状態を変えない', () => {
+    const s = stocked();
+    expect(build(s, 'dorm', 0, 0).ok).toBe(true);
+    const before = structuredClone(s);
+    expect(demolish(s, 'dorm')).toEqual({ ok: false, reason: '宿舎は工事中です' });
+    expect(s).toEqual(before);
+    s.day += FACILITY.dorm.costs[0].days;
+    completeConstructions(s, []);
+    expect(upgrade(s, 'dorm').ok).toBe(true);
+    expect(demolish(s, 'dorm')).toEqual({ ok: false, reason: '宿舎は工事中です' });
+  });
+
+  it('作りかけの品がある工房は断る。品の無い調合所は解体できる', () => {
+    const s = rich();
+    place(s, 'workshop', 0, 0);
+    place(s, 'alchemy', 1, 0);
+    const r = RECIPES.find((x) => x.facility === 'workshop')!;
+    s.crafts.push({ id: 'c1', recipeId: r.id, startDay: 1, doneDay: 5, workers: [] });
+    const before = structuredClone(s);
+    expect(demolish(s, 'workshop')).toEqual({ ok: false, reason: `工房では${r.name}を作っています` });
+    expect(s).toEqual(before);
+    expect(demolish(s, 'alchemy')).toEqual({ ok: true });
+    s.crafts = [];
+    expect(demolish(s, 'workshop')).toEqual({ ok: true });
+  });
+
+  it('訓練中の人がいる訓練所は断り、訓練が終われば解体できる', () => {
+    const s = rich();
+    place(s, 'training', 0, 0);
+    const a = s.adventurers[0];
+    const [skill] = trainableSkills(s, a.id);
+    expect(trainSkill(s, a.id, skill.id).ok).toBe(true);
+    const before = structuredClone(s);
+    expect(demolish(s, 'training')).toEqual({ ok: false, reason: `訓練所では${a.name}が訓練中です` });
+    expect(s).toEqual(before);
+    s.day += trainDays(s);
+    completeTraining(s, []);
+    expect(demolish(s, 'training')).toEqual({ ok: true });
+  });
+
+  it('建っていない施設・知らない施設は断る。戻る金額は0', () => {
+    const s = rich();
+    const before = structuredClone(s);
+    expect(demolish(s, 'dorm')).toEqual({ ok: false, reason: 'その施設はありません' });
+    expect(demolish(s, 'nope')).toEqual({ ok: false, reason: 'その施設はありません' });
+    expect(s).toEqual(before);
+    expect([demolishGold(s, 'dorm'), demolishGold(s, 'nope')]).toEqual([0, 0]);
+  });
+
+  it('canDemolish は状態を変えずに、demolish と同じ可否と理由を返す', () => {
+    const s = rich();
+    place(s, 'workshop', 0, 0);
+    const r = RECIPES.find((x) => x.facility === 'workshop')!;
+    s.crafts.push({ id: 'c1', recipeId: r.id, startDay: 1, doneDay: 5, workers: [] });
+    const before = structuredClone(s);
+    expect(canDemolish(s, 'workshop')).toEqual({ ok: false, reason: `工房では${r.name}を作っています` });
+    expect(canDemolish(s, 'dorm')).toEqual({ ok: false, reason: 'その施設はありません' });
+    expect(s).toEqual(before);
+    s.crafts = [];
+    expect(canDemolish(s, 'workshop')).toEqual({ ok: true });
+    expect(s.base.facilities).toEqual(before.base.facilities);
+  });
+
+  it('宿舎を壊すと名簿が定員を超えるときは断る。収まる人数なら壊せる', () => {
+    const s = rich();
+    place(s, 'dorm', 0, 0);
+    const base = TUNING.game.baseCapacity;
+    while (s.adventurers.length < base + 1) s.adventurers.push(generateAdventurer(rngFor(1, 'extra', s.adventurers.length), { id: `x${s.adventurers.length}` }));
+    const before = structuredClone(s);
+    const r = demolish(s, 'dorm');
+    expect(r.ok).toBe(false);
+    expect(r.ok === false && r.reason).toContain('定員');
+    expect(s).toEqual(before);
+    expect(canDemolish(s, 'dorm').ok).toBe(false);
+    s.adventurers.length = base;
+    expect(canDemolish(s, 'dorm')).toEqual({ ok: true });
+    expect(demolish(s, 'dorm')).toEqual({ ok: true });
+  });
+
+  it('宿舎以外は、名簿が定員いっぱいでも壊せる', () => {
+    const s = rich();
+    place(s, 'dorm', 0, 0);
+    place(s, 'workshop', 1, 0);
+    while (s.adventurers.length < base(s)) s.adventurers.push(generateAdventurer(rngFor(1, 'extra', s.adventurers.length), { id: `x${s.adventurers.length}` }));
+    expect(demolish(s, 'workshop')).toEqual({ ok: true });
+  });
+
+  it('受付を壊しても、受けている依頼は消えない。枠が減るので新しい依頼は受けられない', () => {
+    const s = rich();
+    place(s, 'reception', 0, 0);
+    const quest = (id: string, status: 'accepted' | 'posted') => ({
+      id, templateId: null, type: 'deliver' as const, town: null, name: id, desc: '', target: {}, rewardGold: 10, rewardRep: 1,
+      postedDay: s.day, acceptBy: null, dueDay: null, departDay: null, status, progress: 0, unlocks: [],
+    });
+    const open = activeMax(s);
+    s.quests = [...Array.from({ length: open }, (_, i) => quest(`a${i}`, 'accepted')), quest('p1', 'posted')];
+    expect(demolish(s, 'reception')).toEqual({ ok: true });
+    expect(activeMax(s)).toBeLessThan(open);
+    expect(activeQuests(s)).toHaveLength(open);
+    expect(accept(s, 'p1').ok).toBe(false);
+  });
+});
+
+/** その時点の名簿の定員(基本 + 宿舎) */
+const base = (s: GameState) => TUNING.game.baseCapacity + facilityEffect(s, 'dorm', 'capacity');

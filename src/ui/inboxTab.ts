@@ -44,7 +44,7 @@ export function inboxTab(): HTMLElement {
       waiting ? span('neg', `返信待ち ${waiting}通`) : null,
       span('dim small', `全${state.mails.length}通`),
     ),
-    div('dim small', '押すと本文が開き、既読になります。返事の要るものは選ぶまで「返信待ち」が付きます。'),
+    div('dim small', `押すと本文が開き、既読になります。返事の要るものは選ぶまで「返信待ち」が付きます。読み終えたメールは新しい順に${TUNING.mail.keep}通まで残し、古いものから消えます(未読・返信待ち・退職の意向は消えません)。`),
     list.length
       ? h('ul', { class: 'plain maillist' }, ...list.map((m) => h('li', null,
         h('button', { class: [m.read ? '' : 'unread', m.id === ui.selMail ? 'sel' : ''].join(' ').trim(), onclick: () => open(m.id) },
