@@ -8,7 +8,7 @@ import { DUNGEON, EDGE, ITEM, JOB, NODE, POLICY, QUEST_TEMPLATES, TUNING, type R
 import { exploredRate, parseFloor } from './dungeon';
 import { onDragonDefeated } from './ending';
 import { onReturn, advanceUniqueChain } from './events';
-import { returnDialogue, simulateExploration } from './explore';
+import { floorTransit, returnDialogue, simulateExploration } from './explore';
 import {
   QUEST_TOWNS, REP_LEVELS, accept, createQuest, expireQuests, generateDailyQuests, progressFromReturn, questCargo,
   repLevel, seedUnlockQuests, type RoadInfo,
@@ -16,7 +16,7 @@ import {
 import { arriveCandidates, expireCandidates, spawnCandidate } from './recruit';
 import { addRelation } from './relations';
 import { rngFor, type Rng } from './rng';
-import { addInventory, ledger } from './ledger';
+import { addInventory, heldKeys, ledger } from './ledger';
 import { applyResignations, checkMails, dispatchBlock, markGreeted, markTired, recordParty } from './mail';
 import { resolveScenes } from './scenes';
 import { emptyState } from './state';
@@ -212,6 +212,8 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
       members: party, leaderId: o.leaderId, policy: o.policy,
       progress: s.dungeons[trip.dungeonId], days: o.days, items: { ...items }, relations: s.relations, startDay: s.day + outDays,
       action: o.action, target: { item: o.target.item, enemy: o.target.enemy },
+      // 出発時の在庫で扉が決まる。2階以降は前の階を抜ける歩数を往復で払う
+      keys: heldKeys(s), transit: floorTransit(DUNGEON[trip.dungeonId], trip.floorId, s.dungeons[trip.dungeonId], heldKeys(s)) ?? 0,
     });
   }
   const result = combineLegs(outLeg, site, outLeg.wiped || site?.wiped ? null : backLeg, items, outDays);
@@ -251,6 +253,10 @@ function dungeonTrip(s: GameState, o: DispatchOrder): Trip | string {
   if (!dungeon || !s.dungeons[dungeonId]) return '行き先のダンジョンが分かりません';
   const floorId = o.target.floor ?? 'f1';
   if (!dungeon.floors.some((f) => f.id === floorId)) return '行き先のフロアが分かりません';
+  // 2階以降は、前の階の下り階段までの道が既知で、道の扉の鍵を持っているときだけ出せる(移動費の計算ができる)
+  if (floorTransit(dungeon, floorId, s.dungeons[dungeonId], heldKeys(s)) === null) {
+    return `${dungeon.name}の${dungeon.floors.find((f) => f.id === floorId)!.name}へは、前の階の下り階段までの道がまだ分かりません(階段を踏み、鍵の要る扉は鍵を持って)`;
+  }
   const actionError = checkAction(s, o, dungeonId, floorId);
   if (actionError) return actionError;
   if (!Number.isInteger(o.days) || o.days < 1 || o.days > T.daysMax) return `日数は1〜${T.daysMax}日で指定してください`;
@@ -432,7 +438,8 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
   // 経験値が入る前の、出発時と同じ戦力で比べる
   const power = members.reduce((t, m) => t + powerOf(m), 0);
 
-  for (const [k, n] of Object.entries(r.items)) addInventory(s, k, n);
+  // 鍵は在庫に最大1個。同時に出た2隊が同じ鍵の宝箱を取っても増やさない
+  for (const [k, n] of Object.entries(r.items)) addInventory(s, k, ITEM[k]?.kind === 'key' ? Math.max(0, Math.min(n, 1 - (s.inventory[k] ?? 0))) : n);
   for (const [k, n] of Object.entries(r.materials)) addInventory(s, k, n);
   if (r.gold) { s.gold += r.gold; ledger(s, `拾得金: ${place}`, r.gold); }
   if (r.rescueCost) { s.gold -= r.rescueCost; ledger(s, `救助費用: ${place}`, -r.rescueCost); }

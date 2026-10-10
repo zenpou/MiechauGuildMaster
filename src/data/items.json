@@ -231,5 +231,319 @@
   "kind": "material",
   "price": 45,
   "weight": 1
+ },
+ {
+  "id": "frost_iron",
+  "name": "霜鉄",
+  "desc": "凍てつく谷の岩肌に走る、冷たく青い鉄。鍛えると霜をまとう刃になる。",
+  "kind": "material",
+  "price": 70,
+  "weight": 2,
+  "source": "frost_valley"
+ },
+ {
+  "id": "ice_shard",
+  "name": "氷片",
+  "desc": "谷の奥で溶けずに残る氷のかけら。冷気を封じたお守りの材料。",
+  "kind": "material",
+  "price": 45,
+  "weight": 1,
+  "source": "frost_valley"
+ },
+ {
+  "id": "snow_pelt",
+  "name": "雪獣の毛皮",
+  "desc": "雪獣や霜狼の厚い毛皮。寒さと冷気をよく防ぐ。",
+  "kind": "material",
+  "price": 55,
+  "weight": 1,
+  "source": "frost_valley"
+ },
+ {
+  "id": "relic_shard",
+  "name": "遺物の欠片",
+  "desc": "沈んだ遺跡に散らばる古い工芸品の破片。不思議な力が残っている。",
+  "kind": "material",
+  "price": 90,
+  "weight": 1,
+  "source": "sunken_ruins"
+ },
+ {
+  "id": "old_coin",
+  "name": "古銭",
+  "desc": "遺跡の水底から拾える古い硬貨。好事家が買い取る。",
+  "kind": "material",
+  "price": 70,
+  "weight": 1,
+  "source": "sunken_ruins"
+ },
+ {
+  "id": "moon_stone",
+  "name": "月長石",
+  "desc": "遺跡の祭壇に埋め込まれていた、青白く光る石。",
+  "kind": "material",
+  "price": 120,
+  "weight": 1,
+  "source": "sunken_ruins"
+ },
+ {
+  "id": "ember_fang",
+  "name": "熾火の牙",
+  "desc": "幼竜や火の小鬼の牙。芯に熱を帯び、冷めることがない。",
+  "kind": "material",
+  "price": 95,
+  "weight": 1,
+  "source": "dragon_lair"
+ },
+ {
+  "id": "magma_core",
+  "name": "溶岩核",
+  "desc": "溶岩ナメクジの体内で固まった赤熱の塊。重い。",
+  "kind": "material",
+  "price": 140,
+  "weight": 2,
+  "source": "dragon_lair"
+ },
+ {
+  "id": "dragon_scale",
+  "name": "竜の鱗",
+  "desc": "竜の体を覆う鱗。どんな炎も通さないという。",
+  "kind": "material",
+  "price": 400,
+  "weight": 2
+ },
+ {
+  "id": "ruin_key",
+  "name": "遺跡の鍵",
+  "desc": "廃れた塔の隠し部屋で見つかる古い鍵。沈んだ遺跡の扉に合うという。",
+  "kind": "key",
+  "price": 0,
+  "weight": 0
+ },
+ {
+  "id": "dragon_crest",
+  "name": "竜の紋章",
+  "desc": "遺跡の守護像が守っていた紋章。竜の寝床の封印を解く。",
+  "kind": "key",
+  "price": 0,
+  "weight": 0
+ },
+ {
+  "id": "lumber",
+  "name": "木材",
+  "desc": "製材所で挽いた木材。施設の建築に使う。",
+  "kind": "building",
+  "price": 0,
+  "weight": 0
+ },
+ {
+  "id": "stone",
+  "name": "石材",
+  "desc": "石切場で切り出した石材。施設の建築に使う。",
+  "kind": "building",
+  "price": 0,
+  "weight": 0
+ },
+ {
+  "id": "crystal_blade",
+  "name": "水晶の刃",
+  "desc": "水晶を鉄の芯に沿わせて研いだ刃。よく切れる。",
+  "kind": "weapon",
+  "price": 126,
+  "weight": 2,
+  "equip": {
+   "slot": "weapon",
+   "mods": {
+    "atk": 9
+   }
+  }
+ },
+ {
+  "id": "cloth_robe",
+  "name": "古布のローブ",
+  "desc": "古布を重ねてスライムの核で固めたローブ。闇の力を和らげる。",
+  "kind": "armor",
+  "price": 78,
+  "weight": 1,
+  "equip": {
+   "slot": "armor",
+   "armorClass": "light",
+   "mods": {
+    "def": 8
+   },
+   "resist": {
+    "dark": 0.4
+   }
+  }
+ },
+ {
+  "id": "ember_ring",
+  "name": "熾火の指輪",
+  "desc": "鬼火の残り火を水晶に封じた指輪。炎をいなす。",
+  "kind": "accessory",
+  "price": 98,
+  "weight": 1,
+  "equip": {
+   "slot": "accessory",
+   "mods": {
+    "atk": 1
+   },
+   "resist": {
+    "fire": 0.35
+   }
+  }
+ },
+ {
+  "id": "frost_edge",
+  "name": "霜の刃",
+  "desc": "霜鉄を鍛えた刃。振るうたびに白い霜が散る。",
+  "kind": "weapon",
+  "price": 150,
+  "weight": 2,
+  "equip": {
+   "slot": "weapon",
+   "mods": {
+    "atk": 12
+   }
+  }
+ },
+ {
+  "id": "frost_mail",
+  "name": "霜鉄の鎧",
+  "desc": "霜鉄の板を重ねた重い鎧。冷気を通さないが、動きは鈍る。",
+  "kind": "armor",
+  "price": 176,
+  "weight": 3,
+  "equip": {
+   "slot": "armor",
+   "armorClass": "heavy",
+   "mods": {
+    "def": 15,
+    "spd": -1
+   },
+   "resist": {
+    "ice": 0.4
+   }
+  }
+ },
+ {
+  "id": "pelt_cloak",
+  "name": "毛皮の外套",
+  "desc": "雪獣の毛皮を牙で留めた外套。寒さに強い。",
+  "kind": "armor",
+  "price": 128,
+  "weight": 2,
+  "equip": {
+   "slot": "armor",
+   "armorClass": "medium",
+   "mods": {
+    "def": 11
+   },
+   "resist": {
+    "ice": 0.35
+   }
+  }
+ },
+ {
+  "id": "ice_charm",
+  "name": "氷のお守り",
+  "desc": "氷片を連ねたお守り。冴えた冷気が目を覚まさせる。",
+  "kind": "accessory",
+  "price": 68,
+  "weight": 1,
+  "equip": {
+   "slot": "accessory",
+   "mods": {
+    "scout": 1
+   },
+   "resist": {
+    "ice": 0.4
+   }
+  }
+ },
+ {
+  "id": "ruin_amulet",
+  "name": "遺跡の護符",
+  "desc": "遺物の欠片と月長石を組んだ護符。土・闇・炎を少しずつ退ける。",
+  "kind": "accessory",
+  "price": 195,
+  "weight": 1,
+  "equip": {
+   "slot": "accessory",
+   "mods": {
+    "def": 2
+   },
+   "resist": {
+    "earth": 0.3,
+    "dark": 0.3,
+    "fire": 0.2
+   }
+  }
+ },
+ {
+  "id": "moon_blade",
+  "name": "月長の剣",
+  "desc": "月長石を嵌めた剣。刃が青白く光る。",
+  "kind": "weapon",
+  "price": 290,
+  "weight": 2,
+  "equip": {
+   "slot": "weapon",
+   "mods": {
+    "atk": 15
+   }
+  }
+ },
+ {
+  "id": "guardian_plate",
+  "name": "守護の板金",
+  "desc": "遺跡の守護像を模した板金鎧。岩と炎に強いが重い。",
+  "kind": "armor",
+  "price": 357,
+  "weight": 3,
+  "equip": {
+   "slot": "armor",
+   "armorClass": "heavy",
+   "mods": {
+    "def": 18,
+    "spd": -1
+   },
+   "resist": {
+    "earth": 0.4,
+    "fire": 0.2
+   }
+  }
+ },
+ {
+  "id": "scale_mail",
+  "name": "竜鱗の鎧",
+  "desc": "竜の鱗を綴じた鎧。炎をほとんど通さない。",
+  "kind": "armor",
+  "price": 690,
+  "weight": 3,
+  "equip": {
+   "slot": "armor",
+   "armorClass": "heavy",
+   "mods": {
+    "def": 24
+   },
+   "resist": {
+    "fire": 0.6
+   }
+  }
+ },
+ {
+  "id": "dragon_blade",
+  "name": "竜牙の剣",
+  "desc": "竜の鱗と熾火の牙で鍛えた剣。",
+  "kind": "weapon",
+  "price": 543,
+  "weight": 2,
+  "equip": {
+   "slot": "weapon",
+   "mods": {
+    "atk": 22
+   }
+  }
  }
 ]

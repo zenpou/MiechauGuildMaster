@@ -237,5 +237,276 @@
    "cd": 3,
    "aoe": true
   }
+ },
+ {
+  "id": "frost_wolf",
+  "name": "霜狼",
+  "hp": 130,
+  "atk": 52,
+  "def": 14,
+  "mag": 0,
+  "spd": 16,
+  "exp": 20,
+  "ai": "weakest",
+  "element": "ice",
+  "loot": [
+   {
+    "item": "snow_pelt",
+    "chance": 0.6
+   }
+  ]
+ },
+ {
+  "id": "ice_imp",
+  "name": "氷の小鬼",
+  "hp": 80,
+  "atk": 48,
+  "def": 8,
+  "mag": 0,
+  "spd": 18,
+  "exp": 14,
+  "ai": "random",
+  "element": "ice",
+  "loot": [
+   {
+    "item": "ice_shard",
+    "chance": 0.6
+   }
+  ]
+ },
+ {
+  "id": "snow_beast",
+  "name": "雪獣",
+  "hp": 220,
+  "atk": 58,
+  "def": 20,
+  "mag": 0,
+  "spd": 8,
+  "exp": 32,
+  "ai": "strongest",
+  "element": "ice",
+  "loot": [
+   {
+    "item": "snow_pelt",
+    "chance": 0.8
+   },
+   {
+    "item": "frost_iron",
+    "chance": 0.4
+   }
+  ]
+ },
+ {
+  "id": "frost_giant",
+  "name": "霜の巨人",
+  "hp": 950,
+  "atk": 66,
+  "def": 30,
+  "mag": 0,
+  "spd": 7,
+  "exp": 160,
+  "ai": "strongest",
+  "element": "ice",
+  "resist": {
+   "ice": 0.8,
+   "fire": -0.4
+  },
+  "loot": [
+   {
+    "item": "frost_iron",
+    "chance": 1
+   },
+   {
+    "item": "ice_shard",
+    "chance": 1
+   }
+  ],
+  "symbol": true,
+  "skill": {
+   "name": "氷塊投げ",
+   "mult": 1.4,
+   "cd": 3,
+   "aoe": true
+  }
+ },
+ {
+  "id": "drowned",
+  "name": "溺れた亡者",
+  "hp": 160,
+  "atk": 56,
+  "def": 12,
+  "mag": 0,
+  "spd": 6,
+  "exp": 24,
+  "ai": "random",
+  "element": "dark",
+  "loot": [
+   {
+    "item": "old_coin",
+    "chance": 0.6
+   }
+  ]
+ },
+ {
+  "id": "stone_sentinel",
+  "name": "石の歩哨",
+  "hp": 260,
+  "atk": 60,
+  "def": 32,
+  "mag": 0,
+  "spd": 5,
+  "exp": 38,
+  "ai": "strongest",
+  "element": "earth",
+  "resist": {
+   "earth": 0.5
+  },
+  "loot": [
+   {
+    "item": "relic_shard",
+    "chance": 0.4
+   }
+  ]
+ },
+ {
+  "id": "wraith",
+  "name": "水霊",
+  "hp": 110,
+  "atk": 64,
+  "def": 6,
+  "mag": 0,
+  "spd": 20,
+  "exp": 20,
+  "ai": "weakest",
+  "element": "dark",
+  "resist": {
+   "dark": 0.6,
+   "ice": 0.3
+  },
+  "loot": [
+   {
+    "item": "moon_stone",
+    "chance": 0.3
+   }
+  ]
+ },
+ {
+  "id": "ruin_warden",
+  "name": "遺跡の守護像",
+  "hp": 1200,
+  "atk": 72,
+  "def": 34,
+  "mag": 0,
+  "spd": 8,
+  "exp": 200,
+  "ai": "strongest",
+  "element": "earth",
+  "loot": [
+   {
+    "item": "relic_shard",
+    "chance": 1
+   },
+   {
+    "item": "moon_stone",
+    "chance": 1
+   }
+  ],
+  "symbol": true,
+  "skill": {
+   "name": "崩落",
+   "mult": 1.4,
+   "cd": 3,
+   "aoe": true
+  }
+ },
+ {
+  "id": "drake",
+  "name": "幼竜",
+  "hp": 380,
+  "atk": 78,
+  "def": 26,
+  "mag": 0,
+  "spd": 14,
+  "exp": 56,
+  "ai": "strongest",
+  "element": "fire",
+  "resist": {
+   "fire": 0.7,
+   "ice": -0.3
+  },
+  "loot": [
+   {
+    "item": "ember_fang",
+    "chance": 0.6
+   }
+  ]
+ },
+ {
+  "id": "fire_imp",
+  "name": "火の小鬼",
+  "hp": 120,
+  "atk": 70,
+  "def": 10,
+  "mag": 0,
+  "spd": 22,
+  "exp": 22,
+  "ai": "random",
+  "element": "fire",
+  "resist": {
+   "fire": 0.8
+  },
+  "loot": [
+   {
+    "item": "ember_fang",
+    "chance": 0.3
+   }
+  ]
+ },
+ {
+  "id": "magma_slug",
+  "name": "溶岩ナメクジ",
+  "hp": 300,
+  "atk": 62,
+  "def": 28,
+  "mag": 0,
+  "spd": 4,
+  "exp": 42,
+  "ai": "random",
+  "element": "fire",
+  "loot": [
+   {
+    "item": "magma_core",
+    "chance": 0.4
+   }
+  ]
+ },
+ {
+  "id": "dragon",
+  "name": "竜",
+  "hp": 2800,
+  "atk": 84,
+  "def": 36,
+  "mag": 0,
+  "spd": 12,
+  "exp": 500,
+  "ai": "strongest",
+  "element": "fire",
+  "resist": {
+   "fire": 0.9,
+   "ice": -0.3
+  },
+  "loot": [
+   {
+    "item": "dragon_scale",
+    "chance": 1
+   }
+  ],
+  "boss": true,
+  "skill": {
+   "name": "灼熱のブレス",
+   "mult": 1.5,
+   "cd": 3,
+   "aoe": true
+  }
  }
 ]

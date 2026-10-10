@@ -104,6 +104,44 @@
      "explore": 3
     }
    }
+  },
+  {
+   "id": "sunken_ruins",
+   "name": "沈んだ遺跡",
+   "desc": "学院の街の西、湖に沈みかけた古い遺跡。奥の扉は鍵が無いと開かないという。",
+   "kind": "dungeon",
+   "x": 3,
+   "y": 1,
+   "dungeon": "sunken_ruins",
+   "rumored": true
+  },
+  {
+   "id": "frost_valley",
+   "name": "凍てつく谷",
+   "desc": "学院の街から北東へ2日、氷に閉ざされた谷。霜の巨人が棲むという。",
+   "kind": "dungeon",
+   "x": 7,
+   "y": 0,
+   "dungeon": "frost_valley",
+   "rumored": true
+  },
+  {
+   "id": "high_pass",
+   "name": "高山の関",
+   "desc": "山村から北へ登った先の関所跡。この先は竜の領分だと村人は言う。",
+   "kind": "waypoint",
+   "x": 2,
+   "y": 3
+  },
+  {
+   "id": "dragon_lair",
+   "name": "竜の寝床",
+   "desc": "高山の関の先、火口の底に竜が眠るという。入口は紋章で封じられている。",
+   "kind": "dungeon",
+   "x": 2,
+   "y": 1,
+   "dungeon": "dragon_lair",
+   "rumored": true
   }
  ],
  "edges": [
@@ -163,6 +201,34 @@
    "days": 0,
    "danger": 0.3,
    "hidden": true
+  },
+  {
+   "id": "academy_town__sunken_ruins",
+   "a": "academy_town",
+   "b": "sunken_ruins",
+   "days": 1,
+   "danger": 0.3
+  },
+  {
+   "id": "academy_town__frost_valley",
+   "a": "academy_town",
+   "b": "frost_valley",
+   "days": 2,
+   "danger": 0.35
+  },
+  {
+   "id": "high_pass__mountain_village",
+   "a": "high_pass",
+   "b": "mountain_village",
+   "days": 1,
+   "danger": 0.3
+  },
+  {
+   "id": "dragon_lair__high_pass",
+   "a": "dragon_lair",
+   "b": "high_pass",
+   "days": 1,
+   "danger": 0.5
   }
  ]
 }

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { assignWorker } from '../src/core/base';
 import { availableRecipes, canCraft, craftDays, startCraft } from '../src/core/craft';
+import { RECIPES } from '../src/core/data';
 import { advanceDay, newGame } from '../src/core/game';
+import { recipeUnlocked } from '../src/core/quests';
 import type { GameState } from '../src/core/types';
 
 function rich(seed = 9): GameState {
@@ -25,9 +27,13 @@ describe('レシピ', () => {
     expect(availableRecipes(s)).toEqual([]);
     expect(canCraft(s, 'r_iron_sword').ok).toBe(false);
     place(s, 'workshop', 0, 0);
-    expect(availableRecipes(s).map((r) => r.id)).toEqual([
-      'r_bone_dagger', 'r_iron_sword', 'r_leather_armor', 'r_studded_armor', 'r_iron_armor', 'r_fang_necklace', 'r_moss_charm',
-    ]);
+    // 装備が増えるたびに固定の一覧を書き直さない。工房のレシピのうち、解放済みのものが全部出ればよい
+    const ids = availableRecipes(s).map((r) => r.id);
+    expect(ids).toEqual(RECIPES.filter((r) => r.facility === 'workshop' && recipeUnlocked(s, r.id)).map((r) => r.id));
+    expect(ids).toContain('r_iron_sword');
+    // 竜を倒すまでは竜鱗の装備が出ない
+    expect(ids).not.toContain('r_scale_mail');
+    expect(ids).not.toContain('r_dragon_blade');
     s.base.facilities.push({ id: 'alchemy', level: 0, x: 3, y: 3, builtDay: 1, construction: { toLevel: 1, untilDay: 9 } });
     expect(availableRecipes(s).some((r) => r.facility === 'alchemy')).toBe(false);
   });

@@ -181,5 +181,263 @@
   ],
   "days": 1,
   "gold": 20
+ },
+ {
+  "id": "r_crystal_blade",
+  "name": "水晶の刃",
+  "facility": "workshop",
+  "output": {
+   "item": "crystal_blade",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "crystal",
+    "n": 3
+   },
+   {
+    "item": "iron_ore",
+    "n": 2
+   }
+  ],
+  "days": 3,
+  "gold": 120
+ },
+ {
+  "id": "r_cloth_robe",
+  "name": "古布のローブ",
+  "facility": "workshop",
+  "output": {
+   "item": "cloth_robe",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "ancient_cloth",
+    "n": 4
+   },
+   {
+    "item": "slime_gel",
+    "n": 2
+   }
+  ],
+  "days": 3,
+  "gold": 100
+ },
+ {
+  "id": "r_ember_ring",
+  "name": "熾火の指輪",
+  "facility": "workshop",
+  "output": {
+   "item": "ember_ring",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "wisp_ember",
+    "n": 3
+   },
+   {
+    "item": "crystal",
+    "n": 1
+   }
+  ],
+  "days": 2,
+  "gold": 90
+ },
+ {
+  "id": "r_frost_edge",
+  "name": "霜の刃",
+  "facility": "workshop",
+  "output": {
+   "item": "frost_edge",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "frost_iron",
+    "n": 3
+   },
+   {
+    "item": "ice_shard",
+    "n": 2
+   }
+  ],
+  "days": 4,
+  "gold": 220
+ },
+ {
+  "id": "r_frost_mail",
+  "name": "霜鉄の鎧",
+  "facility": "workshop",
+  "output": {
+   "item": "frost_mail",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "frost_iron",
+    "n": 4
+   },
+   {
+    "item": "iron_ore",
+    "n": 2
+   }
+  ],
+  "days": 4,
+  "gold": 200
+ },
+ {
+  "id": "r_pelt_cloak",
+  "name": "毛皮の外套",
+  "facility": "workshop",
+  "output": {
+   "item": "pelt_cloak",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "snow_pelt",
+    "n": 4
+   },
+   {
+    "item": "fang",
+    "n": 2
+   }
+  ],
+  "days": 3,
+  "gold": 150
+ },
+ {
+  "id": "r_ice_charm",
+  "name": "氷のお守り",
+  "facility": "workshop",
+  "output": {
+   "item": "ice_charm",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "ice_shard",
+    "n": 3
+   }
+  ],
+  "days": 2,
+  "gold": 100
+ },
+ {
+  "id": "r_ruin_amulet",
+  "name": "遺跡の護符",
+  "facility": "workshop",
+  "output": {
+   "item": "ruin_amulet",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "relic_shard",
+    "n": 3
+   },
+   {
+    "item": "moon_stone",
+    "n": 1
+   }
+  ],
+  "days": 3,
+  "gold": 200
+ },
+ {
+  "id": "r_moon_blade",
+  "name": "月長の剣",
+  "facility": "workshop",
+  "output": {
+   "item": "moon_blade",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "moon_stone",
+    "n": 2
+   },
+   {
+    "item": "relic_shard",
+    "n": 3
+   },
+   {
+    "item": "frost_iron",
+    "n": 1
+   }
+  ],
+  "days": 5,
+  "gold": 300
+ },
+ {
+  "id": "r_guardian_plate",
+  "name": "守護の板金",
+  "facility": "workshop",
+  "output": {
+   "item": "guardian_plate",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "relic_shard",
+    "n": 4
+   },
+   {
+    "item": "frost_iron",
+    "n": 3
+   },
+   {
+    "item": "iron_ore",
+    "n": 4
+   }
+  ],
+  "days": 5,
+  "gold": 350
+ },
+ {
+  "id": "r_scale_mail",
+  "name": "竜鱗の鎧",
+  "facility": "workshop",
+  "output": {
+   "item": "scale_mail",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "dragon_scale",
+    "n": 3
+   },
+   {
+    "item": "relic_shard",
+    "n": 2
+   }
+  ],
+  "days": 6,
+  "gold": 600,
+  "unlockedBy": "dragon_slain"
+ },
+ {
+  "id": "r_dragon_blade",
+  "name": "竜牙の剣",
+  "facility": "workshop",
+  "output": {
+   "item": "dragon_blade",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "dragon_scale",
+    "n": 2
+   },
+   {
+    "item": "ember_fang",
+    "n": 3
+   }
+  ],
+  "days": 6,
+  "gold": 600,
+  "unlockedBy": "dragon_slain"
  }
 ]

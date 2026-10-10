@@ -3,7 +3,8 @@
 import { powerOf } from './adventurer';
 import { DUNGEON, TUNING } from './data';
 import { exploredRate, parseFloor } from './dungeon';
-import { runExploration } from './explore';
+import { floorTransit, runExploration } from './explore';
+import { heldKeys } from './ledger';
 import { rngFor } from './rng';
 import type { Adventurer, DispatchOrder, GameState } from './types';
 
@@ -65,6 +66,7 @@ export function assessReadiness(s: GameState, o: DispatchOrder, runs = T.runs): 
       members: members.map((m) => structuredClone(m)), leaderId: o.leaderId, policy: o.policy,
       progress, days: o.days, items: { ...(o.items ?? {}) }, relations: s.relations, startDay: s.day,
       action: o.action, target: { item: o.target.item, enemy: o.target.enemy }, knownOnly: true,
+      keys: heldKeys(s), transit: floorTransit(dungeon, floorId, progress, heldKeys(s)) ?? 0,
     });
     if (result.wiped) wipes++;
     if (result.retreated) retreats++;

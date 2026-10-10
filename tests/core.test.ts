@@ -123,6 +123,55 @@ describe('データの整合(JSON同士の参照)', () => {
       }
     }
   });
+  it('扉の鍵は kind: key のアイテム、階段の行き先は同じダンジョンの実在する階', () => {
+    for (const d of DUNGEONS) for (const f of d.floors) for (const c of Object.values(f.legend)) {
+      if (c.kind === 'door') expect(ITEM[c.key!]?.kind, `${d.id}/${f.id} の key ${c.key}`).toBe('key');
+      if (c.to) expect(d.floors.some((x) => x.id === c.to!.floor), `${d.id}/${f.id} の to ${c.to.floor}`).toBe(true);
+    }
+  });
+});
+
+describe('フェーズ6の装備とレシピ(工房)', () => {
+  const table = [
+    { id: 'crystal_blade', name: '水晶の刃', slot: 'weapon', mods: { atk: 9 }, inputs: { crystal: 3, iron_ore: 2 }, gold: 120, days: 3 },
+    { id: 'cloth_robe', name: '古布のローブ', slot: 'armor', armorClass: 'light', mods: { def: 8 }, resist: { dark: 0.4 }, inputs: { ancient_cloth: 4, slime_gel: 2 }, gold: 100, days: 3 },
+    { id: 'ember_ring', name: '熾火の指輪', slot: 'accessory', mods: { atk: 1 }, resist: { fire: 0.35 }, inputs: { wisp_ember: 3, crystal: 1 }, gold: 90, days: 2 },
+    { id: 'frost_edge', name: '霜の刃', slot: 'weapon', mods: { atk: 12 }, inputs: { frost_iron: 3, ice_shard: 2 }, gold: 220, days: 4 },
+    { id: 'frost_mail', name: '霜鉄の鎧', slot: 'armor', armorClass: 'heavy', mods: { def: 15, spd: -1 }, resist: { ice: 0.4 }, inputs: { frost_iron: 4, iron_ore: 2 }, gold: 200, days: 4 },
+    { id: 'pelt_cloak', name: '毛皮の外套', slot: 'armor', armorClass: 'medium', mods: { def: 11 }, resist: { ice: 0.35 }, inputs: { snow_pelt: 4, fang: 2 }, gold: 150, days: 3 },
+    { id: 'ice_charm', name: '氷のお守り', slot: 'accessory', mods: { scout: 1 }, resist: { ice: 0.4 }, inputs: { ice_shard: 3 }, gold: 100, days: 2 },
+    { id: 'ruin_amulet', name: '遺跡の護符', slot: 'accessory', mods: { def: 2 }, resist: { earth: 0.3, dark: 0.3, fire: 0.2 }, inputs: { relic_shard: 3, moon_stone: 1 }, gold: 200, days: 3 },
+    { id: 'moon_blade', name: '月長の剣', slot: 'weapon', mods: { atk: 15 }, inputs: { moon_stone: 2, relic_shard: 3, frost_iron: 1 }, gold: 300, days: 5 },
+    { id: 'guardian_plate', name: '守護の板金', slot: 'armor', armorClass: 'heavy', mods: { def: 18, spd: -1 }, resist: { earth: 0.4, fire: 0.2 }, inputs: { relic_shard: 4, frost_iron: 3, iron_ore: 4 }, gold: 350, days: 5 },
+    { id: 'scale_mail', name: '竜鱗の鎧', slot: 'armor', armorClass: 'heavy', mods: { def: 24 }, resist: { fire: 0.6 }, inputs: { dragon_scale: 3, relic_shard: 2 }, gold: 600, days: 6, unlockedBy: 'dragon_slain' },
+    { id: 'dragon_blade', name: '竜牙の剣', slot: 'weapon', mods: { atk: 22 }, inputs: { dragon_scale: 2, ember_fang: 3 }, gold: 600, days: 6, unlockedBy: 'dragon_slain' },
+  ];
+  it('装備12種の枠・補正・耐性がプランの表どおり', () => {
+    for (const t of table) {
+      const item = ITEM[t.id];
+      expect(item, t.id).toBeDefined();
+      expect([item.name, item.kind, item.equip?.slot, item.equip?.armorClass, item.equip?.mods, item.equip?.resist], t.id)
+        .toEqual([t.name, t.slot, t.slot, t.armorClass, t.mods, t.resist]);
+    }
+  });
+  it('重さは1〜3、売値は素材の売値合計の半分(±5)', () => {
+    for (const t of table) {
+      const item = ITEM[t.id];
+      expect(item.weight, t.id).toBeGreaterThanOrEqual(1);
+      expect(item.weight, t.id).toBeLessThanOrEqual(3);
+      const sum = Object.entries(t.inputs).reduce((s, [id, n]) => s + ITEM[id].price * n, 0);
+      expect(Math.abs(item.price - sum / 2), t.id).toBeLessThanOrEqual(5);
+    }
+  });
+  it('レシピは r_<装備ID>・工房、素材・資金・日数が表どおり。竜鱗の2つだけ竜の討伐で解放', () => {
+    for (const t of table) {
+      const r = RECIPES.find((x) => x.id === `r_${t.id}`);
+      expect(r, t.id).toBeDefined();
+      expect([r!.name, r!.facility, r!.output, r!.gold, r!.days, r!.unlockedBy], t.id)
+        .toEqual([t.name, 'workshop', { item: t.id, n: 1 }, t.gold, t.days, t.unlockedBy]);
+      expect(Object.fromEntries(r!.inputs.map((i) => [i.item, i.n])), t.id).toEqual(t.inputs);
+    }
+  });
 });
 
 describe('tuning', () => {

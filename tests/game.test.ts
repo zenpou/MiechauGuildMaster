@@ -17,7 +17,7 @@ import { planSteps, route } from '../src/core/world';
 import { trainSkill } from '../src/core/training';
 import { uniqueAdventurer } from '../src/core/events';
 import { pairKey } from '../src/core/relations';
-import { UNIQUE } from '../src/core/data';
+import { DUNGEON as DUNGEONS_T, UNIQUE } from '../src/core/data';
 import type { DispatchOrder, Expedition, GameState, Quest } from '../src/core/types';
 
 function order(s: GameState, o: Partial<DispatchOrder> = {}): DispatchOrder {
@@ -825,5 +825,56 @@ describe('実績・竜の討伐の組み込み', () => {
     expect(s.dragonDefeated).toBe(true);
     expect(s.flags['unlock:dragon_slain']).toBe(true);
     expect(s.achievements).toContain('s_dragon');
+  });
+});
+
+describe('複数フロア・鍵の組み込み', () => {
+  const walkable = (dungeonId: string, floor = 0) => {
+    const g = parseFloor(DUNGEONS_T[dungeonId].floors[floor]);
+    return g.cells.flatMap((c, i) => (c.kind !== 'wall' && c.kind !== 'hidden' ? [i] : []));
+  };
+  const toFloor2 = (s: GameState, dungeonId: string): DispatchOrder =>
+    order(s, { target: { dungeon: dungeonId, floor: 'f2' }, days: 7 });
+
+  it('2階は、前の階の下り階段を踏んでいないと出せない', () => {
+    const s = newGame(60);
+    s.dungeons.ruined_tower.confirmed = true;
+    const r = dispatch(s, toFloor2(s, 'ruined_tower'));
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toContain('階段');
+  });
+
+  it('階段を踏んでいれば2階へ出せて、前の階を抜ける歩数を払う', () => {
+    const s = newGame(60);
+    s.dungeons.ruined_tower.confirmed = true;
+    s.dungeons.ruined_tower.floors.f1.visited = walkable('ruined_tower');
+    const r = dispatch(s, toFloor2(s, 'ruined_tower'));
+    expect(r.ok).toBe(true);
+    if (r.ok && !r.expedition.result.wiped) {
+      expect(r.expedition.result.log.some((l) => l.text.includes('前の階を抜けて'))).toBe(true);
+    }
+  });
+
+  it('階段までの道に鍵の扉があるなら、鍵を持っていないと2階へ出せない(持っていれば出せる)', () => {
+    const s = newGame(61);
+    s.dungeons.sunken_ruins.confirmed = true;
+    s.dungeons.sunken_ruins.floors.f1.visited = walkable('sunken_ruins');
+    expect(dispatch(s, toFloor2(s, 'sunken_ruins')).ok).toBe(false);
+    s.inventory.ruin_key = 1;
+    expect(dispatch(s, toFloor2(s, 'sunken_ruins')).ok).toBe(true);
+  });
+
+  it('帰還で持ち帰った鍵は在庫に入り、すでに持っていれば増えない(最大1個)', () => {
+    const keyReturn = (have: number) => {
+      const s = newGame(62);
+      if (have) s.inventory.ruin_key = have;
+      const r = dispatch(s, order(s, { days: 1 }));
+      expect(r.ok).toBe(true);
+      s.expeditions[0].result.items = { ...s.expeditions[0].result.items, ruin_key: 1 };
+      for (let i = 0; i < 6 && s.expeditions.length; i++) advanceDay(s);
+      return s.inventory.ruin_key ?? 0;
+    };
+    expect(keyReturn(0)).toBe(1);
+    expect(keyReturn(1)).toBe(1);
   });
 });

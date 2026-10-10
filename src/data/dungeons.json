@@ -214,9 +214,9 @@
      "################",
      "#x.........^..D#",
      "#...#####.####.#",
-     "#...#####T####H#",
-     "##.###########H#",
-     "##.########....#",
+     "#...#kH##T####H#",
+     "##.###H#######H#",
+     "##.###H####....#",
      "##.###.g.##..y.#",
      "##...c...##....#",
      "##.###T..###.###",
@@ -271,6 +271,10 @@
      "y": {
       "kind": "nest",
       "enemy": "gargoyle"
+     },
+     "k": {
+      "kind": "treasure",
+      "item": "ruin_key"
      }
     }
    },
@@ -367,6 +371,462 @@
   ],
   "recommended": 480,
   "rescueCost": 400,
+  "encounterRate": 0.05
+ },
+ {
+  "id": "frost_valley",
+  "name": "凍てつく谷",
+  "desc": "学院の街の北東、一年中氷に閉ざされた谷。最奥には霜の巨人が座り込んでいる。",
+  "node": "frost_valley",
+  "floors": [
+   {
+    "id": "f1",
+    "name": "谷底",
+    "rows": [
+     "################",
+     "#.....#...T....#",
+     "#.G...........##",
+     "#.....###.###.##",
+     "###H###f...s#..#",
+     "###H###..i..##^#",
+     "###H#########..#",
+     "##...########.##",
+     "#.............##",
+     "#.w..##.###..###",
+     "#T..f##.###....#",
+     "#######.###.#b.#",
+     "##........#..^.#",
+     "##.^......#p...#",
+     "##s......w######",
+     "#######E########"
+    ],
+    "legend": {
+     "#": {
+      "kind": "wall"
+     },
+     ".": {
+      "kind": "floor"
+     },
+     "E": {
+      "kind": "entrance"
+     },
+     "G": {
+      "kind": "symbol",
+      "enemy": "frost_giant"
+     },
+     "T": {
+      "kind": "treasure"
+     },
+     "H": {
+      "kind": "hidden"
+     },
+     "f": {
+      "kind": "gather",
+      "item": "frost_iron"
+     },
+     "s": {
+      "kind": "gather",
+      "item": "ice_shard"
+     },
+     "p": {
+      "kind": "gather",
+      "item": "snow_pelt"
+     },
+     "i": {
+      "kind": "nest",
+      "enemy": "ice_imp"
+     },
+     "w": {
+      "kind": "nest",
+      "enemy": "frost_wolf"
+     },
+     "b": {
+      "kind": "nest",
+      "enemy": "snow_beast"
+     },
+     "^": {
+      "kind": "trap",
+      "trap": "ice"
+     }
+    }
+   }
+  ],
+  "enemies": [
+   {
+    "id": "frost_wolf",
+    "weight": 4,
+    "group": [
+     1,
+     2
+    ]
+   },
+   {
+    "id": "ice_imp",
+    "weight": 3,
+    "group": [
+     2,
+     3
+    ]
+   },
+   {
+    "id": "snow_beast",
+    "weight": 3,
+    "group": [
+     1,
+     1
+    ]
+   }
+  ],
+  "recommended": 640,
+  "rescueCost": 600,
+  "encounterRate": 0.05
+ },
+ {
+  "id": "sunken_ruins",
+  "name": "沈んだ遺跡",
+  "desc": "湖に半ば沈んだ古代の遺跡。奥の扉は古い鍵でしか開かず、下の階では守護像が紋章を守っている。",
+  "node": "sunken_ruins",
+  "floors": [
+   {
+    "id": "f1",
+    "name": "地下1階",
+    "rows": [
+     "#######E########",
+     "#x....#.#.....x#",
+     "#...n.#.#..^...#",
+     "#.....#.#......#",
+     "###.###.####.###",
+     "#o........^....#",
+     "###.###.####.###",
+     "#.....#.#....n.#",
+     "#T....#.#......#",
+     "#######d########",
+     "#######.########",
+     "##..^.....r...##",
+     "##.#########.###",
+     "#....#####.....#",
+     "#D...#####T...m#",
+     "################"
+    ],
+    "legend": {
+     "#": {
+      "kind": "wall"
+     },
+     ".": {
+      "kind": "floor"
+     },
+     "E": {
+      "kind": "entrance"
+     },
+     "T": {
+      "kind": "treasure"
+     },
+     "^": {
+      "kind": "trap",
+      "trap": "flood"
+     },
+     "x": {
+      "kind": "gather",
+      "item": "relic_shard"
+     },
+     "o": {
+      "kind": "gather",
+      "item": "old_coin"
+     },
+     "m": {
+      "kind": "gather",
+      "item": "moon_stone"
+     },
+     "n": {
+      "kind": "nest",
+      "enemy": "drowned"
+     },
+     "r": {
+      "kind": "nest",
+      "enemy": "wraith"
+     },
+     "d": {
+      "kind": "door",
+      "key": "ruin_key"
+     },
+     "D": {
+      "kind": "stairs_down",
+      "to": {
+       "floor": "f2",
+       "x": 1,
+       "y": 14
+      }
+     }
+    }
+   },
+   {
+    "id": "f2",
+    "name": "地下2階",
+    "rows": [
+     "################",
+     "#m...###########",
+     "#..r.###.....###",
+     "#....###.....Wk#",
+     "##.#####.....###",
+     "##.#######.#####",
+     "##.####.....####",
+     "##.####.^..s####",
+     "##.####.....####",
+     "##.######.######",
+     "##..........o###",
+     "####.######.####",
+     "##....####.....#",
+     "##....####...s.#",
+     "#UE...####^...x#",
+     "################"
+    ],
+    "legend": {
+     "#": {
+      "kind": "wall"
+     },
+     ".": {
+      "kind": "floor"
+     },
+     "E": {
+      "kind": "entrance"
+     },
+     "^": {
+      "kind": "trap",
+      "trap": "flood"
+     },
+     "x": {
+      "kind": "gather",
+      "item": "relic_shard"
+     },
+     "o": {
+      "kind": "gather",
+      "item": "old_coin"
+     },
+     "m": {
+      "kind": "gather",
+      "item": "moon_stone"
+     },
+     "s": {
+      "kind": "nest",
+      "enemy": "stone_sentinel"
+     },
+     "r": {
+      "kind": "nest",
+      "enemy": "wraith"
+     },
+     "W": {
+      "kind": "symbol",
+      "enemy": "ruin_warden"
+     },
+     "k": {
+      "kind": "treasure",
+      "item": "dragon_crest"
+     },
+     "U": {
+      "kind": "stairs_up",
+      "to": {
+       "floor": "f1",
+       "x": 1,
+       "y": 14
+      }
+     }
+    }
+   }
+  ],
+  "enemies": [
+   {
+    "id": "drowned",
+    "weight": 4,
+    "group": [
+     1,
+     2
+    ]
+   },
+   {
+    "id": "stone_sentinel",
+    "weight": 3,
+    "group": [
+     1,
+     1
+    ]
+   },
+   {
+    "id": "wraith",
+    "weight": 3,
+    "group": [
+     1,
+     2
+    ]
+   }
+  ],
+  "recommended": 780,
+  "rescueCost": 800,
+  "encounterRate": 0.05
+ },
+ {
+  "id": "dragon_lair",
+  "name": "竜の寝床",
+  "desc": "高山の関の先、火口へ続く洞穴。紋章の封印の奥で竜が眠っている。",
+  "node": "dragon_lair",
+  "floors": [
+   {
+    "id": "f1",
+    "name": "洞穴",
+    "rows": [
+     "################",
+     "#f..######....D#",
+     "#.i.######.c...#",
+     "###.######...y.#",
+     "###.######.#####",
+     "#......###.#####",
+     "#.#..#.###.#####",
+     "#.##..g###.#####",
+     "E..^....d..#####",
+     "#..##..###.#####",
+     "#.#..#.###...i.#",
+     "#....^.###..^..#",
+     "###.######....f#",
+     "##....c#########",
+     "##.....#########",
+     "################"
+    ],
+    "legend": {
+     "#": {
+      "kind": "wall"
+     },
+     ".": {
+      "kind": "floor"
+     },
+     "E": {
+      "kind": "entrance"
+     },
+     "^": {
+      "kind": "trap",
+      "trap": "flame"
+     },
+     "f": {
+      "kind": "gather",
+      "item": "ember_fang"
+     },
+     "c": {
+      "kind": "gather",
+      "item": "magma_core"
+     },
+     "i": {
+      "kind": "nest",
+      "enemy": "fire_imp"
+     },
+     "g": {
+      "kind": "nest",
+      "enemy": "magma_slug"
+     },
+     "y": {
+      "kind": "nest",
+      "enemy": "drake"
+     },
+     "d": {
+      "kind": "door",
+      "key": "dragon_crest"
+     },
+     "D": {
+      "kind": "stairs_down",
+      "to": {
+       "floor": "f2",
+       "x": 14,
+       "y": 1
+      }
+     }
+    }
+   },
+   {
+    "id": "f2",
+    "name": "火口",
+    "rows": [
+     "################",
+     "###T....#....EU#",
+     "###...........##",
+     "###.y...#####.##",
+     "###.....#####.##",
+     "#############.##",
+     "#############.g#",
+     "#############.##",
+     "#############.##",
+     "##.....i......##",
+     "##.#############",
+     "##.........#####",
+     "####.......#####",
+     "####.......#####",
+     "####......B#####",
+     "################"
+    ],
+    "legend": {
+     "#": {
+      "kind": "wall"
+     },
+     ".": {
+      "kind": "floor"
+     },
+     "E": {
+      "kind": "entrance"
+     },
+     "T": {
+      "kind": "treasure"
+     },
+     "i": {
+      "kind": "nest",
+      "enemy": "fire_imp"
+     },
+     "g": {
+      "kind": "nest",
+      "enemy": "magma_slug"
+     },
+     "y": {
+      "kind": "nest",
+      "enemy": "drake"
+     },
+     "B": {
+      "kind": "boss",
+      "enemy": "dragon"
+     },
+     "U": {
+      "kind": "stairs_up",
+      "to": {
+       "floor": "f1",
+       "x": 14,
+       "y": 1
+      }
+     }
+    }
+   }
+  ],
+  "enemies": [
+   {
+    "id": "fire_imp",
+    "weight": 4,
+    "group": [
+     2,
+     3
+    ]
+   },
+   {
+    "id": "magma_slug",
+    "weight": 3,
+    "group": [
+     1,
+     2
+    ]
+   },
+   {
+    "id": "drake",
+    "weight": 3,
+    "group": [
+     1,
+     1
+    ]
+   }
+  ],
+  "recommended": 1100,
+  "rescueCost": 1500,
   "encounterRate": 0.05
  }
 ]

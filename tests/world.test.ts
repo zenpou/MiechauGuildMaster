@@ -5,7 +5,8 @@ import { edgeBetween, planSteps, route, simulateTravel, travelDays } from '../sr
 import type { Adventurer, Stats } from '../src/core/types';
 
 // テストリスト
-// - [x] world.json: ノード8・道8、道ID は <a>__<b>、近道は hidden、噂のダンジョン、街の掲示板上限
+// - [x] world.json: ノード12・道12、道ID は <a>__<b>、近道は hidden、噂のダンジョン、街の掲示板上限
+// - [x] フェーズ6: 谷・遺跡・高山の関・寝床のノードと道4本。拠点→谷4日・遺跡3日・寝床3日
 // - [x] travelDays: 既知の道だけで最短日数。hidden は found のときだけ
 // - [x] route: hidden の有無で経路(通る道)が変わる
 // - [x] edgeBetween: 2本ある区間は使える中で速い道
@@ -34,10 +35,11 @@ const strong = (job = 'fighter') => [adv('s1', job, { hp: 2000, atk: 400, def: 2
 const weak = () => [adv('w1', 'fighter', { hp: 20, atk: 3, def: 0, spd: 1 })];
 
 describe('world.json', () => {
-  it('ノード8つ・道8本がプランの表どおり', () => {
-    expect(WORLD.nodes.map((n) => n.id).sort()).toEqual(
-      ['academy_town', 'base', 'camp_north', 'forest_cave', 'forge_town', 'mountain_village', 'old_mine', 'ruined_tower'],
-    );
+  it('ノード12・道12本がプランの表どおり', () => {
+    expect(WORLD.nodes.map((n) => n.id).sort()).toEqual([
+      'academy_town', 'base', 'camp_north', 'dragon_lair', 'forest_cave', 'forge_town', 'frost_valley', 'high_pass',
+      'mountain_village', 'old_mine', 'ruined_tower', 'sunken_ruins',
+    ]);
     const e = (id: string) => [EDGE[id]?.days, EDGE[id]?.danger, EDGE[id]?.hidden ?? false];
     expect(e('base__forest_cave')).toEqual([0, 0.05, false]);
     expect(e('base__mountain_village')).toEqual([1, 0.15, false]);
@@ -47,7 +49,11 @@ describe('world.json', () => {
     expect(e('base__camp_north')).toEqual([1, 0.1, false]);
     expect(e('academy_town__camp_north')).toEqual([1, 0.1, false]);
     expect(e('mountain_village__old_mine_short')).toEqual([0, 0.3, true]);
-    expect(WORLD.edges).toHaveLength(8);
+    expect(e('academy_town__sunken_ruins')).toEqual([1, 0.3, false]);
+    expect(e('academy_town__frost_valley')).toEqual([2, 0.35, false]);
+    expect(e('high_pass__mountain_village')).toEqual([1, 0.3, false]);
+    expect(e('dragon_lair__high_pass')).toEqual([1, 0.5, false]);
+    expect(WORLD.edges).toHaveLength(12);
   });
   it('道の ID は両端をアルファベット順に並べたもの(近道は _short)、両端は実在するノード', () => {
     for (const e of WORLD.edges) {
@@ -57,12 +63,17 @@ describe('world.json', () => {
       expect(e.id.replace(/_short$/, '')).toBe(`${e.a}__${e.b}`);
     }
   });
-  it('ダンジョンのノードはダンジョンを指し、塔と坑道は噂', () => {
-    for (const n of WORLD.nodes.filter((x) => x.kind === 'dungeon')) expect(DUNGEON[n.dungeon!], n.id).toBeDefined();
+  it('ダンジョンのノードはダンジョンを指し、森の洞窟以外は噂', () => {
+    for (const n of WORLD.nodes.filter((x) => x.kind === 'dungeon')) {
+      expect(DUNGEON[n.dungeon!], n.id).toBeDefined();
+      expect(DUNGEON[n.dungeon!].node, n.id).toBe(n.id);
+    }
     expect(NODE.forest_cave.dungeon).toBe('forest_cave');
     expect(NODE.forest_cave.rumored ?? false).toBe(false);
-    expect(NODE.old_mine.rumored).toBe(true);
-    expect(NODE.ruined_tower.rumored).toBe(true);
+    for (const id of ['old_mine', 'ruined_tower', 'frost_valley', 'sunken_ruins', 'dragon_lair']) {
+      expect(NODE[id].dungeon, id).toBe(id);
+      expect(NODE[id].rumored, id).toBe(true);
+    }
   });
   it('種類と座標', () => {
     const k = (id: string) => [NODE[id].kind, NODE[id].x, NODE[id].y];
@@ -74,6 +85,10 @@ describe('world.json', () => {
     expect(k('ruined_tower')).toEqual(['dungeon', 9, 2]);
     expect(k('camp_north')).toEqual(['waypoint', 5, 3]);
     expect(k('academy_town')).toEqual(['town', 5, 1]);
+    expect(k('sunken_ruins')).toEqual(['dungeon', 3, 1]);
+    expect(k('frost_valley')).toEqual(['dungeon', 7, 0]);
+    expect(k('high_pass')).toEqual(['waypoint', 2, 3]);
+    expect(k('dragon_lair')).toEqual(['dungeon', 2, 1]);
   });
   it('掲示板の上限は拠点4・街3・村2、依頼の重みを持つ', () => {
     expect(NODE.base.town!.boardMax).toBe(4);
@@ -84,7 +99,9 @@ describe('world.json', () => {
     expect(NODE.forge_town.town!.questWeights.hunt).toBeGreaterThan(0);
     expect(NODE.academy_town.town!.questWeights.explore).toBeGreaterThan(0);
     expect(NODE.mountain_village.town!.questWeights.transport).toBeGreaterThan(0);
-    for (const id of ['forest_cave', 'old_mine', 'ruined_tower', 'camp_north']) expect(NODE[id].town, id).toBeUndefined();
+    for (const id of ['forest_cave', 'old_mine', 'ruined_tower', 'camp_north', 'sunken_ruins', 'frost_valley', 'high_pass', 'dragon_lair']) {
+      expect(NODE[id].town, id).toBeUndefined();
+    }
   });
 });
 
@@ -98,6 +115,15 @@ describe('travelDays / route', () => {
     expect(travelDays('base', 'ruined_tower', known)).toBe(3);
     expect(travelDays('base', 'academy_town', known)).toBe(2);
     expect(travelDays('ruined_tower', 'academy_town', known)).toBe(5);
+    expect(travelDays('base', 'frost_valley', known)).toBe(4);
+    expect(travelDays('base', 'sunken_ruins', known)).toBe(3);
+    expect(travelDays('base', 'dragon_lair', known)).toBe(3);
+    expect(travelDays('base', 'high_pass', known)).toBe(2);
+  });
+  it('新しいダンジョンへの経路(谷・遺跡は学院の街、寝床は山村と高山の関を通る)', () => {
+    expect(route('base', 'frost_valley', known)).toEqual(['base', 'camp_north', 'academy_town', 'frost_valley']);
+    expect(route('base', 'sunken_ruins', known)).toEqual(['base', 'camp_north', 'academy_town', 'sunken_ruins']);
+    expect(route('base', 'dragon_lair', known)).toEqual(['base', 'mountain_village', 'high_pass', 'dragon_lair']);
   });
   it('経路はノード列(両端を含む)', () => {
     expect(route('base', 'ruined_tower', known)).toEqual(['base', 'forge_town', 'ruined_tower']);

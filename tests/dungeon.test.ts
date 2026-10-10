@@ -19,6 +19,11 @@ import type { PassKnowledge } from '../src/core/dungeon';
 // - [ ] forest_cave: 通行可能 60〜75、全マス到達、hidden 閉でも symbol 到達、内訳
 // - [ ] old_mine: 14×14、通行可能 80〜100、全マス到達、hidden 閉でも symbol 到達、symbol まで 閉28〜34/開20〜24歩
 // - [ ] ruined_tower: 16×16×2フロア、内訳、到達性、階段の to が相互参照、敵と素材
+// - [ ] ruined_tower f1: 3マスの隠し通路の奥に ruin_key の宝箱
+// - [ ] frost_valley: 16×16、通行可能 110〜130、内訳、隠し通路を閉じても symbol へ、symbol まで 30〜36歩
+// - [ ] sunken_ruins: f1 100〜120 / f2 80〜100、f1 の扉(ruin_key)の奥に階段、f2 の守護像のすぐ奥に dragon_crest
+// - [ ] dragon_lair: f1 90〜110 / f2 70〜90、f1 の扉(dragon_crest)の奥に階段、f2 の最奥に竜(28〜34歩)
+// - [ ] フェーズ6の敵12・素材9・鍵2・建材2
 
 const legend: FloorDef['legend'] = {
   '#': { kind: 'wall' },
@@ -475,12 +480,24 @@ describe('ruined_tower', () => {
     expect(count('gather')).toBe(4);
     expect(count('nest')).toBe(3);
     expect(count('symbol')).toBe(0);
-    expect(count('treasure')).toBe(2);
+    expect(count('treasure')).toBe(3);
     expect(count('trap')).toBe(2);
-    expect(count('hidden')).toBe(2);
+    expect(count('hidden')).toBe(5);
     expect(kinds(g, 'gather', 'item')).toEqual(['ancient_cloth', 'ancient_cloth', 'crystal', 'crystal']);
     expect(kinds(g, 'nest', 'enemy')).toEqual(['gargoyle', 'ghoul', 'ghoul']);
+    expect(kinds(g, 'treasure', 'item')).toEqual(['ruin_key', undefined, undefined]);
     expect(ofKind(g, 'trap').every((i) => g.cells[i].trap === 'glyph')).toBe(true);
+  });
+  it('ruin_key の宝箱は3マスの隠し通路の奥にあり、隠し通路を見つけないと届かない', () => {
+    const g = floorOf('f1');
+    const key = ofKind(g, 'treasure').find((i) => g.cells[i].item === 'ruin_key')!;
+    expect(shortestPath(g, g.entrance, key, everything(g), none)).toBeNull();
+    const path = shortestPath(g, g.entrance, key, everything(g), allFound(g))!;
+    expect(path.filter((i) => g.cells[i].kind === 'hidden')).toHaveLength(3);
+    // 近道の隠し通路(下り階段の手前)とは別の枝
+    const stairs = ofKind(g, 'stairs_down')[0];
+    const toStairs = shortestPath(g, g.entrance, stairs, everything(g), allFound(g))!;
+    expect(path.filter((i) => g.cells[i].kind === 'hidden').some((h) => toStairs.includes(h))).toBe(false);
   });
   it('f2 のマスの内訳がプラン通り', () => {
     const g = floorOf('f2');
@@ -574,5 +591,283 @@ describe('廃れた塔の敵と素材', () => {
     expect(pick('ancient_cloth')).toEqual(['古布', 'material', 28, 1, 'ruined_tower']);
     expect(pick('crystal')).toEqual(['水晶', 'material', 60, 2, 'ruined_tower']);
     expect(pick('wisp_ember')).toEqual(['鬼火の残り火', 'material', 45, 1, undefined]);
+  });
+});
+
+// ヘルパを中に閉じるのは、並行して足される他の describe と名前がぶつからないように
+describe('フェーズ6のダンジョン', () => {
+  type Grid = ReturnType<typeof parseFloor>;
+  const gridOf = (dungeonId: string, floorId: string) =>
+    parseFloor(DUNGEON[dungeonId].floors.find((f) => f.id === floorId)!);
+  const cellsOf = (g: Grid, kind: CellKind) => g.cells.map((c, i) => (c.kind === kind ? i : -1)).filter((i) => i >= 0);
+  const passable = (g: Grid) => g.cells.map((c, i) => (c.kind === 'wall' ? -1 : i)).filter((i) => i >= 0);
+  const allKnown = (g: Grid) => new Set(g.cells.map((_, i) => i));
+  const know = (g: Grid, keys: string[], hidden: boolean): PassKnowledge =>
+    ({ keys, hiddenFound: hidden ? cellsOf(g, 'hidden') : [] });
+  const stepsTo = (g: Grid, to: number, k: PassKnowledge) => {
+    const p = shortestPath(g, g.entrance, to, allKnown(g), k);
+    return p ? p.length - 1 : null;
+  };
+  const tally = (g: Grid, kind: CellKind, key: 'item' | 'enemy' | 'trap' | 'key') =>
+    cellsOf(g, kind).map((i) => g.cells[i][key]).sort();
+  function reachableAvoiding(g: Grid, avoid: number, k: PassKnowledge): Set<number> {
+    const seen = new Set([g.entrance]);
+    const queue = [g.entrance];
+    while (queue.length > 0) {
+      for (const n of neighbors(g, queue.shift()!, k)) {
+        if (n === avoid || seen.has(n)) continue;
+        seen.add(n);
+        queue.push(n);
+      }
+    }
+    return seen;
+  }
+  function expectLinkedStairs(dungeonId: string) {
+    const f1 = gridOf(dungeonId, 'f1');
+    const f2 = gridOf(dungeonId, 'f2');
+    const down = cellsOf(f1, 'stairs_down')[0];
+    const up = cellsOf(f2, 'stairs_up')[0];
+    expect(f1.cells[down].to).toEqual({ floor: 'f2', ...xy(f2, up) });
+    expect(f2.cells[up].to).toEqual({ floor: 'f1', ...xy(f1, down) });
+    expect(neighbors(f2, up, none)).toContain(f2.entrance);
+  }
+  function expectBetween(n: number | null, lo: number, hi: number, label: string) {
+    expect(n, label).not.toBeNull();
+    expect(n!, label).toBeGreaterThanOrEqual(lo);
+    expect(n!, label).toBeLessThanOrEqual(hi);
+  }
+
+  describe('frost_valley', () => {
+    const g = () => gridOf('frost_valley', 'f1');
+
+    it('フロア f1 が1枚、16×16、通行可能マスは110〜130', () => {
+      expect(DUNGEON.frost_valley.floors.map((f) => f.id)).toEqual(['f1']);
+      expect([g().width, g().height]).toEqual([16, 16]);
+      expectBetween(passable(g()).length, 110, 130, '通行可能');
+    });
+    it('マスの内訳がプラン通り', () => {
+      const count = (kind: CellKind) => cellsOf(g(), kind).length;
+      expect(count('entrance')).toBe(1);
+      expect(count('stairs_down') + count('stairs_up') + count('door') + count('boss')).toBe(0);
+      expect(tally(g(), 'nest', 'enemy')).toEqual(['frost_wolf', 'frost_wolf', 'ice_imp', 'snow_beast']);
+      expect(tally(g(), 'gather', 'item')).toEqual(['frost_iron', 'frost_iron', 'ice_shard', 'ice_shard', 'snow_pelt']);
+      expect(tally(g(), 'symbol', 'enemy')).toEqual(['frost_giant']);
+      expect(tally(g(), 'treasure', 'item')).toEqual([undefined, undefined]);
+      expect(tally(g(), 'trap', 'trap')).toEqual(['ice', 'ice', 'ice']);
+      expect(count('hidden')).toBe(3);
+    });
+    it('隠し通路を開ければ全マスへ、閉じていても symbol へ到達できる', () => {
+      for (const i of passable(g())) expect(stepsTo(g(), i, know(g(), [], true)), `${i}`).not.toBeNull();
+      expect(stepsTo(g(), cellsOf(g(), 'symbol')[0], know(g(), [], false))).not.toBeNull();
+    });
+    it('入口から symbol まで 30〜36歩。隠し通路(3マス一続き)はその近道', () => {
+      const symbol = cellsOf(g(), 'symbol')[0];
+      const closed = stepsTo(g(), symbol, know(g(), [], false));
+      expectBetween(closed, 30, 36, '閉');
+      const path = shortestPath(g(), g().entrance, symbol, allKnown(g()), know(g(), [], true))!;
+      expect(path.length - 1).toBeLessThan(closed!);
+      expect(cellsOf(g(), 'hidden').every((h) => path.includes(h))).toBe(true);
+    });
+    it('出現敵・推奨戦力・救助費用・遭遇率', () => {
+      const d = DUNGEON.frost_valley;
+      expect(d.node).toBe('frost_valley');
+      expect(d.enemies.map((e) => e.id)).toEqual(['frost_wolf', 'ice_imp', 'snow_beast']);
+      expect([d.recommended, d.rescueCost, d.encounterRate]).toEqual([640, 600, 0.05]);
+    });
+  });
+
+  describe('sunken_ruins', () => {
+    const f1 = () => gridOf('sunken_ruins', 'f1');
+    const f2 = () => gridOf('sunken_ruins', 'f2');
+    const withKey = (g: Grid) => know(g, ['ruin_key'], true);
+
+    it('フロア f1 / f2、どちらも 16×16。通行可能マスは f1 100〜120 / f2 80〜100', () => {
+      expect(DUNGEON.sunken_ruins.floors.map((f) => f.id)).toEqual(['f1', 'f2']);
+      for (const g of [f1(), f2()]) expect([g.width, g.height]).toEqual([16, 16]);
+      expectBetween(passable(f1()).length, 100, 120, 'f1');
+      expectBetween(passable(f2()).length, 80, 100, 'f2');
+    });
+    it('f1 のマスの内訳がプラン通り', () => {
+      const g = f1();
+      const count = (kind: CellKind) => cellsOf(g, kind).length;
+      expect(count('entrance')).toBe(1);
+      expect(count('stairs_down')).toBe(1);
+      expect(count('stairs_up') + count('symbol') + count('boss') + count('hidden')).toBe(0);
+      expect(tally(g, 'door', 'key')).toEqual(['ruin_key']);
+      expect(tally(g, 'nest', 'enemy')).toEqual(['drowned', 'drowned', 'wraith']);
+      expect(tally(g, 'gather', 'item')).toEqual(['moon_stone', 'old_coin', 'relic_shard', 'relic_shard']);
+      expect(tally(g, 'treasure', 'item')).toEqual([undefined, undefined]);
+      expect(tally(g, 'trap', 'trap')).toEqual(['flood', 'flood', 'flood']);
+    });
+    it('f1: 鍵が無いと下り階段に届かず、ruin_key があれば全マスへ届く', () => {
+      const g = f1();
+      expect(stepsTo(g, cellsOf(g, 'stairs_down')[0], know(g, [], true))).toBeNull();
+      for (const i of passable(g)) expect(stepsTo(g, i, withKey(g)), `${i}`).not.toBeNull();
+    });
+    it('f1: 扉は入口から階段へ行く途中の中ほど。鍵が無くても手前の5〜8割は歩ける', () => {
+      const g = f1();
+      const door = cellsOf(g, 'door')[0];
+      const stairs = cellsOf(g, 'stairs_down')[0];
+      const path = shortestPath(g, g.entrance, stairs, allKnown(g), withKey(g))!;
+      expect(path).toContain(door);
+      const ratio = path.indexOf(door) / (path.length - 1);
+      expect(ratio).toBeGreaterThanOrEqual(0.3);
+      expect(ratio).toBeLessThanOrEqual(0.7);
+      const front = passable(g).filter((i) => stepsTo(g, i, know(g, [], true)) !== null).length;
+      expectBetween(front / passable(g).length, 0.5, 0.8, '手前の割合');
+    });
+    it('f2 のマスの内訳がプラン通り', () => {
+      const g = f2();
+      const count = (kind: CellKind) => cellsOf(g, kind).length;
+      expect(count('entrance')).toBe(1);
+      expect(count('stairs_up')).toBe(1);
+      expect(count('stairs_down') + count('door') + count('boss') + count('hidden')).toBe(0);
+      expect(tally(g, 'nest', 'enemy')).toEqual(['stone_sentinel', 'stone_sentinel', 'wraith']);
+      expect(tally(g, 'gather', 'item')).toEqual(['moon_stone', 'old_coin', 'relic_shard']);
+      expect(tally(g, 'symbol', 'enemy')).toEqual(['ruin_warden']);
+      expect(tally(g, 'treasure', 'item')).toEqual(['dragon_crest']);
+      expect(tally(g, 'trap', 'trap')).toEqual(['flood', 'flood']);
+    });
+    it('f2: 入口から全マスへ届き、dragon_crest は守護像を越えたすぐ奥(守護像を避けると届かない)', () => {
+      const g = f2();
+      for (const i of passable(g)) expect(stepsTo(g, i, none), `${i}`).not.toBeNull();
+      const symbol = cellsOf(g, 'symbol')[0];
+      const crest = cellsOf(g, 'treasure')[0];
+      expect(reachableAvoiding(g, symbol, none).has(crest)).toBe(false);
+      expectBetween(stepsTo(g, crest, none)! - stepsTo(g, symbol, none)!, 1, 3, '守護像から紋章');
+    });
+    it('階段の to が互いを指し、f2 の入口は上り階段の隣', () => {
+      expectLinkedStairs('sunken_ruins');
+    });
+    it('出現敵・推奨戦力・救助費用・遭遇率', () => {
+      const d = DUNGEON.sunken_ruins;
+      expect(d.node).toBe('sunken_ruins');
+      expect(d.enemies.map((e) => e.id)).toEqual(['drowned', 'stone_sentinel', 'wraith']);
+      expect([d.recommended, d.rescueCost, d.encounterRate]).toEqual([780, 800, 0.05]);
+    });
+  });
+
+  describe('dragon_lair', () => {
+    const f1 = () => gridOf('dragon_lair', 'f1');
+    const f2 = () => gridOf('dragon_lair', 'f2');
+
+    it('フロア f1 / f2、どちらも 16×16。通行可能マスは f1 90〜110 / f2 70〜90', () => {
+      expect(DUNGEON.dragon_lair.floors.map((f) => f.id)).toEqual(['f1', 'f2']);
+      for (const g of [f1(), f2()]) expect([g.width, g.height]).toEqual([16, 16]);
+      expectBetween(passable(f1()).length, 90, 110, 'f1');
+      expectBetween(passable(f2()).length, 70, 90, 'f2');
+    });
+    it('f1 のマスの内訳がプラン通り', () => {
+      const g = f1();
+      const count = (kind: CellKind) => cellsOf(g, kind).length;
+      expect(count('entrance')).toBe(1);
+      expect(count('stairs_down')).toBe(1);
+      expect(count('stairs_up') + count('symbol') + count('boss') + count('hidden') + count('treasure')).toBe(0);
+      expect(tally(g, 'door', 'key')).toEqual(['dragon_crest']);
+      expect(tally(g, 'nest', 'enemy')).toEqual(['drake', 'fire_imp', 'fire_imp', 'magma_slug']);
+      expect(tally(g, 'gather', 'item')).toEqual(['ember_fang', 'ember_fang', 'magma_core', 'magma_core']);
+      expect(tally(g, 'trap', 'trap')).toEqual(['flame', 'flame', 'flame']);
+    });
+    it('f1: 鍵が無いと下り階段に届かず、dragon_crest があれば全マスへ届く。扉は階段への途中', () => {
+      const g = f1();
+      const stairs = cellsOf(g, 'stairs_down')[0];
+      expect(stepsTo(g, stairs, none)).toBeNull();
+      const withKey = know(g, ['dragon_crest'], true);
+      for (const i of passable(g)) expect(stepsTo(g, i, withKey), `${i}`).not.toBeNull();
+      expect(shortestPath(g, g.entrance, stairs, allKnown(g), withKey)).toContain(cellsOf(g, 'door')[0]);
+    });
+    it('f2 のマスの内訳がプラン通り', () => {
+      const g = f2();
+      const count = (kind: CellKind) => cellsOf(g, kind).length;
+      expect(count('entrance')).toBe(1);
+      expect(count('stairs_up')).toBe(1);
+      expect(count('stairs_down') + count('door') + count('symbol') + count('hidden') + count('gather') + count('trap')).toBe(0);
+      expect(tally(g, 'nest', 'enemy')).toEqual(['drake', 'fire_imp', 'magma_slug']);
+      expect(tally(g, 'boss', 'enemy')).toEqual(['dragon']);
+      expect(tally(g, 'treasure', 'item')).toEqual([undefined]);
+    });
+    it('f2: 入口から全マスへ届き、竜は最奥で 28〜34歩', () => {
+      const g = f2();
+      const dist = passable(g).map((i) => stepsTo(g, i, none));
+      expect(dist.every((d) => d !== null)).toBe(true);
+      const boss = stepsTo(g, cellsOf(g, 'boss')[0], none);
+      expectBetween(boss, 28, 34, '竜まで');
+      expect(boss).toBe(Math.max(...(dist as number[])));
+    });
+    it('階段の to が互いを指し、f2 の入口は上り階段の隣', () => {
+      expectLinkedStairs('dragon_lair');
+    });
+    it('出現敵・推奨戦力・救助費用・遭遇率', () => {
+      const d = DUNGEON.dragon_lair;
+      expect(d.node).toBe('dragon_lair');
+      expect(d.enemies.map((e) => e.id)).toEqual(['fire_imp', 'magma_slug', 'drake']);
+      expect([d.recommended, d.rescueCost, d.encounterRate]).toEqual([1100, 1500, 0.05]);
+    });
+  });
+});
+
+describe('フェーズ6の敵と素材', () => {
+  const pick = (id: string) => {
+    const e = ENEMY[id];
+    return e && [e.name, e.hp, e.atk, e.def, e.mag, e.spd, e.ai, e.element];
+  };
+  it('敵12体の能力値と属性がプランの表どおり', () => {
+    expect(pick('frost_wolf')).toEqual(['霜狼', 130, 52, 14, 0, 16, 'weakest', 'ice']);
+    expect(pick('ice_imp')).toEqual(['氷の小鬼', 80, 48, 8, 0, 18, 'random', 'ice']);
+    expect(pick('snow_beast')).toEqual(['雪獣', 220, 58, 20, 0, 8, 'strongest', 'ice']);
+    expect(pick('frost_giant')).toEqual(['霜の巨人', 950, 66, 30, 0, 7, 'strongest', 'ice']);
+    expect(pick('drowned')).toEqual(['溺れた亡者', 160, 56, 12, 0, 6, 'random', 'dark']);
+    expect(pick('stone_sentinel')).toEqual(['石の歩哨', 260, 60, 32, 0, 5, 'strongest', 'earth']);
+    expect(pick('wraith')).toEqual(['水霊', 110, 64, 6, 0, 20, 'weakest', 'dark']);
+    expect(pick('ruin_warden')).toEqual(['遺跡の守護像', 1200, 72, 34, 0, 8, 'strongest', 'earth']);
+    expect(pick('drake')).toEqual(['幼竜', 380, 78, 26, 0, 14, 'strongest', 'fire']);
+    expect(pick('fire_imp')).toEqual(['火の小鬼', 120, 70, 10, 0, 22, 'random', 'fire']);
+    expect(pick('magma_slug')).toEqual(['溶岩ナメクジ', 300, 62, 28, 0, 4, 'random', 'fire']);
+    expect(pick('dragon')).toEqual(['竜', 2800, 84, 36, 0, 12, 'strongest', 'fire']);
+  });
+  it('耐性・技・シンボルとボス', () => {
+    expect(ENEMY.frost_giant.resist).toEqual({ ice: 0.8, fire: -0.4 });
+    expect(ENEMY.stone_sentinel.resist).toEqual({ earth: 0.5 });
+    expect(ENEMY.wraith.resist).toEqual({ dark: 0.6, ice: 0.3 });
+    expect(ENEMY.drake.resist).toEqual({ fire: 0.7, ice: -0.3 });
+    expect(ENEMY.fire_imp.resist).toEqual({ fire: 0.8 });
+    expect(ENEMY.dragon.resist).toEqual({ fire: 0.9, ice: -0.3 });
+    expect(ENEMY.frost_giant.skill).toEqual({ name: '氷塊投げ', mult: 1.4, cd: 3, aoe: true });
+    expect(ENEMY.ruin_warden.skill).toEqual({ name: '崩落', mult: 1.4, cd: 3, aoe: true });
+    expect(ENEMY.dragon.skill).toEqual({ name: '灼熱のブレス', mult: 1.5, cd: 3, aoe: true });
+    expect([ENEMY.frost_giant.symbol, ENEMY.ruin_warden.symbol, ENEMY.dragon.boss]).toEqual([true, true, true]);
+    expect(ENEMY.dragon.symbol ?? false).toBe(false);
+    expect(ENEMY.dragon.loot).toEqual([{ item: 'dragon_scale', chance: 1 }]);
+  });
+  it('雑魚の落とし物はそのダンジョンの素材', () => {
+    const drops = (id: string) => ENEMY[id].loot.map((l) => l.item);
+    expect(drops('frost_wolf')).toEqual(['snow_pelt']);
+    expect(drops('ice_imp')).toEqual(['ice_shard']);
+    expect(drops('snow_beast')).toEqual(['snow_pelt', 'frost_iron']);
+    expect(drops('drowned')).toEqual(['old_coin']);
+    expect(drops('stone_sentinel')).toEqual(['relic_shard']);
+    expect(drops('wraith')).toEqual(['moon_stone']);
+    expect(drops('drake')).toEqual(['ember_fang']);
+    expect(drops('magma_slug')).toEqual(['magma_core']);
+    for (const id of ['frost_giant', 'ruin_warden']) expect(ENEMY[id].loot.every((l) => l.chance === 1), id).toBe(true);
+  });
+  it('素材9種・鍵2種・建材2種がプランの表どおり', () => {
+    const item = (id: string) => {
+      const it = ITEM[id];
+      return it && [it.name, it.kind, it.price, it.weight, it.source];
+    };
+    expect(item('frost_iron')).toEqual(['霜鉄', 'material', 70, 2, 'frost_valley']);
+    expect(item('ice_shard')).toEqual(['氷片', 'material', 45, 1, 'frost_valley']);
+    expect(item('snow_pelt')).toEqual(['雪獣の毛皮', 'material', 55, 1, 'frost_valley']);
+    expect(item('relic_shard')).toEqual(['遺物の欠片', 'material', 90, 1, 'sunken_ruins']);
+    expect(item('old_coin')).toEqual(['古銭', 'material', 70, 1, 'sunken_ruins']);
+    expect(item('moon_stone')).toEqual(['月長石', 'material', 120, 1, 'sunken_ruins']);
+    expect(item('ember_fang')).toEqual(['熾火の牙', 'material', 95, 1, 'dragon_lair']);
+    expect(item('magma_core')).toEqual(['溶岩核', 'material', 140, 2, 'dragon_lair']);
+    expect(item('dragon_scale')).toEqual(['竜の鱗', 'material', 400, 2, undefined]);
+    expect(item('ruin_key')).toEqual(['遺跡の鍵', 'key', 0, 0, undefined]);
+    expect(item('dragon_crest')).toEqual(['竜の紋章', 'key', 0, 0, undefined]);
+    expect(item('lumber')).toEqual(['木材', 'building', 0, 0, undefined]);
+    expect(item('stone')).toEqual(['石材', 'building', 0, 0, undefined]);
   });
 });
