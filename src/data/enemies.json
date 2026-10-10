@@ -1,20 +1,149 @@
 [
-  {"id":"goblin","name":"ゴブリン","hp":34,"atk":14,"def":4,"mag":0,"spd":8,"exp":6,"ai":"random",
-   "loot":[{"item":"fang","chance":0.3}]},
-  {"id":"wolf","name":"森狼","hp":36,"atk":16,"def":4,"mag":0,"spd":14,"exp":8,"ai":"weakest",
-   "loot":[{"item":"fang","chance":0.5}]},
-  {"id":"slime","name":"洞窟スライム","hp":55,"atk":12,"def":8,"mag":0,"spd":4,"exp":7,"ai":"random",
-   "resist":{"thunder":-0.5},
-   "loot":[{"item":"slime_gel","chance":0.4}]},
-  {"id":"goblin_chief","name":"ゴブリンの頭","hp":120,"atk":22,"def":8,"mag":0,"spd":9,"exp":25,"ai":"strongest",
-   "loot":[{"item":"fang","chance":1},{"item":"moss_ore","chance":0.5}],"symbol":true},
-  {"id":"skeleton","name":"骸骨兵","hp":62,"atk":22,"def":10,"mag":0,"spd":8,"exp":11,"ai":"random",
-   "element":"dark","resist":{"dark":0.5},
-   "loot":[{"item":"bone_shard","chance":0.6}]},
-  {"id":"cave_bat","name":"洞窟コウモリ","hp":20,"atk":12,"def":2,"mag":0,"spd":18,"exp":4,"ai":"weakest",
-   "loot":[{"item":"glow_moss","chance":0.2}]},
-  {"id":"golem","name":"坑道のゴーレム","hp":480,"atk":34,"def":18,"mag":0,"spd":4,"exp":70,"ai":"strongest",
-   "element":"earth","resist":{"earth":0.5,"thunder":0.3},
-   "loot":[{"item":"golem_core","chance":1},{"item":"iron_ore","chance":1}],"symbol":true,
-   "skill":{"name":"岩砕き","mult":1.4,"cd":3,"aoe":true}}
+ {
+  "id": "goblin",
+  "name": "ゴブリン",
+  "hp": 34,
+  "atk": 20,
+  "def": 4,
+  "mag": 0,
+  "spd": 8,
+  "exp": 6,
+  "ai": "random",
+  "loot": [
+   {
+    "item": "fang",
+    "chance": 0.5
+   }
+  ]
+ },
+ {
+  "id": "wolf",
+  "name": "森狼",
+  "hp": 36,
+  "atk": 22,
+  "def": 4,
+  "mag": 0,
+  "spd": 14,
+  "exp": 8,
+  "ai": "weakest",
+  "loot": [
+   {
+    "item": "fang",
+    "chance": 0.8
+   }
+  ]
+ },
+ {
+  "id": "slime",
+  "name": "洞窟スライム",
+  "hp": 55,
+  "atk": 18,
+  "def": 8,
+  "mag": 0,
+  "spd": 4,
+  "exp": 7,
+  "ai": "random",
+  "resist": {
+   "thunder": -0.5
+  },
+  "loot": [
+   {
+    "item": "slime_gel",
+    "chance": 0.6
+   }
+  ]
+ },
+ {
+  "id": "goblin_chief",
+  "name": "ゴブリンの頭",
+  "hp": 120,
+  "atk": 28,
+  "def": 8,
+  "mag": 0,
+  "spd": 9,
+  "exp": 25,
+  "ai": "strongest",
+  "loot": [
+   {
+    "item": "fang",
+    "chance": 1
+   },
+   {
+    "item": "moss_ore",
+    "chance": 0.5
+   }
+  ],
+  "symbol": true
+ },
+ {
+  "id": "skeleton",
+  "name": "骸骨兵",
+  "hp": 80,
+  "atk": 38,
+  "def": 10,
+  "mag": 0,
+  "spd": 8,
+  "exp": 11,
+  "ai": "random",
+  "element": "dark",
+  "resist": {
+   "dark": 0.5
+  },
+  "loot": [
+   {
+    "item": "bone_shard",
+    "chance": 0.6
+   }
+  ]
+ },
+ {
+  "id": "cave_bat",
+  "name": "洞窟コウモリ",
+  "hp": 20,
+  "atk": 16,
+  "def": 2,
+  "mag": 0,
+  "spd": 18,
+  "exp": 4,
+  "ai": "weakest",
+  "loot": [
+   {
+    "item": "glow_moss",
+    "chance": 0.2
+   }
+  ]
+ },
+ {
+  "id": "golem",
+  "name": "坑道のゴーレム",
+  "hp": 480,
+  "atk": 40,
+  "def": 18,
+  "mag": 0,
+  "spd": 4,
+  "exp": 70,
+  "ai": "strongest",
+  "element": "earth",
+  "resist": {
+   "earth": 0.5,
+   "thunder": 0.3
+  },
+  "loot": [
+   {
+    "item": "golem_core",
+    "chance": 1
+   },
+   {
+    "item": "iron_ore",
+    "chance": 1
+   }
+  ],
+  "symbol": true,
+  "skill": {
+   "name": "岩砕き",
+   "mult": 1.4,
+   "cd": 3,
+   "aoe": true
+  }
+ }
 ]

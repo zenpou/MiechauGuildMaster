@@ -45,7 +45,7 @@ const isDefault = ACTION === 'explore' && DUNGEON_ID === 'forest_cave';
 const PLANS = ['mine-naked', 'mine-geared', 'forest-then-mine'] as const;
 type PlanId = (typeof PLANS)[number];
 const PLAN = flag('plan') as PlanId | undefined;
-const SWITCH_DAY = Number(flag('switch') ?? 14);
+const SWITCH_DAY = Number(flag('switch') ?? 20);
 if (PLAN && !PLANS.includes(PLAN)) throw new Error(`--plan は ${PLANS.join(' / ')} のどれか`);
 if (!Number.isInteger(SWITCH_DAY) || SWITCH_DAY < 1) throw new Error('--switch は1以上の整数');
 
@@ -168,10 +168,15 @@ const ALCHEMY_AT = [1, 0] as const;
 const POTION_STOCK = 4;
 /** forest-then-mine が売らずに貯める素材(工房・調合所・レシピの材料) */
 const KEEP = new Set(['fang', 'slime_gel', 'moss_ore', 'herb']);
+/** 残す上限。防具4+首飾り4+工房・調合所+回復薬の材料のおおよそ */
+const KEEP_MAX: Record<string, number> = { fang: 20, slime_gel: 10, moss_ore: 4, herb: 8 };
 const GATHERABLE = ['moss_ore', 'slime_gel', 'herb'];
 const forestGrid = parseFloor(DUNGEON[FOREST].floors.find((f) => f.id === FLOOR_ID)!);
 const ARMORS = ['leather_armor', 'studded_armor'];
 const TRACKED_RECIPES = ['r_leather_armor', 'r_studded_armor', 'r_fang_necklace', 'r_potion'];
+/** 坑道プランは疲労がこれ以上の者を休ませる。毎日出し続けると疲労の能力低下で失敗率が頭打ちになり、装備の効き目が見えないため */
+const REST_FATIGUE = 50;
+const readyRested = (a: Adventurer) => ready(a) && a.fatigue < REST_FATIGUE;
 const PLAN_NAME: Record<PlanId, string> = { 'mine-naked': '装備なしで坑道', 'mine-geared': '装備一式を支給して坑道(診断用)', 'forest-then-mine': '森で装備を整えて坑道' };
 /** 診断用の支給品。経済を切り離して装備の効き目だけを測る */
 const GEAR_KIT: Record<string, number> = { leather_armor: 3, studded_armor: 1, fang_necklace: 4, bone_dagger: 2, potion: 4 };
@@ -248,7 +253,7 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
     const toMine = !prepare || s.day >= SWITCH_DAY;
     if (prepare && s.day === SWITCH_DAY) armoredAtSwitch = armoredCount();
 
-    const party = s.adventurers.filter(ready).slice(0, PARTY_MAX);
+    const party = s.adventurers.filter(readyRested).slice(0, PARTY_MAX);
     if (party.length >= MIN_PARTY) {
       const items: Record<string, number> = (s.inventory.potion ?? 0) >= 1 ? { potion: 1 } : {};
       const common = { partyIds: party.map((a) => a.id), leaderId: party[0].id, policy: POLICY_ID, days: DAYS, items };
@@ -293,8 +298,10 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
       });
     }
     for (const [item, n] of Object.entries(s.inventory)) {
-      if (ITEM[item].kind !== 'material' || n <= 0 || (prepare && KEEP.has(item))) continue;
-      sellMaterial(s, item, n);
+      if (ITEM[item].kind !== 'material' || n <= 0) continue;
+      // 装備と施設に要る分だけ残し、余りは売って日給に充てる(人が遊ぶときと同じ)
+      const keep = prepare && KEEP.has(item) ? KEEP_MAX[item] ?? 0 : 0;
+      if (n > keep) sellMaterial(s, item, n - keep);
     }
   }
   return {

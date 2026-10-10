@@ -1,28 +1,209 @@
 [
-  {"id":"herb","name":"薬草","desc":"森の洞窟の湿った岩陰に生える。回復薬の材料。","kind":"material","price":12,"weight":1,"source":"forest_cave"},
-  {"id":"fang","name":"魔物の牙","desc":"ゴブリンや森狼から取れる牙。武具の飾りや矢じりに使う。","kind":"material","price":18,"weight":1},
-  {"id":"slime_gel","name":"スライムの核","desc":"洞窟スライムの芯。弾力があり、薬や接着剤になる。","kind":"material","price":22,"weight":1},
-  {"id":"moss_ore","name":"苔鉄鉱","desc":"苔に覆われた鉄鉱石。重いが鍛冶屋が高く買う。","kind":"material","price":30,"weight":2},
-  {"id":"potion","name":"回復薬","desc":"薬草を煎じた飲み薬。戦闘中にHPを回復する。","kind":"consumable","price":30,"weight":1,
-   "consumable":{"effect":"heal","params":{"ratio":0.45}}},
-  {"id":"iron_ore","name":"鉄鉱石","desc":"古い坑道の岩壁に残る鉄の鉱脈。重いが武具の材料になる。","kind":"material","price":36,"weight":2,"source":"old_mine"},
-  {"id":"glow_moss","name":"光苔","desc":"坑道の暗がりで青く光る苔。灯りや薬の材料になる。","kind":"material","price":20,"weight":1,"source":"old_mine"},
-  {"id":"bone_shard","name":"骨片","desc":"骸骨兵の砕けた骨。細工物や呪い除けに使う。","kind":"material","price":15,"weight":1},
-  {"id":"golem_core","name":"ゴーレムの核","desc":"坑道のゴーレムを動かしていた石の芯。重く、高値で取引される。","kind":"material","price":240,"weight":3},
-  {"id":"hi_potion","name":"上回復薬","desc":"薬草にスライムの核を溶かした濃い薬。戦闘中にHPを大きく回復する。","kind":"consumable","price":50,"weight":1,
-   "consumable":{"effect":"heal","params":{"ratio":0.7}}},
-  {"id":"bone_dagger","name":"骨の短剣","desc":"骨片を削って牙で留めた短剣。軽く、手数が増える。","kind":"weapon","price":40,"weight":1,
-   "equip":{"slot":"weapon","mods":{"atk":3,"spd":1}}},
-  {"id":"iron_sword","name":"鉄の剣","desc":"坑道の鉄を鍛えた素直な剣。","kind":"weapon","price":72,"weight":2,
-   "equip":{"slot":"weapon","mods":{"atk":5}}},
-  {"id":"leather_armor","name":"革の鎧","desc":"魔物の革をスライムの核で固めた軽い鎧。","kind":"armor","price":49,"weight":2,
-   "equip":{"slot":"armor","armorClass":"light","mods":{"def":3}}},
-  {"id":"studded_armor","name":"鋲打ち革鎧","desc":"革の鎧に苔鉄鉱の鋲を打って補強した中装。戦士も着られる。","kind":"armor","price":60,"weight":2,
-   "equip":{"slot":"armor","armorClass":"medium","mods":{"def":4}}},
-  {"id":"iron_armor","name":"鉄の鎧","desc":"鉄板を重ねた重い鎧。岩の一撃にも耐えるが、動きは鈍る。","kind":"armor","price":87,"weight":3,
-   "equip":{"slot":"armor","armorClass":"heavy","mods":{"def":6,"spd":-1},"resist":{"earth":0.2}}},
-  {"id":"fang_necklace","name":"牙の首飾り","desc":"魔物の牙を連ねた首飾り。採取の手際が少し良くなる。","kind":"accessory","price":27,"weight":1,
-   "equip":{"slot":"accessory","mods":{"atk":1},"effects":{"gather":1}}},
-  {"id":"moss_charm","name":"光苔のお守り","desc":"光苔を封じたお守り。暗がりがよく見え、闇の力を和らげる。","kind":"accessory","price":41,"weight":1,
-   "equip":{"slot":"accessory","mods":{"scout":2},"resist":{"dark":0.3}}}
+ {
+  "id": "herb",
+  "name": "薬草",
+  "desc": "森の洞窟の湿った岩陰に生える。回復薬の材料。",
+  "kind": "material",
+  "price": 12,
+  "weight": 1,
+  "source": "forest_cave"
+ },
+ {
+  "id": "fang",
+  "name": "魔物の牙",
+  "desc": "ゴブリンや森狼から取れる牙。武具の飾りや矢じりに使う。",
+  "kind": "material",
+  "price": 18,
+  "weight": 1
+ },
+ {
+  "id": "slime_gel",
+  "name": "スライムの核",
+  "desc": "洞窟スライムの芯。弾力があり、薬や接着剤になる。",
+  "kind": "material",
+  "price": 22,
+  "weight": 1
+ },
+ {
+  "id": "moss_ore",
+  "name": "苔鉄鉱",
+  "desc": "苔に覆われた鉄鉱石。重いが鍛冶屋が高く買う。",
+  "kind": "material",
+  "price": 30,
+  "weight": 2
+ },
+ {
+  "id": "potion",
+  "name": "回復薬",
+  "desc": "薬草を煎じた飲み薬。戦闘中にHPを回復する。",
+  "kind": "consumable",
+  "price": 30,
+  "weight": 1,
+  "consumable": {
+   "effect": "heal",
+   "params": {
+    "ratio": 0.45
+   }
+  }
+ },
+ {
+  "id": "iron_ore",
+  "name": "鉄鉱石",
+  "desc": "古い坑道の岩壁に残る鉄の鉱脈。重いが武具の材料になる。",
+  "kind": "material",
+  "price": 36,
+  "weight": 2,
+  "source": "old_mine"
+ },
+ {
+  "id": "glow_moss",
+  "name": "光苔",
+  "desc": "坑道の暗がりで青く光る苔。灯りや薬の材料になる。",
+  "kind": "material",
+  "price": 20,
+  "weight": 1,
+  "source": "old_mine"
+ },
+ {
+  "id": "bone_shard",
+  "name": "骨片",
+  "desc": "骸骨兵の砕けた骨。細工物や呪い除けに使う。",
+  "kind": "material",
+  "price": 15,
+  "weight": 1
+ },
+ {
+  "id": "golem_core",
+  "name": "ゴーレムの核",
+  "desc": "坑道のゴーレムを動かしていた石の芯。重く、高値で取引される。",
+  "kind": "material",
+  "price": 240,
+  "weight": 3
+ },
+ {
+  "id": "hi_potion",
+  "name": "上回復薬",
+  "desc": "薬草にスライムの核を溶かした濃い薬。戦闘中にHPを大きく回復する。",
+  "kind": "consumable",
+  "price": 50,
+  "weight": 1,
+  "consumable": {
+   "effect": "heal",
+   "params": {
+    "ratio": 0.7
+   }
+  }
+ },
+ {
+  "id": "bone_dagger",
+  "name": "骨の短剣",
+  "desc": "骨片を削って牙で留めた短剣。軽く、手数が増える。",
+  "kind": "weapon",
+  "price": 40,
+  "weight": 1,
+  "equip": {
+   "slot": "weapon",
+   "mods": {
+    "atk": 3,
+    "spd": 1
+   }
+  }
+ },
+ {
+  "id": "iron_sword",
+  "name": "鉄の剣",
+  "desc": "坑道の鉄を鍛えた素直な剣。",
+  "kind": "weapon",
+  "price": 72,
+  "weight": 2,
+  "equip": {
+   "slot": "weapon",
+   "mods": {
+    "atk": 5
+   }
+  }
+ },
+ {
+  "id": "leather_armor",
+  "name": "革の鎧",
+  "desc": "魔物の革をスライムの核で固めた軽い鎧。",
+  "kind": "armor",
+  "price": 49,
+  "weight": 2,
+  "equip": {
+   "slot": "armor",
+   "armorClass": "light",
+   "mods": {
+    "def": 6
+   }
+  }
+ },
+ {
+  "id": "studded_armor",
+  "name": "鋲打ち革鎧",
+  "desc": "革の鎧に苔鉄鉱の鋲を打って補強した中装。戦士も着られる。",
+  "kind": "armor",
+  "price": 60,
+  "weight": 2,
+  "equip": {
+   "slot": "armor",
+   "armorClass": "medium",
+   "mods": {
+    "def": 8
+   }
+  }
+ },
+ {
+  "id": "iron_armor",
+  "name": "鉄の鎧",
+  "desc": "鉄板を重ねた重い鎧。岩の一撃にも耐えるが、動きは鈍る。",
+  "kind": "armor",
+  "price": 87,
+  "weight": 3,
+  "equip": {
+   "slot": "armor",
+   "armorClass": "heavy",
+   "mods": {
+    "def": 11,
+    "spd": -1
+   },
+   "resist": {
+    "earth": 0.2
+   }
+  }
+ },
+ {
+  "id": "fang_necklace",
+  "name": "牙の首飾り",
+  "desc": "魔物の牙を連ねた首飾り。採取の手際が少し良くなる。",
+  "kind": "accessory",
+  "price": 27,
+  "weight": 1,
+  "equip": {
+   "slot": "accessory",
+   "mods": {
+    "atk": 1
+   },
+   "effects": {
+    "gather": 1
+   }
+  }
+ },
+ {
+  "id": "moss_charm",
+  "name": "光苔のお守り",
+  "desc": "光苔を封じたお守り。暗がりがよく見え、闇の力を和らげる。",
+  "kind": "accessory",
+  "price": 41,
+  "weight": 1,
+  "equip": {
+   "slot": "accessory",
+   "mods": {
+    "scout": 2
+   },
+   "resist": {
+    "dark": 0.3
+   }
+  }
+ }
 ]

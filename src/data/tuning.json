@@ -65,7 +65,7 @@
     "gatherFocusBonus": 1
   },
   "combat": {
-    "defScale": 0.5
+    "defScale": 1.0
   },
   "equipment": {
     "resistCap": 0.8
@@ -86,7 +86,7 @@
     ]
   },
   "game": {
-    "startGold": 500,
+    "startGold": 600,
     "startPotions": 2,
     "upkeepPerDay": 30,
     "startApt": 70,
@@ -99,7 +99,7 @@
     "loyaltyInjured": -3,
     "loyaltyWipe": -20,
     "daysMax": 7,
-    "supportGold": 60,
-    "supportDays": 5
+    "supportGold": 100,
+    "supportDays": 10
   }
 }

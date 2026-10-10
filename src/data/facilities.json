@@ -1,24 +1,178 @@
 [
-  {"id":"dorm","name":"宿舎","desc":"冒険者が寝泊まりする建物。広げるほど多く雇える。","category":"housing","maxLevel":2,
-   "costs":[{"gold":200,"materials":{"moss_ore":2},"days":3},{"gold":400,"materials":{"iron_ore":2},"days":4}],
-   "upkeep":5,"effectText":["雇用上限+2","雇用上限+4"],
-   "effects":[{"capacity":2},{"capacity":4}]},
-  {"id":"workshop","name":"工房","desc":"素材から武器・防具・装飾を作る。","category":"production","maxLevel":2,
-   "costs":[{"gold":250,"materials":{"moss_ore":3},"days":3},{"gold":500,"materials":{"iron_ore":4},"days":5}],
-   "upkeep":8,"effectText":["装備のレシピが作れる","装備のレシピが作れる。完成日数−1"],
-   "effects":[{"craftDaysOff":0},{"craftDaysOff":1}],
-   "workSlots":1,"workStat":"dex"},
-  {"id":"alchemy","name":"調合所","desc":"薬草や素材から回復薬を作る。","category":"production","maxLevel":2,
-   "costs":[{"gold":200,"materials":{"slime_gel":3},"days":2},{"gold":400,"materials":{"glow_moss":3},"days":4}],
-   "upkeep":6,"effectText":["消耗品のレシピが作れる","消耗品のレシピが作れる。産出+1"],
-   "effects":[{"outputBonus":0},{"outputBonus":1}],
-   "workSlots":1,"workStat":"gather"},
-  {"id":"clinic","name":"治療所","desc":"負傷者の手当てと休養の場。","category":"recovery","maxLevel":2,
-   "costs":[{"gold":250,"materials":{"herb":5},"days":3},{"gold":500,"materials":{"glow_moss":4},"days":4}],
-   "upkeep":8,"effectText":["負傷日数−1、待機中の疲労回復+5","負傷日数−2、待機中の疲労回復+10"],
-   "effects":[{"injuryDays":-1,"fatigueRecover":5},{"injuryDays":-2,"fatigueRecover":10}]},
-  {"id":"training","name":"訓練所","desc":"派遣で得た経験を身につけやすくする。","category":"training","maxLevel":2,
-   "costs":[{"gold":300,"materials":{"moss_ore":2},"days":3},{"gold":600,"materials":{"iron_ore":3},"days":5}],
-   "upkeep":10,"effectText":["派遣の経験値+20%","派遣の経験値+40%"],
-   "effects":[{"expMult":0.2},{"expMult":0.4}]}
+  {
+    "id": "dorm",
+    "name": "宿舎",
+    "desc": "冒険者が寝泊まりする建物。広げるほど多く雇える。",
+    "category": "housing",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 200,
+        "materials": {},
+        "days": 3
+      },
+      {
+        "gold": 400,
+        "materials": {
+          "iron_ore": 2
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 5,
+    "effectText": [
+      "雇用上限+2",
+      "雇用上限+4"
+    ],
+    "effects": [
+      {
+        "capacity": 2
+      },
+      {
+        "capacity": 4
+      }
+    ]
+  },
+  {
+    "id": "workshop",
+    "name": "工房",
+    "desc": "素材から武器・防具・装飾を作る。",
+    "category": "production",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 250,
+        "materials": {},
+        "days": 3
+      },
+      {
+        "gold": 500,
+        "materials": {
+          "iron_ore": 4
+        },
+        "days": 5
+      }
+    ],
+    "upkeep": 8,
+    "effectText": [
+      "装備のレシピが作れる",
+      "装備のレシピが作れる。完成日数−1"
+    ],
+    "effects": [
+      {
+        "craftDaysOff": 0
+      },
+      {
+        "craftDaysOff": 1
+      }
+    ],
+    "workSlots": 1,
+    "workStat": "dex"
+  },
+  {
+    "id": "alchemy",
+    "name": "調合所",
+    "desc": "薬草や素材から回復薬を作る。",
+    "category": "production",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 200,
+        "materials": {},
+        "days": 2
+      },
+      {
+        "gold": 400,
+        "materials": {
+          "glow_moss": 3
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 6,
+    "effectText": [
+      "消耗品のレシピが作れる",
+      "消耗品のレシピが作れる。産出+1"
+    ],
+    "effects": [
+      {
+        "outputBonus": 0
+      },
+      {
+        "outputBonus": 1
+      }
+    ],
+    "workSlots": 1,
+    "workStat": "gather"
+  },
+  {
+    "id": "clinic",
+    "name": "治療所",
+    "desc": "負傷者の手当てと休養の場。",
+    "category": "recovery",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 250,
+        "materials": {},
+        "days": 3
+      },
+      {
+        "gold": 500,
+        "materials": {
+          "glow_moss": 4
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 8,
+    "effectText": [
+      "負傷日数−1、待機中の疲労回復+5",
+      "負傷日数−2、待機中の疲労回復+10"
+    ],
+    "effects": [
+      {
+        "injuryDays": -1,
+        "fatigueRecover": 5
+      },
+      {
+        "injuryDays": -2,
+        "fatigueRecover": 10
+      }
+    ]
+  },
+  {
+    "id": "training",
+    "name": "訓練所",
+    "desc": "派遣で得た経験を身につけやすくする。",
+    "category": "training",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 300,
+        "materials": {},
+        "days": 3
+      },
+      {
+        "gold": 600,
+        "materials": {
+          "iron_ore": 3
+        },
+        "days": 5
+      }
+    ],
+    "upkeep": 10,
+    "effectText": [
+      "派遣の経験値+20%",
+      "派遣の経験値+40%"
+    ],
+    "effects": [
+      {
+        "expMult": 0.2
+      },
+      {
+        "expMult": 0.4
+      }
+    ]
+  }
 ]

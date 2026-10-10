@@ -134,15 +134,15 @@ describe('装備', () => {
   it('武器と防具で atk/def が mods の分だけ増える', () => {
     const bare = effectiveStats(fixture());
     const geared = effectiveStats(fixture({ equipment: eq('iron_sword', 'leather_armor', 'fang_necklace') }));
-    expect(geared.atk).toBe(bare.atk + 5 + 1);
-    expect(geared.def).toBe(bare.def + 3);
+    expect(geared.atk).toBe(bare.atk + ITEM.iron_sword.equip!.mods.atk! + ITEM.fang_necklace.equip!.mods.atk!);
+    expect(geared.def).toBe(bare.def + ITEM.leather_armor.equip!.mods.def!);
     expect(geared.hp).toBe(bare.hp);
   });
 
-  it('鉄の鎧は def+6 と spd−1', () => {
+  it('鉄の鎧は def が上がり spd−1', () => {
     const bare = effectiveStats(fixture());
     const geared = effectiveStats(fixture({ equipment: eq(null, 'iron_armor', null) }));
-    expect(geared.def).toBe(bare.def + 6);
+    expect(geared.def).toBe(bare.def + ITEM.iron_armor.equip!.mods.def!);
     expect(geared.spd).toBe(bare.spd - 1);
   });
 

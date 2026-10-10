@@ -395,7 +395,7 @@ describe('old_mine', () => {
     expect(d.node).toBe('old_mine');
     expect(d.enemies).toEqual([
       { id: 'skeleton', weight: 4, group: [1, 2] },
-      { id: 'cave_bat', weight: 4, group: [2, 4] },
+      { id: 'cave_bat', weight: 4, group: [3, 5] },
       { id: 'slime', weight: 2, group: [1, 2] },
     ]);
     expect(d.recommended).toBe(320);
@@ -410,9 +410,10 @@ describe('古い坑道の敵と素材', () => {
       const e = ENEMY[id];
       return e && [e.hp, e.atk, e.def, e.mag, e.spd, e.exp, e.ai];
     };
-    expect(pick('skeleton')).toEqual([62, 22, 10, 0, 8, 11, 'random']);
-    expect(pick('cave_bat')).toEqual([20, 12, 2, 0, 18, 4, 'weakest']);
-    expect(pick('golem')).toEqual([480, 34, 18, 0, 4, 70, 'strongest']);
+    // 2026-10-10 守備係数1.0に合わせて攻撃を上げ、装備なしの坑道が失敗率35%になる値(VERIFICATION 参照)
+    expect(pick('skeleton')).toEqual([80, 38, 10, 0, 8, 11, 'random']);
+    expect(pick('cave_bat')).toEqual([20, 16, 2, 0, 18, 4, 'weakest']);
+    expect(pick('golem')).toEqual([480, 40, 18, 0, 4, 70, 'strongest']);
     expect(ENEMY.skeleton.loot).toEqual([{ item: 'bone_shard', chance: 0.6 }]);
     expect(ENEMY.cave_bat.loot).toEqual([{ item: 'glow_moss', chance: 0.2 }]);
     expect(ENEMY.golem.loot).toEqual([{ item: 'golem_core', chance: 1 }, { item: 'iron_ore', chance: 1 }]);

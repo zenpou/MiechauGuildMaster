@@ -34,8 +34,8 @@ describe('装備の定義', () => {
     const want: Record<string, [string, Record<string, number>]> = {
       bone_dagger: ['weapon', { atk: 3, spd: 1 }],
       iron_sword: ['weapon', { atk: 5 }],
-      leather_armor: ['armor', { def: 3 }],
-      iron_armor: ['armor', { def: 6, spd: -1 }],
+      leather_armor: ['armor', { def: 6 }],
+      iron_armor: ['armor', { def: 11, spd: -1 }],
       fang_necklace: ['accessory', { atk: 1 }],
       moss_charm: ['accessory', { scout: 2 }],
     };
@@ -69,8 +69,8 @@ describe('equip / unequip', () => {
     expect(s.inventory.iron_sword ?? 0).toBe(0);
     expect(s.inventory.leather_armor).toBe(1);
     const after = effectiveStats(a);
-    expect(after.atk).toBe(before.atk + 5);
-    expect(after.def).toBe(before.def + 3);
+    expect(after.atk).toBe(before.atk + ITEM.iron_sword.equip!.mods.atk!);
+    expect(after.def).toBe(before.def + ITEM.leather_armor.equip!.mods.def!);
   });
 
   it('外すと在庫に戻る。付け替えで前の物も在庫に戻る', () => {

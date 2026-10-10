@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { addExp, generateAdventurer } from '../src/core/adventurer';
 import { assignWorker } from '../src/core/base';
 import { startCraft } from '../src/core/craft';
-import { DUNGEON, JOB } from '../src/core/data';
+import { DUNGEON, JOB, TUNING } from '../src/core/data';
+
+const G0 = TUNING.game.startGold;
+const SUP = TUNING.game.supportGold;
 import { parseFloor } from '../src/core/dungeon';
 import { advanceDay, buyItem, dispatch, exploredRateOf, newGame, recall, sellMaterial } from '../src/core/game';
 import { rngFor } from '../src/core/rng';
@@ -27,9 +30,9 @@ function sent(s: GameState, o: Partial<DispatchOrder> = {}): Expedition {
 const wages = (s: GameState) => s.adventurers.reduce((t, a) => t + a.salary, 0);
 
 describe('newGame', () => {
-  it('固定4人(剣士・戦士・僧侶・斥候)・500G・回復薬2・森の洞窟の進捗0', () => {
+  it('固定4人(剣士・戦士・僧侶・斥候)・初期資金・回復薬2・森の洞窟の進捗0', () => {
     const s = newGame(7);
-    expect(s.gold).toBe(500);
+    expect(s.gold).toBe(G0);
     expect(s.adventurers.map((a) => a.job)).toEqual(['fighter', 'warrior', 'priest', 'scout']);
     for (const a of s.adventurers) {
       for (const r of JOB[a.job].roles) expect(a.apt[r]).toBeGreaterThanOrEqual(70);
@@ -41,7 +44,7 @@ describe('newGame', () => {
     expect(s.inventory.potion).toBe(2);
     expect(s.dungeons.forest_cave).toEqual({ confirmed: true, floors: { f1: { visited: [], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false });
     expect(s.world.visitedNodes).toEqual(['base']);
-    expect(s.ledger.some((l) => l.amount === 500)).toBe(true);
+    expect(s.ledger.some((l) => l.amount === G0)).toBe(true);
     expect(exploredRateOf(s, 'forest_cave', 'f1')).toBe(0);
   });
 });
@@ -91,13 +94,13 @@ describe('dispatch の検証', () => {
 });
 
 describe('advanceDay', () => {
-  it('日給と維持費30が引かれ、台帳に載る(1日目は初期支援金60Gが入る)', () => {
+  it('日給と維持費30が引かれ、台帳に載る(1日目は初期支援金が入る)', () => {
     const s = newGame(9);
     const w = wages(s);
     const r = advanceDay(s);
     expect(r.day).toBe(2);
     expect(s.day).toBe(2);
-    expect(s.gold).toBe(500 + 60 - w - 30);
+    expect(s.gold).toBe(G0 + SUP - w - 30);
     expect(s.ledger.some((l) => l.amount === -w && l.label.includes('日給'))).toBe(true);
     expect(s.ledger.some((l) => l.amount === -30 && l.label.includes('維持費'))).toBe(true);
   });
@@ -109,7 +112,7 @@ describe('advanceDay', () => {
     const loyal = s.adventurers.map((a) => a.loyalty);
     const w = wages(s);
     advanceDay(s);
-    const deficit = 1000 + w + 30 - 60;
+    const deficit = 1000 + w + 30 - SUP;
     expect(s.gold).toBe(-deficit - Math.ceil(deficit * 0.02));
     expect(s.rep).toBe(4);
     expect(s.debt).toBe(true);
@@ -196,7 +199,7 @@ describe('advanceDay', () => {
     const loyal = s.adventurers.map((a) => a.loyalty);
     const w = wages(s);
     advanceDay(s);
-    expect(s.gold).toBe(500 + 60 - w - 30 - 120);
+    expect(s.gold).toBe(G0 + SUP - w - 30 - 120);
     expect(s.ledger.some((l) => l.amount === -120)).toBe(true);
     expect(s.inventory.herb ?? 0).toBe(0);
     s.adventurers.forEach((a, i) => expect(a.loyalty).toBe(loyal[i] - 20 + 1));
@@ -212,7 +215,7 @@ describe('売買', () => {
     expect(sellMaterial(s, 'potion', 1).ok).toBe(false);
     expect(sellMaterial(s, 'fang', 2).ok).toBe(true);
     expect(s.inventory.fang).toBe(1);
-    expect(s.gold).toBe(500 + 36);
+    expect(s.gold).toBe(G0 + 36);
     expect(s.ledger[0].amount).toBe(36);
   });
 
@@ -220,7 +223,7 @@ describe('売買', () => {
     const s = newGame(1);
     expect(buyItem(s, 'potion', 2).ok).toBe(true);
     expect(s.inventory.potion).toBe(4);
-    expect(s.gold).toBe(440);
+    expect(s.gold).toBe(G0 - 60);
     expect(buyItem(s, 'herb', 1).ok).toBe(false);
     expect(buyItem(s, 'potion', 100).ok).toBe(false);
     expect(s.inventory.potion).toBe(4);
@@ -316,12 +319,13 @@ function place(s: GameState, id: string, x: number, y: number, level = 1) {
 }
 
 describe('初期支援金', () => {
-  it('1〜5日目の日送りで60Gずつ台帳「初期支援金」に載り、6日目からは無い', () => {
+  it('supportDays 日目までの日送りで supportGold ずつ台帳「初期支援金」に載り、その後は無い', () => {
     const s = newGame(13);
-    for (let i = 0; i < 7; i++) advanceDay(s);
+    const days = TUNING.game.supportDays;
+    for (let i = 0; i < days + 2; i++) advanceDay(s);
     const support = s.ledger.filter((l) => l.label === '初期支援金');
-    expect(support.map((l) => l.day)).toEqual([5, 4, 3, 2, 1]);
-    expect(support.every((l) => l.amount === 60)).toBe(true);
+    expect(support.map((l) => l.day)).toEqual(Array.from({ length: days }, (_, i) => days - i));
+    expect(support.every((l) => l.amount === SUP)).toBe(true);
   });
 });
 
@@ -335,7 +339,7 @@ describe('施設の維持費', () => {
     const w = wages(s);
     advanceDay(s);
     expect(s.ledger.some((l) => l.label === '施設維持費' && l.amount === -13)).toBe(true);
-    expect(s.gold).toBe(gold + 60 - w - 30 - 13);
+    expect(s.gold).toBe(gold + SUP - w - 30 - 13);
   });
 });
 

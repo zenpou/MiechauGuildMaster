@@ -1,11 +1,183 @@
 [
-  {"id":"r_bone_dagger","name":"骨の短剣","facility":"workshop","output":{"item":"bone_dagger","n":1},"inputs":[{"item":"bone_shard","n":4},{"item":"fang","n":1}],"days":2,"gold":40},
-  {"id":"r_iron_sword","name":"鉄の剣","facility":"workshop","output":{"item":"iron_sword","n":1},"inputs":[{"item":"iron_ore","n":3},{"item":"fang","n":2}],"days":3,"gold":80},
-  {"id":"r_leather_armor","name":"革の鎧","facility":"workshop","output":{"item":"leather_armor","n":1},"inputs":[{"item":"fang","n":3},{"item":"slime_gel","n":2}],"days":2,"gold":50},
-  {"id":"r_studded_armor","name":"鋲打ち革鎧","facility":"workshop","output":{"item":"studded_armor","n":1},"inputs":[{"item":"fang","n":4},{"item":"moss_ore","n":1}],"days":3,"gold":70},
-  {"id":"r_iron_armor","name":"鉄の鎧","facility":"workshop","output":{"item":"iron_armor","n":1},"inputs":[{"item":"iron_ore","n":4},{"item":"moss_ore","n":1}],"days":4,"gold":120},
-  {"id":"r_fang_necklace","name":"牙の首飾り","facility":"workshop","output":{"item":"fang_necklace","n":1},"inputs":[{"item":"fang","n":3}],"days":1,"gold":30},
-  {"id":"r_moss_charm","name":"光苔のお守り","facility":"workshop","output":{"item":"moss_charm","n":1},"inputs":[{"item":"glow_moss","n":3},{"item":"slime_gel","n":1}],"days":1,"gold":40},
-  {"id":"r_potion","name":"回復薬","facility":"alchemy","output":{"item":"potion","n":2},"inputs":[{"item":"herb","n":2}],"days":1,"gold":10},
-  {"id":"r_hi_potion","name":"上回復薬","facility":"alchemy","output":{"item":"hi_potion","n":1},"inputs":[{"item":"herb","n":2},{"item":"slime_gel","n":1}],"days":1,"gold":20}
+ {
+  "id": "r_bone_dagger",
+  "name": "骨の短剣",
+  "facility": "workshop",
+  "output": {
+   "item": "bone_dagger",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "bone_shard",
+    "n": 4
+   },
+   {
+    "item": "fang",
+    "n": 1
+   }
+  ],
+  "days": 2,
+  "gold": 40
+ },
+ {
+  "id": "r_iron_sword",
+  "name": "鉄の剣",
+  "facility": "workshop",
+  "output": {
+   "item": "iron_sword",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "iron_ore",
+    "n": 3
+   },
+   {
+    "item": "fang",
+    "n": 2
+   }
+  ],
+  "days": 3,
+  "gold": 80
+ },
+ {
+  "id": "r_leather_armor",
+  "name": "革の鎧",
+  "facility": "workshop",
+  "output": {
+   "item": "leather_armor",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "fang",
+    "n": 2
+   },
+   {
+    "item": "slime_gel",
+    "n": 2
+   }
+  ],
+  "days": 2,
+  "gold": 50
+ },
+ {
+  "id": "r_studded_armor",
+  "name": "鋲打ち革鎧",
+  "facility": "workshop",
+  "output": {
+   "item": "studded_armor",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "fang",
+    "n": 3
+   },
+   {
+    "item": "moss_ore",
+    "n": 1
+   }
+  ],
+  "days": 3,
+  "gold": 70
+ },
+ {
+  "id": "r_iron_armor",
+  "name": "鉄の鎧",
+  "facility": "workshop",
+  "output": {
+   "item": "iron_armor",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "iron_ore",
+    "n": 4
+   },
+   {
+    "item": "moss_ore",
+    "n": 1
+   }
+  ],
+  "days": 4,
+  "gold": 120
+ },
+ {
+  "id": "r_fang_necklace",
+  "name": "牙の首飾り",
+  "facility": "workshop",
+  "output": {
+   "item": "fang_necklace",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "fang",
+    "n": 2
+   }
+  ],
+  "days": 1,
+  "gold": 30
+ },
+ {
+  "id": "r_moss_charm",
+  "name": "光苔のお守り",
+  "facility": "workshop",
+  "output": {
+   "item": "moss_charm",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "glow_moss",
+    "n": 3
+   },
+   {
+    "item": "slime_gel",
+    "n": 1
+   }
+  ],
+  "days": 1,
+  "gold": 40
+ },
+ {
+  "id": "r_potion",
+  "name": "回復薬",
+  "facility": "alchemy",
+  "output": {
+   "item": "potion",
+   "n": 2
+  },
+  "inputs": [
+   {
+    "item": "herb",
+    "n": 2
+   }
+  ],
+  "days": 1,
+  "gold": 10
+ },
+ {
+  "id": "r_hi_potion",
+  "name": "上回復薬",
+  "facility": "alchemy",
+  "output": {
+   "item": "hi_potion",
+   "n": 1
+  },
+  "inputs": [
+   {
+    "item": "herb",
+    "n": 2
+   },
+   {
+    "item": "slime_gel",
+    "n": 1
+   }
+  ],
+  "days": 1,
+  "gold": 20
+ }
 ]

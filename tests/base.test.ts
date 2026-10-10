@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   activeSynergies, assignWorker, build, canBuild, facilityLevel, listSynergies, synergyValue, unassignWorker, upgrade,
 } from '../src/core/base';
+import { FACILITY } from '../src/core/data';
 import { advanceDay, newGame } from '../src/core/game';
 import type { GameState } from '../src/core/types';
 
@@ -21,14 +22,16 @@ describe('build', () => {
     expect(newGame(1).base.facilities).toEqual([]);
   });
 
-  it('空きマスにだけ建ち、資金と素材を引いて建設中(Lv0)になる', () => {
+  it('空きマスにだけ建ち、資金(Lv1は建材なし)を引いて建設中(Lv0)になる', () => {
     const s = rich();
+    const cost = FACILITY.dorm.costs[0];
+    expect(cost.materials).toEqual({});
     expect(build(s, 'dorm', 2, 2).ok).toBe(true);
-    expect(s.gold).toBe(5000 - 200);
-    expect(s.inventory.moss_ore).toBe(18);
+    expect(s.gold).toBe(5000 - cost.gold);
+    expect(s.inventory.moss_ore).toBe(20);
     expect(facilityLevel(s, 'dorm')).toBe(0);
-    expect(s.base.facilities[0].construction).toEqual({ toLevel: 1, untilDay: 4 });
-    expect(s.ledger[0]).toMatchObject({ amount: -200 });
+    expect(s.base.facilities[0].construction).toEqual({ toLevel: 1, untilDay: 1 + cost.days });
+    expect(s.ledger[0]).toMatchObject({ amount: -cost.gold });
     expect(canBuild(s, 'clinic', 2, 2).ok).toBe(false);
     expect(canBuild(s, 'clinic', 5, 0).ok).toBe(false);
     expect(canBuild(s, 'clinic', -1, 0).ok).toBe(false);
@@ -38,16 +41,18 @@ describe('build', () => {
     expect(canBuild(s, 'clinic', 0, 0).ok).toBe(true);
   });
 
-  it('資金・素材が足りなければ断り、状態を変えない', () => {
+  it('資金が足りなければ断り、状態を変えない。Lv2 は建材も要る', () => {
     const s = rich();
-    s.gold = 199;
+    s.gold = FACILITY.dorm.costs[0].gold - 1;
     const before = structuredClone(s);
     expect(build(s, 'dorm', 0, 0).ok).toBe(false);
     expect(s).toEqual(before);
     s.gold = 5000;
-    s.inventory.moss_ore = 1;
+    place(s, 'dorm', 0, 0);
+    const mat = Object.keys(FACILITY.dorm.costs[1].materials)[0];
+    s.inventory[mat] = 0;
     const before2 = structuredClone(s);
-    expect(build(s, 'dorm', 0, 0).ok).toBe(false);
+    expect(upgrade(s, 'dorm').ok).toBe(false);
     expect(s).toEqual(before2);
   });
 
