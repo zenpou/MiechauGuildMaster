@@ -40,9 +40,13 @@ npm test
 npm run build
 npm run sim -- 100
 npm run sim:styles
+npm run sim:boss                 # ボス戦の勝率(基準の隊の Lv × 装備の段)
+npm run sim:dragon -- 30 200     # 竜まで攻める bot。バランスを変えたら 30 seed で前後を比べる(10 seed は ±10 日ぶれる)
+npm run test:browser             # build 済みの画面を実ブラウザで通す
 ```
 
 ブラウザ検証はインストール済み Chrome を Playwright で使う(`npm run test:browser`)。通常のブラウザセーブには触れない。
+人のテストプレイの手引きは `docs/PLAYTEST.md`。
 
 ## 委譲
 
