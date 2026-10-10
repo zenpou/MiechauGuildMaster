@@ -21,10 +21,10 @@ button.danger { background: #5a3434; border-color: #7d4a4a; }
 button.wide { display: block; width: 100%; padding: 10px; margin: 8px 0; }
 select { font: inherit; }
 
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
-.tabs button { padding: 8px 0; }
+.tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
+.tabs button { padding: 8px 0; min-width: 0; position: relative; font-size: 0.9rem; white-space: nowrap; }
 .tabs button.on { background: #57916d; border-color: #6fb088; }
-.tabs .badge { margin-left: 4px; }
+.tabs .badge { position: absolute; top: -4px; right: -2px; font-size: 0.7rem; }
 
 .scroll { overflow-x: auto; }
 table { border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; }
@@ -47,8 +47,12 @@ ul.plain li { padding: 4px 0; border-bottom: 1px solid #2f3e41; }
 .cell.seen, .lg.seen { background: #6f7d74; color: #1d2422; }
 .cell.stepped, .lg.stepped { background: #d8d2bd; color: #2a2a2a; }
 .cell.recent, .lg.recent { background: #f0c25a; color: #2a2a2a; }
+.cell.door, .lg.door { background: #9a5a3c; color: #fff4e0; }
+.cell.door.open, .lg.door.open { background: #3f8a6a; color: #f2fff8; }
+.cell.door.recent { box-shadow: inset 0 0 0 2px #f0c25a; }
 .legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 8px 0 4px; }
 .lg { display: inline-block; width: 14px; height: 14px; border: 1px solid #111; }
+.lg-item { display: inline-flex; align-items: center; gap: 4px; margin-right: 6px; white-space: nowrap; }
 
 .loglist button { width: 100%; text-align: left; }
 .loglist button.sel { background: #57916d; }
@@ -66,7 +70,7 @@ ol.log li { padding: 2px 0; }
 .log-talk { color: #c8e6a0; }
 
 .warn { background: #6b3a2a; padding: 8px; border-radius: 6px; margin: 6px 0; }
-.toast { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); max-width: calc(100% - 24px); background: #34474a; border: 1px solid #6fb088; padding: 10px 14px; border-radius: 8px; z-index: 2; }
+.toast { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); max-width: calc(100% - 24px); background: #34474a; border: 1px solid #6fb088; padding: 10px 14px; border-radius: 8px; z-index: 11; }
 .toast.err { border-color: #ff8f80; }
 select.wide { width: 100%; }
 .actions { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0; }
@@ -120,7 +124,7 @@ button.link { background: none; border: none; padding: 0; text-decoration: under
 .world-map .node.visited.k-waypoint circle { fill: #5b5248; }
 .world-map .node.rumored circle { stroke-dasharray: 1.2 0.9; }
 .world-map .node.sel circle { stroke: #f0c25a; stroke-width: 1.4; }
-.world-map .node-label { font-size: 3.2px; fill: #e8e6df; text-anchor: middle; }
+.world-map .node-label { font-size: 3.2px; fill: #e8e6df; }
 .world-map .party rect { fill: #ffe08a; stroke: #2a2a2a; stroke-width: 0.4; }
 .world-map .party-label { font-size: 2.8px; fill: #ffe08a; font-weight: bold; }
 .lg.w-visited { background: #3d5d6b; border-radius: 50%; border-color: #e8e6df; }
@@ -158,3 +162,13 @@ ul.quests li { padding: 6px 0; }
 .training ul li { padding: 4px 0; }
 .return-lines { margin-top: 10px; border-top: 1px solid #3a4a4d; }
 .return-lines .talk-name { color: #c8e6a0; font-weight: bold; }
+
+.bar { height: 6px; background: #151b1c; border-radius: 3px; overflow: hidden; margin: 4px 0 2px; }
+.bar-fill { height: 100%; background: #57916d; }
+.achievements li.on { color: #ffe08a; background: #3a3a22; padding-left: 6px; border-left: 3px solid #f0c25a; }
+.achievements li.on .badge { background: #7a6a2f; }
+.cleared { border: 1px solid #f0c25a; color: #ffe08a; }
+.jobs ul li { padding: 4px 0; }
+.modal-back { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; overscroll-behavior: contain; background: rgba(12, 18, 19, 0.94); }
+.modal { width: 100%; max-width: 520px; max-height: 100%; overflow-y: auto; background: #263437; border: 1px solid #6fb088; border-radius: 10px; padding: 16px; }
+.ending-text { margin: 12px 0; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }

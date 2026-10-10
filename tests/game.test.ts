@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { addExp, generateAdventurer } from '../src/core/adventurer';
 import { assignWorker } from '../src/core/base';
 import { startCraft } from '../src/core/craft';
-import { DUNGEON, JOB, TUNING } from '../src/core/data';
+import { DUNGEON, ITEM, JOB, TUNING } from '../src/core/data';
 
 const G0 = TUNING.game.startGold;
 const SUP = TUNING.game.supportGold;
 import { parseFloor } from '../src/core/dungeon';
 import {
-  acceptQuest, advanceDay, buildFacility, buyItem, dispatch, exploredRateOf, newGame, recall, sellMaterial,
+  acceptQuest, advanceDay, buildFacility, buyItem, dispatch, exploredRateOf, newGame, recall, sellGold, sellMaterial,
 } from '../src/core/game';
 import { availableRecipes, canCraft } from '../src/core/craft';
 import { createQuest, deliver } from '../src/core/quests';
@@ -876,5 +876,83 @@ describe('複数フロア・鍵の組み込み', () => {
     };
     expect(keyReturn(0)).toBe(1);
     expect(keyReturn(1)).toBe(1);
+  });
+});
+
+describe('新しい施設の効果(売却・日送りの産出・派遣)', () => {
+  it('市場で素材の売却額が増える: Lv1 で1割、Lv2 で2割、鍛冶場と隣り合う(商い)とさらに1割。端数は四捨五入', () => {
+    const s = newGame(3);
+    s.inventory.fang = 30;
+    const p = ITEM.fang.price;
+    const sell = (n: number) => {
+      const g = s.gold;
+      expect(sellMaterial(s, 'fang', n)).toEqual({ ok: true });
+      return s.gold - g;
+    };
+    expect(sell(3)).toBe(p * 3);
+    place(s, 'market', 0, 0);
+    expect(sellGold(s, 'fang', 3)).toBe(Math.round(p * 3 * 1.1));
+    expect(sell(3)).toBe(Math.round(p * 3 * 1.1));
+    expect(s.ledger[0]).toMatchObject({ label: `素材売却: ${ITEM.fang.name}×3`, amount: Math.round(p * 3 * 1.1) });
+    s.base.facilities[0].level = 2;
+    expect(sell(1)).toBe(Math.round(p * 1.2));
+    place(s, 'smithy', 1, 0);
+    expect(sell(5)).toBe(Math.round(p * 5 * 1.3));
+  });
+
+  it('日送りで製材所・石切場の産出が在庫に入る。完成した日から産み、台帳とお知らせには出ない', () => {
+    const s = newGame(3);
+    s.gold = 5000;
+    expect(buildFacility(s, 'sawmill', 0, 0)).toEqual({ ok: true });
+    place(s, 'quarry', 4, 4, 2);
+    advanceDay(s);
+    expect(s.inventory.lumber ?? 0).toBe(0);
+    expect(s.inventory.stone).toBe(2);
+    advanceDay(s);
+    advanceDay(s);
+    expect(s.base.facilities[0].level).toBe(1);
+    expect([s.inventory.lumber, s.inventory.stone]).toEqual([1, 6]);
+    expect(s.ledger.some((l) => /木材|石材/.test(l.label))).toBe(false);
+    expect(s.notices.some((n) => /木材|石材/.test(n.text))).toBe(false);
+  });
+
+  it('地図室の発見率が派遣の探索に渡り、隠し通路が多く見つかる(固定seed)', () => {
+    const found = (withMap: boolean) => {
+      let n = 0;
+      for (let seed = 1; seed <= 40; seed++) {
+        const s = newGame(seed);
+        if (withMap) {
+          place(s, 'map_room', 0, 0, 2);
+          place(s, 'tavern', 1, 0);
+        }
+        const e = sent(s, { days: 3, items: {} });
+        n += e.result.mapDeltas.reduce((t, d) => t + d.hidden.length, 0);
+      }
+      return n;
+    };
+    const plain = found(false);
+    expect(found(true)).toBeGreaterThan(plain);
+  });
+
+  it('見張り台で派遣の道中の遭遇が減る(往路・復路とも倍率が渡る)', () => {
+    const encounters = (withTower: boolean) => {
+      let n = 0;
+      for (let seed = 1; seed <= 100; seed++) {
+        const s = newGame(seed);
+        s.dungeons.old_mine = { confirmed: true, floors: { f1: { visited: [], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false };
+        if (withTower) {
+          place(s, 'watchtower', 0, 0, 2);
+          place(s, 'reception', 1, 0);
+        }
+        const e = sent(s, { target: { dungeon: 'old_mine', floor: 'f1' }, days: 1, items: {} });
+        const legs = (e as unknown as { legs: { out: { encounters: number }; back: { encounters: number } } }).legs;
+        n += legs.out.encounters + legs.back.encounters;
+      }
+      return n;
+    };
+    // 見張り台 Lv2(−25%)と護衛の手配(−10%)で、遭遇はおよそ 0.65 倍になる
+    const plain = encounters(false);
+    expect(plain).toBeGreaterThan(30);
+    expect(encounters(true)).toBeLessThan(plain * 0.85);
   });
 });

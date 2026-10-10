@@ -1,19 +1,21 @@
 import { effectiveStats } from '../core/adventurer';
 import { facilityLevel } from '../core/base';
 import { canEquip, equip, unequip } from '../core/equipment';
-import { advanceDay, buyItem, dailyCost, newGame, sellMaterial } from '../core/game';
-import { ITEM, JOB, PERSONALITY, TRAINED_SKILL, TUNING, type TrainedSkillDef } from '../core/data';
+import { advanceDay, buyItem, dailyCost, newGame, sellGold, sellMaterial } from '../core/game';
+import { ITEM, JOB, JOBS, PERSONALITY, TRAINED_SKILL, TUNING, type TrainedSkillDef } from '../core/data';
+import { canChangeJob, changeJob, promotionCost, promotionOptions } from '../core/jobs';
 import { unreadCount } from '../core/mail';
 import { REP_LEVELS, repLevel } from '../core/quests';
 import { capacity, dismiss } from '../core/recruit';
-import { canTrain, trainableSkills, trainSkill } from '../core/training';
-import { LOYALTY_MILESTONES, STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type Result } from '../core/types';
+import { canTrain, trainDays, trainableSkills, trainSkill } from '../core/training';
+import { LOYALTY_MILESTONES, STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type JobDef, type Result } from '../core/types';
 import { advById, commit, personaText, render, replaceState, sign, SLOTS, STAT_LABEL, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
 
 const ELEMENT_NAME: Record<string, string> = { fire: '火', ice: '氷', thunder: '雷', earth: '土', dark: '闇' };
 const EFFECT_NAME: Record<string, string> = { gather: '採取量', carry: '積載' };
 const ARMOR_NAME: Record<string, string> = { light: '軽装', medium: '中装', heavy: '重装' };
+const TIER_NAME: Record<JobDef['tier'], string> = { lower: '下級', upper: '上級' };
 const slotsOf = (a: Adventurer) => a.equipment ?? { weapon: null, armor: null, accessory: null };
 const skillsOf = (a: Adventurer) => a.skills ?? [];
 const ROSTER_HEAD = ['名前', '職', '武器', '防具', '装飾', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態', ''];
@@ -78,9 +80,7 @@ export function homeTab(): HTMLElement {
     div('row',
       h('button', { onclick: () => buy(1) }, `${potion.name}を買う(${potion.price}G)`),
     ),
-    h('h2', null, '台帳(最近10件)'),
-    h('ul', { class: 'plain small' }, ...s.ledger.slice(0, 10).map((l) =>
-      h('li', null, span('dim', `${l.day}日目 `), l.label, ' ', span(l.amount < 0 ? 'neg' : 'pos', `${l.amount > 0 ? '+' : ''}${l.amount}G`)))),
+    div('dim small', '台帳(お金の出入り)と実績は記録タブにあります。'),
     div('row footer',
       span('dim small', `seed ${s.seed}`),
       h('button', { class: 'danger', onclick: restart }, '新しく始める'),
@@ -138,6 +138,8 @@ function noticesBlock(): HTMLElement | null {
 
 const KIND_GROUPS: { name: string; kinds: string[] }[] = [
   { name: '素材', kinds: ['material'] },
+  { name: '鍵', kinds: ['key'] },
+  { name: '建材', kinds: ['building'] },
   { name: '装備', kinds: ['weapon', 'armor', 'accessory'] },
   { name: '消耗品', kinds: ['consumable'] },
 ];
@@ -156,10 +158,12 @@ function inventoryBlock(): HTMLElement {
       const def = ITEM[id];
       const sellable = def?.kind === 'material';
       const fx = equipText(def);
+      const note = def?.kind === 'key' || def?.kind === 'building' ? def.desc : '';
       return h('li', null,
         span(null, `${def?.name ?? id} ×${n}`),
         fx ? span('dim small', ` ${fx}`) : null,
-        sellable ? span('dim small', ` (${def.price}G)`) : null,
+        note ? span('dim small', ` ${note}`) : null,
+        sellable ? span('dim small', ` (${sellGold(state, id, 1)}G)`) : null,
         sellable ? h('button', { class: 'small', onclick: () => sell(id, 1) }, '1つ売る') : null,
         sellable && n > 1 ? h('button', { class: 'small', onclick: () => sell(id, n) }, '全部売る') : null,
       );
@@ -210,7 +214,53 @@ function equipPanel(): HTMLElement | null {
       );
     }),
     trainingBlock(a),
+    jobBlock(a),
   );
+}
+
+// canChangeJob は可否しか返さないので、並べる候補はここで決める(上級からは入口の下級へ戻るだけ)
+function jobTargets(a: Adventurer): JobDef[] {
+  const cur = JOB[a.job];
+  if (cur?.tier === 'upper') return (cur.from ?? []).map((id) => JOB[id]).filter((j): j is JobDef => !!j);
+  return [...JOBS.filter((j) => j.tier === 'lower' && j.id !== a.job), ...promotionOptions(a)];
+}
+
+const isPromotion = (a: Adventurer, j: JobDef) => j.tier === 'upper' && JOB[a.job]?.tier !== 'upper';
+const armorText = (j: JobDef) => j.armor.map((c) => ARMOR_NAME[c] ?? c).join('・');
+
+function jobBlock(a: Adventurer): HTMLElement {
+  const cur = JOB[a.job];
+  const cost = promotionCost(state);
+  const checks = jobTargets(a).map((j) => ({ j, c: canChangeJob(state, a.id, j.id) }));
+  const reasons = new Set(checks.map(({ c }) => (c.ok ? '' : c.reason)));
+  // 訓練と同じく、全行が同じ理由(待機中でない等)なら1回だけ出す
+  const common = reasons.size === 1 ? [...reasons][0] : '';
+  return div('slot jobs',
+    h('h3', null, '転職'),
+    div('small', `今の職: ${cur.name}(${TIER_NAME[cur.tier]})`, span('dim', ` ${cur.desc}`)),
+    div('dim small', `下級どうしは無料。上級への昇格は条件を満たすと${cost}G。上級からは入口の下級へ無料で戻れます(別の上級へは移れません)。転職は待機中のみ。Lvは変わりません。`),
+    div('small neg', '着けられなくなる防具は在庫に戻ります。'),
+    common ? div('small neg', common) : null,
+    checks.length ? h('ul', { class: 'plain' }, ...checks.map(({ j, c }) => h('li', { class: c.ok ? '' : 'dim' },
+      div('row tight',
+        span(null, j.name), span(j.tier === 'upper' ? 'badge' : 'dim small', TIER_NAME[j.tier]),
+        span('dim small', isPromotion(a, j) ? `Lv${j.requireLevel ?? '?'}以上・${cost}G` : '無料'),
+        h('button', { class: 'small', disabled: !c.ok, onclick: () => doChangeJob(a, j) }, isPromotion(a, j) ? '昇格する' : '転職する')),
+      div('dim small', `${j.desc} 着られる防具: ${armorText(j)}`),
+      c.ok || common ? null : div('small neg', c.reason),
+    ))) : div('dim small', '転職先がありません'),
+  );
+}
+
+function doChangeJob(a: Adventurer, j: JobDef) {
+  if (isPromotion(a, j) && !window.confirm(`${a.name}を${j.name}に昇格させますか?(費用${promotionCost(state)}G)`)) return;
+  const armorBefore = slotsOf(a).armor;
+  const r = changeJob(state, a.id, j.id);
+  if (!r.ok) return toast(r.reason, true);
+  const now = advById(a.id) ?? a;
+  const dropped = armorBefore && slotsOf(now).armor !== armorBefore ? armorBefore : null;
+  commit();
+  toast(`${a.name}が${j.name}になりました。${dropped ? `${ITEM[dropped]?.name ?? dropped}は着けられないので在庫に戻しました。` : ''}`);
 }
 
 /** 訓練所があるときだけ出す */
@@ -226,7 +276,7 @@ function trainingBlock(a: Adventurer): HTMLElement | null {
   const common = reasons.size === 1 ? [...reasons][0] : '';
   return div('slot training',
     h('h3', null, '訓練'),
-    div('dim small', `1回${T.days}日・${T.gold}G。訓練で覚えられるのは1人${T.maxSkills}つまで(固有スキルは数えない)。訓練中は派遣や勤務に出せません。`),
+    div('dim small', `1回${trainDays(state)}日・${T.gold}G。訓練で覚えられるのは1人${T.maxSkills}つまで(固有スキルは数えない)。訓練中は派遣や勤務に出せません。`),
     owned.length
       ? div('small', '覚えているスキル: ', owned.map((id, i) => `${i ? '、' : ''}${TRAINED_SKILL[id]?.name ?? id}(${skillText(TRAINED_SKILL[id])})`).join(''))
       : null,
@@ -234,8 +284,8 @@ function trainingBlock(a: Adventurer): HTMLElement | null {
     common ? div('small neg', common) : null,
     checks.length ? h('ul', { class: 'plain' }, ...checks.map(({ d, c }) => h('li', { class: c.ok ? '' : 'dim' },
       div('row tight',
-        span(null, d.name), span('small', skillText(d)), span('dim small', `${T.days}日・${T.gold}G`),
-        h('button', { class: 'small', disabled: !c.ok, onclick: () => act(trainSkill(state, a.id, d.id), `${a.name}が「${d.name}」の訓練を始めました(${T.days}日)`) }, '訓練する'),
+        span(null, d.name), span('small', skillText(d)), span('dim small', `${trainDays(state)}日・${T.gold}G`),
+        h('button', { class: 'small', disabled: !c.ok, onclick: () => act(trainSkill(state, a.id, d.id), `${a.name}が「${d.name}」の訓練を始めました(${trainDays(state)}日)`) }, '訓練する'),
       ),
       d.desc ? div('dim small', d.desc) : null,
       c.ok || common ? null : div('small neg', c.reason),

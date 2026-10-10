@@ -1,6 +1,7 @@
 // 出発前の見込み。既知のマスだけを歩く探索を同じ条件で何度か回し、損耗の目安を出す(DESIGN 第3節)。
 // 未踏の中身は見ないので、探索率が低いほど数字は当てにならない。その度合いを uncertainty で示す。
 import { powerOf } from './adventurer';
+import { bonus } from './base';
 import { DUNGEON, TUNING } from './data';
 import { exploredRate, parseFloor } from './dungeon';
 import { floorTransit, runExploration } from './explore';
@@ -67,6 +68,7 @@ export function assessReadiness(s: GameState, o: DispatchOrder, runs = T.runs): 
       progress, days: o.days, items: { ...(o.items ?? {}) }, relations: s.relations, startDay: s.day,
       action: o.action, target: { item: o.target.item, enemy: o.target.enemy }, knownOnly: true,
       keys: heldKeys(s), transit: floorTransit(dungeon, floorId, progress, heldKeys(s)) ?? 0,
+      hiddenBonus: bonus(s, 'hiddenFind'),
     });
     if (result.wiped) wipes++;
     if (result.retreated) retreats++;

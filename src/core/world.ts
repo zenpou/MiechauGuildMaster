@@ -140,11 +140,12 @@ export interface TravelResult {
 }
 
 /**
- * 片道ぶんの道中を確定する。移動1日ごとに danger(斥候役がいれば ×0.7)で遭遇1回。
+ * 片道ぶんの道中を確定する。移動1日ごとに danger(斥候役がいれば ×0.7)× encounterMult(見張り台など)で遭遇1回。
  * direction 'return' は経路を逆にたどる。全滅したらそこで打ち切る。
  */
 export function simulateTravel(
   rng: Rng, members: Adventurer[], nodes: string[], direction: 'outbound' | 'return', knowledge: EdgeKnowledge,
+  encounterMult = 1,
 ): TravelResult {
   const path = direction === 'outbound' ? nodes : [...nodes].reverse();
   const edges = edgesOf(path, knowledge);
@@ -172,7 +173,7 @@ export function simulateTravel(
       day++;
       if (day > 1) for (const u of units) u.hp = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * T.campHeal));
       addFatigue(T.dayFatigue + T.campFatigue);
-      if (!rng.chance(e.danger * (scouted ? SCOUT_ENCOUNTER_MULT : 1))) continue;
+      if (!rng.chance(e.danger * (scouted ? SCOUT_ENCOUNTER_MULT : 1) * encounterMult)) continue;
       result.encounters++;
       const pick = rng.weighted(roadEnemies(e), (x) => x.weight);
       const def = ENEMY[pick.id];

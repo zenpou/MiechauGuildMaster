@@ -1,15 +1,33 @@
 import { effectiveStats } from '../core/adventurer';
 import { activeSynergies, assignWorker, canBuild, facilityLevel, listSynergies, unassignWorker, upgrade, workersOf } from '../core/base';
-import { canCraft, craftDays, startCraft } from '../core/craft';
-import { FACILITIES, FACILITY, ITEM, RECIPE, RECIPES } from '../core/data';
+import { canCraft, craftDays, craftGold, startCraft } from '../core/craft';
+import { FACILITIES, FACILITY, ITEM, ITEMS, RECIPE, RECIPES } from '../core/data';
 import { buildFacility } from '../core/game';
-import type { FacilityLevelCost, PlacedFacility, Result } from '../core/types';
+import type { FacilityDef, FacilityLevelCost, PlacedFacility, Result } from '../core/types';
 import { commit, render, STAT_LABEL, state, toast, ui } from './app';
 import { div, h, span } from './dom';
 
 const itemName = (id: string) => ITEM[id]?.name ?? id;
 const placedAt = (x: number, y: number) => state.base.facilities.find((f) => f.x === x && f.y === y);
 const stock = (id: string) => state.inventory[id] ?? 0;
+const BUILDING_ITEMS = ITEMS.filter((i) => i.kind === 'building').map((i) => i.id);
+
+const CATEGORY_NAME: Record<FacilityDef['category'], string> = {
+  housing: '住居', production: '生産', training: '育成', recovery: '回復', info: '情報', office: '事務',
+};
+const CATEGORIES = Object.keys(CATEGORY_NAME) as FacilityDef['category'][];
+
+/** 毎日の産出(製材所・石切場)。効果の値そのまま。勤務者の上乗せは effectText に任せる */
+const PRODUCE: [key: string, item: string][] = [['produceLumber', 'lumber'], ['produceStone', 'stone']];
+function produceText(fx: Record<string, number> | undefined): string {
+  return PRODUCE.filter(([k]) => fx?.[k]).map(([k, item]) => `毎日 ${itemName(item)} +${fx![k]}`).join(' / ');
+}
+
+/** 手持ちの建材。費用の行と見比べられるよう、建設費の近くに出す */
+function buildingStock(): HTMLElement | null {
+  if (!BUILDING_ITEMS.length) return null;
+  return div('small stock', '手持ちの建材: ', ...BUILDING_ITEMS.map((id) => span(stock(id) ? '' : 'dim', `${itemName(id)} ×${stock(id)} `)));
+}
 
 /** 足りない物を赤くした費用表示 */
 function costView(c: FacilityLevelCost): HTMLElement {
@@ -71,17 +89,24 @@ function cellPanel(x: number, y: number): HTMLElement {
 function buildPanel(x: number, y: number): HTMLElement {
   const placed = new Set(state.base.facilities.map((f) => f.id));
   const list = FACILITIES.filter((d) => !placed.has(d.id));
+  const groups = [...CATEGORIES.map((c) => ({ name: CATEGORY_NAME[c], list: list.filter((d) => d.category === c) })),
+    { name: 'その他', list: list.filter((d) => !CATEGORIES.includes(d.category)) }].filter((g) => g.list.length);
   return div('detail',
     div(null, span('big', `空きマス(${x + 1}, ${y + 1})`)),
-    list.length ? h('ul', { class: 'plain' }, ...list.map((d) => {
-      const r = canBuild(state, d.id, x, y);
-      return h('li', null,
-        div('row tight', span(null, d.name), costView(d.costs[0]),
-          h('button', { class: 'small', disabled: !r.ok, onclick: () => doBuild(d.id, x, y) }, '建てる')),
-        div('small', d.effectText[0], span('dim', ` / 維持費 ${d.upkeep}G/日`)),
-        r.ok ? null : div('small neg', r.reason),
-      );
-    })) : div('dim', '建てられる施設はもうありません'),
+    buildingStock(),
+    groups.length ? groups.map((g) => div(null,
+      h('h3', null, g.name),
+      h('ul', { class: 'plain' }, ...g.list.map((d) => {
+        const r = canBuild(state, d.id, x, y);
+        const produce = produceText(d.effects[0]);
+        return h('li', null,
+          div('row tight', span(null, d.name), costView(d.costs[0]),
+            h('button', { class: 'small', disabled: !r.ok, onclick: () => doBuild(d.id, x, y) }, '建てる')),
+          produce ? div('small pos', produce) : null,
+          div('small', d.effectText[0], span('dim', ` / 維持費 ${d.upkeep}G/日`)),
+          r.ok ? null : div('small neg', r.reason),
+        );
+      })))) : div('dim', '建てられる施設はもうありません'),
   );
 }
 
@@ -90,14 +115,18 @@ function facilityPanel(f: PlacedFacility): HTMLElement {
   if (!d) return div('detail', f.id);
   const lv = facilityLevel(state, f.id);
   const next = f.construction || f.level >= d.maxLevel ? null : d.costs[f.level];
+  const produce = lv ? produceText(d.effects[lv - 1]) : '';
+  const nextProduce = next ? produceText(d.effects[f.level]) : '';
   return div('detail',
     div(null, span('big', d.name), span('dim small', ` Lv${lv}/${d.maxLevel} 維持費 ${d.upkeep}G/日`)),
     div('dim small', d.desc),
     div('small', lv ? `効果: ${d.effectText[lv - 1]}` : '効果: 完成後に効きます'),
+    produce ? div('small pos', produce) : null,
     f.construction ? div('small', `工事中: Lv${f.construction.toLevel}まで あと${f.construction.untilDay - state.day}日(${f.construction.untilDay}日目に完成)`) : null,
     next ? div(null,
       div('row tight', span('small', `Lv${f.level + 1}へ:`), costView(next), h('button', { class: 'small', onclick: () => doUpgrade(f.id) }, 'Lvを上げる')),
-      div('dim small', `Lv${f.level + 1}の効果: ${d.effectText[f.level]}`),
+      buildingStock(),
+      div('dim small', `Lv${f.level + 1}の効果: ${d.effectText[f.level]}${nextProduce ? `(${nextProduce})` : ''}`),
     ) : null,
     d.workSlots && lv ? workerBlock(f.id) : null,
     lv && RECIPES.some((r) => r.facility === f.id) ? recipeBlock(f.id) : null,
@@ -110,9 +139,11 @@ function workerBlock(facilityId: string): HTMLElement {
   const idle = state.adventurers.filter((a) => a.status === 'idle');
   const full = workers.length >= (d.workSlots ?? 0);
   const stat = d.workStat;
+  // 製材所・石切場の勤務の効き目は効果の欄(effectText)に書いてあるので、ここでは製作の短縮だけ説明する
+  const crafts = RECIPES.some((r) => r.facility === facilityId);
   return div(null,
     h('h3', null, `勤務(${workers.length}/${d.workSlots})`),
-    div('dim small', `${stat ? `勤務者の${STAT_LABEL[stat]}が12以上なら完成日数−1。` : ''}勤務中は派遣に出せません。`),
+    div('dim small', `${stat && crafts ? `勤務者の${STAT_LABEL[stat]}が12以上なら完成日数−1。` : ''}勤務中は派遣に出せません。`),
     h('ul', { class: 'plain' }, ...workers.map((a) => h('li', null, a.name,
       h('button', { class: 'small', onclick: () => doUnassign(a.id) }, '解除')))),
     full ? null : h('select', { class: 'wide', onchange: (ev: Event) => { const v = (ev.target as HTMLSelectElement).value; if (v) doAssign(v, facilityId); } },
@@ -131,7 +162,7 @@ function recipeBlock(facilityId: string): HTMLElement {
       return h('li', null,
         div('row tight',
           span(null, `${r.name}${r.output.n > 1 ? `×${r.output.n}` : ''}`),
-          span('small', span(state.gold >= r.gold ? '' : 'neg', `${r.gold}G`), ` ${craftDays(state, r.id)}日`),
+          span('small', span(state.gold >= craftGold(state, r.id) ? '' : 'neg', `${craftGold(state, r.id)}G`), ` ${craftDays(state, r.id)}日`),
           h('button', { class: 'small', disabled: !c.ok, onclick: () => doCraft(r.id) }, '作る')),
         div('small', ...r.inputs.map((i) => span(stock(i.item) >= i.n ? 'pos' : 'neg', `${itemName(i.item)}×${i.n}(${stock(i.item)}) `))),
         div('dim small', ITEM[r.output.item]?.desc ?? ''),

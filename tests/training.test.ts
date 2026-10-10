@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveStats } from '../src/core/adventurer';
-import { TUNING } from '../src/core/data';
+import { FACILITY, TUNING } from '../src/core/data';
 import { newGame } from '../src/core/game';
-import { canTrain, completeTraining, trainSkill, trainableSkills } from '../src/core/training';
+import { canTrain, completeTraining, trainDays, trainSkill, trainableSkills } from '../src/core/training';
 import type { GameState } from '../src/core/types';
 
 const T = TUNING.training;
@@ -80,5 +80,38 @@ describe('スキル訓練', () => {
     const s = withTrainingYard();
     s.gold = T.gold - 1;
     expect(canTrain(s, s.adventurers[0].id, 'tough').ok).toBe(false);
+  });
+});
+
+describe('図書室で訓練日数が縮む', () => {
+  const library = (s: GameState, level: number, x: number) => {
+    s.base.facilities.push({ id: 'library', level, x, y: 0, builtDay: 1, construction: null });
+  };
+
+  it('図書室 Lv1 は縮まず、Lv2 で−1日、訓練所と隣り合う(学び舎)とさらに−1日。訓練の期日に反映される', () => {
+    const s = withTrainingYard();
+    expect(trainDays(s)).toBe(T.days);
+    library(s, 1, 2);
+    expect(trainDays(s)).toBe(T.days);
+    s.base.facilities[1].level = 2;
+    expect(trainDays(s)).toBe(Math.max(1, T.days - 1));
+    s.base.facilities[1].x = 1;
+    expect(trainDays(s)).toBe(Math.max(1, T.days - 2));
+    const a = s.adventurers[0];
+    expect(trainSkill(s, a.id, 'tough')).toEqual({ ok: true });
+    expect(a.assignment).toEqual({ training: 'tough', untilDay: s.day + Math.max(1, T.days - 2) });
+  });
+
+  it('1日より短くはならない', () => {
+    const s = withTrainingYard();
+    library(s, 2, 1);
+    const eff = FACILITY.library.effects[1];
+    const saved = eff.trainDaysOff;
+    eff.trainDaysOff = 10;
+    try {
+      expect(trainDays(s)).toBe(1);
+    } finally {
+      eff.trainDaysOff = saved;
+    }
   });
 });

@@ -190,3 +190,46 @@ describe('ユニーク冒険者の出現', () => {
     expect(b.candidates.filter((c) => !c.adv.unique).map((c) => c.adv.name)).toEqual(a.candidates.map((c) => c.adv.name));
   });
 });
+
+describe('酒場', () => {
+  const put = (s: GameState, id: string, x: number, level = 1) => {
+    s.base.facilities.push({ id, level, x, y: 0, builtDay: 1, construction: null });
+  };
+
+  it('毎日の来訪者が 酒場 Lv1 で+1、Lv2 で+2、宿舎と隣り合う(冒険者の宿)とさらに+1。上限は変わらない', () => {
+    for (let d = 0; d < 12; d++) {
+      const arrive = (setup: (s: GameState) => void) => {
+        const s = bare();
+        setup(s);
+        return arriveCandidates(s, rngFor(3, 'arrive', d)).length;
+      };
+      const n0 = arrive(() => {});
+      expect(arrive((s) => put(s, 'tavern', 0))).toBe(n0 + 1);
+      expect(arrive((s) => put(s, 'tavern', 0, 2))).toBe(n0 + 2);
+      expect(arrive((s) => { put(s, 'tavern', 0, 2); put(s, 'dorm', 1); })).toBe(n0 + 3);
+      expect(arrive((s) => { put(s, 'tavern', 0, 2); put(s, 'dorm', 2); })).toBe(n0 + 2);
+    }
+    const full = bare();
+    put(full, 'tavern', 0, 2);
+    put(full, 'dorm', 1);
+    for (let d = 0; d < 5; d++) arriveCandidates(full, rngFor(4, 'full', d));
+    expect(full.candidates).toHaveLength(T.candidateMax);
+  });
+
+  it('候補者の質が上がる。同じ乱数なら能力は下がらず、合計は上がる', () => {
+    let plain = 0;
+    let boosted = 0;
+    for (let i = 0; i < 30; i++) {
+      const a = spawnCandidate(bare(), rngFor(5, 'quality', i)).adv;
+      const s = bare();
+      put(s, 'tavern', 0, 2);
+      put(s, 'map_room', 1);
+      const b = spawnCandidate(s, rngFor(5, 'quality', i)).adv;
+      for (const k of ['hp', 'atk', 'def', 'mag', 'spd'] as const) expect(b.base[k], `${i} ${k}`).toBeGreaterThanOrEqual(a.base[k]);
+      expect(b.growth).toBeGreaterThanOrEqual(a.growth);
+      plain += a.base.hp + a.base.atk + a.base.def + a.base.mag + a.base.spd;
+      boosted += b.base.hp + b.base.atk + b.base.def + b.base.mag + b.base.spd;
+    }
+    expect(boosted).toBeGreaterThan(plain);
+  });
+});

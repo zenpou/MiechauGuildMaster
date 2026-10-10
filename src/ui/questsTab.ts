@@ -1,6 +1,6 @@
 import { DUNGEON, ENEMY, ITEM, NODE, RECIPE } from '../core/data';
 import { acceptQuest } from '../core/game';
-import { activeQuests, deliver, questCargo, visibleBoards, visibleQuests, ACTIVE_MAX, dungeonRate } from '../core/quests';
+import { activeQuests, deliver, questCargo, visibleBoards, visibleQuests, activeMax, dungeonRate, questRewardGold } from '../core/quests';
 import type { Quest, QuestType } from '../core/types';
 import { commit, render, state, toast, ui } from './app';
 import { div, h, span } from './dom';
@@ -21,7 +21,7 @@ export function questLine(q: Quest): HTMLElement {
     span('badge', QUEST_TYPE_NAME[q.type] ?? q.type), ' ', q.name,
     div('dim small', q.desc),
     div('small',
-      `報酬 ${q.rewardGold}G・評判+${q.rewardRep}`,
+      `報酬 ${questRewardGold(state, q)}G・評判+${q.rewardRep}`,
       q.departDay !== null ? ` / 出発日 ${q.departDay}日目` : '',
       q.acceptBy !== null ? span(q.acceptBy <= state.day ? 'neg' : '', ` / 受注期限 ${q.acceptBy}日目(${left(q.acceptBy)})`) : '',
     ),
@@ -33,7 +33,7 @@ export function questsTab(): HTMLElement {
   const unlocks = visibleQuests(state).filter((q) => q.type === 'unlock');
   const boards = visibleBoards(state);
   return div('tab-body',
-    div('summary', span('big', `${state.day}日目`), span('big', `${state.gold}G`), span('dim', `受注中 ${activeQuests(state).length}/${ACTIVE_MAX}件`)),
+    div('summary', span('big', `${state.day}日目`), span('big', `${state.gold}G`), span('dim', `受注中 ${activeQuests(state).length}/${activeMax(state)}件`)),
     h('h2', null, '受注中'),
     active.length ? h('ul', { class: 'plain quests' }, ...active.map(activeRow)) : div('dim', '受けている依頼はありません'),
     h('h2', null, '掲示板'),
@@ -79,7 +79,7 @@ function activeRow(q: Quest): HTMLElement {
   return h('li', null,
     span('badge', QUEST_TYPE_NAME[q.type] ?? q.type), ' ', q.name,
     div('small', progressView(q)),
-    div('small', `報酬 ${q.rewardGold}G・評判+${q.rewardRep}`,
+    div('small', `報酬 ${questRewardGold(state, q)}G・評判+${q.rewardRep}`,
       q.dueDay !== null ? span(q.dueDay - state.day <= 1 ? 'neg' : '', ` / 納期 ${q.dueDay}日目(${left(q.dueDay)})`) : ''),
     q.type === 'deliver' ? h('button', { class: 'small', onclick: () => doDeliver(q) }, '納品する') : null,
     out ? div('small pos', '隊が向かっています') : null,
@@ -94,7 +94,7 @@ function unlockRow(q: Quest): HTMLElement {
     span('badge', '解放'), ' ', q.name, span('dim small', ` (${nodeName(q.town)})`),
     div('dim small', q.desc),
     div('small', `達成で開くもの: ${opens || 'なし'}`),
-    div('small', progressView(q), ` / 報酬 ${q.rewardGold}G・評判+${q.rewardRep}`),
+    div('small', progressView(q), ` / 報酬 ${questRewardGold(state, q)}G・評判+${q.rewardRep}`),
     q.status === 'posted'
       ? h('button', { class: 'small', onclick: () => accept(q.id, q.name) }, '受注')
       : h('button', { class: 'small', onclick: () => doDeliver(q) }, '納品する'),
@@ -118,5 +118,5 @@ function doDeliver(q: Quest) {
   const r = deliver(state, q.id);
   if (!r.ok) return toast(r.reason, true);
   commit();
-  toast(`「${q.name}」を納めました。報酬 ${q.rewardGold}G`);
+  toast(`「${q.name}」を納めました。報酬 ${questRewardGold(state, q)}G`);
 }

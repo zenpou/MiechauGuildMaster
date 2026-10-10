@@ -1,5 +1,6 @@
 // 依頼: 掲示板への発生・受注・納品・帰還での達成・期限切れ、評判Lv。
 // world.json は読まない。道の日数と危険度は呼び出し側が roadInfo で渡す。
+import { bonus } from './base';
 import { DUNGEON, ENEMY, ITEM, QUEST_TEMPLATE, QUEST_TEMPLATES, RECIPE, TUNING } from './data';
 import { exploredRate, parseFloor } from './dungeon';
 import { addInventory, ledger } from './ledger';
@@ -12,7 +13,7 @@ export const REP_LEVELS = [0, 8, 20, 35, 55];
 type TownKind = 'base' | 'town' | 'village';
 /** 街の種類ごとの、1日に依頼が1件出る確率 */
 const BOARD_CHANCE: Record<TownKind, number> = { base: 0.5, town: 0.4, village: 0.3 };
-/** 掲示板の上限(解放依頼は数えない) */
+/** 掲示板の上限(解放依頼は数えない)。拠点は受付で増える */
 const BOARD_MAX: Record<TownKind, number> = { base: 4, town: 3, village: 2 };
 /** 受注期限 = 掲示日 + この幅 */
 const ACCEPT_DAYS: [number, number] = [5, 7];
@@ -20,7 +21,7 @@ const ACCEPT_DAYS_EXPLORE: [number, number] = [7, 10];
 /** 護衛の出発日 = 掲示日 + この幅 */
 const T = TUNING.quests;
 const ESCORT_DEPART_DAYS: [number, number] = [3, 5];
-/** 同時に受けられる件数(受付施設はフェーズ6) */
+/** 同時に受けられる件数の基本値。受付とシナジーの分は activeMax で足す */
 export const ACTIVE_MAX = 3;
 const DELIVER_PRICE_MUL = T.deliverPriceMul;
 const HUNT_EXP_MUL = T.huntExpMul;
@@ -168,11 +169,12 @@ export function seedUnlockQuests(s: GameState) {
 /** 日送りで呼ぶ。街ごとに確率で1件。出した依頼を返す */
 export function generateDailyQuests(s: GameState, rng: Rng, roadInfo?: RoadInfo): Quest[] {
   const out: Quest[] = [];
+  const homeExtra = bonus(s, 'boardBonus');
   for (const town of QUEST_TOWNS) {
     // 掲示板が満杯でも引いておき、乱数の列を街の状態に左右させない
     if (!rng.chance(BOARD_CHANCE[town.kind])) continue;
     const posted = s.quests.filter((q) => q.status === 'posted' && q.town === town.id && q.type !== 'unlock').length;
-    if (posted >= BOARD_MAX[town.kind]) continue;
+    if (posted >= BOARD_MAX[town.kind] + (town.kind === 'base' ? homeExtra : 0)) continue;
     const pool = TEMPLATES.filter((t) => t.town === town.id && t.type !== 'unlock' && t.minRep <= s.rep);
     if (!pool.length) continue;
     const type = rng.weighted([...new Set(pool.map((t) => t.type))], (ty) => town.questWeights[ty] ?? 0);
@@ -202,6 +204,11 @@ export function activeQuests(s: GameState): Quest[] {
   return s.quests.filter((q) => q.status === 'accepted');
 }
 
+/** 同時に受けられる件数 */
+export function activeMax(s: GameState): number {
+  return ACTIVE_MAX + bonus(s, 'questSlots');
+}
+
 function dueDayFor(s: GameState, q: Quest, info: RoadInfo | undefined): number | null {
   switch (q.type) {
     case 'unlock': return null;
@@ -224,7 +231,8 @@ export function accept(s: GameState, questId: string, roadInfo?: RoadInfo): Resu
   if (q.status !== 'posted') return fail('この依頼は受けられません');
   if (!boardSeen(s, q.town)) return fail('まだその街の掲示板を見ていません');
   if (q.acceptBy !== null && q.acceptBy < s.day) return fail('受注期限を過ぎています');
-  if (activeQuests(s).length >= ACTIVE_MAX) return fail(`同時に受けられる依頼は${ACTIVE_MAX}件までです`);
+  const max = activeMax(s);
+  if (activeQuests(s).length >= max) return fail(`同時に受けられる依頼は${max}件までです`);
   q.status = 'accepted';
   q.dueDay = dueDayFor(s, q, roadInfo);
   return ok();
@@ -304,13 +312,19 @@ export function expireQuests(s: GameState, notices: string[]) {
   }
 }
 
+/** 達成時に払う額。掲示の額(rewardGold)は変えず、護衛・運搬の見張り台の割増しは達成時の施設で決める */
+export function questRewardGold(s: GameState, q: Quest): number {
+  return q.type === 'escort' || q.type === 'transport' ? Math.round(q.rewardGold * (1 + bonus(s, 'escortGoldMult'))) : q.rewardGold;
+}
+
 export function completeQuest(s: GameState, q: Quest, notices: string[]) {
   if (q.status === 'done') return;
   q.status = 'done';
-  s.gold += q.rewardGold;
-  ledger(s, `依頼達成: ${q.name}`, q.rewardGold);
+  const gold = questRewardGold(s, q);
+  s.gold += gold;
+  ledger(s, `依頼達成: ${q.name}`, gold);
   addRep(s, q.rewardRep);
-  notices.push(`依頼「${q.name}」を達成した。報酬 ${q.rewardGold}G、評判+${q.rewardRep}。`);
+  notices.push(`依頼「${q.name}」を達成した。報酬 ${gold}G、評判+${q.rewardRep}。`);
   if (q.type === 'unlock' && q.templateId) s.flags['unlock:' + q.templateId] = true;
   for (const id of q.unlocks) {
     s.flags['unlock:' + id] = true;

@@ -1,7 +1,9 @@
 import { carryCapacity } from '../core/adventurer';
-import { DUNGEON, DUNGEONS, ENEMY, ITEM, JOB, NODE, POLICIES, PERSONALITY } from '../core/data';
+import { DUNGEON, DUNGEONS, ENEMY, ITEM, JOB, NODE, POLICIES, PERSONALITY, TUNING } from '../core/data';
 import { parseFloor } from '../core/dungeon';
+import { floorTransit } from '../core/explore';
 import { dispatch, exploredRateOf, recall } from '../core/game';
+import { heldKeys } from '../core/ledger';
 import { activeQuests, questCargo } from '../core/quests';
 import { assessReadiness, type Readiness } from '../core/readiness';
 import { travelDays } from '../core/world';
@@ -9,8 +11,7 @@ import { PARTY_MAX, PARTIES_MAX, type ActionKind, type DispatchOrder, type Exped
 import { ACTION_NAME, actionText, advById, commit, destText, nameOf, positionText, render, SLOTS, state, statusText, stepToday, toast, ui } from './app';
 import { div, h, span } from './dom';
 
-const FLOOR_ID = 'f1';
-const DAY_CHOICES = [1, 2, 3, 4, 5];
+const DAY_CHOICES = Array.from({ length: TUNING.game.daysMax }, (_, i) => i + 1);
 const ACTIONS: ActionKind[] = ['explore', 'gather', 'hunt', 'boss', 'survey'];
 const BOSS_KINDS = ['symbol', 'boss'];
 const FORECAST_RUNS = 40;
@@ -28,14 +29,22 @@ const questDests = () => activeQuests(state).filter((q) =>
 const selQuest = (): Quest | undefined => (ui.d.questId ? questDests().find((q) => q.id === ui.d.questId) : undefined);
 const nodeName = (id: string | undefined) => (id ? NODE[id]?.name ?? id : '?');
 
-/** 行き先ごとの選択肢。可否の最終判断は dispatch の戻りに任せ、ここは出発前に見せるための再現 */
-function choicesFor(dungeonId: string) {
+// 出せるかどうかは dispatch と同じ floorTransit で決める(UI が別の条件を持つと、表示と実際の可否が食い違う)
+function floorChoices(dungeonId: string) {
   const def = DUNGEON[dungeonId];
   const prog = state.dungeons[dungeonId];
-  const grid = parseFloor(def.floors.find((f) => f.id === FLOOR_ID)!);
-  const visited = prog?.floors[FLOOR_ID]?.visited ?? [];
+  const keys = heldKeys(state);
+  return (def?.floors ?? []).map((f) => ({ id: f.id, name: f.name, transit: prog ? floorTransit(def, f.id, prog, keys) : null }));
+}
+
+/** 行き先ごとの選択肢。可否の最終判断は dispatch の戻りに任せ、ここは出発前に見せるための再現 */
+function choicesFor(dungeonId: string, floorId: string) {
+  const def = DUNGEON[dungeonId];
+  const prog = state.dungeons[dungeonId];
+  const grid = parseFloor(def.floors.find((f) => f.id === floorId) ?? def.floors[0]);
+  const visited = prog?.floors[floorId]?.visited ?? [];
   const confirmed = !!prog?.confirmed;
-  const full = confirmed && exploredRateOf(state, dungeonId, FLOOR_ID) >= 1;
+  const full = confirmed && exploredRateOf(state, dungeonId, floorId) >= 1;
   const items = uniq(grid.cells.filter((c) => c.kind === 'gather' && c.item).map((c) => c.item!));
   const enemies = uniq(grid.cells.filter((c) => (c.kind === 'nest' || BOSS_KINDS.includes(c.kind)) && c.enemy).map((c) => c.enemy!));
   const reason: Partial<Record<ActionKind, string>> = {};
@@ -55,10 +64,12 @@ function tidy() {
   if (!d.leader || !d.members.includes(d.leader)) d.leader = d.members[0] ?? null;
   d.potions = Math.min(d.potions, state.inventory.potion ?? 0);
   if (!state.dungeons[d.dungeon]) d.dungeon = dungeonIds()[0];
+  const floors = floorChoices(d.dungeon);
+  if (!floors.some((f) => f.id === d.floor && f.transit !== null)) d.floor = floors[0]?.id ?? 'f1';
   if (d.questId && !selQuest()) d.questId = '';
   const q = selQuest();
   if (q) { d.action = q.type as ActionKind; return; }
-  const c = choicesFor(d.dungeon);
+  const c = choicesFor(d.dungeon, d.floor);
   if (c.reason[d.action]) d.action = ACTIONS.find((a) => !c.reason[a]) ?? 'explore';
   if (d.action === 'gather' && !c.items.includes(d.item)) d.item = c.items[0] ?? '';
   if (d.action !== 'hunt' || !c.full || !c.enemies.includes(d.enemy)) d.enemy = '';
@@ -74,7 +85,7 @@ function currentOrder(): DispatchOrder | null {
       policy: d.policy, days: 1, items: d.potions > 0 ? { potion: d.potions } : {},
     };
   }
-  const target: DispatchOrder['target'] = { dungeon: d.dungeon, floor: FLOOR_ID };
+  const target: DispatchOrder['target'] = { dungeon: d.dungeon, floor: d.floor };
   if (d.action === 'gather' && d.item) target.item = d.item;
   if (d.action === 'hunt' && d.enemy) target.enemy = d.enemy;
   return {
@@ -92,7 +103,7 @@ export function dispatchTab(): HTMLElement {
   const free = new Set(available().map((a) => a.id));
   const potionStock = state.inventory.potion ?? 0;
   const quest = selQuest();
-  const c = choicesFor(d.dungeon);
+  const c = choicesFor(d.dungeon, d.floor);
   const leader = d.leader ? advById(d.leader) : undefined;
   const order = currentOrder();
   const forecast = ui.forecast && ui.forecast.key === orderKey(order) ? ui.forecast.r : null;
@@ -174,6 +185,7 @@ function dungeonBlock(c: Choices): HTMLElement {
   const d = ui.d;
   return div(null,
     div('dim small', DUNGEON[d.dungeon]?.desc ?? ''),
+    floorBlock(),
     h('h2', null, '行動'),
     div('actions', ...ACTIONS.map((a) => h('label', { class: c.reason[a] ? 'dim' : '' },
       h('input', {
@@ -183,6 +195,28 @@ function dungeonBlock(c: Choices): HTMLElement {
       ` ${ACTION_NAME[a]}`))),
     h('ul', { class: 'plain reasons small dim' }, ...ACTIONS.filter((a) => c.reason[a]).map((a) => h('li', null, `${ACTION_NAME[a]}: ${c.reason[a]}`))),
     targetBlock(c),
+  );
+}
+
+// 階が1つのダンジョンでは選ぶ物が無いので出さない
+function floorBlock(): HTMLElement | null {
+  const d = ui.d;
+  const floors = floorChoices(d.dungeon);
+  if (floors.length < 2) return null;
+  const keys = heldKeys(state);
+  return div(null,
+    h('h2', null, '階'),
+    div('actions', ...floors.map((f) => h('label', { class: f.transit === null ? 'dim' : '' },
+      h('input', {
+        type: 'radio', name: 'floor', value: f.id, checked: d.floor === f.id ? true : undefined, disabled: f.transit === null,
+        onchange: () => { d.floor = f.id; ui.forecast = null; render(); },
+      }),
+      ` ${f.name}`))),
+    h('ul', { class: 'plain reasons small' }, ...floors.slice(1).map((f) => h('li', { class: f.transit === null ? 'dim' : '' },
+      `${f.name}: `, f.transit === null
+        ? '前の階の下り階段までの道がまだ分かりません(階段を踏み、鍵の要る扉は鍵を持って)'
+        : `前の階を抜けるのに片道${f.transit}歩(行きと帰りに1回ずつ、現地の歩数から払う)`))),
+    div('small', `所持: ${keys.length ? keys.map((k) => ITEM[k]?.name ?? k).join('・') : '鍵なし'}`),
   );
 }
 
@@ -220,7 +254,7 @@ function tripText(q: Quest | undefined): string {
 
 function pickDest(v: string) {
   if (v.startsWith(QUEST_PREFIX)) ui.d.questId = v.slice(QUEST_PREFIX.length);
-  else { ui.d.questId = ''; ui.d.dungeon = v; }
+  else { ui.d.questId = ''; ui.d.dungeon = v; ui.d.floor = 'f1'; }
   ui.forecast = null;
   render();
 }

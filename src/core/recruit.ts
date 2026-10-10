@@ -1,6 +1,6 @@
 // 募集: 候補者の到着・入れ替わり、雇用(契約金と上限)、解雇。仕組みは前作 GuildQuest のまま(DESIGN 第6節)。
 import { generateAdventurer, isTalent } from './adventurer';
-import { facilityEffect } from './base';
+import { bonus, facilityEffect } from './base';
 import { TUNING, UNIQUES } from './data';
 import { uniqueAdventurer } from './events';
 import { ledger } from './ledger';
@@ -35,17 +35,18 @@ export function spawnCandidate(s: GameState, rng: Rng): Candidate {
   const gone = Object.keys(s.flags).filter((k) => k.startsWith('goneName:')).map((k) => k.slice('goneName:'.length));
   const usedNames = new Set([...s.adventurers.map((a) => a.name), ...s.candidates.map((c) => c.adv.name), ...gone]);
   const level = rng.chance(LEVEL2_PER_LV * (lv - 1)) ? 2 : 1;
-  const adv = generateAdventurer(rng, { id: `a${s.counters.nextId++}`, quality: (lv - 1) * QUALITY_PER_LV, level, usedNames });
+  const quality = (lv - 1) * QUALITY_PER_LV + bonus(s, 'recruitQuality');
+  const adv = generateAdventurer(rng, { id: `a${s.counters.nextId++}`, quality, level, usedNames });
   const c: Candidate = { adv, arrivedDay: s.day, expiresDay: s.day + T.candidateDays };
   s.candidates.push(c);
   return c;
 }
 
-/** 日送りで呼ぶ。1 +(評判Lv3以上で+1)+(40%で+1)人、保持の上限まで */
+/** 日送りで呼ぶ。1 +(評判Lv3以上で+1)+(40%で+1)+(酒場とシナジー)人、保持の上限まで */
 export function arriveCandidates(s: GameState, rng: Rng): Candidate[] {
   // 上限で打ち切っても到着数の抽選は先に済ませ、乱数の列を保持数に左右させない
   const extra = rng.chance(EXTRA_ARRIVAL_CHANCE) ? 1 : 0;
-  const n = 1 + (repLevel(s.rep) >= EXTRA_ARRIVAL_REP_LV ? 1 : 0) + extra;
+  const n = 1 + (repLevel(s.rep) >= EXTRA_ARRIVAL_REP_LV ? 1 : 0) + extra + bonus(s, 'candidateBonus');
   const out: Candidate[] = [];
   for (let i = 0; i < n && s.candidates.length < T.candidateMax; i++) out.push(spawnCandidate(s, rng));
   for (const u of UNIQUES) {

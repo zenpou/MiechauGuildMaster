@@ -1,5 +1,5 @@
 // スキル訓練: 訓練所で待機中の冒険者に訓練スキルを覚えさせる。日数と費用は tuning.training(DESIGN 第6節)。
-import { facilityLevel } from './base';
+import { bonus, facilityLevel } from './base';
 import { TRAINED_SKILL, TRAINED_SKILLS, TUNING, type TrainedSkillDef } from './data';
 import { ledger } from './ledger';
 import type { GameState, Result } from './types';
@@ -32,6 +32,11 @@ export function trainableSkills(s: GameState, advId: string): TrainedSkillDef[] 
   return TRAINED_SKILLS.filter((d) => !a.skills.includes(d.id));
 }
 
+/** 図書室と学び舎で縮む。UI の表示と訓練の期日で同じ日数を使う */
+export function trainDays(s: GameState): number {
+  return Math.max(1, T.days - bonus(s, 'trainDaysOff'));
+}
+
 export function trainSkill(s: GameState, advId: string, skillId: string): Result {
   const r = canTrain(s, advId, skillId);
   if (!r.ok) return r;
@@ -39,7 +44,7 @@ export function trainSkill(s: GameState, advId: string, skillId: string): Result
   s.gold -= T.gold;
   ledger(s, `訓練: ${a.name}「${TRAINED_SKILL[skillId].name}」`, -T.gold);
   a.status = 'training';
-  a.assignment = { training: skillId, untilDay: s.day + T.days };
+  a.assignment = { training: skillId, untilDay: s.day + trainDays(s) };
   return ok();
 }
 

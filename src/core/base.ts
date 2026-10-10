@@ -1,5 +1,6 @@
-// 拠点の施設: 建設・増築・隣接シナジー・施設勤務。
-import { FACILITY, ITEM, SYNERGIES } from './data';
+// 拠点の施設: 建設・増築・隣接シナジー・施設勤務・毎日の産出。
+import { effectiveStats } from './adventurer';
+import { FACILITY, ITEM, SYNERGIES, TUNING } from './data';
 import { addInventory, ledger } from './ledger';
 import type { FacilityLevelCost, GameState, PlacedFacility, Result, SynergyDef } from './types';
 
@@ -102,6 +103,30 @@ export function activeSynergies(s: GameState): SynergyDef[] {
 
 export function synergyValue(s: GameState, key: string): number {
   return activeSynergies(s).reduce((t, syn) => t + (syn.effect[key] ?? 0), 0);
+}
+
+/** 施設の効果はここで読む。同じ効果を複数の施設とシナジーが持つので、施設を名指しせず合計する */
+export function bonus(s: GameState, key: string): number {
+  return s.base.facilities.reduce((t, f) => t + facilityEffect(s, f.id, key), 0) + synergyValue(s, key);
+}
+
+const PRODUCTION = [
+  { facility: 'sawmill', key: 'produceLumber', item: 'lumber' },
+  { facility: 'quarry', key: 'produceStone', item: 'stone' },
+];
+
+/**
+ * advanceDay から呼ぶ。製材所・石切場が建材を在庫に足す。勤務者の基準は工房と同じ(tuning.craft.workerStatMin)。
+ * 建材は売り買いしないので台帳に載せず、毎日のことなのでお知らせも出さない(notices は他の日送り処理と形をそろえるため)
+ */
+export function dailyProduction(s: GameState, notices: string[]) {
+  for (const p of PRODUCTION) {
+    if (facilityLevel(s, p.facility) < 1) continue;
+    const stat = FACILITY[p.facility].workStat;
+    const skilled = !!stat && workersOf(s, p.facility).some((a) => effectiveStats(a)[stat] >= TUNING.craft.workerStatMin);
+    const n = bonus(s, p.key) + (skilled ? 1 : 0);
+    if (n > 0) addInventory(s, p.item, n);
+  }
 }
 
 /** その施設で勤務中の冒険者 */

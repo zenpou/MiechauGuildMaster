@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { parseFloor } from '../src/core/dungeon';
 import { DUNGEON, ENEMY, ITEM, QUEST_TEMPLATE, TUNING } from '../src/core/data';
 import {
-  accept, completeQuest, createQuest, deliver, expireQuests, generateDailyQuests, progressFromReturn,
-  recipeUnlocked, repLevel, seedUnlockQuests, visibleBoards, visibleQuests, type RoadInfo,
+  ACTIVE_MAX, accept, activeMax, completeQuest, createQuest, deliver, expireQuests, generateDailyQuests, progressFromReturn,
+  questRewardGold, recipeUnlocked, repLevel, seedUnlockQuests, visibleBoards, visibleQuests, type RoadInfo,
 } from '../src/core/quests';
 import { rngFor } from '../src/core/rng';
 import { emptyState } from '../src/core/state';
@@ -322,5 +322,71 @@ describe('帰還での進捗', () => {
     expect(s.pendingTags).toContain('rep_milestone');
     expect(s.repMilestones).toContain(2);
     expect(notices.length).toBeGreaterThan(0);
+  });
+});
+
+describe('受付・見張り台', () => {
+  const put = (s: GameState, id: string, x: number, level = 1) => {
+    s.base.facilities.push({ id, level, x, y: 0, builtDay: 1, construction: null });
+  };
+
+  it('同時受注の上限は 3 + 受付(Lv1 で+1、Lv2 で+2)+ 市場と隣り合う帳場(+1)', () => {
+    const s = emptyState(1);
+    expect(ACTIVE_MAX).toBe(3);
+    expect(activeMax(s)).toBe(3);
+    put(s, 'reception', 0);
+    expect(activeMax(s)).toBe(4);
+    s.base.facilities[0].level = 2;
+    expect(activeMax(s)).toBe(5);
+    put(s, 'market', 1);
+    expect(activeMax(s)).toBe(6);
+  });
+
+  it('受付 Lv1 なら4件目まで受けられ、5件目で断る', () => {
+    const s = emptyState(1);
+    put(s, 'reception', 0);
+    const qs = [
+      make(s, 't_hunt_goblin'), make(s, 't_deliver_fang'), make(s, 't_escort_village'), make(s, 't_hunt_goblin', 2),
+      make(s, 't_deliver_fang', 2),
+    ];
+    for (const q of qs.slice(0, 4)) expect(accept(s, q.id, road), q.id).toEqual({ ok: true });
+    expect(accept(s, qs[4].id, road)).toEqual({ ok: false, reason: '同時に受けられる依頼は4件までです' });
+    expect(qs[4].status).toBe('posted');
+  });
+
+  it('拠点の掲示板は受付があると1件多く貼られる', () => {
+    const posted = (withReception: boolean) => {
+      const s = emptyState(3);
+      if (withReception) put(s, 'reception', 0);
+      runDays(s, 60);
+      return s.quests.filter((q) => q.status === 'posted' && q.town === 'base' && q.type !== 'unlock').length;
+    };
+    expect(posted(false)).toBe(4);
+    expect(posted(true)).toBe(5);
+  });
+
+  it('護衛・運搬の達成報酬は見張り台で1割増し、受付と隣り合う(護衛の手配)とさらに15%増し。他の依頼は変わらない', () => {
+    const s = emptyState(1);
+    put(s, 'watchtower', 0);
+    const e = make(s, 't_escort_village');
+    const notices: string[] = [];
+    let g = s.gold;
+    const paid = Math.round(e.rewardGold * 1.1);
+    expect(paid).toBeGreaterThan(e.rewardGold);
+    expect(questRewardGold(s, e)).toBe(paid);
+    completeQuest(s, e, notices);
+    expect(s.gold - g).toBe(paid);
+    expect(s.ledger[0]).toMatchObject({ label: `依頼達成: ${e.name}`, amount: paid });
+    expect(notices[0]).toContain(`報酬 ${paid}G`);
+    put(s, 'reception', 1);
+    const t = make(s, 't_transport_village');
+    g = s.gold;
+    completeQuest(s, t, []);
+    expect(s.gold - g).toBe(Math.round(t.rewardGold * 1.25));
+    const d = make(s, 't_deliver_fang');
+    expect(questRewardGold(s, d)).toBe(d.rewardGold);
+    g = s.gold;
+    completeQuest(s, d, []);
+    expect(s.gold - g).toBe(d.rewardGold);
   });
 });

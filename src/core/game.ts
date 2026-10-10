@@ -1,7 +1,7 @@
 // ゲーム状態の進行。派遣は出発時に 往路・現地・復路 を全部確定し、帰還日に applyReturn で開示する。
 import { addExp, carryCapacity, generateAdventurer, powerOf, salaryOf } from './adventurer';
 import { achievementExpMult, checkAchievements } from './achievements';
-import { build, completeConstructions, facilityEffect, facilityUpkeep, synergyValue } from './base';
+import { bonus, build, completeConstructions, dailyProduction, facilityUpkeep, synergyValue } from './base';
 import { completeCrafts } from './craft';
 import { completeTraining } from './training';
 import { DUNGEON, EDGE, ITEM, JOB, NODE, POLICY, QUEST_TEMPLATES, TUNING, type ReturnOutcome } from './data';
@@ -36,6 +36,8 @@ export const UPKEEP_PER_DAY = T.upkeepPerDay;
 const SHORTCUT_VILLAGE = 'mountain_village';
 const SHORTCUT_EDGE = 'mountain_village__old_mine_short';
 const SHORTCUT_VISITS = 3;
+/** 見張り台とシナジーを重ねても、道中の遭遇はこの割合までしか減らさない */
+const ROAD_ENCOUNTER_OFF_MAX = 0.8;
 const START_JOBS = ['fighter', 'warrior', 'priest', 'scout'];
 const BUYABLE = ['potion'];
 const NOTICES_MAX = 80;
@@ -199,9 +201,10 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   const n = s.counters.dispatches;
   // 帰還日まで隊員の状態は変わらないが、シミュレーション中の書き換えから在籍データを守るため複製を渡す
   const party = members.map((m) => structuredClone(m));
-  const outLeg = simulateTravel(rngFor(s.seed, 'road', n, 'out'), party, trip.out, 'outbound', k);
+  const encounterMult = 1 - Math.min(ROAD_ENCOUNTER_OFF_MAX, bonus(s, 'roadEncounterOff'));
+  const outLeg = simulateTravel(rngFor(s.seed, 'road', n, 'out'), party, trip.out, 'outbound', k, encounterMult);
   // 呼び戻しで現地を切り上げても使えるよう、現地の結果に関係なく帰路の遭遇も先に引いておく
-  const backLeg = simulateTravel(rngFor(s.seed, 'road', n, 'back'), party, trip.back, 'outbound', k);
+  const backLeg = simulateTravel(rngFor(s.seed, 'road', n, 'back'), party, trip.back, 'outbound', k, encounterMult);
   const outDays = pathDays(trip.out, k);
   let site: ExpeditionResult | null = null;
   if (trip.dungeonId && !outLeg.wiped) {
@@ -214,6 +217,7 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
       action: o.action, target: { item: o.target.item, enemy: o.target.enemy },
       // 出発時の在庫で扉が決まる。2階以降は前の階を抜ける歩数を往復で払う
       keys: heldKeys(s), transit: floorTransit(DUNGEON[trip.dungeonId], trip.floorId, s.dungeons[trip.dungeonId], heldKeys(s)) ?? 0,
+      hiddenBonus: bonus(s, 'hiddenFind'),
     });
   }
   const result = combineLegs(outLeg, site, outLeg.wiped || site?.wiped ? null : backLeg, items, outDays);
@@ -449,7 +453,7 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
     m.status = 'idle';
     m.fatigue = clamp(m.fatigue + (r.fatigue[m.id] ?? 0), 0, 100);
     const rawInj = r.injuries[m.id] ?? 0;
-    const inj = rawInj ? Math.max(1, rawInj + facilityEffect(s, 'clinic', 'injuryDays')) : 0;
+    const inj = rawInj ? Math.max(1, rawInj + bonus(s, 'injuryDays')) : 0;
     if (inj) m.injuryDays = Math.max(m.injuryDays, inj);
     // 全滅は全員が負傷扱いになるので、負傷の−3を重ねず全滅の−20だけにする
     if (r.wiped) addLoyalty(m, T.loyaltyWipe);
@@ -457,7 +461,7 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
       if (r.success) addLoyalty(m, T.loyaltySuccess);
       if (inj) addLoyalty(m, T.loyaltyInjured);
     }
-    const ups = addExp(m, Math.round((r.expGain[m.id] ?? 0) * (1 + facilityEffect(s, 'training', 'expMult')) * achievementExpMult(s)));
+    const ups = addExp(m, Math.round((r.expGain[m.id] ?? 0) * (1 + bonus(s, 'expMult')) * achievementExpMult(s)));
     if (ups) notices.push(`${m.name}がLv${m.level}に上がった。`);
     for (const t of r.revealedTraits) {
       if (t.advId !== m.id) continue;
@@ -569,11 +573,13 @@ export function advanceDay(s: GameState): DayReport {
   for (const e of returned) onReturn(s, e, notices);
   completeConstructions(s, notices);
   completeCrafts(s, notices);
+  // 完成したその日から産む
+  dailyProduction(s, notices);
   completeTraining(s, notices);
   advanceUniqueChain(s, notices);
 
   const returnedIds = new Set(returned.flatMap((e) => e.order.partyIds));
-  const rest = T.restFatigue - facilityEffect(s, 'clinic', 'fatigueRecover') - synergyValue(s, 'fatigueRecover');
+  const rest = T.restFatigue - bonus(s, 'fatigueRecover');
   const idleExp = synergyValue(s, 'idleExp');
   for (const a of s.adventurers) {
     // 派遣中だけ回復しない。訓練中・勤務中は待機と同じに休める
@@ -605,13 +611,18 @@ export function advanceDay(s: GameState): DayReport {
   return { day: s.day, returned, notices, scene, mails };
 }
 
+/** 素材を n 個売ったときの額。UI の表示と売却で同じ額を使う */
+export function sellGold(s: GameState, item: string, n: number): number {
+  return Math.round((has(ITEM, item) ? ITEM[item].price : 0) * n * (1 + bonus(s, 'sellMult')));
+}
+
 export function sellMaterial(s: GameState, item: string, n: number): Result {
   const def = has(ITEM, item) ? ITEM[item] : undefined;
   if (!def || def.kind !== 'material') return fail('売れるのは素材だけです');
   if (!isCount(n) || n < 1) return fail('個数が不正です');
   if ((s.inventory[item] ?? 0) < n) return fail(`${def.name}が足りません`);
   addInventory(s, item, -n);
-  const gold = def.price * n;
+  const gold = sellGold(s, item, n);
   s.gold += gold;
   ledger(s, `素材売却: ${def.name}×${n}`, gold);
   return ok();

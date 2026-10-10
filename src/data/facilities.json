@@ -174,5 +174,389 @@
         "expMult": 0.4
       }
     ]
+  },
+  {
+    "id": "sawmill",
+    "name": "製材所",
+    "desc": "丸太を挽いて木材にする。毎日木材ができ、施設の建築に使える。",
+    "category": "production",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 250,
+        "materials": {},
+        "days": 3
+      },
+      {
+        "gold": 500,
+        "materials": {
+          "stone": 4
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 8,
+    "effectText": [
+      "毎日 木材+1(勤務者の器用さが12以上でさらに+1)",
+      "毎日 木材+2(勤務者の器用さが12以上でさらに+1)"
+    ],
+    "effects": [
+      {
+        "produceLumber": 1
+      },
+      {
+        "produceLumber": 2
+      }
+    ],
+    "workSlots": 1,
+    "workStat": "dex"
+  },
+  {
+    "id": "quarry",
+    "name": "石切場",
+    "desc": "岩を切り出して石材にする。毎日石材ができ、施設の建築に使える。",
+    "category": "production",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 250,
+        "materials": {},
+        "days": 3
+      },
+      {
+        "gold": 500,
+        "materials": {
+          "lumber": 4
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 8,
+    "effectText": [
+      "毎日 石材+1(勤務者の腕力が12以上でさらに+1)",
+      "毎日 石材+2(勤務者の腕力が12以上でさらに+1)"
+    ],
+    "effects": [
+      {
+        "produceStone": 1
+      },
+      {
+        "produceStone": 2
+      }
+    ],
+    "workSlots": 1,
+    "workStat": "atk"
+  },
+  {
+    "id": "library",
+    "name": "図書室",
+    "desc": "古い記録と教本をそろえた部屋。上級職への転職費用と、スキル訓練の日数を減らす。",
+    "category": "training",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 300,
+        "materials": {
+          "lumber": 6,
+          "stone": 2
+        },
+        "days": 3
+      },
+      {
+        "gold": 600,
+        "materials": {
+          "lumber": 8,
+          "stone": 4
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 10,
+    "effectText": [
+      "上級職への転職費用−30%",
+      "上級職への転職費用−50%、スキル訓練の日数−1"
+    ],
+    "effects": [
+      {
+        "promoDiscount": 0.3,
+        "trainDaysOff": 0
+      },
+      {
+        "promoDiscount": 0.5,
+        "trainDaysOff": 1
+      }
+    ]
+  },
+  {
+    "id": "bath",
+    "name": "浴場",
+    "desc": "湯に浸かって疲れを抜く。待機中の冒険者の疲労がよく取れる。",
+    "category": "recovery",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 280,
+        "materials": {
+          "stone": 6,
+          "lumber": 3
+        },
+        "days": 3
+      },
+      {
+        "gold": 560,
+        "materials": {
+          "stone": 8,
+          "lumber": 4
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 9,
+    "effectText": [
+      "待機中の疲労回復+8/日",
+      "待機中の疲労回復+14/日"
+    ],
+    "effects": [
+      {
+        "fatigueRecover": 8
+      },
+      {
+        "fatigueRecover": 14
+      }
+    ]
+  },
+  {
+    "id": "map_room",
+    "name": "地図室",
+    "desc": "持ち帰った地図を突き合わせる部屋。探索で隠し通路に気づきやすくなる。",
+    "category": "info",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 300,
+        "materials": {
+          "lumber": 5,
+          "stone": 3
+        },
+        "days": 3
+      },
+      {
+        "gold": 600,
+        "materials": {
+          "lumber": 7,
+          "stone": 5
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 9,
+    "effectText": [
+      "隠し通路の発見率+15%",
+      "隠し通路の発見率+25%"
+    ],
+    "effects": [
+      {
+        "hiddenFind": 0.15
+      },
+      {
+        "hiddenFind": 0.25
+      }
+    ]
+  },
+  {
+    "id": "tavern",
+    "name": "酒場",
+    "desc": "冒険者が集まって噂を交わす。訪ねてくる候補者が増え、腕の立つ者も来やすくなる。",
+    "category": "info",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 280,
+        "materials": {
+          "lumber": 6,
+          "stone": 2
+        },
+        "days": 3
+      },
+      {
+        "gold": 560,
+        "materials": {
+          "lumber": 8,
+          "stone": 4
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 12,
+    "effectText": [
+      "毎日の来訪者+1、候補者の質+0.1(評判1段の半分)",
+      "毎日の来訪者+2、候補者の質+0.2(評判1段ぶん)"
+    ],
+    "effects": [
+      {
+        "candidateBonus": 1,
+        "recruitQuality": 0.1
+      },
+      {
+        "candidateBonus": 2,
+        "recruitQuality": 0.2
+      }
+    ]
+  },
+  {
+    "id": "reception",
+    "name": "受付",
+    "desc": "依頼の受け付けと整理を任せる窓口。同時に受けられる依頼と、拠点の掲示板の枠が増える。",
+    "category": "office",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 300,
+        "materials": {
+          "lumber": 5,
+          "stone": 3
+        },
+        "days": 3
+      },
+      {
+        "gold": 600,
+        "materials": {
+          "lumber": 7,
+          "stone": 5
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 10,
+    "effectText": [
+      "同時に受けられる依頼+1、拠点の掲示板+1件",
+      "同時に受けられる依頼+2、拠点の掲示板+1件"
+    ],
+    "effects": [
+      {
+        "questSlots": 1,
+        "boardBonus": 1
+      },
+      {
+        "questSlots": 2,
+        "boardBonus": 1
+      }
+    ]
+  },
+  {
+    "id": "market",
+    "name": "市場",
+    "desc": "商人が出入りする売り場。素材を高く売れる。",
+    "category": "office",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 300,
+        "materials": {
+          "lumber": 4,
+          "stone": 4
+        },
+        "days": 3
+      },
+      {
+        "gold": 600,
+        "materials": {
+          "lumber": 6,
+          "stone": 6
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 10,
+    "effectText": [
+      "素材の売却額+10%",
+      "素材の売却額+20%"
+    ],
+    "effects": [
+      {
+        "sellMult": 0.1
+      },
+      {
+        "sellMult": 0.2
+      }
+    ]
+  },
+  {
+    "id": "watchtower",
+    "name": "見張り台",
+    "desc": "街道を見張り、危険を先に知らせる。道中の遭遇が減り、護衛・運搬の報酬が上がる。",
+    "category": "office",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 280,
+        "materials": {
+          "lumber": 8,
+          "stone": 2
+        },
+        "days": 3
+      },
+      {
+        "gold": 560,
+        "materials": {
+          "lumber": 10,
+          "stone": 4
+        },
+        "days": 4
+      }
+    ],
+    "upkeep": 8,
+    "effectText": [
+      "道中の遭遇−15%、護衛・運搬の達成報酬+10%",
+      "道中の遭遇−25%、護衛・運搬の達成報酬+20%"
+    ],
+    "effects": [
+      {
+        "roadEncounterOff": 0.15,
+        "escortGoldMult": 0.1
+      },
+      {
+        "roadEncounterOff": 0.25,
+        "escortGoldMult": 0.2
+      }
+    ]
+  },
+  {
+    "id": "smithy",
+    "name": "鍛冶場",
+    "desc": "炉と金床を備えた作業場。製作にかかる費用を抑える。",
+    "category": "production",
+    "maxLevel": 2,
+    "costs": [
+      {
+        "gold": 320,
+        "materials": {
+          "stone": 6,
+          "iron_ore": 2
+        },
+        "days": 4
+      },
+      {
+        "gold": 640,
+        "materials": {
+          "stone": 8,
+          "iron_ore": 4
+        },
+        "days": 5
+      }
+    ],
+    "upkeep": 10,
+    "effectText": [
+      "製作費−15%",
+      "製作費−30%"
+    ],
+    "effects": [
+      {
+        "craftGoldOff": 0.15
+      },
+      {
+        "craftGoldOff": 0.3
+      }
+    ]
   }
 ]

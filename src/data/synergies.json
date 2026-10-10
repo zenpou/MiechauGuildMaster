@@ -1,5 +1,15 @@
 [
   {"id":"craft_street","a":"workshop","b":"alchemy","name":"職人通り","desc":"工房と調合所が隣り合うと、どちらも完成日数−1。","effect":{"craftDaysOff":1}},
   {"id":"quiet_dorm","a":"clinic","b":"dorm","name":"静かな寮","desc":"治療所と宿舎が隣り合うと、待機中の疲労回復+10/日。","effect":{"fatigueRecover":10}},
-  {"id":"morning_drill","a":"training","b":"dorm","name":"朝練","desc":"訓練所と宿舎が隣り合うと、待機中に経験値+2/日。","effect":{"idleExp":2}}
+  {"id":"morning_drill","a":"training","b":"dorm","name":"朝練","desc":"訓練所と宿舎が隣り合うと、待機中に経験値+2/日。","effect":{"idleExp":2}},
+  {"id":"stockyard","a":"sawmill","b":"quarry","name":"資材置き場","desc":"製材所と石切場が隣り合うと、木材と石材がどちらも+1/日。","effect":{"produceLumber":1,"produceStone":1}},
+  {"id":"study_hall","a":"library","b":"training","name":"学び舎","desc":"図書室と訓練所が隣り合うと、派遣の経験値+10%、スキル訓練の日数−1。","effect":{"expMult":0.1,"trainDaysOff":1}},
+  {"id":"hot_spring","a":"bath","b":"clinic","name":"湯治","desc":"浴場と治療所が隣り合うと、負傷日数−1。","effect":{"injuryDays":-1}},
+  {"id":"warm_dorm","a":"bath","b":"dorm","name":"大浴場つきの寮","desc":"浴場と宿舎が隣り合うと、待機中の疲労回復+8/日。","effect":{"fatigueRecover":8}},
+  {"id":"info_den","a":"map_room","b":"tavern","name":"噂の集まる店","desc":"地図室と酒場が隣り合うと、隠し通路の発見率+10%、候補者の質+0.1。","effect":{"hiddenFind":0.1,"recruitQuality":0.1}},
+  {"id":"adventurers_inn","a":"tavern","b":"dorm","name":"冒険者の宿","desc":"酒場と宿舎が隣り合うと、毎日の来訪者+1。","effect":{"candidateBonus":1}},
+  {"id":"ledger_desk","a":"reception","b":"market","name":"帳場","desc":"受付と市場が隣り合うと、同時に受けられる依頼+1。","effect":{"questSlots":1}},
+  {"id":"forge_works","a":"smithy","b":"workshop","name":"鍛冶と細工","desc":"鍛冶場と工房が隣り合うと、製作費−10%。","effect":{"craftGoldOff":0.1}},
+  {"id":"trade_post","a":"market","b":"smithy","name":"商い","desc":"市場と鍛冶場が隣り合うと、素材の売却額+10%。","effect":{"sellMult":0.1}},
+  {"id":"escort_office","a":"watchtower","b":"reception","name":"護衛の手配","desc":"見張り台と受付が隣り合うと、護衛・運搬の達成報酬+15%、道中の遭遇−10%。","effect":{"escortGoldMult":0.15,"roadEncounterOff":0.1}}
 ]

@@ -5,7 +5,7 @@ import type { Readiness } from '../core/readiness';
 import { load, save } from '../core/save';
 import type { ActionKind, Adventurer, DispatchOrder, EquipSlot, Expedition, GameState, Persona, StatKey, WorldStep } from '../core/types';
 
-export type Tab = 'home' | 'inbox' | 'quests' | 'dispatch' | 'world' | 'recruit' | 'base' | 'map' | 'log';
+export type Tab = 'home' | 'inbox' | 'quests' | 'dispatch' | 'world' | 'recruit' | 'base' | 'map' | 'log' | 'records';
 
 export let state: GameState = load(localStorage) ?? newGame(Date.now() >>> 0);
 
@@ -22,11 +22,14 @@ export const ui = {
   /** 見込みと、それを出した時の条件。条件が変わったら表示しない */
   forecast: null as null | { key: string; r: Readiness },
   mapDungeon: 'forest_cave',
+  mapFloor: 'f1',
   /** ワールドタブで選んだノード */
   selNode: null as string | null,
   lastReport: null as DayReport | null,
   toast: null as null | { text: string; err: boolean },
   saveWarning: '',
+  /** エンディングのモーダルで開いているページ */
+  endingPage: 0,
 };
 
 let renderFn: () => void = () => {};
@@ -48,7 +51,9 @@ export function replaceState(s: GameState) {
   ui.d = newDispatchForm();
   ui.forecast = null;
   ui.mapDungeon = 'forest_cave';
+  ui.mapFloor = 'f1';
   ui.selNode = null;
+  ui.endingPage = 0;
   commit();
 }
 
@@ -56,7 +61,7 @@ function newDispatchForm() {
   return {
     members: [] as string[], leader: null as string | null, policy: 'standard', days: 3, potions: 0,
     /** 護衛・運搬の依頼に出すときの依頼ID。空ならダンジョンへ */
-    dungeon: 'forest_cave', questId: '', action: 'explore' as ActionKind, item: '', enemy: '',
+    dungeon: 'forest_cave', floor: 'f1', questId: '', action: 'explore' as ActionKind, item: '', enemy: '',
   };
 }
 

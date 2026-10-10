@@ -281,3 +281,27 @@ describe('simulateTravel', () => {
     expect(a).toEqual(b);
   });
 });
+
+describe('simulateTravel の遭遇倍率(見張り台)', () => {
+  const path = ['base', 'forge_town', 'ruined_tower'];
+
+  it('省くと1と同じ結果。0なら一度も遭遇しない', () => {
+    for (let i = 0; i < 20; i++) {
+      const plain = simulateTravel(rngFor(21, 'mult', i), strong(), path, 'outbound', known);
+      expect(simulateTravel(rngFor(21, 'mult', i), strong(), path, 'outbound', known, 1)).toEqual(plain);
+      expect(simulateTravel(rngFor(21, 'mult', i), strong(), path, 'outbound', known, 0).encounters).toBe(0);
+    }
+  });
+
+  it('倍率を下げると遭遇がおおむねその割合に減る(固定seed)', () => {
+    let full = 0;
+    let half = 0;
+    for (let i = 0; i < 300; i++) {
+      full += simulateTravel(rngFor(22, 'mult', i), strong(), path, 'outbound', known).encounters;
+      half += simulateTravel(rngFor(22, 'mult', i), strong(), path, 'outbound', known, 0.5).encounters;
+    }
+    expect(full).toBeGreaterThan(50);
+    expect(half / full).toBeGreaterThan(0.35);
+    expect(half / full).toBeLessThan(0.65);
+  });
+});
