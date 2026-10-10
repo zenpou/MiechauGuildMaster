@@ -1,7 +1,26 @@
+import { effectiveStats } from '../core/adventurer';
+import { canEquip, equip, unequip } from '../core/equipment';
 import { advanceDay, buyItem, dailyCost, newGame, sellMaterial } from '../core/game';
 import { ITEM, JOB, PERSONALITY } from '../core/data';
-import { commit, replaceState, state, statusText, toast, ui } from './app';
+import { STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type Result } from '../core/types';
+import { advById, commit, render, replaceState, SLOTS, STAT_LABEL, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
+
+const ELEMENT_NAME: Record<string, string> = { fire: '火', ice: '氷', thunder: '雷', earth: '土', dark: '闇' };
+const EFFECT_NAME: Record<string, string> = { gather: '採取量', carry: '積載' };
+const ARMOR_NAME: Record<string, string> = { light: '軽装', medium: '中装', heavy: '重装' };
+const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
+const slotsOf = (a: Adventurer) => a.equipment ?? { weapon: null, armor: null, accessory: null };
+
+/** 「攻撃+3 闇耐性30%」のような装備の効果文 */
+function equipText(def: ItemDef | undefined): string {
+  const e = def?.equip;
+  if (!e) return '';
+  const parts = Object.entries(e.mods).map(([k, v]) => `${STAT_LABEL[k as keyof typeof STAT_LABEL] ?? k}${sign(v as number)}`);
+  for (const [k, v] of Object.entries(e.resist ?? {})) parts.push(`${ELEMENT_NAME[k] ?? k}耐性${Math.round((v as number) * 100)}%`);
+  for (const [k, v] of Object.entries(e.effects ?? {})) parts.push(`${EFFECT_NAME[k] ?? k}${sign(v)}`);
+  return parts.join(' ');
+}
 
 export function homeTab(): HTMLElement {
   const s = state;
@@ -15,12 +34,14 @@ export function homeTab(): HTMLElement {
     h('button', { class: 'primary wide', onclick: nextDay }, '次の日へ'),
     noticesBlock(),
     h('h2', null, '名簿'),
+    div('dim small', '名前を押すと装備を付け替えられます。'),
     div('scroll',
       h('table', null,
-        h('thead', null, h('tr', null, ...['名前', '職', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態'].map((t) => h('th', null, t)))),
-        h('tbody', null, ...s.adventurers.map((a) => h('tr', null,
-          h('td', null, a.name),
+        h('thead', null, h('tr', null, ...['名前', '職', '武器', '防具', '装飾', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態'].map((t) => h('th', null, t)))),
+        h('tbody', null, ...s.adventurers.map((a) => h('tr', { class: ui.selAdv === a.id ? 'sel' : '' },
+          h('td', null, h('button', { class: 'link', onclick: () => pickAdv(a.id) }, a.name)),
           h('td', null, JOB[a.job].name),
+          ...SLOTS.map((sl) => { const id = slotsOf(a)[sl.id]; return h('td', id ? null : { class: 'dim' }, id ? ITEM[id]?.name ?? id : '—'); }),
           h('td', null, PERSONALITY[a.personality]?.name ?? a.personality),
           h('td', { class: 'num' }, a.level),
           h('td', { class: 'num' }, a.fatigue),
@@ -31,6 +52,7 @@ export function homeTab(): HTMLElement {
         ))),
       ),
     ),
+    equipPanel(),
     h('h2', null, '在庫'),
     inventoryBlock(),
     div('row',
@@ -55,19 +77,86 @@ function noticesBlock(): HTMLElement | null {
   );
 }
 
+const KIND_GROUPS: { name: string; kinds: string[] }[] = [
+  { name: '素材', kinds: ['material'] },
+  { name: '装備', kinds: ['weapon', 'armor', 'accessory'] },
+  { name: '消耗品', kinds: ['consumable'] },
+];
+
 function inventoryBlock(): HTMLElement {
   const entries = Object.entries(state.inventory).filter(([, n]) => n > 0);
   if (!entries.length) return div('dim', '何も無い');
-  return h('ul', { class: 'plain inv' }, ...entries.map(([id, n]) => {
-    const def = ITEM[id];
-    const sellable = def?.kind === 'material';
-    return h('li', null,
-      span(null, `${def?.name ?? id} ×${n}`),
-      sellable ? span('dim small', ` (${def.price}G)`) : null,
-      sellable ? h('button', { class: 'small', onclick: () => sell(id, 1) }, '1つ売る') : null,
-      sellable && n > 1 ? h('button', { class: 'small', onclick: () => sell(id, n) }, '全部売る') : null,
-    );
-  }));
+  const known = new Set(KIND_GROUPS.flatMap((g) => g.kinds));
+  const groups = [...KIND_GROUPS, { name: 'その他', kinds: [] as string[] }].map((g) => ({
+    name: g.name,
+    list: entries.filter(([id]) => (g.kinds.length ? g.kinds.includes(ITEM[id]?.kind) : !known.has(ITEM[id]?.kind))),
+  })).filter((g) => g.list.length);
+  return div(null, ...groups.map((g) => div(null,
+    h('h3', null, g.name),
+    h('ul', { class: 'plain inv' }, ...g.list.map(([id, n]) => {
+      const def = ITEM[id];
+      const sellable = def?.kind === 'material';
+      const fx = equipText(def);
+      return h('li', null,
+        span(null, `${def?.name ?? id} ×${n}`),
+        fx ? span('dim small', ` ${fx}`) : null,
+        sellable ? span('dim small', ` (${def.price}G)`) : null,
+        sellable ? h('button', { class: 'small', onclick: () => sell(id, 1) }, '1つ売る') : null,
+        sellable && n > 1 ? h('button', { class: 'small', onclick: () => sell(id, n) }, '全部売る') : null,
+      );
+    })),
+  )), div('dim small', '売れるのは素材だけです。'));
+}
+
+function pickAdv(id: string) {
+  ui.selAdv = ui.selAdv === id ? null : id;
+  render();
+}
+
+/** 付け替えた場合の実効能力。変わる能力だけ「前→後」で返す */
+function statDiff(a: Adventurer, slot: EquipSlot, itemId: string | null): string {
+  const before = effectiveStats(a);
+  const after = effectiveStats({ ...a, equipment: { ...slotsOf(a), [slot]: itemId } });
+  const out = STAT_KEYS.filter((k) => before[k] !== after[k]).map((k) => `${STAT_LABEL[k]} ${before[k]}→${after[k]}`);
+  return out.length ? out.join(' / ') : '能力の変化なし';
+}
+
+function equipPanel(): HTMLElement | null {
+  const a = ui.selAdv ? advById(ui.selAdv) : undefined;
+  if (!a) return null;
+  const idle = a.status === 'idle';
+  const st = effectiveStats(a);
+  const eq = slotsOf(a);
+  return div('detail equip',
+    div('row tight', span('big', a.name), span('dim small', `${JOB[a.job].name} Lv${a.level} 着られる防具: ${JOB[a.job].armor.map((c) => ARMOR_NAME[c] ?? c).join('・')}`),
+      h('button', { class: 'small', onclick: () => pickAdv(a.id) }, '閉じる')),
+    div('small stats', ...STAT_KEYS.map((k) => span(null, `${STAT_LABEL[k]}${st[k]}`))),
+    idle ? null : div('small neg', `${statusText(a)}のため付け替えできません(待機中のみ)`),
+    ...SLOTS.map((sl) => {
+      const cur = eq[sl.id];
+      const cands = Object.keys(state.inventory).filter((id) => (state.inventory[id] ?? 0) > 0 && ITEM[id]?.equip?.slot === sl.id);
+      return div('slot',
+        h('h3', null, `${sl.name}: ${cur ? ITEM[cur]?.name ?? cur : '—'}`),
+        cur ? div('small', span('dim', equipText(ITEM[cur])),
+          h('button', { class: 'small', disabled: !idle, onclick: () => act(unequip(state, a.id, sl.id), `${ITEM[cur]?.name ?? cur}を外しました`) }, '外す'),
+          div('dim small', `外すと: ${statDiff(a, sl.id, null)}`)) : null,
+        cands.length ? h('ul', { class: 'plain' }, ...cands.map((id) => {
+          const c = canEquip(a, id);
+          return h('li', { class: c.ok ? '' : 'dim' },
+            div('row tight', span(null, `${ITEM[id].name} ×${state.inventory[id]}`), span('dim small', equipText(ITEM[id])),
+              h('button', { class: 'small', disabled: !c.ok, onclick: () => act(equip(state, a.id, id), `${a.name}に${ITEM[id].name}を着けました`) }, '着ける')),
+            c.ok ? div('small', statDiff(a, sl.id, id)) : div('small neg', c.reason),
+          );
+        })) : div('dim small', '在庫に着けられる物がありません'),
+      );
+    }),
+  );
+}
+
+function act(r: Result, msg: string) {
+  if (!r.ok) return toast(r.reason, true);
+  commit();
+  toast(msg);
 }
 
 function nextDay() {

@@ -3,7 +3,7 @@ import { parseFloor } from '../core/dungeon';
 import { dispatch, exploredRateOf } from '../core/game';
 import { assessReadiness, type Readiness } from '../core/readiness';
 import { PARTY_MAX, PARTIES_MAX, type ActionKind, type DispatchOrder } from '../core/types';
-import { ACTION_NAME, actionText, advById, commit, nameOf, render, state, statusText, toast, ui } from './app';
+import { ACTION_NAME, actionText, advById, commit, nameOf, render, SLOTS, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
 
 const FLOOR_ID = 'f1';
@@ -85,7 +85,11 @@ export function dispatchTab(): HTMLElement {
           type: 'checkbox', checked: checked ? true : undefined, disabled: !can,
           onchange: (ev: Event) => toggleMember(a.id, (ev.target as HTMLInputElement).checked),
         }),
-        ` ${a.name}`, span('dim small', ` ${JOB[a.job].name} Lv${a.level} / ${PERSONALITY[a.personality].name} / 疲労${a.fatigue}`),
+        ` ${a.name} `, span('gear', ...SLOTS.map((sl) => {
+          const id = a.equipment?.[sl.id];
+          return span(id ? 'on' : 'off', { title: id ? ITEM[id]?.name ?? id : `${sl.name}なし` }, sl.short);
+        })),
+        span('dim small', ` ${JOB[a.job].name} Lv${a.level} / ${PERSONALITY[a.personality].name} / 疲労${a.fatigue}`),
         can ? null : span('small', ` (${statusText(a)})`),
       ),
       checked ? h('label', { class: 'leader' },

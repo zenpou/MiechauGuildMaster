@@ -21,7 +21,7 @@ button.danger { background: #5a3434; border-color: #7d4a4a; }
 button.wide { display: block; width: 100%; padding: 10px; margin: 8px 0; }
 select { font: inherit; }
 
-.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
+.tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
 .tabs button { padding: 8px 0; }
 .tabs button.on { background: #57916d; border-color: #6fb088; }
 
@@ -79,3 +79,21 @@ select.wide { width: 100%; }
 .badge.grade-危険 { background: #7d3a3a; }
 .dungeon-pick { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
 .dungeon-pick button.on { background: #57916d; border-color: #6fb088; }
+
+h3 { font-size: 0.92rem; margin: 10px 0 4px; }
+.row.tight { gap: 4px 8px; margin: 2px 0; }
+.plots { display: grid; gap: 3px; width: 100%; max-width: 420px; }
+.plots .plot { aspect-ratio: 1; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-size: clamp(0.62rem, 2.9vw, 0.85rem); line-height: 1.15; overflow: hidden; background: #26383b; border-style: dashed; min-width: 0; }
+.plots .plot .small { font-size: 0.9em; }
+.plots .plot.built { background: #3d5d6b; border-style: solid; }
+.plots .plot.building { background: #5a4f2c; border-style: solid; }
+.plots .plot.sel { outline: 2px solid #f0c25a; }
+.synergies li.on { color: #ffe08a; background: #3a3a22; padding-left: 6px; border-left: 3px solid #f0c25a; }
+.synergies .badge { margin-left: 4px; background: #7a6a2f; }
+tr.sel td { background: #34474a; }
+button.link { background: none; border: none; padding: 0; text-decoration: underline; color: #a8d8ff; }
+.equip .stats { display: flex; flex-wrap: wrap; gap: 0 8px; }
+.equip .slot { border-top: 1px solid #3a4a4d; margin-top: 6px; }
+.gear { font-size: 0.8rem; letter-spacing: 1px; margin-right: 4px; }
+.gear .on { color: #f0c25a; font-weight: bold; }
+.gear .off { opacity: 0.3; }

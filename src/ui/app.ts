@@ -1,17 +1,21 @@
 // 画面の共有状態。保存は操作ごとに core/save.ts へ。
-import { ENEMY, ITEM } from '../core/data';
+import { ENEMY, FACILITY, ITEM } from '../core/data';
 import { newGame, type DayReport } from '../core/game';
 import type { Readiness } from '../core/readiness';
 import { load, save } from '../core/save';
-import type { ActionKind, Adventurer, DispatchOrder, GameState } from '../core/types';
+import type { ActionKind, Adventurer, DispatchOrder, EquipSlot, GameState, StatKey } from '../core/types';
 
-export type Tab = 'home' | 'dispatch' | 'map' | 'log';
+export type Tab = 'home' | 'base' | 'dispatch' | 'map' | 'log';
 
 export let state: GameState = load(localStorage) ?? newGame(Date.now() >>> 0);
 
 export const ui = {
   tab: 'home' as Tab,
   selLog: null as string | null,
+  /** 施設タブで選んだマス */
+  selCell: null as null | { x: number; y: number },
+  /** 名簿で装備パネルを開いている冒険者 */
+  selAdv: null as string | null,
   d: newDispatchForm(),
   /** 見込みと、それを出した時の条件。条件が変わったら表示しない */
   forecast: null as null | { key: string; r: Readiness },
@@ -33,6 +37,8 @@ export function commit() {
 export function replaceState(s: GameState) {
   state = s;
   ui.selLog = null;
+  ui.selCell = null;
+  ui.selAdv = null;
   ui.lastReport = null;
   ui.d = newDispatchForm();
   ui.forecast = null;
@@ -58,6 +64,10 @@ export const nameOf = (id: string) => advById(id)?.name ?? id;
 
 export function statusText(a: Adventurer): string {
   if (a.status === 'away') return '派遣中';
+  if (a.status === 'working') {
+    const f = a.assignment && 'facility' in a.assignment ? FACILITY[a.assignment.facility]?.name : undefined;
+    return f ? `勤務(${f})` : '勤務';
+  }
   if (a.injuryDays > 0) return `負傷(あと${a.injuryDays}日)`;
   if (a.fatigue >= 70) return '疲労大';
   return '待機';
@@ -74,3 +84,13 @@ export function actionText(o: DispatchOrder): string {
   if (o.action === 'hunt' && o.target.enemy) return `${name}: ${ENEMY[o.target.enemy]?.name ?? o.target.enemy}`;
   return name;
 }
+
+export const STAT_LABEL: Record<StatKey, string> = {
+  hp: 'HP', atk: '攻撃', def: '防御', mag: '魔力', spd: '素早さ', dex: '器用さ', scout: '斥候', gather: '採取',
+};
+
+export const SLOTS: { id: EquipSlot; name: string; short: string }[] = [
+  { id: 'weapon', name: '武器', short: '武' },
+  { id: 'armor', name: '防具', short: '防' },
+  { id: 'accessory', name: '装飾', short: '飾' },
+];

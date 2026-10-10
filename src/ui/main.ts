@@ -1,5 +1,6 @@
 import './style.css';
 import { commit, setRender, ui, type Tab } from './app';
+import { baseTab } from './baseTab';
 import { dispatchTab } from './dispatchTab';
 import { div, h } from './dom';
 import { homeTab } from './home';
@@ -8,6 +9,7 @@ import { mapTab } from './mapTab';
 
 const TABS: { id: Tab; label: string; view: () => HTMLElement }[] = [
   { id: 'home', label: '拠点', view: homeTab },
+  { id: 'base', label: '施設', view: baseTab },
   { id: 'dispatch', label: '派遣', view: dispatchTab },
   { id: 'map', label: '地図', view: mapTab },
   { id: 'log', label: 'ログ', view: logTab },
