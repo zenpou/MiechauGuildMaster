@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { dismissHint, hintFor, hintsOff } from '../src/core/hints';
 import { newGame } from '../src/core/game';
+import { promotionOptions } from '../src/core/jobs';
 import type { GameState } from '../src/core/types';
 
 // テストリスト
@@ -13,6 +14,9 @@ import type { GameState } from '../src/core/types';
 // - [x] 閉じたヒントは二度と出ない。次のヒントへ進む
 // - [x] ヒントを全部切れる
 // - [x] 先のヒントの条件を満たしていても、順番は守る(前のヒントが閉じるまで次は出ない)
+// - [x] 昇格できる人(待機中・下級職・Lvが足りて訓練所と費用がある)がいれば、転職をすすめる
+// - [x] 昇格に届いたが訓練所が無ければ、訓練所をすすめる
+// - [x] Lvが足りない・待機中でない・上級職の人だけなら、昇格のヒントは出ない
 
 const fresh = () => newGame(1);
 const sent = (s: GameState) => { s.counters.dispatches = 1; return s; };
@@ -80,6 +84,59 @@ describe('hintFor', () => {
     s.base.facilities = [];
     expect(hintFor(s)?.id).toBe('quests');
     dismissHint(s, 'quests');
+    expect(hintFor(s)?.id).toBe('facility');
+  });
+});
+
+describe('昇格のヒント', () => {
+  /** 昇格の入口になる下級職の人を1人、必要なLvまで上げて返す */
+  const ready = (s: GameState) => {
+    const a = s.adventurers.find((x) => promotionOptions(x).length > 0)!;
+    a.level = Math.min(...promotionOptions(a).map((o) => o.requireLevel ?? 0));
+    return a;
+  };
+  const afterFirstReturn = (s: GameState) => {
+    returned(s);
+    s.quests = [{ status: 'done' } as GameState['quests'][number]];
+    s.base.facilities = [];
+    s.gold = 0;
+    return s;
+  };
+  const withTraining = (s: GameState) => {
+    s.base.facilities.push({ id: 'training', level: 1, x: 0, y: 0, builtDay: 1, construction: null });
+    return s;
+  };
+
+  it('昇格できる人がいれば、転職をすすめる', () => {
+    const s = withTraining(afterFirstReturn(fresh()));
+    ready(s);
+    s.gold = 5000;
+    expect(hintFor(s)?.id).toBe('promote');
+    expect(hintFor(s)?.text).toContain('転職');
+  });
+
+  it('昇格に届いたが訓練所が無ければ、訓練所をすすめる', () => {
+    const s = afterFirstReturn(fresh());
+    ready(s);
+    s.gold = 5000;
+    expect(hintFor(s)?.id).toBe('promote-need-training');
+    expect(hintFor(s)?.text).toContain('訓練所');
+  });
+
+  it('Lvが足りない・待機中でない人しかいなければ、昇格のヒントは出ない', () => {
+    const s = withTraining(afterFirstReturn(fresh()));
+    s.gold = 5000;
+    expect(hintFor(s)?.id).not.toBe('promote');
+    const a = ready(s);
+    a.status = 'away';
+    expect(hintFor(s)?.id).not.toBe('promote');
+  });
+
+  it('閉じると二度と出ず、次のヒントへ進む', () => {
+    const s = afterFirstReturn(fresh());
+    ready(s);
+    s.gold = 5000;
+    dismissHint(s, 'promote-need-training');
     expect(hintFor(s)?.id).toBe('facility');
   });
 });

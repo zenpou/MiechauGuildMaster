@@ -1,5 +1,7 @@
 // 最初の数日のヒント: いまの状態から「次にやること」を1つだけ出す。閉じたものは二度と出ない。
 // 状態は flags に持つので、GameState に項目は足さない。
+import { facilityLevel } from './base';
+import { promotionCost, promotionOptions } from './jobs';
 import type { GameState } from './types';
 
 export interface Hint { id: string; text: string }
@@ -8,6 +10,10 @@ export interface Hint { id: string; text: string }
 const FACILITY_GOLD = 300;
 const OFF = 'hint:off';
 const closedKey = (id: string) => `hint:${id}`;
+
+/** Lvが足りて待機中の下級職の人(転職の先に上級職がある)。費用・訓練所は問わない */
+const promotable = (s: GameState) => s.adventurers.some((a) => a.status === 'idle'
+  && promotionOptions(a).some((o) => a.level >= (o.requireLevel ?? 0)));
 
 interface Rule extends Hint {
   /** 状態がこの条件を満たすあいだ出す */
@@ -33,6 +39,14 @@ const RULES: Rule[] = [
   {
     id: 'quests', when: (s) => s.history.length > 0 && !s.quests.some((q) => q.status !== 'posted'),
     text: '「依頼」タブの依頼を受けると、報酬と評判が手に入ります。納期に間に合わないと評判が下がるので、日数を見て選びましょう。',
+  },
+  {
+    id: 'promote', when: (s) => promotable(s) && facilityLevel(s, 'training') >= 1 && s.gold >= promotionCost(s),
+    text: 'Lvが上がった人がいます。ホームの名簿で名前を押すと、上級職へ転職できます(費用あり)。転職すると、できる役割が広がります。',
+  },
+  {
+    id: 'promote-need-training', when: (s) => promotable(s) && facilityLevel(s, 'training') < 1,
+    text: 'Lvが上がった人がいます。上級職への転職には、「施設」タブで訓練所を建てる必要があります。',
   },
   {
     id: 'facility', when: (s) => s.history.length > 0 && s.gold >= FACILITY_GOLD && s.base.facilities.length === 0,
