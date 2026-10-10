@@ -10,6 +10,7 @@
     "sim": "tsx scripts/sim.ts",
     "sim:styles": "tsx scripts/playstyles.ts",
     "sim:dragon": "tsx scripts/dragon.ts",
+    "sim:boss": "tsx scripts/boss.ts",
     "preview": "vite preview --host 127.0.0.1"
   },
   "devDependencies": {
