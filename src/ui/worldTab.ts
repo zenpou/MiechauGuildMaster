@@ -6,47 +6,10 @@ import type { NodeKind, WorldEdgeDef, WorldNodeDef } from '../core/types';
 import { commit, edgeName, nameOf, positionText, render, state, stepToday, toast, ui } from './app';
 import { div, h, span, sv } from './dom';
 import { questLine } from './questsTab';
+import { layoutWorld, NODE_R, placePartyLabel, px, py } from './worldLayout';
 
-const SCALE = 10;
-const PAD = 6;
-const px = (n: WorldNodeDef) => PAD + n.x * SCALE;
-const py = (n: WorldNodeDef) => PAD + n.y * SCALE;
-const NODE_R = 3.2;
-const NODE_FONT = 3.2;
-const ROAD_FONT = 2.6;
 const MARGIN = 1.5;
 const pct = (x: number) => Math.floor(x * 100 + 1e-9);
-
-type Anchor = 'start' | 'middle' | 'end';
-type Box = { x1: number; y1: number; x2: number; y2: number };
-type Label = { x: number; y: number; anchor: Anchor; box: Box };
-
-// 描画前なので getBBox は使えない。全角1字=1em、半角0.6em、高さは Chrome で測った字形の枠(基線の上1.12em・下0.26em)に余裕を足して見積もる
-const textWidth = (t: string, fs: number) => [...t].reduce((w, ch) => w + ((ch.codePointAt(0) ?? 0) < 0x80 ? 0.6 : 1) * fs, 0);
-function textBox(x: number, y: number, t: string, fs: number, anchor: Anchor): Box {
-  const w = textWidth(t, fs);
-  const x1 = anchor === 'start' ? x : anchor === 'end' ? x - w : x - w / 2;
-  return { x1, y1: y - fs * 1.15, x2: x1 + w, y2: y + fs * 0.3 };
-}
-const hit = (a: Box, b: Box) => a.x1 < b.x2 && b.x1 < a.x2 && a.y1 < b.y2 && b.y1 < a.y2;
-
-// 下を最初に試すのは、これまでの見た目(名前はノードの下)をなるべく変えないため
-const LABEL_SPOTS: [number, number, Anchor][] = [[0, 7, 'middle'], [0, -4.6, 'middle'], [4.6, 1.1, 'start'], [-4.6, 1.1, 'end']];
-
-// どこに置いても重なるときは下に置く(名前を消すよりは読める)
-function placeNodeLabels(nodes: WorldNodeDef[], circles: Box[], taken: Box[]): Map<string, Label> {
-  const out = new Map<string, Label>();
-  for (const n of nodes) {
-    const spots = LABEL_SPOTS.map(([dx, dy, anchor]) => {
-      const [x, y] = [px(n) + dx, py(n) + dy];
-      return { x, y, anchor, box: textBox(x, y, n.name, NODE_FONT, anchor) };
-    });
-    const pick = spots.find((sp) => ![...circles, ...taken].some((b) => hit(sp.box, b))) ?? spots[0];
-    taken.push(pick.box);
-    out.set(n.id, pick);
-  }
-  return out;
-}
 
 export const KIND_NAME: Record<NodeKind, string> = { base: '拠点', town: '街', village: '村', dungeon: 'ダンジョン', waypoint: '中継地' };
 
@@ -58,72 +21,49 @@ function dangerText(e: WorldEdgeDef): string {
   return m === undefined ? '?' : `${Math.round(m * 100)}%`;
 }
 
-const anchorFor = (ox: number, oy: number) => (Math.abs(ox) > Math.abs(oy) ? (ox > 0 ? 'start' : 'end') : 'middle');
-
 export function worldTab(): HTMLElement {
   const visited = new Set(state.world.visitedNodes);
   const edges = WORLD.edges.filter(edgeKnown);
-  // 同じ2点を結ぶ道(近道)が重なって見えなくならないよう、2本目以降は弧で描く
-  const pairSeen = new Map<string, number>();
-  const geo = new Map<string, { mx: number; my: number; ox: number; oy: number }>();
-  const taken: Box[] = [];
-  const edgeEls = edges.map((e) => {
-    const a = NODE[e.a];
-    const b = NODE[e.b];
-    const key = [e.a, e.b].sort().join('|');
-    const nth = pairSeen.get(key) ?? 0;
-    pairSeen.set(key, nth + 1);
-    const [x1, y1, x2, y2] = [px(a), py(a), px(b), py(b)];
-    const len = Math.hypot(x2 - x1, y2 - y1) || 1;
-    const bend = nth * 7;
-    const cx = (x1 + x2) / 2 + ((y2 - y1) / len) * bend;
-    const cy = (y1 + y2) / 2 - ((x2 - x1) / len) * bend;
-    // ラベルは道の脇に寄せ、ノード名と重ならないようにする
-    const ox = ((y2 - y1) / len) * 3.2;
-    const oy = (-(x2 - x1) / len) * 3.2;
-    const mx = ((x1 + x2) / 2 + cx) / 2;
-    const my = ((y1 + y2) / 2 + cy) / 2;
-    geo.set(e.id, { mx, my, ox, oy });
-    const label = `${e.days}日 危${dangerText(e)}`;
-    const [lx, ly, anchor] = [mx + ox, my + oy + 0.9, anchorFor(ox, oy)] as const;
-    taken.push(textBox(lx, ly, label, ROAD_FONT, anchor));
-    return sv('g', null,
-      sv('path', { d: `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`, class: `road${e.hidden ? ' short' : ''}` }),
-      sv('text', { x: lx, y: ly, 'text-anchor': anchor, class: 'road-label' }, label),
-    );
-  });
-
-  const circles = WORLD.nodes.map((n) => ({ x1: px(n) - NODE_R, y1: py(n) - NODE_R, x2: px(n) + NODE_R, y2: py(n) + NODE_R }));
-  const labels = placeNodeLabels(WORLD.nodes, circles, taken);
+  const layout = layoutWorld(WORLD.nodes, edges, (e) => `${e.days}日 危${dangerText(e)}`);
+  const geo = new Map(layout.roads.map((r) => [r.edge.id, r]));
+  const edgeEls = layout.roads.map((r) => sv('g', null,
+    sv('path', { d: `M${r.x1},${r.y1} Q${r.cx},${r.cy} ${r.x2},${r.y2}`, class: `road${r.edge.hidden ? ' short' : ''}` }),
+    sv('text', { x: r.label.x, y: r.label.y, 'text-anchor': r.label.anchor, class: 'road-label' }, `${r.edge.days}日 危${dangerText(r.edge)}`),
+  ));
   const nodeEls = WORLD.nodes.map((n) => {
     const cls = ['node', `k-${n.kind}`, visited.has(n.id) ? 'visited' : 'unvisited', isRumored(n) ? 'rumored' : '', ui.selNode === n.id ? 'sel' : ''].join(' ');
-    const lb = labels.get(n.id)!;
+    const lb = layout.nodeLabels.get(n.id)!;
     return sv('g', { class: cls, onclick: () => pickNode(n.id) },
       sv('circle', { cx: px(n), cy: py(n), r: NODE_R }),
       sv('text', { x: lb.x, y: lb.y, 'text-anchor': lb.anchor, class: 'node-label' }, n.name),
     );
   });
-  // ノードを足しても名前や道のラベルが切れないよう、描く物全体の外枠から viewBox を決める
-  const all = [...circles, ...taken];
-  const vx = Math.floor(Math.min(...all.map((b) => b.x1)) - MARGIN);
-  const vy = Math.floor(Math.min(...all.map((b) => b.y1)) - MARGIN);
-  const vw = Math.ceil(Math.max(...all.map((b) => b.x2)) + MARGIN) - vx;
-  const vh = Math.ceil(Math.max(...all.map((b) => b.y2)) + MARGIN) - vy;
-
+  // 隊の名前は、円・道のラベル・ノード名・先に置いた隊の名前を避けて置く
+  const partyAvoid = [...layout.boxes];
   const partyEls = state.expeditions.map((e, i) => {
     const st = stepToday(e);
     const at = st?.edge ? EDGE[st.edge] : null;
     const g = at ? geo.get(at.id) : undefined;
-    // 名前は道のラベルと反対側に出し、重ならないようにする
+    // 名前はまず道のラベルと反対側に出す
     let [x, y, ox, oy] = [0, 0, 2.4, 0];
     if (g) [x, y, ox, oy] = [g.mx, g.my, -g.ox * 1.2, -g.oy * 1.2];
     else if (st?.node && NODE[st.node]) [x, y] = [px(NODE[st.node]) + 4.5, py(NODE[st.node]) - 3];
     y -= i * 5;
+    const name = nameOf(e.order.leaderId);
+    const lb = placePartyLabel(x, y, name, ox, oy, partyAvoid);
+    partyAvoid.push(lb.box);
     return sv('g', { class: 'party' },
       sv('rect', { x: x - 1.6, y: y - 1.6, width: 3.2, height: 3.2, transform: `rotate(45 ${x} ${y})` }),
-      sv('text', { x: x + ox, y: y + oy + 1, 'text-anchor': anchorFor(ox, oy), class: 'party-label' }, nameOf(e.order.leaderId)),
+      sv('text', { x: lb.x, y: lb.y, 'text-anchor': lb.anchor, class: 'party-label' }, name),
     );
   });
+
+  // ノードを足しても名前や道のラベルが切れないよう、描く物全体の外枠から viewBox を決める
+  const all = partyAvoid;
+  const vx = Math.floor(Math.min(...all.map((b) => b.x1)) - MARGIN);
+  const vy = Math.floor(Math.min(...all.map((b) => b.y1)) - MARGIN);
+  const vw = Math.ceil(Math.max(...all.map((b) => b.x2)) + MARGIN) - vx;
+  const vh = Math.ceil(Math.max(...all.map((b) => b.y2)) + MARGIN) - vy;
 
   return div('tab-body',
     h('h2', null, 'ワールド'),

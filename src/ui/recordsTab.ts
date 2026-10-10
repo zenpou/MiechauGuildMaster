@@ -50,11 +50,11 @@ export function recordsTab(): HTMLElement {
 function storySection(): HTMLElement {
   const seen = storySeen(state);
   return div(null,
-    h('h2', null, `物語(${seen.length}/${STORY.length})`),
+    h('h2', null, `物語の章(${seen.length}/${STORY.length})`),
     seen.length
       ? h('ul', { class: 'plain story-chapters' }, ...seen.map((c) => h('li', null,
         chapterThumb(c),
-        span('story-chapter-title', c.title, span('dim small', ` ${storySeenDay(state, c.id)}日目`)),
+        span('story-chapter-title', c.title, span('dim small', storySeenDay(state, c.id) ? ` ${storySeenDay(state, c.id)}日目` : ' 以前に進めた分')),
         h('button', { class: 'small', onclick: () => rereadChapter(c.id, render) }, '読み返す'))))
       : div('dim', 'まだ読んだ章はありません'),
   );

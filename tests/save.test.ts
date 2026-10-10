@@ -90,6 +90,8 @@ describe('物語の導入前から遊んでいたセーブ', () => {
     const s = migrate(old)!;
     expect(storyDue(s)).toEqual([]);
     expect(storyFlags(s).length).toBeGreaterThan(1);
+    // 読んでいない章に「読んだ日」を付けない。0 は「読んだ日は不明の既読」
+    for (const k of storyFlags(s)) expect(s.flags[k], k).toBe(0);
   });
 
   it('1日目の新規セーブは序章がまだ出る', () => {

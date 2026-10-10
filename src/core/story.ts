@@ -55,10 +55,13 @@ export function storyDue(s: GameState): StoryChapter[] {
   return STORY.filter((c) => storySeenDay(s, c.id) === null && triggerMet(s, c.trigger));
 }
 
-/** 二度目以降は最初に読んだ日を残す。読み返しで日付が動くと、いつ読んだかが分からなくなる */
-export function markStorySeen(s: GameState, id: string): void {
+/**
+ * 二度目以降は最初に読んだ日を残す。読み返しで日付が動くと、いつ読んだかが分からなくなる。
+ * day に 0 を渡すと「読んだ日は不明の既読」(物語の導入前から遊んでいたセーブの、過ぎた章)
+ */
+export function markStorySeen(s: GameState, id: string, day: number = s.day): void {
   if (storySeenDay(s, id) !== null || !STORY.some((c) => c.id === id)) return;
-  s.flags[SEEN_PREFIX + id] = s.day;
+  s.flags[SEEN_PREFIX + id] = day;
 }
 
 /** 読み終えた章(台本の並び順)。読み返し用 */

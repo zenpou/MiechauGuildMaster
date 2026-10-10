@@ -325,6 +325,22 @@ describe('更新ボタンと再読み込み(src/ui/pwa.ts)', () => {
     expect(textsOf(harness)).toContain('開発プレビュー · 自動保存');
   });
 
+  it('起動時にすでに controller が付いていれば、register が返るのを待たずに「オフラインでも遊べます」と出す', async () => {
+    // オフラインで開き直すと register() が返るまで0.5〜2秒かかり、その間「準備中」と出ていた
+    const harness = createPwaClientHarness({});
+    harness.serviceWorker.register = vi.fn(() => new Promise(() => {}));
+    await importPwaClient(harness);
+    expect(textsOf(harness)).toContain('オフラインでも遊べます · 自動保存');
+    expect(textsOf(harness)).not.toContain('オフラインで遊ぶ準備中…');
+  });
+
+  it('controller がまだ無い初回の起動では、準備ができるまで「準備中」と出す', async () => {
+    const harness = createPwaClientHarness(null);
+    harness.serviceWorker.register = vi.fn(() => new Promise(() => {}));
+    await importPwaClient(harness);
+    expect(textsOf(harness)).toContain('オフラインで遊ぶ準備中…');
+  });
+
   it('初めてのインストールの claim では再読み込みせず、次の版への切り替えで1回だけ再読み込みする', async () => {
     const harness = createPwaClientHarness(null);
     await importPwaClient(harness);

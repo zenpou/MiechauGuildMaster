@@ -50,6 +50,9 @@ export function initPwa() {
   paint();
   if (!import.meta.env.PROD) return;
   if (!('serviceWorker' in navigator) || !window.isSecureContext) { failure = true; paint(); return; }
+  // すでに controller があるページは、キャッシュから開けている = オフラインで遊べる。オフラインで開き直すと
+  // register() が返るまで0.5〜2秒かかり、その間ずっと「準備中」と出ていた
+  if (navigator.serviceWorker.controller) { offlineReady = true; paint(); }
   // 初めてのインストールは、まだ制御されていないページを claim するだけなので再読み込みしない。
   // すでに controller があるなら更新なので、更新ボタンを押していないタブも含めて、
   // 制御下のタブはすべて controllerchange で再読み込みする

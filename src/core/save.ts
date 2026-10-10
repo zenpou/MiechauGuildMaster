@@ -50,7 +50,7 @@ export function migrate(raw: unknown): GameState | null {
   // 物語の導入前から遊んでいたセーブ(章の旗が1つも無く、1日目を過ぎている)は、過ぎた章を開いた直後に
   // 連続で出さず、既読にする。出す・出さないを章ごとに選ばせないのは、台本があとから増えても同じ扱いで済ませるため
   if (merged.day > 1 && !Object.keys(merged.flags).some((k) => k.startsWith('story:'))) {
-    for (const c of storyDue(merged)) markStorySeen(merged, c.id);
+    for (const c of storyDue(merged)) markStorySeen(merged, c.id, 0);
   }
   merged.version = SAVE_VERSION;
   return merged;

@@ -273,6 +273,31 @@ async function nextDay(t) {
   await skipStories(t, `${before + 1}日目`);
 }
 
+/**
+ * ワールド地図の文字(ノード名・道のラベル・隊の名前)と、ノードの円の重なり。描いた後の実測(getBBox)で見る。
+ * 道のラベルが重なると、距離と危険度という判断材料が読めなくなる
+ */
+const worldClashes = (page) => page.evaluate(() => {
+  const svg = document.querySelector('.world-map');
+  if (!svg) return null;
+  const items = [...svg.querySelectorAll('text, circle')].map((el) => {
+    const b = el.getBBox();
+    return { kind: el.tagName === 'circle' ? '円' : el.getAttribute('class'), text: el.textContent || '', x1: b.x, y1: b.y, x2: b.x + b.width, y2: b.y + b.height };
+  });
+  const out = [];
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      const a = items[i];
+      const b = items[j];
+      if (a.kind === '円' && b.kind === '円') continue;
+      const w = Math.min(a.x2, b.x2) - Math.max(a.x1, b.x1);
+      const h = Math.min(a.y2, b.y2) - Math.max(a.y1, b.y1);
+      if (w > 0.3 && h > 0.3) out.push(`${a.kind}「${a.text}」と${b.kind}「${b.text}」(${w.toFixed(1)}×${h.toFixed(1)})`);
+    }
+  }
+  return out;
+});
+
 /** 10個のタブを順に開き、描画・エラー・横のはみ出しを確かめて画面を残す */
 async function tour(t, name) {
   for (const [id, label] of TABS) {
@@ -281,6 +306,10 @@ async function tour(t, name) {
       await t.page.locator('#app .tab-body').waitFor({ timeout: 5000 });
       const w = await widths(t.page);
       t.check(w.scroll <= w.width, `タブ「${label}」が横にはみ出す(scrollWidth ${w.scroll} > 表示幅 ${w.width})`);
+      if (id === 'world') {
+        const clashes = await worldClashes(t.page);
+        t.check(clashes !== null && clashes.length === 0, `ワールド地図の文字が重なる: ${(clashes ?? ['地図が無い']).join(' / ')}`);
+      }
       await t.shot(`${name}-${id}`);
     } catch (e) {
       t.fail(`タブ「${label}」を開けない: ${brief(e)}`);
