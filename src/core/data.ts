@@ -55,6 +55,14 @@ export interface Tuning {
     expPerDay: number;
     traitReveal: number;
     returnRelation: number;
+    gatherFocusBonus: number;
+  };
+  readiness: {
+    runs: number;
+    /** 余裕 / 適正 / 厳しい の境(戦力比) */
+    gradeEdges: number[];
+    /** 不確かさ 低 / 中 の境(探索率) */
+    uncertaintyEdges: number[];
   };
   game: {
     startGold: number;

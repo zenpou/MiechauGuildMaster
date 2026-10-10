@@ -1,7 +1,7 @@
 // 出発前の見込み。既知のマスだけを歩く探索を同じ条件で何度か回し、損耗の目安を出す(DESIGN 第3節)。
 // 未踏の中身は見ないので、探索率が低いほど数字は当てにならない。その度合いを uncertainty で示す。
 import { powerOf } from './adventurer';
-import { DUNGEON } from './data';
+import { DUNGEON, TUNING } from './data';
 import { exploredRate, parseFloor } from './dungeon';
 import { runExploration } from './explore';
 import { rngFor } from './rng';
@@ -23,10 +23,9 @@ export interface Readiness {
   uncertainty: Uncertainty;
 }
 
-/** 戦力比の境(余裕 / 適正 / 厳しい)。sim で調整する値 */
-const GRADE_EDGES = [1.3, 1.0, 0.8];
-/** 探索率の境(不確かさ 低 / 中)。sim で調整する値 */
-const UNCERTAINTY_EDGES = [0.7, 0.3];
+const T = TUNING.readiness;
+const GRADE_EDGES = T.gradeEdges;
+const UNCERTAINTY_EDGES = T.uncertaintyEdges;
 const FIGHT_KINDS = ['nest', 'symbol', 'boss', 'encounter'];
 
 export function gradeOf(ratio: number): Grade {
@@ -43,7 +42,7 @@ export function uncertaintyOf(rate: number): Uncertainty {
 }
 
 /** s は変更しない。dispatch と同じ検証はしないので、出せる指示かは呼び出し側で確かめる */
-export function assessReadiness(s: GameState, o: DispatchOrder, runs = 40): Readiness {
+export function assessReadiness(s: GameState, o: DispatchOrder, runs = T.runs): Readiness {
   const dungeonId = o.target.dungeon ?? '';
   const dungeon = DUNGEON[dungeonId];
   if (!dungeon) throw new Error(`ダンジョン ${dungeonId} が無い`);

@@ -11,8 +11,6 @@ import type {
 
 // sim で調整する値は src/data/tuning.json
 const T = TUNING.explore;
-/** 採集指示で対象素材の採取点に着いたときの上乗せ。sim で調整する値 */
-const GATHER_FOCUS_BONUS = 1;
 
 
 export interface ExploreInput {
@@ -330,7 +328,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
           say('event', `${g.name}が${ITEM[item].name}を探したが、使えるものは見つからなかった。`);
           return;
         }
-        const focus = inp.action === 'gather' && (!targetItem || targetItem === item) ? GATHER_FOCUS_BONUS : 0;
+        const focus = inp.action === 'gather' && (!targetItem || targetItem === item) ? T.gatherFocusBonus : 0;
         const qty = rng.int(T.gatherQty[0], T.gatherQty[1]) + (skilled('pack') ? ROLE_SKILL.pack.params.gatherBonus : 0) + focus;
         const kept = addMaterial(item, qty);
         if (kept > 0) say('event', `${g.name}が${ITEM[item].name}を${kept}個採った。`);
