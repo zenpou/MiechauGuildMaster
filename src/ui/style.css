@@ -67,3 +67,15 @@ ol.log li { padding: 2px 0; }
 .warn { background: #6b3a2a; padding: 8px; border-radius: 6px; margin: 6px 0; }
 .toast { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); max-width: calc(100% - 24px); background: #34474a; border: 1px solid #6fb088; padding: 10px 14px; border-radius: 8px; z-index: 2; }
 .toast.err { border-color: #ff8f80; }
+select.wide { width: 100%; }
+.actions { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0; }
+.actions label { white-space: nowrap; }
+.reasons li { padding: 1px 0; border-bottom: none; }
+.explore-desc { margin: 6px 0; color: #c8e6a0; }
+.forecast > div { margin: 2px 0; }
+.badge.grade-余裕 { background: #3d6b4f; }
+.badge.grade-適正 { background: #3d5d6b; }
+.badge.grade-厳しい { background: #7a6a2f; }
+.badge.grade-危険 { background: #7d3a3a; }
+.dungeon-pick { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.dungeon-pick button.on { background: #57916d; border-color: #6fb088; }

@@ -1,5 +1,5 @@
 import { advanceDay, buyItem, dailyCost, newGame, sellMaterial } from '../core/game';
-import { ITEM, JOB } from '../core/data';
+import { ITEM, JOB, PERSONALITY } from '../core/data';
 import { commit, replaceState, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
 
@@ -17,10 +17,11 @@ export function homeTab(): HTMLElement {
     h('h2', null, '名簿'),
     div('scroll',
       h('table', null,
-        h('thead', null, h('tr', null, ...['名前', '職', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態'].map((t) => h('th', null, t)))),
+        h('thead', null, h('tr', null, ...['名前', '職', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態'].map((t) => h('th', null, t)))),
         h('tbody', null, ...s.adventurers.map((a) => h('tr', null,
           h('td', null, a.name),
           h('td', null, JOB[a.job].name),
+          h('td', null, PERSONALITY[a.personality]?.name ?? a.personality),
           h('td', { class: 'num' }, a.level),
           h('td', { class: 'num' }, a.fatigue),
           h('td', { class: 'num' }, a.injuryDays || '-'),

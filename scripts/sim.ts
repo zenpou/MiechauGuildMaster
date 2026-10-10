@@ -1,12 +1,12 @@
 // フェーズ1の計測: 森の洞窟 f1 へ毎日派遣し続けたときの探索率・最深到達・損耗を seed 間で集計する。
-// 使い方: npm run sim -- [seeds=20] [days=30]
+// 使い方: npm run sim -- [seeds=20] [days=30] [--action explore|gather|hunt|boss|survey] [--item 素材ID] [--dungeon ID]
+// --action survey は、踏査の帰還で入口が確認済みになったら以後は探索を出す。
 import { DUNGEON, ITEM, PERSONALITIES } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
 import { cellDepths } from '../src/core/explore';
 import { advanceDay, dispatch, exploredRateOf, newGame, sellMaterial } from '../src/core/game';
-import { PARTY_MAX, type Adventurer, type DispatchOrder, type Expedition } from '../src/core/types';
+import { PARTY_MAX, type ActionKind, type Adventurer, type DispatchOrder, type Expedition } from '../src/core/types';
 
-const DUNGEON_ID = 'forest_cave';
 const FLOOR_ID = 'f1';
 const DAYS = 3;
 const POLICY_ID = 'standard';
@@ -14,12 +14,28 @@ const MIN_PARTY = 2;
 const RATE_STEP = 5;
 const DISPATCH_PICKS = [1, 2, 3, 5, 8];
 
-const nums = process.argv.slice(2).filter((a) => /^\d+$/.test(a)).map(Number);
+const args = process.argv.slice(2);
+const flag = (name: string) => {
+  const i = args.indexOf(`--${name}`);
+  return i >= 0 ? args[i + 1] : undefined;
+};
+const nums = args.filter((a, i) => /^\d+$/.test(a) && !args[i - 1]?.startsWith('--')).map(Number);
 const SEEDS = nums[0] ?? 20;
 const LAST_DAY = nums[1] ?? 30;
+const ACTIONS: ActionKind[] = ['explore', 'gather', 'hunt', 'boss', 'survey'];
+const ACTION_NAME: Record<string, string> = { explore: '探索', gather: '採集', hunt: '討伐', boss: 'ボス', survey: '踏査→探索' };
+const ACTION = (flag('action') ?? 'explore') as ActionKind;
+const DUNGEON_ID = flag('dungeon') ?? 'forest_cave';
+if (!ACTIONS.includes(ACTION)) throw new Error(`--action は ${ACTIONS.join(' / ')} のどれか`);
+if (!DUNGEON[DUNGEON_ID]) throw new Error(`ダンジョン ${DUNGEON_ID} が無い`);
 
 const floorDef = DUNGEON[DUNGEON_ID].floors.find((f) => f.id === FLOOR_ID)!;
 const depths = cellDepths(parseFloor(floorDef));
+const GATHER_ITEM = ACTION === 'gather'
+  ? flag('item') ?? parseFloor(floorDef).cells.find((c) => c.kind === 'gather')?.item
+  : undefined;
+if (ACTION === 'gather' && !GATHER_ITEM) throw new Error('採集する素材が決まらない');
+const isDefault = ACTION === 'explore' && DUNGEON_ID === 'forest_cave';
 
 interface DispatchRecord {
   n: number;
@@ -63,9 +79,12 @@ function run(seed: number, leaderPersonality?: string): RunResult {
     const party = s.adventurers.filter(ready).slice(0, PARTY_MAX);
     const leader = leaderPersonality ? s.adventurers[0] : party[0];
     if (party.length >= MIN_PARTY && leader && party.includes(leader)) {
+      const action: ActionKind = ACTION !== 'survey' ? ACTION : s.dungeons[DUNGEON_ID].confirmed ? 'explore' : 'survey';
+      const target: DispatchOrder['target'] = { dungeon: DUNGEON_ID, floor: FLOOR_ID };
+      if (GATHER_ITEM) target.item = GATHER_ITEM;
       const order: DispatchOrder = {
         partyIds: party.map((a) => a.id), leaderId: leader.id,
-        action: 'explore', target: { dungeon: DUNGEON_ID, floor: FLOOR_ID },
+        action, target,
         policy: POLICY_ID, days: DAYS,
         items: (s.inventory.potion ?? 0) >= 1 ? { potion: 1 } : {},
       };
@@ -135,7 +154,9 @@ const byPersonality = PERSONALITIES.map((p) => ({ p, runs: seeds.map((seed) => r
 const elapsed = (performance.now() - t0) / 1000;
 
 const out: string[] = [];
-out.push(`### 計測(\`npm run sim -- ${SEEDS} ${LAST_DAY}\`。${SEEDS}seed×${LAST_DAY}日、${DUNGEON_ID} ${FLOOR_ID}・探索・${DAYS}日・標準方針・回復薬1(在庫があれば)、待機中で負傷0の隊員を最大${PARTY_MAX}人、${MIN_PARTY}人未満なら休む)`);
+const extraArgs = isDefault ? '' : ` --action ${ACTION}${GATHER_ITEM ? ` --item ${GATHER_ITEM}` : ''} --dungeon ${DUNGEON_ID}`;
+const actionLabel = `${ACTION_NAME[ACTION]}${GATHER_ITEM ? `(${ITEM[GATHER_ITEM]?.name ?? GATHER_ITEM})` : ''}`;
+out.push(`### 計測(\`npm run sim -- ${SEEDS} ${LAST_DAY}${extraArgs}\`。${SEEDS}seed×${LAST_DAY}日、${DUNGEON_ID} ${FLOOR_ID}・${actionLabel}・${DAYS}日・標準方針・回復薬1(在庫があれば)、待機中で負傷0の隊員を最大${PARTY_MAX}人、${MIN_PARTY}人未満なら休む)`);
 out.push('');
 out.push('N日目 = その日の帰還を反映した後の値。隊長は待機メンバーのうち名簿順で最初の者(性格は seed 次第)。');
 out.push('');
@@ -157,10 +178,11 @@ out.push('');
 
 out.push('#### 隊長の性格を固定(名簿の1人目の性格を書き換え、常に隊長。1人目が出られない日は休む)');
 out.push('');
-out.push(table(['隊長', '15日目 探索率', `${LAST_DAY}日目 探索率`, '派遣数/seed', '最深(行程) 平均'], byPersonality.map(({ p, runs }) => {
+// 入口で引き返した派遣(maxDepth 0)を混ぜると、性格の奥への行きやすさが薄まる
+out.push(table(['隊長', '15日目 探索率', `${LAST_DAY}日目 探索率`, '派遣数/seed', '最深(行程) 平均(動いた派遣のみ)'], byPersonality.map(({ p, runs }) => {
   const ds = runs.flatMap((r) => r.dispatches);
   return [p.name, pct(mean(runs.map((r) => r.rate[15] ?? NaN))), pct(mean(runs.map((r) => r.rate[LAST_DAY] ?? 0))),
-    fix(ds.length / runs.length), fix(mean(ds.map((d) => d.traceDepth)))];
+    fix(ds.length / runs.length), fix(mean(ds.filter((d) => d.traceDepth > 0).map((d) => d.traceDepth)))];
 })));
 out.push('');
 

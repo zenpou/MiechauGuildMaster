@@ -1,11 +1,10 @@
-import { DUNGEON } from '../core/data';
+import { DUNGEON, DUNGEONS, PERSONALITY } from '../core/data';
 import { parseFloor, visibleFrom } from '../core/dungeon';
 import { exploredRateOf } from '../core/game';
 import type { CellKind } from '../core/types';
-import { state } from './app';
+import { actionText, advById, nameOf, render, state, ui } from './app';
 import { div, h, span } from './dom';
 
-const DUNGEON_ID = 'forest_cave';
 const FLOOR_ID = 'f1';
 
 const MARK: Partial<Record<CellKind, string>> = {
@@ -13,6 +12,10 @@ const MARK: Partial<Record<CellKind, string>> = {
 };
 
 export function mapTab(): HTMLElement {
+  const confirmed = DUNGEONS.filter((d) => state.dungeons[d.id]?.confirmed);
+  if (!confirmed.some((d) => d.id === ui.mapDungeon)) ui.mapDungeon = confirmed[0]?.id ?? '';
+  if (!ui.mapDungeon) return div('tab-body', div('dim', '入口を確認したダンジョンがありません'));
+  const DUNGEON_ID = ui.mapDungeon;
   const dungeon = DUNGEON[DUNGEON_ID];
   const floor = dungeon.floors.find((f) => f.id === FLOOR_ID)!;
   const grid = parseFloor(floor);
@@ -35,9 +38,12 @@ export function mapTab(): HTMLElement {
   });
 
   const rate = Math.round(exploredRateOf(state, DUNGEON_ID, FLOOR_ID) * 100);
+  const leader = last ? advById(last.order.leaderId) : undefined;
   return div('tab-body',
+    confirmed.length > 1 ? div('dungeon-pick', ...confirmed.map((d) =>
+      h('button', { class: d.id === DUNGEON_ID ? 'on' : '', onclick: () => { ui.mapDungeon = d.id; render(); } }, d.name))) : null,
     h('h2', null, `${dungeon.name} ${floor.name}`),
-    div('summary', span('big', `探索率 ${rate}%`), span('dim', `踏んだマス ${visited.size}`)),
+    div('summary', span('big', `探索率 ${rate}%`), rate >= 100 ? span('big pos', '踏破') : null, span('dim', `踏んだマス ${visited.size}`)),
     div('map', { style: `grid-template-columns: repeat(${grid.width}, 1fr)` }, ...cells),
     div('legend small',
       span('lg unknown', ''), '未知 ',
@@ -47,6 +53,7 @@ export function mapTab(): HTMLElement {
       span('lg wall', ''), '壁',
     ),
     div('dim small', '入=入口 採=採取 巣=敵の巣 主=巣の主 宝=宝箱 罠=罠 隠=隠し通路(発見済み)'),
-    last ? div('dim small', `強調: ${last.returnDay}日目に帰還した遠征`) : null,
+    last ? div('dim small', `強調: ${last.returnDay}日目に帰還した遠征(隊長 ${nameOf(last.order.leaderId)}`
+      + `${leader ? `・${PERSONALITY[leader.personality]?.name ?? leader.personality}` : ''} / ${actionText(last.order)})`) : null,
   );
 }
