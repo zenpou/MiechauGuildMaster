@@ -6,11 +6,13 @@ import { ENEMY, ITEM, PERSONALITY, POLICY, ROLE_SKILL, TRAIT, TUNING } from './d
 import { exploredRate, frontier, isPassable, neighbors, parseFloor, shortestPath, visibleFrom, xy, type Grid, type PassKnowledge } from './dungeon';
 import type { Rng } from './rng';
 import type {
-  Adventurer, CellKind, DungeonDef, DungeonProgress, ExpeditionResult, LogKind, StatKey,
+  ActionKind, Adventurer, CellKind, DungeonDef, DungeonProgress, ExpeditionResult, LogKind, StatKey,
 } from './types';
 
 // sim で調整する値は src/data/tuning.json
 const T = TUNING.explore;
+/** 採集指示で対象素材の採取点に着いたときの上乗せ。sim で調整する値 */
+const GATHER_FOCUS_BONUS = 1;
 
 
 export interface ExploreInput {
@@ -27,6 +29,10 @@ export interface ExploreInput {
   items: Record<string, number>;
   relations: Record<string, number>;
   startDay: number;
+  action: ActionKind;
+  target?: { item?: string; enemy?: string };
+  /** 見込み用: 既知のマスだけを歩き、未踏には踏み込まない */
+  knownOnly?: boolean;
 }
 
 /** 1歩の記録。cost は既踏1・未踏2 */
@@ -93,7 +99,12 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   const policy = POLICY[inp.policy] ?? POLICY.standard;
   const leader = members.find((m) => m.id === inp.leaderId) ?? members[0];
   const ex = PERSONALITY[leader.personality].explore;
-  const avoid = ex.detour === 'avoid';
+  // 寄り道と臆病の回避は探索系だけ。採集・討伐・ボスでは指示を優先する
+  const exploring = inp.action === 'explore' || inp.action === 'survey';
+  const avoid = exploring && ex.detour === 'avoid';
+  const knownOnly = inp.knownOnly === true;
+  const targetItem = inp.target?.item;
+  const targetEnemy = inp.target?.enemy;
   const entrance = grid.entrance;
 
   // ---- 知識 ----
@@ -135,6 +146,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   for (const m of members) result.fatigue[m.id] = 0;
   const downedEver = new Set<string>();
   const consumed = new Set<number>();
+  const edgesDone = new Set<number>();
 
   const addFatigue = (n: number) => {
     for (const m of members) result.fatigue[m.id] += Math.round(n * traitNum(m, 'fatigueRate', 1));
@@ -318,7 +330,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
           say('event', `${g.name}が${ITEM[item].name}を探したが、使えるものは見つからなかった。`);
           return;
         }
-        const qty = rng.int(T.gatherQty[0], T.gatherQty[1]) + (skilled('pack') ? ROLE_SKILL.pack.params.gatherBonus : 0);
+        const focus = inp.action === 'gather' && (!targetItem || targetItem === item) ? GATHER_FOCUS_BONUS : 0;
+        const qty = rng.int(T.gatherQty[0], T.gatherQty[1]) + (skilled('pack') ? ROLE_SKILL.pack.params.gatherBonus : 0) + focus;
         const kept = addMaterial(item, qty);
         if (kept > 0) say('event', `${g.name}が${ITEM[item].name}を${kept}個採った。`);
         return;
@@ -366,6 +379,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   };
   /** 隣の隠し通路は、通りがかった時に1日1度だけ発見を試みる */
   const tryHidden = (i: number) => {
+    if (knownOnly) return;
     for (const n of visibleFrom(grid, i)) {
       if (kindOf(n) !== 'hidden' || hiddenFound.includes(n) || tried.has(n)) continue;
       tried.add(n);
@@ -384,6 +398,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   const move = (next: number, cost: number) => {
     const fresh = !visited.has(next);
     pos = next;
+    edgesDone.add(next);
     if (fresh) {
       visited.add(next);
       newCells.push(next);
@@ -428,17 +443,54 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   };
 
   // ---- 目標選び ----
-  /** null = 候補が無い(歩き尽くした)/ 'far' = 候補はあるが今回の残り歩数では往復できない */
-  const chooseTarget = (): number | null | 'far' => {
+  /** 見込み用: 既知の端(未踏に接する既踏マス)。各端はその派遣で1度だけ目指す */
+  const knownEdges = () => {
+    const out = new Set<number>();
+    for (const f of frontier(grid, visited, seen, know)) {
+      for (const n of neighbors(grid, f, know)) if (visited.has(n) && !edgesDone.has(n)) out.add(n);
+    }
+    return out;
+  };
+  /** 行動種別ごとの目標候補。値は寄り道先か(加点の有無) */
+  const candidates = (): Map<number, boolean> => {
     const cands = new Map<number, boolean>();
-    for (const f of frontier(grid, visited, seen, know)) cands.set(f, false);
+    const unspent = (i: number) => !consumed.has(i);
+    switch (inp.action) {
+      case 'gather':
+        for (const i of visited) if (kindOf(i) === 'gather' && unspent(i) && (!targetItem || grid.cells[i].item === targetItem)) cands.set(i, false);
+        return cands;
+      case 'hunt':
+        for (const i of visited) if (isDanger(i) && unspent(i) && (!targetEnemy || grid.cells[i].enemy === targetEnemy)) cands.set(i, false);
+        return cands;
+      case 'boss':
+        for (const i of visited) if ((kindOf(i) === 'symbol' || kindOf(i) === 'boss') && unspent(i)) cands.set(i, false);
+        return cands;
+      default:
+        break;
+    }
+    if (knownOnly) for (const i of knownEdges()) cands.set(i, false);
+    else for (const f of frontier(grid, visited, seen, know)) cands.set(f, false);
     if (ex.detour === 'nest' || ex.detour === 'treasure') {
       const kinds = ex.detour === 'nest' ? DANGER_KINDS : LOOT_KINDS;
-      for (const i of [...visited, ...seen]) {
-        if (kinds.includes(kindOf(i)) && !consumed.has(i) && isPassable(grid, i, know)) cands.set(i, true);
+      for (const i of knownOnly ? [...visited] : [...visited, ...seen]) {
+        if (kinds.includes(kindOf(i)) && unspent(i) && isPassable(grid, i, know)) cands.set(i, true);
       }
     }
     if (avoid) for (const i of [...cands.keys()]) if (isDanger(i)) cands.delete(i);
+    return cands;
+  };
+  const exhaustedText = (): string => {
+    switch (inp.action) {
+      case 'gather': return '目当ての採取点は採り尽くした。入口へ引き返す。';
+      case 'hunt': return '巣を回り終えた。入口へ引き返す。';
+      case 'boss': return '討ち取って引き返す。';
+      default: return '行ける場所は歩き尽くした。入口へ引き返す。';
+    }
+  };
+
+  /** null = 候補が無い(歩き尽くした)/ 'far' = 候補はあるが今回の残り歩数では往復できない */
+  const chooseTarget = (): number | null | 'far' => {
+    const cands = candidates();
     cands.delete(pos);
     if (cands.size === 0) return null;
 
@@ -537,7 +589,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         if (t === null) {
           mapFull = true;
           flush();
-          say('narration', '行ける場所は歩き尽くした。入口へ引き返す。');
+          say('narration', exhaustedText());
           continue;
         }
         const r = pathTo(pos, t);

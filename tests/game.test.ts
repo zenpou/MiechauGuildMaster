@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { generateAdventurer } from '../src/core/adventurer';
-import { JOB } from '../src/core/data';
+import { DUNGEON, JOB } from '../src/core/data';
+import { parseFloor } from '../src/core/dungeon';
 import { advanceDay, buyItem, dispatch, exploredRateOf, newGame, recall, sellMaterial } from '../src/core/game';
 import { rngFor } from '../src/core/rng';
 import type { DispatchOrder, Expedition, GameState } from '../src/core/types';
@@ -235,5 +236,75 @@ describe('決定論', () => {
       return s;
     };
     expect(play()).toEqual(play());
+  });
+});
+
+const caveGrid = parseFloor(DUNGEON.forest_cave.floors[0]);
+const caveCells = (pred: (kind: string) => boolean) => caveGrid.cells.flatMap((c, i) => (pred(c.kind) ? [i] : []));
+const caveSymbol = caveCells((k) => k === 'symbol')[0];
+const caveAll = caveCells((k) => k !== 'wall');
+
+describe('行動種別の検証', () => {
+  it('護衛・輸送はまだ出せない', () => {
+    const s = newGame(3);
+    expect(dispatch(s, order(s, { action: 'escort' })).ok).toBe(false);
+    expect(dispatch(s, order(s, { action: 'transport' })).ok).toBe(false);
+  });
+
+  it('踏査は未確認のダンジョンにだけ、他は確認済みにだけ出せる', () => {
+    const s = newGame(3);
+    expect(s.dungeons.old_mine.confirmed).toBe(false);
+    expect(dispatch(s, order(s, { action: 'survey' })).ok).toBe(false);
+    expect(dispatch(s, order(s, { target: { dungeon: 'old_mine', floor: 'f1' } })).ok).toBe(false);
+    expect(dispatch(s, order(s, { action: 'survey', target: { dungeon: 'old_mine', floor: 'f1' } })).ok).toBe(true);
+  });
+
+  it('踏査から帰ると(全滅でも)入口が確認済みになり、お知らせが出る', () => {
+    const s = newGame(3);
+    const e = sent(s, { action: 'survey', target: { dungeon: 'old_mine', floor: 'f1' }, days: 1, items: {} });
+    Object.assign(e.result, { success: false, wiped: true, materials: {}, rescueCost: 0 });
+    const r = advanceDay(s);
+    expect(s.dungeons.old_mine.confirmed).toBe(true);
+    expect(r.notices).toContain('古い坑道の入口を確認した。');
+  });
+
+  it('採集は対象素材が必須で、そのフロアの採取点にある素材だけ', () => {
+    const s = newGame(3);
+    expect(dispatch(s, order(s, { action: 'gather' })).ok).toBe(false);
+    expect(dispatch(s, order(s, { action: 'gather', target: { dungeon: 'forest_cave', floor: 'f1', item: 'iron_ore' } })).ok).toBe(false);
+    expect(dispatch(s, order(s, { action: 'gather', target: { dungeon: 'forest_cave', floor: 'f1', item: 'herb' } })).ok).toBe(true);
+  });
+
+  it('討伐の対象指定は探索率100%から、そのフロアの巣・シンボルの敵だけ', () => {
+    const s = newGame(3);
+    const hunt = (enemy?: string) => order(s, { action: 'hunt', target: { dungeon: 'forest_cave', floor: 'f1', enemy } });
+    expect(dispatch(s, hunt('wolf')).ok).toBe(false);
+    s.dungeons.forest_cave.floors.f1.visited = caveAll;
+    expect(dispatch(s, hunt('slime')).ok).toBe(false);
+    expect(dispatch(s, hunt('wolf')).ok).toBe(true);
+    const t = newGame(3);
+    expect(dispatch(t, order(t, { action: 'hunt' })).ok).toBe(true);
+  });
+
+  it('ボスはシンボルを踏んだことがあるときだけ出せ、直行して戦う', () => {
+    const s = newGame(3);
+    expect(dispatch(s, order(s, { action: 'boss' })).ok).toBe(false);
+    // 隠し通路を開けていないと往復が日数に収まらないので、近道込みの知識にする
+    s.dungeons.forest_cave.floors.f1 = { visited: caveAll, hiddenFound: caveCells((k) => k === 'hidden') };
+    const e = sent(s, { action: 'boss', days: 3 });
+    expect(e.result.mapDeltas[0].cells).toEqual([]);
+    expect(e.result.log.some((l) => l.kind === 'combat')).toBe(true);
+    expect(caveSymbol).toBeGreaterThan(0);
+  });
+
+  it('シンボルの敵を倒すと bossDefeated が増え、全マス踏むと踏破のお知らせ', () => {
+    const s = newGame(3);
+    const e = sent(s, { days: 1 });
+    e.result.kills = { goblin_chief: 1, goblin: 2 };
+    e.result.mapDeltas = [{ dungeon: 'forest_cave', floor: 'f1', cells: caveAll, hidden: caveCells((k) => k === 'hidden') }];
+    const r = advanceDay(s);
+    expect(s.dungeons.forest_cave.bossDefeated).toBe(1);
+    expect(s.dungeons.forest_cave.fullCleared).toBe(true);
+    expect(r.notices.some((n) => n.includes('踏破'))).toBe(true);
   });
 });

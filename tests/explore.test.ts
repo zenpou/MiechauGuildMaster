@@ -32,7 +32,7 @@ function input(seed: number, o: Partial<ExploreInput> & { leader?: string; jobs?
     rng: rngFor(seed, 'explore-test'),
     dungeon: CAVE, floorId: 'f1',
     members, leaderId: members[0].id, policy: 'standard',
-    progress: progressOf(), days: 3, items: { potion: 1 }, relations: {}, startDay: 0,
+    progress: progressOf(), days: 3, items: { potion: 1 }, relations: {}, startDay: 0, action: 'explore',
     ...o,
   };
 }
@@ -311,5 +311,108 @@ describe('探索シミュレーション', () => {
     if (!result.wiped) expect(result.relationDeltas.filter((r) => r.reason === '共に帰還した')).toHaveLength(6);
     expect(result.log[0].day).toBe(1);
     expect(result.log.some((l) => l.kind === 'map')).toBe(true);
+  });
+});
+
+/** 通れるマスのうち、列 maxCol 以下を「前回までに踏んだ」とする */
+function knownUpTo(d: DungeonDef, maxCol: number): number[] {
+  const g = parseFloor(d.floors[0]);
+  return g.cells.flatMap((c, i) => (c.kind !== 'wall' && i % g.width <= maxCol ? [i] : []));
+}
+const cellsOf = (d: DungeonDef, kind: string) =>
+  parseFloor(d.floors[0]).cells.flatMap((c, i) => (c.kind === kind ? [i] : []));
+
+describe('行動種別', () => {
+  // 薬草2か所と、脇道の苔鉱石。列6以降は未踏
+  const herbs = corridor('herbs', [
+    '##########',
+    'E.h..h.h.#',
+    '#m########',
+    '##########',
+  ]);
+
+  it('採集: 既知の対象素材の採取点だけを回り、未踏に入らず、早く帰る', () => {
+    const known = knownUpTo(herbs, 5);
+    const herbCells = cellsOf(herbs, 'gather').filter((i) => known.includes(i) && parseFloor(herbs.floors[0]).cells[i].item === 'herb');
+    for (const seed of SEEDS) {
+      const { result, trace } = runExploration(input(seed, {
+        dungeon: herbs, progress: progressOf(known), days: 3, action: 'gather', target: { item: 'herb' },
+      }));
+      expect(result.mapDeltas[0].cells).toEqual([]);
+      const gathered = trace.events.filter((e) => e.kind === 'gather').map((e) => e.cell).sort((a, b) => a - b);
+      expect(gathered).toEqual(herbCells);
+      expect(Object.keys(result.materials).every((k) => k === 'herb')).toBe(true);
+      expect(result.daysSpent).toBeLessThan(3);
+      expect(trace.finalCell).toBe(parseFloor(herbs.floors[0]).entrance);
+      expect(result.log.some((l) => l.text.includes('採り尽くした'))).toBe(true);
+    }
+  });
+
+  it('採集: 指定した素材は集中ボーナスで多く採れる', () => {
+    const one = corridor('one', ['####', 'Eh.#', '####']);
+    const known = knownUpTo(one, 2);
+    let focused = 0;
+    let plain = 0;
+    for (const seed of SEEDS) {
+      focused += runExploration(input(seed, { dungeon: one, progress: progressOf(known), action: 'gather', target: { item: 'herb' } })).result.materials.herb ?? 0;
+      plain += runExploration(input(seed, { dungeon: one, progress: progressOf([parseFloor(one.floors[0]).entrance]), action: 'explore' })).result.materials.herb ?? 0;
+    }
+    expect(focused).toBeGreaterThan(plain);
+  });
+
+  it('討伐: 既知の巣を回り、未踏には入らない', () => {
+    const den = corridor('den', ['##########', 'E.w..w..w#', '##########']);
+    const known = knownUpTo(den, 6);
+    const knownNests = cellsOf(den, 'nest').filter((i) => known.includes(i));
+    let both = 0;
+    for (const seed of SEEDS) {
+      const { result, trace } = runExploration(input(seed, { dungeon: den, progress: progressOf(known), action: 'hunt' }));
+      expect(result.mapDeltas[0].cells).toEqual([]);
+      const nests = trace.events.filter((e) => e.kind === 'nest').map((e) => e.cell);
+      for (const n of nests) expect(knownNests).toContain(n);
+      if (nests.length === 2) {
+        both++;
+        expect(result.daysSpent).toBeLessThan(3);
+      }
+    }
+    expect(both).toBeGreaterThan(0);
+  });
+
+  it('討伐: 対象モンスターを指定するとその巣だけを回る', () => {
+    const den = corridor('den2', ['########', 'E.w....#', '#B######', '########']);
+    const known = knownUpTo(den, 7);
+    for (const seed of SEEDS) {
+      const { trace } = runExploration(input(seed, { dungeon: den, progress: progressOf(known), action: 'hunt', target: { enemy: 'wolf' } }));
+      expect(trace.events.some((e) => e.kind === 'symbol')).toBe(false);
+      expect(trace.events.some((e) => e.kind === 'nest')).toBe(true);
+    }
+  });
+
+  it('ボス: 踏んだことのあるシンボルへ直行して戦い、未踏に入らない', () => {
+    const lair = corridor('lair2', ['###########', 'E...B.....#', '###########']);
+    const known = knownUpTo(lair, 4);
+    for (const seed of SEEDS) {
+      const { result, trace } = runExploration(input(seed, { dungeon: lair, progress: progressOf(known), action: 'boss', days: 3 }));
+      expect(trace.events.filter((e) => e.kind === 'symbol')).toHaveLength(1);
+      expect(result.mapDeltas[0].cells).toEqual([]);
+    }
+  });
+
+  it('knownOnly: 新しく踏むマスが0で、隠し通路も探さない', () => {
+    const known = knownWithin(6);
+    for (const seed of SEEDS) {
+      const { result, trace } = runExploration(input(seed, { progress: progressOf(known), knownOnly: true }));
+      expect(result.mapDeltas[0].cells).toEqual([]);
+      expect(result.mapDeltas[0].hidden).toEqual([]);
+      expect(trace.events.some((e) => e.kind === 'hidden')).toBe(false);
+      expect(trace.days.flatMap((d) => d.moves).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('knownOnly: 既知の端まで歩く', () => {
+    const known = knownWithin(6);
+    const far = Math.max(...known.map((i) => DEPTH[i]));
+    const reached = SEEDS.filter((seed) => runExploration(input(seed, { progress: progressOf(known), knownOnly: true })).trace.maxDepth === far);
+    expect(reached.length).toBeGreaterThan(0);
   });
 });

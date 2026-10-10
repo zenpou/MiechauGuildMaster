@@ -8,7 +8,7 @@ import { rngFor } from './rng';
 import { emptyState } from './state';
 import {
   LOYALTY_MAX, PARTIES_MAX, PARTY_MAX,
-  type Adventurer, type DispatchOrder, type Expedition, type GameState,
+  type ActionKind, type Adventurer, type DispatchOrder, type Expedition, type GameState,
 } from './types';
 
 // sim で調整する値は src/data/tuning.json
@@ -21,6 +21,9 @@ const BUYABLE = ['potion'];
 const LEDGER_MAX = 300;
 const NOTICES_MAX = 80;
 const HISTORY_MAX = 40;
+/** 今出せる行動。escort / transport はフェーズ4 */
+const ACTIONS: ActionKind[] = ['explore', 'gather', 'hunt', 'boss', 'survey'];
+const BOSS_KINDS = ['symbol', 'boss'];
 
 export type Result = { ok: true } | { ok: false; reason: string };
 export interface DayReport { day: number; returned: Expedition[]; notices: string[] }
@@ -74,7 +77,10 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   const progress = s.dungeons[dungeonId];
   if (!dungeon || !progress) return fail('行き先のダンジョンが分かりません');
   const floorId = o.target.floor ?? 'f1';
-  if (!dungeon.floors.some((f) => f.id === floorId)) return fail('行き先のフロアが分かりません');
+  const floorDef = dungeon.floors.find((f) => f.id === floorId);
+  if (!floorDef) return fail('行き先のフロアが分かりません');
+  const actionError = checkAction(s, o, dungeonId, floorId);
+  if (actionError) return fail(actionError);
   if (!has(POLICY, o.policy)) return fail('方針が不正です');
   if (!Number.isInteger(o.days) || o.days < 1 || o.days > T.daysMax) return fail(`日数は1〜${T.daysMax}日で指定してください`);
   if (o.partyIds.length < 1 || o.partyIds.length > PARTY_MAX) return fail(`隊は1〜${PARTY_MAX}人で組んでください`);
@@ -101,6 +107,7 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
     dungeon, floorId,
     members: members.map((m) => structuredClone(m)), leaderId: o.leaderId, policy: o.policy,
     progress, days: o.days, items: { ...items }, relations: s.relations, startDay: s.day,
+    action: o.action, target: { item: o.target.item, enemy: o.target.enemy },
   });
   const expedition: Expedition = {
     id: `e${s.counters.nextId++}`,
@@ -114,6 +121,29 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   for (const [k, n] of Object.entries(items)) addInventory(s, k, -n);
   s.expeditions.push(expedition);
   return { ok: true, expedition };
+}
+
+/** 行動種別ごとの出発条件。問題なければ null */
+function checkAction(s: GameState, o: DispatchOrder, dungeonId: string, floorId: string): string | null {
+  if (!ACTIONS.includes(o.action)) return 'その行動はまだ選べません';
+  const progress = s.dungeons[dungeonId];
+  const name = DUNGEON[dungeonId].name;
+  if (o.action === 'survey') return progress.confirmed ? `${name}は入口を確認済みです(踏査は噂だけのダンジョンへ)` : null;
+  if (!progress.confirmed) return `${name}は噂だけで入口が分かりません。先に踏査してください`;
+  const grid = parseFloor(DUNGEON[dungeonId].floors.find((f) => f.id === floorId)!);
+  const visited = progress.floors[floorId]?.visited ?? [];
+  if (o.action === 'gather') {
+    const item = o.target.item;
+    if (!item) return '採集する素材を指定してください';
+    if (!grid.cells.some((c) => c.kind === 'gather' && c.item === item)) return 'その素材はこのフロアでは採れません';
+  }
+  if (o.action === 'hunt' && o.target.enemy !== undefined) {
+    if (exploredRateOf(s, dungeonId, floorId) < 1) return '対象の指定は探索率100%から選べます';
+    const enemy = o.target.enemy;
+    if (!grid.cells.some((c) => (c.kind === 'nest' || BOSS_KINDS.includes(c.kind)) && c.enemy === enemy)) return 'その敵の巣はこのフロアにありません';
+  }
+  if (o.action === 'boss' && !visited.some((i) => BOSS_KINDS.includes(grid.cells[i]?.kind))) return 'ボスの居場所をまだ踏んでいません';
+  return null;
 }
 
 export function recall(s: GameState, expeditionId: string): Result {
@@ -171,6 +201,21 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
     const fl = (prog.floors[md.floor] ??= { visited: [], hiddenFound: [] });
     fl.visited = [...new Set([...fl.visited, ...md.cells])];
     fl.hiddenFound = [...new Set([...fl.hiddenFound, ...md.hidden])];
+  }
+  const prog = s.dungeons[dungeonId];
+  const def = DUNGEON[dungeonId];
+  if (prog && def) {
+    // 全滅しても入口までは辿り着いているので、踏査は結果を問わず確認済みにする
+    if (e.order.action === 'survey' && !prog.confirmed) {
+      prog.confirmed = true;
+      notices.push(`${place}の入口を確認した。`);
+    }
+    const bossEnemies = new Set(def.floors.flatMap((f) => parseFloor(f).cells.filter((c) => BOSS_KINDS.includes(c.kind)).map((c) => c.enemy!)));
+    for (const [k, n] of Object.entries(r.kills)) if (bossEnemies.has(k)) prog.bossDefeated += n;
+    if (!prog.fullCleared && def.floors.every((f) => exploredRateOf(s, dungeonId, f.id) >= 1)) {
+      prog.fullCleared = true;
+      notices.push(`${place}を踏破した(探索率100%)。`);
+    }
   }
 
   e.claimed = true;
