@@ -21,8 +21,15 @@ export const ROLE_LABEL: Record<RoleId, string> = {
 export type Aptitude = Record<RoleId, number>;
 
 export type ArmorClass = 'light' | 'medium' | 'heavy';
-/** 属性の種類はフェーズ3(装備と耐性)で確定する */
-export type ElementId = string;
+/** 属性(第5節)。敵の攻撃に付き、防具・装飾の resist で被ダメージを ×(1 − resist) に減らす */
+export type ElementId = 'fire' | 'ice' | 'thunder' | 'earth' | 'dark';
+export const ELEMENT_IDS: ElementId[] = ['fire', 'ice', 'thunder', 'earth', 'dark'];
+export const ELEMENT_LABEL: Record<ElementId, string> = { fire: '火', ice: '氷', thunder: '雷', earth: '土', dark: '闇' };
+/** 耐性。正で軽減、負で弱点。装備の合計は 0.8 で頭打ち */
+export type Resist = Partial<Record<ElementId, number>>;
+
+/** 操作の結果。失敗理由は UI にそのまま出す日本語 */
+export type Result = { ok: true } | { ok: false; reason: string };
 
 // ---- データ定義(JSON) ----
 export interface JobDef {
@@ -87,7 +94,7 @@ export interface PolicyDef {
 
 export interface EnemyDef {
   id: string; name: string; hp: number; atk: number; def: number; mag: number; spd: number; exp: number;
-  element?: ElementId; resist?: Record<ElementId, number>;
+  element?: ElementId; resist?: Resist;
   loot: { item: string; chance: number }[];
   ai: 'random' | 'weakest' | 'strongest';
   boss?: boolean; symbol?: boolean;
@@ -102,7 +109,8 @@ export interface ItemDef {
   price: number;
   /** 積載に占める重さ */
   weight: number;
-  equip?: { slot: EquipSlot; armorClass?: ArmorClass; mods: Partial<Stats>; resist?: Record<ElementId, number>; effects?: string[] };
+  /** effects はフェーズ3では gather(採取量+N)と carry(積載+N) */
+  equip?: { slot: EquipSlot; armorClass?: ArmorClass; mods: Partial<Stats>; resist?: Resist; effects?: Record<string, number> };
   consumable?: { effect: string; params: Record<string, number> };
   /** 産出するダンジョン(素材のみ) */
   source?: string;
@@ -191,6 +199,8 @@ export interface FacilityDef {
   costs: FacilityLevelCost[];
   upkeep: number;
   effectText: string[];
+  /** Lvごとの効果の値(index = Lv−1)。例: 治療所 { injuryDays: -1, fatigueRecover: 5 } */
+  effects: Record<string, number>[];
   /** 勤務できる人数と、勤務で効く能力 */
   workSlots?: number; workStat?: StatKey;
 }
