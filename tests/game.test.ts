@@ -1,0 +1,239 @@
+import { describe, expect, it } from 'vitest';
+import { generateAdventurer } from '../src/core/adventurer';
+import { JOB } from '../src/core/data';
+import { advanceDay, buyItem, dispatch, exploredRateOf, newGame, recall, sellMaterial } from '../src/core/game';
+import { rngFor } from '../src/core/rng';
+import type { DispatchOrder, Expedition, GameState } from '../src/core/types';
+
+function order(s: GameState, o: Partial<DispatchOrder> = {}): DispatchOrder {
+  const ids = s.adventurers.map((a) => a.id);
+  return {
+    partyIds: ids, leaderId: ids[0], action: 'explore',
+    target: { dungeon: 'forest_cave', floor: 'f1' },
+    policy: 'standard', days: 2, items: { potion: 1 },
+    ...o,
+  };
+}
+
+function sent(s: GameState, o: Partial<DispatchOrder> = {}): Expedition {
+  const r = dispatch(s, order(s, o));
+  if (!r.ok) throw new Error(r.reason);
+  return r.expedition;
+}
+
+const wages = (s: GameState) => s.adventurers.reduce((t, a) => t + a.salary, 0);
+
+describe('newGame', () => {
+  it('固定4人(剣士・戦士・僧侶・斥候)・500G・回復薬2・森の洞窟の進捗0', () => {
+    const s = newGame(7);
+    expect(s.gold).toBe(500);
+    expect(s.adventurers.map((a) => a.job)).toEqual(['fighter', 'warrior', 'priest', 'scout']);
+    for (const a of s.adventurers) {
+      for (const r of JOB[a.job].roles) expect(a.apt[r]).toBeGreaterThanOrEqual(70);
+      expect(a.history.hiredDay).toBe(1);
+      expect(a.unique).toBeUndefined();
+      expect(a.status).toBe('idle');
+    }
+    expect(new Set(s.adventurers.map((a) => a.name)).size).toBe(4);
+    expect(s.inventory.potion).toBe(2);
+    expect(s.dungeons.forest_cave).toEqual({ confirmed: true, floors: { f1: { visited: [], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false });
+    expect(s.world.visitedNodes).toEqual(['base']);
+    expect(s.ledger.some((l) => l.amount === 500)).toBe(true);
+    expect(exploredRateOf(s, 'forest_cave', 'f1')).toBe(0);
+  });
+});
+
+describe('dispatch の検証', () => {
+  it('重複・0人・5人・在庫不足・隊長が隊外・日数外・負傷者は ok:false で、状態を変えない', () => {
+    const s = newGame(3);
+    const ids = s.adventurers.map((a) => a.id);
+    s.adventurers.push(generateAdventurer(rngFor(3, 'extra'), { id: 'x5' }));
+    const before = structuredClone(s);
+    expect(dispatch(s, order(s, { partyIds: [ids[0], ids[0]] })).ok).toBe(false);
+    expect(dispatch(s, order(s, { partyIds: [] })).ok).toBe(false);
+    expect(dispatch(s, order(s, { partyIds: [...ids, 'x5'] })).ok).toBe(false);
+    expect(dispatch(s, order(s, { partyIds: ids, items: { potion: 3 } })).ok).toBe(false);
+    expect(dispatch(s, order(s, { partyIds: ids.slice(1), leaderId: ids[0] })).ok).toBe(false);
+    expect(dispatch(s, order(s, { partyIds: ids, days: 0 })).ok).toBe(false);
+    expect(dispatch(s, order(s, { partyIds: ids, days: 8 })).ok).toBe(false);
+    expect(s).toEqual(before);
+    s.adventurers[1].injuryDays = 2;
+    expect(dispatch(s, order(s, { partyIds: ids })).ok).toBe(false);
+  });
+
+  it('派遣中の者は重ねて出せない', () => {
+    const s = newGame(3);
+    const ids = s.adventurers.map((a) => a.id);
+    sent(s, { partyIds: ids.slice(0, 2), items: {} });
+    expect(dispatch(s, order(s, { partyIds: [ids[1], ids[2]], leaderId: ids[1], items: {} })).ok).toBe(false);
+  });
+
+  it('出発後、隊員は away になり持ち物が在庫から減る。地図は帰還日まで変わらない', () => {
+    const s = newGame(5);
+    const e = sent(s, { days: 3, items: { potion: 1 } });
+    expect(s.adventurers.every((a) => a.status === 'away')).toBe(true);
+    expect(s.inventory.potion).toBe(1);
+    expect(e.startDay).toBe(1);
+    expect(e.returnDay).toBe(4);
+    expect(s.expeditions).toHaveLength(1);
+    expect(s.counters.dispatches).toBe(1);
+    expect(s.dungeons.forest_cave.floors.f1.visited).toEqual([]);
+  });
+
+  it('呼び戻しはフェーズ1では不可', () => {
+    const s = newGame(5);
+    const e = sent(s);
+    expect(recall(s, e.id).ok).toBe(false);
+  });
+});
+
+describe('advanceDay', () => {
+  it('日給と維持費30が引かれ、台帳に載る', () => {
+    const s = newGame(9);
+    const w = wages(s);
+    const r = advanceDay(s);
+    expect(r.day).toBe(2);
+    expect(s.day).toBe(2);
+    expect(s.gold).toBe(500 - w - 30);
+    expect(s.ledger.some((l) => l.amount === -w && l.label.includes('日給'))).toBe(true);
+    expect(s.ledger.some((l) => l.amount === -30 && l.label.includes('維持費'))).toBe(true);
+  });
+
+  it('赤字なら利息2%・忠誠−4・評判−1', () => {
+    const s = newGame(9);
+    s.gold = -1000;
+    s.rep = 5;
+    const loyal = s.adventurers.map((a) => a.loyalty);
+    const w = wages(s);
+    advanceDay(s);
+    const deficit = 1000 + w + 30;
+    expect(s.gold).toBe(-deficit - Math.ceil(deficit * 0.02));
+    expect(s.rep).toBe(4);
+    expect(s.debt).toBe(true);
+    s.adventurers.forEach((a, i) => expect(a.loyalty).toBe(loyal[i] - 4 + 1));
+  });
+
+  it('忠誠は全員毎日+1(派遣中も)、上限255', () => {
+    const s = newGame(11);
+    const ids = s.adventurers.map((a) => a.id);
+    sent(s, { partyIds: ids.slice(0, 2), days: 5, items: {} });
+    s.adventurers[3].loyalty = 255;
+    const loyal = s.adventurers.map((a) => a.loyalty);
+    advanceDay(s);
+    expect(s.adventurers.map((a) => a.loyalty)).toEqual(loyal.map((v) => Math.min(255, v + 1)));
+  });
+
+  it('待機者は疲労−25・負傷−1', () => {
+    const s = newGame(11);
+    s.adventurers[0].fatigue = 30;
+    s.adventurers[0].injuryDays = 2;
+    advanceDay(s);
+    expect(s.adventurers[0].fatigue).toBe(5);
+    expect(s.adventurers[0].injuryDays).toBe(1);
+  });
+
+  it('帰還日に結果が反映される(素材・持ち物・地図・状態・履歴・お知らせ)', () => {
+    const s = newGame(13);
+    const e = sent(s, { days: 2 });
+    const res = structuredClone(e.result);
+    const potionsLeft = res.items.potion ?? 0;
+    const r1 = advanceDay(s);
+    expect(r1.returned).toHaveLength(0);
+    expect(s.adventurers.every((a) => a.status === 'away')).toBe(true);
+    const r2 = advanceDay(s);
+    expect(r2.day).toBe(3);
+    expect(r2.returned.map((x) => x.id)).toEqual([e.id]);
+    expect(r2.notices.length).toBeGreaterThan(0);
+    expect(s.expeditions).toHaveLength(0);
+    expect(s.history[0].id).toBe(e.id);
+    expect(s.adventurers.every((a) => a.status === 'idle')).toBe(true);
+    expect(s.inventory.potion).toBe(1 + potionsLeft);
+    if (!res.wiped) for (const [k, n] of Object.entries(res.materials)) expect(s.inventory[k]).toBe(n);
+    const visited = s.dungeons.forest_cave.floors.f1.visited;
+    expect(visited.length).toBeGreaterThan(0);
+    expect([...visited].sort()).toEqual([...new Set(res.mapDeltas[0].cells)].sort());
+    expect(exploredRateOf(s, 'forest_cave', 'f1')).toBeGreaterThan(0);
+    for (const a of s.adventurers) {
+      expect(a.history.expeditions).toBe(1);
+      expect(a.history.visits.forest_cave).toBe(1);
+    }
+  });
+
+  it('地図の進捗は重複なくマージされる', () => {
+    const s = newGame(13);
+    const e = sent(s, { days: 1 });
+    e.result.mapDeltas = [{ dungeon: 'forest_cave', floor: 'f1', cells: [60, 61, 62], hidden: [67] }];
+    s.dungeons.forest_cave.floors.f1 = { visited: [60, 63], hiddenFound: [67] };
+    advanceDay(s);
+    expect([...s.dungeons.forest_cave.floors.f1.visited].sort((a, b) => a - b)).toEqual([60, 61, 62, 63]);
+    expect(s.dungeons.forest_cave.floors.f1.hiddenFound).toEqual([67]);
+  });
+
+  it('成功で忠誠+3(+日次1)、負傷で−3', () => {
+    const s = newGame(17);
+    const e = sent(s, { days: 1 });
+    const [a0, a1] = s.adventurers;
+    Object.assign(e.result, { success: true, retreated: false, wiped: false, injuries: { [a1.id]: 2 } });
+    const l0 = a0.loyalty, l1 = a1.loyalty;
+    advanceDay(s);
+    expect(a0.loyalty).toBe(l0 + 3 + 1);
+    expect(a1.loyalty).toBe(l1 + 3 - 3 + 1);
+    expect(a1.injuryDays).toBe(2);
+  });
+
+  it('全滅の帰還: 救助費用が引かれ、失った素材は入らず、忠誠−20', () => {
+    const s = newGame(19);
+    const e = sent(s, { days: 1, items: {} });
+    const ids = s.adventurers.map((a) => a.id);
+    Object.assign(e.result, {
+      success: false, retreated: false, wiped: true,
+      materials: {}, lostMaterials: { herb: 3 }, gold: 0, rescueCost: 120,
+      injuries: Object.fromEntries(ids.map((id) => [id, 3])),
+    });
+    const loyal = s.adventurers.map((a) => a.loyalty);
+    const w = wages(s);
+    advanceDay(s);
+    expect(s.gold).toBe(500 - w - 30 - 120);
+    expect(s.ledger.some((l) => l.amount === -120)).toBe(true);
+    expect(s.inventory.herb ?? 0).toBe(0);
+    s.adventurers.forEach((a, i) => expect(a.loyalty).toBe(loyal[i] - 20 + 1));
+    expect(s.adventurers.every((a) => a.injuryDays === 3)).toBe(true);
+  });
+});
+
+describe('売買', () => {
+  it('素材を売ると価格×個数が入り台帳に載る。持っていない数は売れない', () => {
+    const s = newGame(1);
+    s.inventory.fang = 3;
+    expect(sellMaterial(s, 'fang', 4).ok).toBe(false);
+    expect(sellMaterial(s, 'potion', 1).ok).toBe(false);
+    expect(sellMaterial(s, 'fang', 2).ok).toBe(true);
+    expect(s.inventory.fang).toBe(1);
+    expect(s.gold).toBe(500 + 36);
+    expect(s.ledger[0].amount).toBe(36);
+  });
+
+  it('回復薬だけ買える。資金不足では買えない', () => {
+    const s = newGame(1);
+    expect(buyItem(s, 'potion', 2).ok).toBe(true);
+    expect(s.inventory.potion).toBe(4);
+    expect(s.gold).toBe(440);
+    expect(buyItem(s, 'herb', 1).ok).toBe(false);
+    expect(buyItem(s, 'potion', 100).ok).toBe(false);
+    expect(s.inventory.potion).toBe(4);
+  });
+});
+
+describe('決定論', () => {
+  it('同seedで同じ手順なら同じ状態', () => {
+    const play = () => {
+      const s = newGame(42);
+      sent(s, { days: 3 });
+      for (let i = 0; i < 4; i++) advanceDay(s);
+      sent(s, { days: 2, items: {} });
+      for (let i = 0; i < 3; i++) advanceDay(s);
+      return s;
+    };
+    expect(play()).toEqual(play());
+  });
+});

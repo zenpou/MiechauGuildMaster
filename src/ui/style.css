@@ -1,8 +1,69 @@
 :root { color-scheme: light dark; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
-body { margin: 0; padding: 16px; background: #202c2e; color: #e8e6df; }
-h1 { font-size: 1.4rem; margin: 0 0 4px; }
-h2 { font-size: 1.1rem; margin: 20px 0 8px; }
-.meta { opacity: 0.7; font-size: 0.9rem; }
-table { border-collapse: collapse; font-size: 0.9rem; }
-th, td { border: 1px solid #3a4a4d; padding: 4px 8px; text-align: left; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 12px; background: #202c2e; color: #e8e6df; }
+#app { max-width: 720px; margin: 0 auto; }
+h1 { font-size: 1.2rem; margin: 0 0 8px; }
+h2 { font-size: 1rem; margin: 18px 0 6px; }
+.dim { opacity: 0.65; }
+.small { font-size: 0.85rem; }
+.big { font-size: 1.15rem; font-weight: bold; }
+.neg { color: #ff8f80; }
+.pos { color: #9ad89a; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+.footer { justify-content: space-between; margin-top: 24px; }
+.summary { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; margin: 4px 0 10px; }
+
+button { font: inherit; color: inherit; background: #34474a; border: 1px solid #4b6266; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button:disabled { opacity: 0.45; cursor: default; }
+button.small { padding: 2px 8px; font-size: 0.85rem; margin-left: 6px; }
+button.primary { background: #3d6b4f; border-color: #57916d; font-weight: bold; }
+button.danger { background: #5a3434; border-color: #7d4a4a; }
+button.wide { display: block; width: 100%; padding: 10px; margin: 8px 0; }
+select { font: inherit; }
+
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px; position: sticky; top: 0; background: #202c2e; padding: 4px 0; z-index: 1; }
+.tabs button { padding: 8px 0; }
+.tabs button.on { background: #57916d; border-color: #6fb088; }
+
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; }
+th, td { border: 1px solid #3a4a4d; padding: 4px 6px; text-align: left; }
 th { background: #2a393c; }
+td.num { text-align: right; }
+
+ul.plain, ol.plain { list-style: none; padding: 0; margin: 0; }
+ul.plain li { padding: 4px 0; border-bottom: 1px solid #2f3e41; }
+.notices li.fresh { color: #ffe08a; }
+.inv li { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+.members li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; }
+.members .leader { white-space: nowrap; }
+.form { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 4px; }
+
+.map { display: grid; gap: 1px; width: 100%; max-width: 420px; background: #111; border: 1px solid #111; }
+.cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: clamp(0.6rem, 3vw, 0.9rem); line-height: 1; }
+.cell.unknown, .lg.unknown { background: #151b1c; }
+.cell.wall, .lg.wall { background: #5b5248; }
+.cell.seen, .lg.seen { background: #6f7d74; color: #1d2422; }
+.cell.stepped, .lg.stepped { background: #d8d2bd; color: #2a2a2a; }
+.cell.recent, .lg.recent { background: #f0c25a; color: #2a2a2a; }
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 8px 0 4px; }
+.lg { display: inline-block; width: 14px; height: 14px; border: 1px solid #111; }
+
+.loglist button { width: 100%; text-align: left; }
+.loglist button.sel { background: #57916d; }
+.badge { font-size: 0.8rem; padding: 0 6px; border-radius: 8px; background: #3d6b4f; }
+.badge.撤退 { background: #7a6a2f; }
+.badge.全滅 { background: #7d3a3a; }
+.detail { margin-top: 10px; padding: 8px; background: #263437; border-radius: 6px; }
+ol.log { padding-left: 0; list-style: none; margin: 8px 0 0; font-size: 0.85rem; }
+ol.log li { padding: 2px 0; }
+.log-combat { color: #ffb4a0; }
+.log-event { color: #a8d8ff; }
+.log-relation { color: #e5b5ff; }
+.log-result { font-weight: bold; }
+.log-map { color: #f0c25a; }
+.log-talk { color: #c8e6a0; }
+
+.warn { background: #6b3a2a; padding: 8px; border-radius: 6px; margin: 6px 0; }
+.toast { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); max-width: calc(100% - 24px); background: #34474a; border: 1px solid #6fb088; padding: 10px 14px; border-radius: 8px; z-index: 2; }
+.toast.err { border-color: #ff8f80; }
