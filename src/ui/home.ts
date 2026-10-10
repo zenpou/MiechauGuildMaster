@@ -75,7 +75,7 @@ export function homeTab(): HTMLElement {
     div('scroll',
       h('table', { class: 'roster' },
         h('thead', null, h('tr', null, ...ROSTER_HEAD.map((t) => h('th', null, t)))),
-        h('tbody', null, ...s.adventurers.flatMap((a) => [h('tr', { class: ui.selAdv === a.id ? 'sel has-sub' : 'has-sub' },
+        h('tbody', null, ...s.adventurers.flatMap((a) => [labeled(h('tr', { class: ui.selAdv === a.id ? 'sel has-sub' : 'has-sub' },
           h('td', null, h('button', { class: 'link', onclick: () => pickAdv(a.id) }, a.unique ? `★${a.name}` : a.name)),
           h('td', null, JOB[a.job].name),
           ...SLOTS.map((sl) => { const id = slotsOf(a)[sl.id]; return h('td', id ? null : { class: 'dim' }, id ? ITEM[id]?.name ?? id : '—'); }),
@@ -87,7 +87,7 @@ export function homeTab(): HTMLElement {
           h('td', { class: 'num' }, `${a.salary}G`),
           h('td', null, statusText(a)),
           h('td', null, a.status === 'idle' ? h('button', { class: 'small danger', onclick: () => fire(a) }, '解雇') : null),
-        ), profileRow(a)])),
+        )), profileRow(a)])),
       ),
     ),
     equipPanel(),
@@ -108,6 +108,12 @@ export function homeTab(): HTMLElement {
 function loyaltyCell(a: Adventurer): HTMLElement {
   const next = LOYALTY_MILESTONES.find((m) => a.loyalty < m);
   return span(null, String(a.loyalty), next === undefined ? null : span('dim tiny', ` 次の節目 ${next}`));
+}
+
+/** 狭い画面では表をカードにし、各セルの上に見出しを出す(CSS の attr(data-label))。横に流さず、忠誠・日給・状態が見える */
+function labeled(row: HTMLElement): HTMLElement {
+  [...row.children].forEach((cell, i) => cell.setAttribute('data-label', ROSTER_HEAD[i] ?? ''));
+  return row;
 }
 
 /** 名簿の2行目: 所持スキルと人となり */
