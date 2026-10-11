@@ -89,7 +89,7 @@ const { canCraft, craftGold, startCraft } = await import('../src/core/craft');
 const { isPassable, needsSearch, parseFloor, searchSpots, visibleFrom } = await import('../src/core/dungeon');
 const { equip } = await import('../src/core/equipment');
 const { cellDepths, floorTransit } = await import('../src/core/explore');
-const { acceptQuest, advanceDay, buildFacility, dailyCost, dispatch, exploredRateOf, newGame, sellMaterial } = await import('../src/core/game');
+const { acceptQuest, advanceDay, buildFacility, dailyCost, dispatch, exploredRateOf, newGame, sellItem } = await import('../src/core/game');
 const { canChangeJob, changeJob, promotionCost, promotionOptions } = await import('../src/core/jobs');
 const { heldKeys } = await import('../src/core/ledger');
 const { dispatchBlock, markRead, replyMail } = await import('../src/core/mail');
@@ -634,7 +634,7 @@ function runSeed(seed: number, log: boolean): Run {
       if (ITEM[item]?.kind !== 'material') continue;
       const extra = n - (keep[item] ?? 0);
       const before = s.gold;
-      if (extra > 0 && sellMaterial(s, item, extra).ok) gold += s.gold - before;
+      if (extra > 0 && sellItem(s, item, extra).ok) gold += s.gold - before;
     }
     if (gold > 0) acts.push(`売却 ${gold}G`);
   };

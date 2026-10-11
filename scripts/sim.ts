@@ -9,7 +9,7 @@ import { DUNGEON, ENEMY, ITEM, JOB, PERSONALITIES } from '../src/core/data';
 import { equip } from '../src/core/equipment';
 import { parseFloor } from '../src/core/dungeon';
 import { cellDepths } from '../src/core/explore';
-import { advanceDay, dispatch, exploredRateOf, newGame, sellMaterial } from '../src/core/game';
+import { advanceDay, dispatch, exploredRateOf, newGame, sellItem } from '../src/core/game';
 import { addInventory } from '../src/core/ledger';
 import { PARTY_MAX, type ActionKind, type Adventurer, type DispatchOrder, type Expedition } from '../src/core/types';
 
@@ -113,7 +113,7 @@ function run(seed: number, leaderPersonality?: string): RunResult {
     for (const [item, n] of Object.entries(s.inventory)) {
       if (ITEM[item].kind !== 'material' || n <= 0) continue;
       const before = s.gold;
-      if (sellMaterial(s, item, n).ok) sold += s.gold - before;
+      if (sellItem(s, item, n).ok) sold += s.gold - before;
     }
   }
   return {
@@ -301,7 +301,7 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
       if (ITEM[item].kind !== 'material' || n <= 0) continue;
       // 装備と施設に要る分だけ残し、余りは売って日給に充てる(人が遊ぶときと同じ)
       const keep = prepare && KEEP.has(item) ? KEEP_MAX[item] ?? 0 : 0;
-      if (n > keep) sellMaterial(s, item, n - keep);
+      if (n > keep) sellItem(s, item, n - keep);
     }
   }
   return {

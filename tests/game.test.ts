@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { addExp, generateAdventurer } from '../src/core/adventurer';
 import { assignWorker } from '../src/core/base';
 import { startCraft } from '../src/core/craft';
-import { DUNGEON, FACILITY, ITEM, JOB, TUNING } from '../src/core/data';
+import { DUNGEON, FACILITY, ITEM, JOB, RECIPES, TUNING } from '../src/core/data';
 
 const G0 = TUNING.game.startGold;
 const SUP = TUNING.game.supportGold;
 import { parseFloor } from '../src/core/dungeon';
 import {
-  acceptQuest, advanceDay, buildFacility, buyItem, dispatch, exploredRateOf, newGame, recall, sellGold, sellMaterial,
+  acceptQuest, advanceDay, buildFacility, buyItem, dispatch, exploredRateOf, newGame, recall, sellGold, sellItem,
 } from '../src/core/game';
 import { availableRecipes, canCraft } from '../src/core/craft';
 import { createQuest, deliver } from '../src/core/quests';
@@ -272,13 +272,67 @@ describe('売買', () => {
   it('素材を売ると価格×個数が入り台帳に載る。持っていない数は売れない', () => {
     const s = newGame(1);
     s.inventory.fang = 3;
-    expect(sellMaterial(s, 'fang', 4).ok).toBe(false);
-    expect(sellMaterial(s, 'potion', 1).ok).toBe(false);
-    expect(sellMaterial(s, 'fang', 2).ok).toBe(true);
+    expect(sellItem(s, 'fang', 4).ok).toBe(false);
+    expect(sellItem(s, 'potion', 1).ok).toBe(false);
+    expect(sellItem(s, 'fang', 2).ok).toBe(true);
     expect(s.inventory.fang).toBe(1);
     const price = Math.round(ITEM.fang.price * 2 * TUNING.game.sellScale);
     expect(s.gold).toBe(G0 + price);
     expect(s.ledger[0].amount).toBe(price);
+  });
+
+  describe('装備の中古売却(儲けではなく、使わなくなった装備の処理)', () => {
+    const gear = ['bone_dagger', 'iron_armor', 'ember_ring'] as const;
+
+    it('使わなくなった装備(武器・防具・装飾)を、素材と同じ相場の計算で売れる。台帳には「中古売却」で載る', () => {
+      for (const id of gear) {
+        const s = newGame(1);
+        s.inventory[id] = 2;
+        expect(sellItem(s, id, 1)).toEqual({ ok: true });
+        const price = Math.round(ITEM[id].price * TUNING.game.sellScale);
+        expect(sellGold(s, id, 1), id).toBe(price);
+        expect(s.gold, id).toBe(G0 + price);
+        expect(s.inventory[id], id).toBe(1);
+        expect(s.ledger[0]).toEqual({ day: s.day, label: `中古売却: ${ITEM[id].name}×1`, amount: price });
+      }
+    });
+
+    it('市場の上乗せは、中古にも同じように掛かる', () => {
+      const s = newGame(1);
+      place(s, 'market', 0, 0);
+      expect(sellGold(s, 'iron_armor', 1)).toBe(Math.round(ITEM.iron_armor.price * TUNING.game.sellScale * 1.1));
+    });
+
+    it('着けている装備は在庫に無いので売れない(外してから)', () => {
+      const s = newGame(1);
+      s.adventurers[0].equipment.weapon = 'bone_dagger';
+      s.inventory.bone_dagger = 0;
+      expect(sellItem(s, 'bone_dagger', 1).ok).toBe(false);
+      expect(s.adventurers[0].equipment.weapon).toBe('bone_dagger');
+    });
+
+    it('回復薬・鍵・建材・知らない品・持っていない数は売れない(回復薬は買値より高く売れてしまうので特に)', () => {
+      const s = newGame(1);
+      s.inventory.ruin_key = 1;
+      s.inventory.lumber = 5;
+      s.inventory.bone_dagger = 1;
+      const before = structuredClone(s);
+      for (const id of ['potion', 'hi_potion', 'ruin_key', 'lumber', 'nope']) expect(sellItem(s, id, 1).ok, id).toBe(false);
+      expect(sellItem(s, 'bone_dagger', 2).ok).toBe(false);
+      expect(s).toEqual(before);
+    });
+
+    it('どの装備も、市場の上乗せが最大でも、作るのにかかった費用(原料を素材で売った額+製作費)より安く売れる', () => {
+      // 作って売ると必ず損、にしておく。工房を儲けの種にしない(「鍛冶屋に頼めよ」になるため)
+      const best = 1 + 0.2 + 0.1;
+      for (const r of RECIPES) {
+        const out = ITEM[r.output.item];
+        if (!['weapon', 'armor', 'accessory'].includes(out.kind)) continue;
+        const cost = r.inputs.reduce((t, i) => t + ITEM[i.item].price * i.n * TUNING.game.sellScale, 0) + r.gold;
+        const sale = out.price * r.output.n * TUNING.game.sellScale * best;
+        expect(sale, `${out.name}: 売値 ${Math.round(sale)}G は費用 ${Math.round(cost)}G 未満`).toBeLessThan(cost);
+      }
+    });
   });
 
   it('回復薬だけ買える。資金不足では買えない', () => {
@@ -946,7 +1000,7 @@ describe('新しい施設の効果(売却・日送りの産出・派遣)', () =>
     const p = ITEM.fang.price;
     const sell = (n: number) => {
       const g = s.gold;
-      expect(sellMaterial(s, 'fang', n)).toEqual({ ok: true });
+      expect(sellItem(s, 'fang', n)).toEqual({ ok: true });
       return s.gold - g;
     };
     const k = TUNING.game.sellScale;

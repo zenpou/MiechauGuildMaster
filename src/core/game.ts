@@ -23,7 +23,7 @@ import { emptyState } from './state';
 import {
   LOYALTY_MAX, PARTIES_MAX, PARTY_MAX,
   type ActionKind, type Adventurer, type DispatchOrder, type Expedition, type ExpeditionResult, type GameState,
-  type LogEntry, type Mail, type Result, type Scene, type WorldStep,
+  type ItemKind, type LogEntry, type Mail, type Result, type Scene, type WorldStep,
 } from './types';
 import { edgeBetween, planSteps, route, simulateTravel, type TravelResult } from './world';
 
@@ -626,15 +626,24 @@ export function sellGold(s: GameState, item: string, n: number): number {
   return Math.round((has(ITEM, item) ? ITEM[item].price : 0) * n * T.sellScale * (1 + bonus(s, 'sellMult')));
 }
 
-export function sellMaterial(s: GameState, item: string, n: number): Result {
+/** 装備の種類。使わなくなった分を中古として売れる */
+const GEAR_KINDS: ItemKind[] = ['weapon', 'armor', 'accessory'];
+
+/**
+ * 素材と、使わなくなった装備(中古)を拠点の道具屋に売る。
+ * 装備の売値は作るのにかかった費用より安くなるよう品の price を置いてある(tests/game.test.ts が全品を確かめる)。
+ * 工房を儲けの種にしないのは、装備を売って稼ぐなら鍛冶屋に任せればよく、ギルドが作って売る筋が通らないため。
+ * 回復薬は売れない: 買値(30G)より売値(素材と同じ3倍の相場)が高くなり、お金が湧く
+ */
+export function sellItem(s: GameState, item: string, n: number): Result {
   const def = has(ITEM, item) ? ITEM[item] : undefined;
-  if (!def || def.kind !== 'material') return fail('売れるのは素材だけです');
+  if (!def || (def.kind !== 'material' && !GEAR_KINDS.includes(def.kind))) return fail('売れるのは素材と、使わなくなった装備だけです');
   if (!isCount(n) || n < 1) return fail('個数が不正です');
   if ((s.inventory[item] ?? 0) < n) return fail(`${def.name}が足りません`);
   addInventory(s, item, -n);
   const gold = sellGold(s, item, n);
   s.gold += gold;
-  ledger(s, `素材売却: ${def.name}×${n}`, gold);
+  ledger(s, `${def.kind === 'material' ? '素材売却' : '中古売却'}: ${def.name}×${n}`, gold);
   return ok();
 }
 

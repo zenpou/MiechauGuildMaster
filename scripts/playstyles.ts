@@ -7,7 +7,7 @@ import { canCraft, startCraft } from '../src/core/craft';
 import { DUNGEON, ENEMY, ITEM, JOB } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
 import { equip } from '../src/core/equipment';
-import { acceptQuest, advanceDay, buildFacility, dispatch, exploredRateOf, newGame, sellMaterial } from '../src/core/game';
+import { acceptQuest, advanceDay, buildFacility, dispatch, exploredRateOf, newGame, sellItem } from '../src/core/game';
 import { dispatchBlock, markRead, replyMail } from '../src/core/mail';
 import { activeQuests, deliver, visibleQuests } from '../src/core/quests';
 import { capacity, hire, hireFee } from '../src/core/recruit';
@@ -302,7 +302,7 @@ function runStyle(style: Style, seed: number): Run {
     for (const [item, n] of Object.entries(s.inventory)) {
       if (ITEM[item].kind !== 'material') continue;
       const extra = n - (keep[item] ?? 0);
-      if (extra > 0) sellMaterial(s, item, extra);
+      if (extra > 0) sellItem(s, item, extra);
     }
   };
 

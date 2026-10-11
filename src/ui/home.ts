@@ -1,7 +1,7 @@
 import { effectiveStats } from '../core/adventurer';
 import { facilityLevel } from '../core/base';
 import { canEquip, equip, unequip } from '../core/equipment';
-import { advanceDay, buyItem, dailyCost, newGame, sellGold, sellMaterial } from '../core/game';
+import { advanceDay, buyItem, dailyCost, newGame, sellGold, sellItem } from '../core/game';
 import { ITEM, JOB, JOBS, PERSONALITY, TRAINED_SKILL, TUNING, type TrainedSkillDef } from '../core/data';
 import { dismissHint, hintFor, hintsOff } from '../core/hints';
 import { canChangeJob, changeJob, promotionCost, promotionOptions } from '../core/jobs';
@@ -179,7 +179,8 @@ function inventoryBlock(): HTMLElement {
     h('h3', null, g.name),
     h('ul', { class: 'plain inv' }, ...g.list.map(([id, n]) => {
       const def = ITEM[id];
-      const sellable = def?.kind === 'material';
+      // 素材と、使わなくなった装備(中古)。回復薬・鍵・建材は売れない
+      const sellable = def?.kind === 'material' || def?.kind === 'weapon' || def?.kind === 'armor' || def?.kind === 'accessory';
       const fx = equipText(def);
       const note = def?.kind === 'key' || def?.kind === 'building' ? def.desc : '';
       return h('li', null,
@@ -191,7 +192,7 @@ function inventoryBlock(): HTMLElement {
         sellable && n > 1 ? h('button', { class: 'small', onclick: () => sell(id, n) }, '全部売る') : null,
       );
     })),
-  )), div('dim small', '売れるのは素材だけです。'));
+  )), div('dim small', '売れるのは素材と、使わなくなった装備です。装備は中古なので、作るのにかかった費用よりずっと安く、着けている間は売れません。'));
 }
 
 function pickAdv(id: string) {
@@ -343,7 +344,7 @@ function fire(a: Adventurer) {
 }
 
 function sell(id: string, n: number) {
-  const r = sellMaterial(state, id, n);
+  const r = sellItem(state, id, n);
   if (!r.ok) return toast(r.reason, true);
   commit();
 }
