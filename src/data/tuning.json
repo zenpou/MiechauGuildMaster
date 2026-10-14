@@ -91,7 +91,7 @@
     ]
   },
   "game": {
-    "startGold": 600,
+    "startGold": 150,
     "startPotions": 2,
     "upkeepPerDay": 30,
     "startApt": 70,
@@ -107,6 +107,8 @@
     "supportGold": 100,
     "supportDays": 10,
     "candidateMax": 8,
+    "startCandidates": 0,
+    "candidateFromDay": 3,
     "candidateDays": 5,
     "hireSalaryDays": 4,
     "baseCapacity": 6,
