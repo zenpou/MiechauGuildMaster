@@ -89,10 +89,11 @@ describe('物語の導入前から遊んでいたセーブ', () => {
     const old = clone(newGame(5));
     old.day = 60;
     old.dungeons.old_mine.confirmed = true;
-    expect(storyDue(old).length).toBeGreaterThan(1);
+    // 章は鎖なので、読む前は序章しか出ない。読み込みでは鎖をたどって過ぎた章を全部既読にする
+    expect(storyDue(old).map((c) => c.id)).toEqual(['prologue']);
     const s = migrate(old)!;
     expect(storyDue(s)).toEqual([]);
-    expect(storyFlags(s).length).toBeGreaterThan(1);
+    expect(storyFlags(s)).toEqual(['story:prologue', 'story:ch1', 'story:ch2']);
     // 読んでいない章に「読んだ日」を付けない。0 は「読んだ日は不明の既読」
     for (const k of storyFlags(s)) expect(s.flags[k], k).toBe(0);
   });
@@ -108,7 +109,7 @@ describe('物語の導入前から遊んでいたセーブ', () => {
     old.flags['story:prologue'] = 1;
     old.dungeons.old_mine.confirmed = true;
     const s = migrate(old)!;
-    expect(storyDue(s).map((c) => c.id)).toEqual(['ch2']);
+    expect(storyDue(s).map((c) => c.id)).toEqual(['ch1']);
   });
 });
 

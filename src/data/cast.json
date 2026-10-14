@@ -10,8 +10,5 @@
   {"id": "aurelia", "name": "アウレリア", "color": "#f0702a", "poses": ["neutral", "happy", "angry", "surprised", "shy", "dragon"], "poseDisplay": {"dragon": {"scale": 1, "top": 0}}},
   {"id": "gald", "name": "ガルド", "color": "#8a6240", "poses": ["neutral", "happy", "coatless_happy", "coatless_neutral"]},
   {"id": "mother", "name": "母", "color": "#9b8b7b", "poses": ["neutral"]},
-  {"id": "everyone", "name": "全員", "color": "#d9c27a", "poses": ["neutral"]},
-  {"id": "master", "name": "ギルドマスター(仮)", "color": "#d9b45f", "poses": ["neutral", "happy", "thoughtful"]},
-  {"id": "clerk", "name": "受付(仮)", "color": "#6fb0d8", "poses": ["neutral", "happy", "worried"]},
-  {"id": "unique", "name": "ユニーク冒険者(仮)", "color": "#d9786f", "poses": ["neutral", "happy", "angry"]}
+  {"id": "everyone", "name": "全員", "color": "#d9c27a", "poses": ["neutral"]}
 ]

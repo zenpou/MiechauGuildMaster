@@ -117,11 +117,15 @@
   background: #26393b;
   isolation: isolate;
 }
-.vn-player-stage[data-background='guild'] { background: linear-gradient(#5f4228, #93683d 58%, #634324 58%); }
-.vn-player-stage[data-background='town'] { background: linear-gradient(#6c9fc9 0 49%, #a4815d 49% 100%); }
-.vn-player-stage[data-background='night'] { background: radial-gradient(circle at 72% 18%, #5767a5 0, #1b2853 34%, #080f23 82%); }
-.vn-player-stage[data-background='tavern'] { background: linear-gradient(#341b0d, #6b3515 55%, #24170f 55%); }
-.vn-player-stage[data-background='office'] { background: linear-gradient(#202d42 0 55%, #535862 55%); }
+.vn-player-stage[data-background='bg_guild_hall'] { background: linear-gradient(#5f4228, #93683d 58%, #634324 58%); }
+.vn-player-stage[data-background='bg_street_gate'],
+.vn-player-stage[data-background='bg_street_morning'] { background: linear-gradient(#6c9fc9 0 49%, #a4815d 49% 100%); }
+.vn-player-stage[data-background='bg_guild_office_night'] { background: radial-gradient(circle at 72% 18%, #5767a5 0, #1b2853 34%, #080f23 82%); }
+.vn-player-stage[data-background='bg_guild_office'] { background: linear-gradient(#202d42 0 55%, #535862 55%); }
+.vn-player-stage[data-background='bg_guild_office_sunset'] { background: linear-gradient(#5a3a2a 0 55%, #8c6a4a 55%); }
+.vn-player-stage[data-background='bg_dungeon_mine'] { background: linear-gradient(#2a1d12, #4a3420 60%, #1a120a 60%); }
+.vn-player-stage[data-background='bg_dungeon_crystal'] { background: radial-gradient(circle at 50% 30%, #4a6fb0 0, #2b2f6e 45%, #101230 85%); }
+.vn-player-stage[data-background='bg_dungeon_dragon'] { background: radial-gradient(circle at 50% 70%, #c0391b 0, #5a1a10 45%, #1a0806 85%); }
 .vn-player-scene,
 .vn-player-scene-snapshot {
   position: absolute;

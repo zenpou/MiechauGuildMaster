@@ -34,7 +34,8 @@ const SEEN_PREFIX = 'story:';
 export function triggerMet(s: GameState, t: StoryTrigger): boolean {
   if ('all' in t) return t.all.every((c) => triggerMet(s, c));
   if ('day' in t) return s.day >= t.day;
-  if ('flag' in t) return Boolean(s.flags[t.flag]);
+  // 読んだ日が不明の既読は 0 で記録するので、真偽値に丸めると前章の読了が無かったことになる
+  if ('flag' in t) return s.flags[t.flag] !== undefined && s.flags[t.flag] !== false;
   if ('dungeonConfirmed' in t) return s.dungeons[t.dungeonConfirmed]?.confirmed === true;
   if ('keyHeld' in t) return heldKeys(s).includes(t.keyHeld);
   if ('dragonDefeated' in t) return s.dragonDefeated === t.dragonDefeated;

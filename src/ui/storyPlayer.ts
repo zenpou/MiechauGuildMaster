@@ -652,7 +652,7 @@ export function createStoryPlayer(options: CreateStoryPlayerOptions): StoryPlaye
   };
 
   const updateStage = (line: PresentedLine) => {
-    const background = line.background ?? 'guild';
+    const background = line.background ?? 'bg_guild_office';
     stage.dataset.background = background;
     stage.dataset.mode = line.still ? 'still' : 'compose';
     backgroundFallback.textContent = `仮の背景 · ${background}`;

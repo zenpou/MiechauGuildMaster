@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DUNGEON, ITEM } from '../src/core/data';
 import { newGame } from '../src/core/game';
@@ -181,12 +183,12 @@ describe('絵の引き当て', () => {
   });
 
   it('パスを入れるとそのパスを返す', () => {
-    const keep = ART.backgrounds.guild;
-    ART.backgrounds.guild = 'backgrounds/guild.webp';
+    const keep = ART.backgrounds.bg_guild_office;
+    ART.backgrounds.bg_guild_office = 'backgrounds/guild.webp';
     try {
-      expect(backgroundArt('guild')).toBe('backgrounds/guild.webp');
+      expect(backgroundArt('bg_guild_office')).toBe('backgrounds/guild.webp');
     } finally {
-      ART.backgrounds.guild = keep;
+      ART.backgrounds.bg_guild_office = keep;
     }
   });
 });
@@ -346,6 +348,11 @@ describe('trigger の評価', () => {
     expect(triggerMet(s, { flag: 'test:seen' })).toBe(false);
     s.flags['test:seen'] = 3;
     expect(triggerMet(s, { flag: 'test:seen' })).toBe(true);
+    // 読んだ日が不明の既読(0)も立っている。false は立っていない
+    s.flags['test:seen'] = 0;
+    expect(triggerMet(s, { flag: 'test:seen' })).toBe(true);
+    s.flags['test:seen'] = false;
+    expect(triggerMet(s, { flag: 'test:seen' })).toBe(false);
   });
 
   it('dungeonConfirmed: 入口を確認したダンジョン', () => {
@@ -407,39 +414,67 @@ describe('storyDue', () => {
     expect(ids(storyDue(s))).toEqual(['prologue']);
   });
 
-  it('未読で条件を満たす章を台本の並び順で返す', () => {
+  /** 全章の条件を一度に満たした状態。鎖(前章の読了)だけが章を順に出す */
+  function everythingMet(): GameState {
+    const s = newGame(1);
+    s.day = 2;
+    confirmDungeon(s, 'old_mine');
+    s.inventory.ruin_key = 1;
+    finishQuests(s, 10);
+    s.inventory.dragon_crest = 1;
+    s.dragonDefeated = true;
+    return s;
+  }
+
+  it('章は前の章を読み終えるまで出ない(全条件を満たしていても、未読の次の1章だけ)', () => {
+    const s = everythingMet();
+    for (const id of ['prologue', 'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'epilogue']) {
+      expect(ids(storyDue(s))).toEqual([id]);
+      markStorySeen(s, id);
+    }
+    expect(storyDue(s)).toEqual([]);
+  });
+
+  it('第一章は序章読了の翌日(2日目)から', () => {
     const s = newGame(1);
     markStorySeen(s, 'prologue');
     expect(storyDue(s)).toEqual([]);
-    s.inventory.dragon_crest = 1;
-    s.inventory.ruin_key = 1;
-    confirmDungeon(s, 'old_mine');
-    finishQuests(s, 1);
-    expect(ids(storyDue(s))).toEqual(['ch1', 'ch2', 'ch3', 'ch4']);
+    s.day = 2;
+    expect(ids(storyDue(s))).toEqual(['ch1']);
   });
 
-  it('最終章は竜を倒し、エンディングを読み終えてから', () => {
-    const s = newGame(1);
-    for (const c of STORY) if (c.id !== 'ch5') markStorySeen(s, c.id);
-    s.dragonDefeated = true;
+  it('第四章は第三章読了と依頼10件、第五章は竜の紋章、終章は第五章読了と竜の討伐', () => {
+    const s = everythingMet();
+    for (const id of ['prologue', 'ch1', 'ch2', 'ch3']) markStorySeen(s, id);
+    s.quests = s.quests.filter((q) => !q.id.startsWith('test-done-'));
+    finishQuests(s, 9);
     expect(storyDue(s)).toEqual([]);
-    s.flags['ending:seen'] = true;
+    finishQuests(s, 1);
+    expect(ids(storyDue(s))).toEqual(['ch4']);
+    markStorySeen(s, 'ch4');
+    s.inventory.dragon_crest = 0;
+    expect(storyDue(s)).toEqual([]);
+    s.inventory.dragon_crest = 1;
     expect(ids(storyDue(s))).toEqual(['ch5']);
+    markStorySeen(s, 'ch5');
+    s.dragonDefeated = false;
+    expect(storyDue(s)).toEqual([]);
+    s.dragonDefeated = true;
+    expect(ids(storyDue(s))).toEqual(['epilogue']);
   });
 
   it('読み終えた章は条件を満たしたままでも二度と出ない', () => {
     const s = newGame(1);
-    markStorySeen(s, 'prologue');
+    for (const id of ['prologue', 'ch1', 'ch2']) markStorySeen(s, id);
     confirmDungeon(s, 'old_mine');
-    markStorySeen(s, 'ch2');
     s.day += 30;
     expect(storyDue(s)).toEqual([]);
   });
 
   it('決定論: 同じ状態からは同じ章が出る', () => {
     const run = () => {
-      const s = newGame(7);
-      s.inventory.ruin_key = 1;
+      const s = everythingMet();
+      markStorySeen(s, 'prologue');
       return ids(storyDue(s));
     };
     expect(run()).toEqual(run());
@@ -500,5 +535,147 @@ describe('演出の語彙', () => {
   it('音の部品は周波数・長さ・音量が正で、開始は0以上', () => {
     const bad = SOUND_CUES.flatMap((cue) => SOUND_PARTS[cue].filter((p) => !(p.frequency > 0 && p.duration > 0 && p.gain > 0 && p.start >= 0)).map(() => cue));
     expect(bad).toEqual([]);
+  });
+});
+
+describe('台本(docs/story/scripts)との照合', () => {
+  // 台本の表が正本。story.json はそこから起こしたもので、ずれたらここで気づく
+  const SCRIPT_FILES: Record<string, string> = {
+    prologue: 'prologue_script.md', ch1: 'ch1_script.md', ch2: 'ch2_script.md', ch3: 'ch3_script.md',
+    ch4: 'ch4_script.md', ch5: 'ch5_script.md', epilogue: 'epilogue_script.md',
+  };
+  const NAMES: Record<string, string> = {
+    カイ: 'kai', ティナ: 'tina', アイリス: 'iris', ノエル: 'noel', セラ: 'sera', ヴィオラ: 'viola',
+    ルゥ: 'ruu', フィーネ: 'fine', アウレリア: 'aurelia', ガルド: 'gald', 母: 'mother', 全員: 'everyone',
+  };
+  const POSES: Record<string, string> = {
+    通常: 'neutral', 喜び: 'happy', 怒り: 'angry', 驚き: 'surprised', 照れ: 'shy', 昼寝: 'sleep', 拗ね: 'sulky',
+    ふらつき: 'dizzy', 心配: 'worried', 涙目: 'teary', 動揺: 'flustered', 強がり: 'bluff', 素材に目が光る: 'sparkle',
+    竜の姿: 'dragon', '通常・斥候服': 'scout_neutral', '怒り・斥候服': 'scout_angry', '喜び・斥候服': 'scout_happy',
+    '動揺・斥候服': 'scout_flustered', '喜び・コートなし': 'coatless_happy', '通常・コートなし': 'coatless_neutral',
+  };
+  const SIDES: Record<string, string> = { 左: 'left', 中央: 'center', 右: 'right' };
+  type Row = { no: number; speaker?: string; text: string; background: string; cast: { character: string; pose: string; position: string; motion?: string }[]; sfx?: string; effect?: string; transition?: string };
+
+  function parseScript(id: string): Row[] {
+    const text = readFileSync(resolve(__dirname, '../docs/story/scripts', SCRIPT_FILES[id]), 'utf8');
+    const rows: Row[] = [];
+    for (const raw of text.split('\n')) {
+      if (!raw.startsWith('| ')) continue;
+      const cells = raw.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+      if (cells.length !== 7 || !/^\d+$/.test(cells[0])) continue; // 見出し・区切り・汎用差分(No が -)は飛ばす
+      const [no, speakerCell, body, bg, castCell, fxCell] = cells;
+      const row: Row = { no: Number(no), text: body, background: bg.replace(/`/g, ''), cast: [] };
+      if (speakerCell !== '-' && !speakerCell.includes('(独白)')) {
+        row.speaker = speakerCell.replace('(声のみ)', '').trim();
+        row.text = row.text.replace(/^「+/, '').replace(/」+$/, '');
+      }
+      // 序章シーン1(門前)は一枚絵 prologue を背景にする(組み込みの決定。台本は bg_street_morning のまま)
+      if (id === 'prologue' && row.no <= 7) row.background = 'bg_street_gate';
+      if (!['なし', '', '-'].includes(castCell)) {
+        for (const part of castCell.split(/<br\s*\/?>/)) {
+          const m = part.trim().match(/^(\S+)\s*\((左|中央|右)\s*\/\s*(.+?)\)$/);
+          if (!m) throw new Error(`${id}[${no}]: 立ち絵の書式が読めない: ${part}`);
+          row.cast.push({ character: NAMES[m[1]], pose: POSES[m[3]], position: SIDES[m[2]] });
+        }
+      }
+      for (const m of fxCell.matchAll(/`(motion|sfx|effect|transition):\s*([a-z-]+)`\s*(?:\(([^)]*)\))?/g)) {
+        const [, kind, value, target] = m;
+        if (kind !== 'motion') { (row as Record<string, unknown>)[kind] = value; continue; }
+        const targets = target ? target.split('、').map((t) => NAMES[t.trim()]) : null;
+        const side = ({ 'enter-left': 'left', 'enter-right': 'right' } as Record<string, string>)[value];
+        for (const a of row.cast) {
+          if (targets ? targets.includes(a.character) : !side || a.position === side) a.motion = value;
+        }
+      }
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  it('7章が台本の順で並び、解放条件は PLOT.md のとおり', () => {
+    expect(ids(STORY)).toEqual(['prologue', 'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'epilogue']);
+    expect(STORY.map((c) => c.trigger)).toEqual([
+      { day: 1 },
+      { all: [{ flag: 'story:prologue' }, { day: 2 }] },
+      { all: [{ flag: 'story:ch1' }, { dungeonConfirmed: 'old_mine' }] },
+      { all: [{ flag: 'story:ch2' }, { keyHeld: 'ruin_key' }] },
+      { all: [{ flag: 'story:ch3' }, { questsDone: 10 }] },
+      { all: [{ flag: 'story:ch4' }, { keyHeld: 'dragon_crest' }] },
+      { all: [{ flag: 'story:ch5' }, { dragonDefeated: true }] },
+    ]);
+  });
+
+  it('各章の行は台本の表と一字一句同じ(話し手・本文・背景・立ち絵・動き・効果音・効果・遷移)', () => {
+    for (const c of STORY) {
+      const rows = parseScript(c.id);
+      expect(c.lines.length, `${c.id} の行数`).toBe(rows.length);
+      c.lines.forEach((l, i) => {
+        const r = rows[i];
+        const where = `${c.id}[${r.no}]`;
+        expect({ speaker: l.speaker, text: l.text, background: l.background }, where)
+          .toEqual({ speaker: r.speaker, text: r.text, background: r.background });
+        expect((l.cast ?? []).map((a) => ({ character: a.character, pose: a.pose, position: a.position, motion: a.motion })), where)
+          .toEqual(r.cast.map((a) => ({ character: a.character, pose: a.pose, position: a.position, motion: a.motion })));
+        expect({ sfx: l.sfx, effect: l.effect, transition: l.transition }, where)
+          .toEqual({ sfx: r.sfx, effect: r.effect, transition: r.transition });
+      });
+    }
+  });
+
+  it('章の扉絵は序章=prologue、終章=dragon、他は無し', () => {
+    expect(STORY.map((c) => [c.id, c.art])).toEqual([
+      ['prologue', 'prologue'], ['ch1', undefined], ['ch2', undefined], ['ch3', undefined], ['ch4', undefined], ['ch5', undefined], ['epilogue', 'dragon'],
+    ]);
+  });
+
+  it('仮の台本(draft)は残っていない', () => {
+    expect(STORY.filter((c) => c.draft).map((c) => c.id)).toEqual([]);
+  });
+
+  it('登場・遷移以外の動きと、効果音・効果には、本文の語句のきっかけがある', () => {
+    const bad = lines().flatMap(({ at, l }) => [
+      ...(l.sfx && !l.sfxAt && !(l.sfx === 'door' || l.sfx === 'step') ? [`${at}: sfx ${l.sfx}`] : []),
+      ...(l.effect && !l.effectAt ? [`${at}: effect ${l.effect}`] : []),
+      ...(l.cast ?? []).filter((a) => a.motion && !a.motion.startsWith('enter-') && !a.motionAt).map((a) => `${at}: motion ${a.motion}`),
+    ]);
+    expect(bad).toEqual([]);
+  });
+});
+
+describe('art.json の絵のファイル', () => {
+  const verification = JSON.parse(readFileSync(resolve(__dirname, '../artifacts/source-art/story-assets-verification.json'), 'utf8')) as {
+    assets: { files: { webp: { path: string } } }[]; faces: { assets: { files: { webp: { path: string } } }[] };
+  };
+  const delivered = new Set([...verification.assets, ...verification.faces.assets].map((a) => a.files.webp.path.replace(/^public\/art\//, '')));
+  const paths = (): { at: string; path: string; story: boolean }[] => [
+    ...Object.entries(ART.backgrounds).flatMap(([k, v]) => (v ? [{ at: `backgrounds.${k}`, path: v, story: false }] : [])),
+    ...Object.entries(ART.stills).flatMap(([k, v]) => (v ? [{ at: `stills.${k}`, path: v, story: true }] : [])),
+    ...Object.entries(ART.characters).flatMap(([id, poses]) => Object.entries(poses).flatMap(([pose, v]) => {
+      if (v === null) return [];
+      if (typeof v === 'string') return [{ at: `characters.${id}.${pose}`, path: v, story: true }];
+      return [{ at: `characters.${id}.${pose}.image`, path: v.image, story: true }, { at: `characters.${id}.${pose}.face`, path: v.face, story: true }];
+    })),
+  ];
+
+  it('指すファイルが public/art/ にある', () => {
+    expect(paths().filter((p) => !existsSync(resolve(__dirname, '../public/art', p.path))).map((p) => `${p.at}: ${p.path}`)).toEqual([]);
+  });
+
+  it('立ち絵・顔・一枚絵は素材の検証一覧(story-assets-verification.json)にあるものだけ', () => {
+    expect(paths().filter((p) => p.story && !delivered.has(p.path)).map((p) => `${p.at}: ${p.path}`)).toEqual([]);
+  });
+
+  it('絵のある人物は全ポーズに立ち絵と顔の両方がある', () => {
+    const bad = CAST.flatMap((c) => c.poses.flatMap((pose) => {
+      const v = ART.characters[c.id]?.[pose];
+      return v === null || (typeof v === 'object' && v.image && v.face) ? [] : [`${c.id}/${pose}`];
+    }));
+    expect(bad).toEqual([]);
+  });
+
+  it('絵の無い話し手は「母」と「全員」だけ', () => {
+    const silent = CAST.filter((c) => c.poses.every((pose) => ART.characters[c.id]?.[pose] === null)).map((c) => c.id);
+    expect(silent).toEqual(['mother', 'everyone']);
   });
 });

@@ -8,12 +8,7 @@
     "bg_guild_hall": "backgrounds/guild-reception-v1.webp",
     "bg_dungeon_mine": "backgrounds/bg_dungeon_mine.webp",
     "bg_dungeon_crystal": "backgrounds/bg_dungeon_crystal.webp",
-    "bg_dungeon_dragon": "backgrounds/bg_dungeon_dragon.webp",
-    "guild": "backgrounds/guild-reception-v1.webp",
-    "town": "backgrounds/street-morning-v1.webp",
-    "night": "backgrounds/guild-office-night-v1.webp",
-    "tavern": "backgrounds/guild-tavern-v1.webp",
-    "office": "backgrounds/guild-office-day-v1.webp"
+    "bg_dungeon_dragon": "backgrounds/bg_dungeon_dragon.webp"
   },
   "characters": {
     "kai": {
@@ -105,22 +100,7 @@
     },
     "everyone": {
       "neutral": null
-    },
-    "master": {
-      "neutral": null,
-      "happy": null,
-      "thoughtful": null
-    },
-    "clerk": {
-      "neutral": null,
-      "happy": null,
-      "worried": null
-    },
-    "unique": {
-      "neutral": null,
-      "happy": null,
-      "angry": null
     }
   },
-  "stills": {"prologue": "stills/prologue.webp", "dragon": "stills/dragon.webp", "founding": null}
+  "stills": {"prologue": "stills/prologue.webp", "dragon": "stills/dragon.webp"}
 }
