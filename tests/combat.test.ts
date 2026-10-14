@@ -10,7 +10,7 @@ function adv(job: string): Adventurer {
   return {
     id: 'a1', name: 'テスト', age: 20, level: 1, exp: 0, job, base: stats(),
     apt: { attacker: 50, tank: 50, healer: 50, scout: 50, gatherer: 50 }, growth: 1,
-    personality: 'cautious', traits: [], fatigue: 0, injuryDays: 0, salary: 10, loyalty: 50,
+    personality: 'cautious', gender: 'male', appearance: 'adv_cautious_male', traits: [], fatigue: 0, injuryDays: 0, salary: 10, loyalty: 50,
     status: 'idle', assignment: null, equipment: { weapon: null, armor: null, accessory: null }, skills: [],
     persona: { hobby: '', talent: '', likes: '', dislikes: '' },
     history: { hiredDay: 0, expeditions: 0, kills: 0, visits: {}, raisesRefused: 0, warnedDay: null },

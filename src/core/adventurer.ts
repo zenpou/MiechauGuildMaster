@@ -2,7 +2,7 @@ import { ITEM, JOB, LOWER_JOBS, NAMES, PERSONA, PERSONALITIES, ROLE_SKILL, TRAIN
 import type { Rng } from './rng';
 import {
   ROLE_IDS, STAT_KEYS,
-  type Adventurer, type Aptitude, type ItemDef, type Persona, type Resist, type RoleId, type Stats, type TraitDef,
+  type Adventurer, type Aptitude, type Gender, type ItemDef, type Persona, type Resist, type RoleId, type Stats, type TraitDef,
   type TraitInstance,
 } from './types';
 
@@ -159,6 +159,10 @@ export function rollAptitude(rng: Rng, quality = 0): AptitudeRoll {
 
 const lowerJobOf = (role: RoleId) => LOWER_JOBS.find((j) => j.roles[0] === role)!.id;
 
+export function genericAppearance(personality: string, gender: Gender): string {
+  return `adv_${personality}_${gender}`;
+}
+
 export interface GenOptions { id: string; quality?: number; level?: number; usedNames?: Set<string> }
 
 export function generateAdventurer(rng: Rng, o: GenOptions): Adventurer {
@@ -200,10 +204,16 @@ export function generateAdventurer(rng: Rng, o: GenOptions): Adventurer {
     dislikes: rng.pick(PERSONA.dislikes.filter((w) => w !== likes)),
   };
 
+  const age = rng.int(16, 38);
+  const personality = rng.pick(PERSONALITIES).id;
+  const loyalty = rng.int(40, 60);
+  // 性別は既存の引きの後ろで決める。途中に挟むと seed ごとの能力や名前がずれ、計測の前後比較ができなくなる
+  const gender: Gender = rng.chance(0.5) ? 'female' : 'male';
+
   const a: Adventurer = {
-    id: o.id, name, age: rng.int(16, 38), level, exp: 0, job, base, apt, growth,
-    personality: rng.pick(PERSONALITIES).id, traits,
-    fatigue: 0, injuryDays: 0, salary: 0, loyalty: rng.int(40, 60), status: 'idle',
+    id: o.id, name, age, level, exp: 0, job, base, apt, growth,
+    personality, gender, appearance: genericAppearance(personality, gender), traits,
+    fatigue: 0, injuryDays: 0, salary: 0, loyalty, status: 'idle',
     assignment: null,
     equipment: { weapon: null, armor: null, accessory: null },
     skills: [],

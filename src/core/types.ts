@@ -231,11 +231,15 @@ export interface TraitInstance { id: string; revealed: boolean }
 export interface Persona { hobby: string; talent: string; likes: string; dislikes: string }
 export interface Equipment { weapon: string | null; armor: string | null; accessory: string | null }
 export type AdventurerStatus = 'idle' | 'away' | 'working' | 'training';
+export type Gender = 'male' | 'female';
 
 export interface Adventurer {
   id: string; name: string; age: number; level: number; exp: number;
   job: string; base: Stats; apt: Aptitude; growth: number;
   personality: string; traits: TraitInstance[];
+  gender: Gender;
+  /** 立ち絵・顔の画像 id。汎用は adv_<性格>_<性別>、ユニークは人物 id */
+  appearance: string;
   fatigue: number; injuryDays: number;
   salary: number;
   /** 0〜255。式は第6節 */
@@ -418,7 +422,7 @@ export interface GameState {
 }
 
 // ---- 定数(数値調整はここではなく data/ で行う。構造上の上限だけ置く) ----
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 export const PARTY_MAX = 4;
 export const PARTIES_MAX = 4;
 export const LOYALTY_MAX = 255;

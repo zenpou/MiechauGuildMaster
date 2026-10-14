@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveStats } from '../src/core/adventurer';
+import { LOWER_JOBS } from '../src/core/data';
+import { equip, unequip } from '../src/core/equipment';
 import { advanceDay, dispatch, newGame } from '../src/core/game';
+import { changeJob } from '../src/core/jobs';
 import { deserialize, migrate, serialize } from '../src/core/save';
 import { markStorySeen, storyDue } from '../src/core/story';
-import type { GameState } from '../src/core/types';
+import { SAVE_VERSION, type Adventurer, type GameState } from '../src/core/types';
 
 const clone = (s: GameState) => JSON.parse(JSON.stringify(s));
 
@@ -122,5 +125,81 @@ describe('セーブの書き出しと読み込み(deserialize / serialize)', () 
     for (const bad of ['', 'not json', '{}', '[]', 'null', '{"seed": "x", "day": 1}', '{"seed": 1}', '123']) {
       expect(deserialize(bad), JSON.stringify(bad)).toBeNull();
     }
+  });
+});
+
+describe('性別と外見(版1 → 版2)', () => {
+  /** 版1のセーブ: 冒険者に gender / appearance が無い */
+  function v1Save() {
+    const old = clone(newGame(5));
+    old.version = 1;
+    for (const a of [...old.adventurers, ...old.candidates.map((c: { adv: unknown }) => c.adv)] as Record<string, any>[]) {
+      delete a.gender;
+      delete a.appearance;
+    }
+    return old;
+  }
+  const everyone = (s: GameState): Adventurer[] => [...s.adventurers, ...s.candidates.map((c) => c.adv)];
+  const looks = (s: GameState) => everyone(s).map((a) => [a.id, a.gender, a.appearance]);
+
+  it('版1のセーブを読むと、名簿と応募者の全員に性別と外見が入り、版が2になる', () => {
+    const s = migrate(v1Save())!;
+    expect(SAVE_VERSION).toBe(2);
+    expect(s.version).toBe(2);
+    expect(s.candidates.length).toBeGreaterThan(0);
+    for (const a of everyone(s)) {
+      expect(['male', 'female']).toContain(a.gender);
+      expect(a.appearance).toBe(`adv_${a.personality}_${a.gender}`);
+    }
+  });
+
+  it('同じ古いセーブを何度読んでも同じ性別と外見になる', () => {
+    expect(looks(migrate(v1Save())!)).toEqual(looks(migrate(v1Save())!));
+  });
+
+  it('補完した値は書き出して読み直しても変わらない', () => {
+    const s = migrate(v1Save())!;
+    expect(looks(deserialize(serialize(s))!)).toEqual(looks(s));
+  });
+
+  it('すでに性別と外見がある冒険者は上書きしない', () => {
+    const src = v1Save();
+    src.adventurers[0].gender = 'female';
+    src.adventurers[0].appearance = 'custom_look';
+    src.candidates[0].adv.gender = 'male';
+    src.candidates[0].adv.appearance = 'other_look';
+    const s = migrate(src)!;
+    expect([s.adventurers[0].gender, s.adventurers[0].appearance]).toEqual(['female', 'custom_look']);
+    expect([s.candidates[0].adv.gender, s.candidates[0].adv.appearance]).toEqual(['male', 'other_look']);
+  });
+
+  it('ユニークの性別と外見は定義の値になる(hash で決めない)', () => {
+    const src = v1Save();
+    src.adventurers[0].unique = 'u_alpha';
+    const s = migrate(src)!;
+    expect([s.adventurers[0].gender, s.adventurers[0].appearance]).toEqual(['male', 'u_alpha']);
+  });
+
+  it('定義が見つからないユニークの外見は unique の値になる', () => {
+    const src = v1Save();
+    src.adventurers[0].unique = 'u_missing';
+    const s = migrate(src)!;
+    expect(s.adventurers[0].appearance).toBe('u_missing');
+    expect(['male', 'female']).toContain(s.adventurers[0].gender);
+  });
+
+  it('転職・装備の付け外し・書き出しと読み直しの前後で、性別と外見は変わらない', () => {
+    const s = newGame(5);
+    markStorySeen(s, 'prologue');
+    const a = s.adventurers[0];
+    const before = [a.gender, a.appearance];
+    const other = LOWER_JOBS.find((j) => j.id !== a.job)!.id;
+    expect(changeJob(s, a.id, other)).toEqual({ ok: true });
+    s.inventory.iron_sword = 1;
+    expect(equip(s, a.id, 'iron_sword')).toEqual({ ok: true });
+    expect(unequip(s, a.id, 'weapon')).toEqual({ ok: true });
+    expect([a.gender, a.appearance]).toEqual(before);
+    const back = deserialize(serialize(s))!.adventurers[0];
+    expect([back.gender, back.appearance]).toEqual(before);
   });
 });

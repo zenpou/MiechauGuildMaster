@@ -21,7 +21,7 @@ export function uniqueAdventurer(def: UniqueDef, id: string): Adventurer {
   const a: Adventurer = {
     id, name: def.name, age: def.age, level: 1, exp: 0, job: def.job,
     base: { ...def.base }, apt: { ...def.apt }, growth: def.growth,
-    personality: def.personality, traits: [],
+    personality: def.personality, gender: def.gender, appearance: def.appearance, traits: [],
     fatigue: 0, injuryDays: 0, salary: def.salary, loyalty: 50, status: 'idle',
     assignment: null,
     equipment: { weapon: null, armor: null, accessory: null },

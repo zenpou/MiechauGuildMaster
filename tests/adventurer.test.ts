@@ -3,7 +3,8 @@ import {
   addExp, aptFactor, bestJob, carryCapacity, effectiveStats, equipEffect, equipResist, expToNext, fatigueFactor,
   generateAdventurer, jobAptitude, PENTAGON, rollAptitude, salaryOf,
 } from '../src/core/adventurer';
-import { ITEM, JOB, LOWER_JOBS, PERSONA, PERSONALITY, TRAIT, TUNING } from '../src/core/data';
+import { ITEM, JOB, LOWER_JOBS, PERSONA, PERSONALITY, TRAIT, TUNING, UNIQUES } from '../src/core/data';
+import { uniqueAdventurer } from '../src/core/events';
 import { Rng, rngFor } from '../src/core/rng';
 import { ROLE_IDS, type Adventurer, type RoleId } from '../src/core/types';
 
@@ -21,6 +22,8 @@ import { ROLE_IDS, type Adventurer, type RoleId } from '../src/core/types';
 // [x] equipResist は装備の合計で、各属性 0.8 が上限
 // [x] equipEffect は gather / carry の合計。carry は積載に足される
 // [x] equipment が無い旧データでも落ちない
+// [x] 性別は男女どちらも出て、外見は adv_<性格>_<性別>。同seedで同じ
+// [x] ユニークの性別と外見は定義から写す
 
 /** 適性・能力を固定した冒険者。乱数を通さずに式だけを確かめる */
 function fixture(over: Partial<Adventurer> = {}): Adventurer {
@@ -28,7 +31,7 @@ function fixture(over: Partial<Adventurer> = {}): Adventurer {
     id: 'a1', name: 'テスト', age: 20, level: 1, exp: 0, job: 'fighter',
     base: { hp: 60, atk: 10, def: 8, mag: 9, spd: 8, dex: 9, scout: 9, gather: 9 },
     apt: { attacker: 50, tank: 50, healer: 50, scout: 50, gatherer: 50 },
-    growth: 1, personality: 'cautious', traits: [],
+    growth: 1, personality: 'cautious', gender: 'male', appearance: 'adv_cautious_male', traits: [],
     fatigue: 0, injuryDays: 0, salary: 10, loyalty: 50, status: 'idle', assignment: null,
     equipment: { weapon: null, armor: null, accessory: null }, skills: [],
     persona: { hobby: '釣り', talent: '早起き', likes: '猫', dislikes: '虫' },
@@ -280,5 +283,31 @@ describe('generateAdventurer', () => {
     }
     expect(peaked).toBeGreaterThan(100);
     expect(Math.abs(matched / peaked - 0.6)).toBeLessThanOrEqual(0.1);
+  });
+});
+
+describe('性別と外見', () => {
+  it('生成した冒険者は性別を持ち、外見は adv_<性格>_<性別>', () => {
+    const rng = new Rng(7);
+    for (let i = 0; i < 30; i++) {
+      const a = generateAdventurer(rng, { id: `g${i}` });
+      expect(['male', 'female']).toContain(a.gender);
+      expect(a.appearance).toBe(`adv_${a.personality}_${a.gender}`);
+    }
+  });
+  it('同seedなら同じ性別と外見になる', () => {
+    const a = generateAdventurer(new Rng(42), { id: 'x' });
+    const b = generateAdventurer(new Rng(42), { id: 'x' });
+    expect([a.gender, a.appearance]).toEqual([b.gender, b.appearance]);
+  });
+  it('男女どちらも出る', () => {
+    const rng = new Rng(99);
+    const genders = new Set(Array.from({ length: 40 }, (_, i) => generateAdventurer(rng, { id: `h${i}` }).gender));
+    expect(genders).toEqual(new Set(['male', 'female']));
+  });
+  it('ユニークの性別と外見は定義から写す', () => {
+    const def = UNIQUES.find((u) => u.id === 'u_alpha')!;
+    const a = uniqueAdventurer(def, 'u1');
+    expect([a.gender, a.appearance]).toEqual(['male', 'u_alpha']);
   });
 });

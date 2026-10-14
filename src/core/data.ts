@@ -21,7 +21,7 @@ import returnLinesJson from '../data/return-lines.json';
 import uniquesJson from '../data/uniques.json';
 import achievementsJson from '../data/achievements.json';
 import endingJson from '../data/ending.json';
-import type { Aptitude, Persona, Stats } from './types';
+import type { Aptitude, Gender, Persona, Stats } from './types';
 import type { DungeonDef, EnemyDef, FacilityDef, ItemDef, JobDef, PersonalityDef, PolicyDef, RecipeDef, RoleSkillDef, SynergyDef, TraitDef } from './types';
 import type { QuestTemplateDef } from './types';
 import type { WorldEdgeDef, WorldNodeDef } from './types';
@@ -184,6 +184,7 @@ export interface UniqueChainStep {
 }
 export interface UniqueDef {
   id: string; name: string; job: string; personality: string; age: number;
+  gender: Gender; appearance: string;
   base: Stats; apt: Aptitude; growth: number;
   /** 0 なら雇う時に salaryOf で決める */
   salary: number;

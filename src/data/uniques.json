@@ -1,6 +1,7 @@
 [
   {
     "id": "u_alpha", "name": "ユニークA(仮)", "job": "scout", "personality": "cautious", "age": 24,
+    "gender": "male", "appearance": "u_alpha",
     "base": {"hp": 66, "atk": 11, "def": 9, "mag": 8, "spd": 12, "dex": 13, "scout": 15, "gather": 10},
     "apt": {"attacker": 45, "tank": 30, "healer": 35, "scout": 92, "gatherer": 60},
     "growth": 1.2, "salary": 0,

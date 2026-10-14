@@ -22,7 +22,7 @@ function adv(id: string, job: string, v: Partial<Stats> = {}): Adventurer {
   return {
     id, name: id, age: 20, level: 1, exp: 0, job, base: stats(v),
     apt: { attacker: 100, tank: 100, healer: 100, scout: 100, gatherer: 100 }, growth: 1,
-    personality: 'cautious', traits: [], fatigue: 0, injuryDays: 0, salary: 10, loyalty: 50,
+    personality: 'cautious', gender: 'male', appearance: 'adv_cautious_male', traits: [], fatigue: 0, injuryDays: 0, salary: 10, loyalty: 50,
     status: 'idle', assignment: null, equipment: { weapon: null, armor: null, accessory: null }, skills: [],
     persona: { hobby: '', talent: '', likes: '', dislikes: '' },
     history: { hiredDay: 0, expeditions: 0, kills: 0, visits: {}, raisesRefused: 0, warnedDay: null },

@@ -1,6 +1,8 @@
 // セーブの直列化と読み込み。DOM非依存にするため、保存先は Storage 風の口を外から渡す。
 import { emptyState, initialDungeonProgress } from './state';
-import { DUNGEONS } from './data';
+import { genericAppearance } from './adventurer';
+import { DUNGEONS, UNIQUE } from './data';
+import { hashSeed, Rng } from './rng';
 import { markStorySeen, storyDue } from './story';
 import { SAVE_VERSION, type Adventurer, type GameState } from './types';
 
@@ -27,6 +29,13 @@ function fillAdventurer(a: Adventurer) {
   a.history.warnedDay ??= null;
 }
 
+/** 版1には性別・外見が無い。seed と id の hash で決めるのは、読み込むたびに性別が変わらないようにするため */
+function fillLooks(a: Adventurer, seed: number) {
+  const def = a.unique ? UNIQUE[a.unique] : undefined;
+  if (!a.gender) a.gender = def?.gender ?? (new Rng(hashSeed(seed, 'appearance', a.id)).chance(0.5) ? 'female' : 'male');
+  if (!a.appearance) a.appearance = def?.appearance ?? a.unique ?? genericAppearance(a.personality, a.gender);
+}
+
 export function migrate(raw: unknown): GameState | null {
   if (!raw || typeof raw !== 'object') return null;
   const s = raw as Partial<GameState>;
@@ -42,8 +51,10 @@ export function migrate(raw: unknown): GameState | null {
     e.result.daysSpent ??= e.returnDay - e.startDay;
     e.result.returnDialogue ??= [];
   }
-  for (const a of merged.adventurers) fillAdventurer(a);
-  for (const c of merged.candidates) fillAdventurer(c.adv);
+  for (const a of [...merged.adventurers, ...merged.candidates.map((c) => c.adv)]) {
+    fillAdventurer(a);
+    fillLooks(a, merged.seed);
+  }
   // 後から足したダンジョンは、古いセーブでは進捗が無いので初期値(噂)で埋める
   merged.dungeons = { ...merged.dungeons };
   for (const d of DUNGEONS) merged.dungeons[d.id] ??= initialDungeonProgress(d.id);
