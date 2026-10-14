@@ -1,0 +1,11 @@
+{
+  "character": "sera",
+  "asset": "design-candidate-v1.png",
+  "mode": "built-in image_gen generate",
+  "references": [
+    {"path": "artifacts/source-art/characters/tina/design-approved-v1.png", "role": "shared framing and art direction only"},
+    {"path": "artifacts/source-art/characters/iris/design-approved-v1.png", "role": "shared framing and art direction only"}
+  ],
+  "prompt_summary": "19-year-old adult petite ordinary priest/healer; fluffy sakura-pink short hair; gentle round eyes; timid kind expression and uncertain smile; simple clean white priest robe with cream accents; plain warm ivory background; near-front three-quarter full-body conversational standing pose; bold clean anime-manga outlines, simple flat colors, few cel shadows; full hair and both feet visible; no child proportions, no hood, no weapon, no extra characters, no text or watermark.",
+  "review": "Full hair and feet visible; adult but youthful proportions; priest identity clear; no auto-adoption."
+}

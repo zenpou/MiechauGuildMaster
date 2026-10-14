@@ -1,0 +1,9 @@
+{
+  "character": "ヴィオラ",
+  "status": "style-transfer-candidate",
+  "source": "built-in image_gen",
+  "style_reference": "artifacts/source-art/characters/tina/design-approved-v1.png",
+  "design_reference": "artifacts/source-art/characters/viola/design-candidate-v1.png",
+  "prompt": "Use Image 1 only as the style reference: strong dark-brown contour lines, thick upper eyelids, large vertically elongated irises with dark upper portions and simple white highlights, simple rounded youthful faces, angular hair clumps, 2-3 hard cel-shadow shapes, stronger saturation and shadow contrast, rustic manga/classic RPG standing-portrait feel. Use Image 2 only as the design reference. Preserve Viola's navy straight long hair, blue eyes, 21-year-old adult appearance, cool mildly self-confident face and pose, practical dark steel medium-heavy tank armor, brown straps and belt, armored boots, and large blue-and-steel tower shield at her side. Preserve full-body framing and plain warm ivory background. Replace the target's delicate thin lines, pale watercolor shading, glossy details, and fine hair strands with Tina's bold simplified line-and-cel-shading language. Do not copy Tina's red hair, amber eyes, scarf, light swordswoman outfit, or sword. No crop, text, watermark, or shield over face.",
+  "output": "artifacts/source-art/characters/viola/design-tina-style-v1.png"
+}

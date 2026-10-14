@@ -1,0 +1,11 @@
+{
+  "character": "アウレリア",
+  "status": "candidate",
+  "source": "built-in image_gen",
+  "references": [
+    "artifacts/source-art/characters/tina/design-approved-v1.png",
+    "artifacts/source-art/characters/iris/design-approved-v1.png"
+  ],
+  "prompt": "Full-body character design candidate for a game dialogue standing portrait. Aurelia is a human-shaped ancient dragon appearing as a quiet adult woman around 22 years old. Long straight black hair fading to flame orange at the tips, gold eyes with vertical slit pupils, subtle small scales on the neck and backs of the hands, nearly emotionless cool kuudere expression. Modest simple black and muted flame-orange outfit with high neckline, covered shoulders, long skirt or tailored trousers, understated belt and boots. Human form only: no horns, wings, tail, large armor, royal regalia, or elaborate ornaments. Plain warm ivory background, full body with hair and feet visible, calm front-facing slight three-quarter pose. Clean Japanese anime/manga illustration, bold dark outlines, simple cel shading, restrained detail. No text or watermark.",
+  "output": "artifacts/source-art/characters/aurelia/design-candidate-v1.png"
+}

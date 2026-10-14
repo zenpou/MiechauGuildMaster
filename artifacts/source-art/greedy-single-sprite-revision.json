@@ -1,0 +1,24 @@
+{
+  "tool": "built-in image_gen",
+  "assets": [
+    {
+      "id": "adv_greedy_male",
+      "pose": "neutral",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-6f0fcc95-9adb-4ed3-9cba-983ebe32948c.png",
+      "prompt": "Use case: precise-object-edit. Correct ONLY the HEAD AND FACE anatomy of this male generic greedy adventurer sprite. Current face looks like a squashed child's face with a pasted-on mustache. Make a balanced recognizable ADULT man in his thirties, ordinary fantasy villager, slightly stocky. Preserve short curly dark brown hair and a small natural mustache, but redraw head with normal adult cranial proportions, properly spaced eyes on the same perspective plane, a more defined midface and believable nose, enough space between eyes/nose/mouth/chin, naturally proportioned jaw and neck. Slight calculating closed-mouth smile, subtly arched brows, interested eyes; not villain caricature, not chibi. Head size proportional to existing body, same approximate position and three-quarter angle. Preserve EXACT rest of body, plum-brown plain laced tunic, belt and closed pouch, trousers, boots, hand by chin and hand on hip, pose, warm anime cel shading and clean outline. Do not enlarge head or eyes, no weapon or profession equipment. Full-body transparent sprite 1:2 ratio for 512x1024, full feet and hair visible, genuine transparent alpha, no background or ground shadow, no text.",
+      "references": [
+        "artifacts/source-art/revisions/greedy-single-sprite/characters/adv_greedy_male/neutral.png"
+      ]
+    },
+    {
+      "id": "adv_greedy_female",
+      "pose": "neutral",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-d2d81fd7-18a7-4fdd-a8cc-a0c208637ebc.png",
+      "prompt": "Use case: precise-object-edit. Edit this female generic greedy adventurer to look like an ORDINARY modestly dressed village traveler, not a glamorous voluptuous character. Preserve her recognizable curly copper hair in a high bun, freckles, adult face, slightly sly pleased expression, raised small closed coin pouch, general pose and warm clean anime style. Change body silhouette to natural AVERAGE adult proportions: moderate shoulders and hips, small-to-average bust, relaxed natural waist, ordinary limbs. No exaggerated hourglass or emphasized breasts/thighs. Replace fitted deep-neckline garment with a LOOSE straight-cut burgundy LINEN TUNIC, simple high round neckline with a small CLOSED lace slit, fully covering upper chest and NO cleavage. Belt loosely at natural waist, fabric hangs naturally rather than hugging bust/hips. Plain brown loose trousers, simple leather boots, no armor/weapons/profession-specific gear. Keep both hands and pouch readable, complete full body including feet and hair. 1:2 portrait for 512x1024, genuine transparent alpha background, no floor shadow, no text or watermark.",
+      "references": [
+        "artifacts/source-art/revisions/greedy-single-sprite/characters/adv_greedy_female/neutral.png"
+      ]
+    }
+  ],
+  "scope": "Generic characters use neutral only; happy images retained as unused reserves. No runtime integration."
+}

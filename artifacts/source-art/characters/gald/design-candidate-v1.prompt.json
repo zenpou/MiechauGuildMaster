@@ -1,0 +1,12 @@
+{
+  "character": "ガルド",
+  "status": "candidate",
+  "source": "built-in image_gen",
+  "references": [
+    "artifacts/source-art/characters/tina/design-approved-v1.png",
+    "artifacts/source-art/characters/iris/design-approved-v1.png",
+    "artifacts/source-art/characters/iris/design-coat-approved-v2.png"
+  ],
+  "prompt": "Full-body character design candidate for a game dialogue standing portrait. Gald is a man around 50 years old, former guild master, very muscular and broad, with short tidy brown hair, a full neat brown beard, rugged friendly mature male face, warm eyes, and a large hearty smile. Healthy and energetic usual state. Practical brown long coat fitting his large frame, with the same broad tan-brown lapels and prominent round gold buttons as Iris's oversized coat, adapted to his size; dark shirt, sturdy brown trousers, practical boots. Plain warm ivory background, full body with coat hem and feet visible, front-facing slight three-quarter pose. Clean Japanese anime/manga illustration, bold dark outlines, simple cel shading, restrained detail, same visual world as the approved young women but clearly an adult man. No ornate armor, royal clothing, cape, weapons, text, or watermark.",
+  "output": "artifacts/source-art/characters/gald/design-candidate-v1.png"
+}

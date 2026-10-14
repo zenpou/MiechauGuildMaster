@@ -1,0 +1,11 @@
+{
+  "character": "カイ",
+  "status": "candidate",
+  "source": "built-in image_gen",
+  "references": [
+    "artifacts/source-art/characters/tina/design-approved-v1.png",
+    "artifacts/source-art/characters/iris/design-approved-v1.png"
+  ],
+  "prompt": "Full-body character design candidate for a game dialogue standing portrait. Kai is a 19-year-old young adult man and reluctant guild acting master who wants to be a NEET. Clearly male youthful face, slightly narrow jaw, messy short black hair, sleepy half-lidded dark eyes, mildly bored but approachable expression, loose slouched standing posture. Off-white shirt, plain navy lightweight jacket, brown straight trousers, light simple leather shoes. Everyday practical clothes, no armor, weapon, cape, or uniform. Plain warm ivory background, full body with hair and feet visible, front-facing slight three-quarter pose. Clean Japanese anime/manga illustration, bold dark outlines, simple cel shading, restrained detail. No text or watermark.",
+  "output": "artifacts/source-art/characters/kai/design-candidate-v1.png"
+}

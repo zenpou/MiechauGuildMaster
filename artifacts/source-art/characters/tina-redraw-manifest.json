@@ -1,0 +1,59 @@
+{
+  "status": "review-candidates",
+  "generation": "built-in image_gen",
+  "style_reference": "tina/design-approved-v1.png",
+  "strategy": "Draw again from Tina reference only; old character images are design notes, not generation inputs. Final Iris coat and Noel ribbon received precise consistency edits.",
+  "gallery": "tina-redraw-review.html",
+  "assets": [
+    {
+      "character": "sera",
+      "image": "sera/design-tina-redraw-v1.png",
+      "prompt": "sera/design-tina-redraw-v1.prompt.json"
+    },
+    {
+      "character": "viola",
+      "image": "viola/design-tina-redraw-v1.png",
+      "prompt": "viola/design-tina-redraw-v1.prompt.json"
+    },
+    {
+      "character": "ruu",
+      "image": "ruu/design-tina-redraw-v1.png",
+      "prompt": "ruu/design-tina-redraw-v1.prompt.json"
+    },
+    {
+      "character": "fine",
+      "image": "fine/design-tina-redraw-v1.png",
+      "prompt": "fine/design-tina-redraw-v1.prompt.json"
+    },
+    {
+      "character": "aurelia",
+      "image": "aurelia/design-tina-redraw-v1.png",
+      "prompt": "aurelia/design-tina-redraw-v1.prompt.json"
+    },
+    {
+      "character": "kai",
+      "image": "kai/design-tina-redraw-v1.png",
+      "prompt": "kai/design-tina-redraw-v1.prompt.json"
+    },
+    {
+      "character": "gald",
+      "image": "gald/design-tina-redraw-v1.png",
+      "prompt": "gald/design-tina-redraw-v1.prompt.json"
+    },
+    {
+      "character": "iris",
+      "image": "iris/design-tina-redraw-v1.png",
+      "prompt": "iris/design-tina-redraw-v1.prompt.json"
+    },
+    {
+      "character": "iris-coat",
+      "image": "iris/design-coat-tina-redraw-v2.png",
+      "prompt": "iris/design-coat-tina-redraw-v2.prompt.json"
+    },
+    {
+      "character": "noel",
+      "image": "noel/design-tina-redraw-v2.png",
+      "prompt": "noel/design-tina-redraw-v2.prompt.json"
+    }
+  ]
+}

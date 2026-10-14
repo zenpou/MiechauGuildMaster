@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>背景素材 v1 — 見えちゃうギルドマスター</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:24px;background:#171e1c;color:#f1e8d5;font:16px/1.7 system-ui}main{max-width:1200px;margin:auto}h1{font-size:26px}p{color:#bfc7b9}main>nav{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}a,button{color:#efca84}button{font:inherit;padding:8px 16px;border:1px solid #8e7650;border-radius:8px;background:#2b3830;cursor:pointer}main>section{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}main figure{margin:0;background:#253129;border:1px solid #566047;border-radius:12px;overflow:hidden}main figure img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover}main figcaption{padding:14px}small{display:block;color:#bbc5b5}#preview{position:fixed;inset:0;z-index:20;background:#101816f5;display:grid;place-items:center;padding:8px}#preview[hidden]{display:none}#preview>.vn-player{max-width:1100px}@media(max-width:500px){body{padding:12px}}
+</style>
+<main><h1>背景素材 v1</h1><p>朝の街路、ギルド受付、執務室の昼夜、酒場。1536 × 1024 / WebP。人物・台詞を重ねるため、手前に余白を置いています。</p>
+<nav><button id="play">ゲームの会話画面で確認</button><a href="batch-v1.json">生成プロンプト</a><a href="manifest-v1.json">素材一覧</a></nav>
+<section><figure><a href="street-morning-v1.png"><img src="../../../public/art/backgrounds/street-morning-v1.webp" alt="朝の街路"></a><figcaption>朝の街路<small>town / bg_street_morning</small></figcaption></figure>
+<figure><a href="guild-office-day-v1.png"><img src="../../../public/art/backgrounds/guild-office-day-v1.webp" alt="ギルド執務室・昼"></a><figcaption>ギルド執務室・昼<small>office / bg_guild_office</small></figcaption></figure>
+<figure><a href="guild-reception-v1.png"><img src="../../../public/art/backgrounds/guild-reception-v1.webp" alt="ギルド受付"></a><figcaption>ギルド受付<small>guild / bg_guild_reception</small></figcaption></figure>
+<figure><a href="guild-office-night-v1.png"><img src="../../../public/art/backgrounds/guild-office-night-v1.webp" alt="ギルド執務室・夜"></a><figcaption>ギルド執務室・夜<small>night / bg_guild_office_night</small></figcaption></figure>
+<figure><a href="guild-tavern-v1.png"><img src="../../../public/art/backgrounds/guild-tavern-v1.webp" alt="ギルドの酒場"></a><figcaption>ギルドの酒場<small>tavern / bg_guild_tavern</small></figcaption></figure></section>
+<p>元のPNGは画像をクリック。背景のみの素材セットです。立ち絵の透過・表情差分、イベントスチルは今後の制作対象です。</p></main><div id="preview" hidden></div>
+<script type="module">
+import { createStoryPlayer } from '/src/ui/storyPlayer.ts';
+const rows=[{"key":"town","name":"朝の街路"},{"key":"office","name":"ギルド執務室・昼"},{"key":"guild","name":"ギルド受付"},{"key":"night","name":"ギルド執務室・夜"},{"key":"tavern","name":"ギルドの酒場"}];
+const holder=document.querySelector('#preview');
+document.querySelector('#play').addEventListener('click',()=>{
+ holder.hidden=false;
+ const player=createStoryPlayer({id:'background-assets-v1',title:'背景の表示確認',lines:rows.map(r=>({text:r.name+' — 背景素材の表示確認です。人物と台詞は別レイヤーで表示されます。',background:r.key})),onClose:()=>{player.dispose();holder.replaceChildren();holder.hidden=true;}});
+ holder.append(player.element);
+});
+</script></html>
+

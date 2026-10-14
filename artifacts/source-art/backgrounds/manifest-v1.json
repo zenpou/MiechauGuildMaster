@@ -1,0 +1,87 @@
+{
+  "created": "2026-10-13",
+  "status": "generated; visual review complete; user approval not yet recorded",
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "id": "street-morning",
+      "name": "朝の街路",
+      "keys": [
+        "town",
+        "bg_street_morning"
+      ],
+      "source": "street-morning-v1.png",
+      "runtime": "backgrounds/street-morning-v1.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 376308,
+      "sha256": "542428038c4ee8444bc490b8d0ff7b7993523ffc939ac09120be5d13ed95c4f9"
+    },
+    {
+      "id": "guild-office-day",
+      "name": "ギルド執務室・昼",
+      "keys": [
+        "office",
+        "bg_guild_office"
+      ],
+      "source": "guild-office-day-v1.png",
+      "runtime": "backgrounds/guild-office-day-v1.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 252482,
+      "sha256": "379c47fde68507f43eb06e4bb0189fd486041dc87355d760a8429c764783576c"
+    },
+    {
+      "id": "guild-reception",
+      "name": "ギルド受付",
+      "keys": [
+        "guild",
+        "bg_guild_reception"
+      ],
+      "source": "guild-reception-v1.png",
+      "runtime": "backgrounds/guild-reception-v1.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 224606,
+      "sha256": "5ffa7d0648d92dc6ba41b12e69cf1ad7e81bbf6918ddf6c12a8dc699234d03f7"
+    },
+    {
+      "id": "guild-office-night",
+      "name": "ギルド執務室・夜",
+      "keys": [
+        "night",
+        "bg_guild_office_night"
+      ],
+      "source": "guild-office-night-v1.png",
+      "runtime": "backgrounds/guild-office-night-v1.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 190570,
+      "sha256": "48856b929dbd48235054d4128412877ac6a229c488328404112fddb23ec0607f"
+    },
+    {
+      "id": "guild-tavern",
+      "name": "ギルドの酒場",
+      "keys": [
+        "tavern",
+        "bg_guild_tavern"
+      ],
+      "source": "guild-tavern-v1.png",
+      "runtime": "backgrounds/guild-tavern-v1.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 224302,
+      "sha256": "c6350baca6a50ad872b1a4d1a2a3d29940fd78108b9de5e0371dbddda5055fc3"
+    }
+  ]
+}

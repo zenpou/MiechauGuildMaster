@@ -1,0 +1,12 @@
+{
+  "tool": "built-in image_gen",
+  "asset": "stills/prologue",
+  "reason": "Correct unnatural neck, shoulder and torso orientation.",
+  "prompt": "Use case: precise-object-edit. Edit target: image 1, existing prologue still. Supporting character identity reference: image 2, Kai. Correct ONLY Kai's broken anatomy on the left. Keep Tina on the right, her exact face/outfit/pose, gate, street, castle, lighting, framing and clean anime rendering unchanged. The current Kai has an impossible neck/head orientation and confused shoulders. Redraw his entire pose as ONE anatomically coherent young man tumbling forward out of the gate, seen in clear SIDE / three-quarter SIDE profile, curled naturally into a loose forward somersault. Head at lower-right of his silhouette, pelvis upper-left; spine gently curved, head follows torso orientation with short natural neck, chin slightly tucked toward chest. His facial orientation must rotate with his body rather than remain upright. Show exactly two arms attached to their appropriate shoulders and two legs attached to one pelvis, with ordinary elbows and knees bending in natural directions; clearly separate limb silhouettes and simple readable foreshortening. Knees loosely bent toward belly, one a little more open; arms reaching downward/forward from shoulders, five fingers per hand. Preserve Kai's recognizable black spiky hair, startled comic face, navy short jacket over cream button shirt, brown trousers and brown lace-up shoes from reference 2, normal proportions. He is airborne, humorously kicked out, no one kicking visible, retain curved dust motion arc and non-graphic comedy. Do not retain the malformed upright face attached to inverted torso. No extra limbs, no disconnected shoulders, no twisted neck or waist, no added objects or text. Output 1536x1024 landscape.",
+  "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-73a3e8a6-d148-4a2c-a5b8-0b44a436c0ff.png",
+  "references": [
+    "artifacts/source-art/revisions/prologue-before-anatomy-fix.png",
+    "artifacts/characters/kai.png"
+  ],
+  "visual_review": "Head follows torso, two coherent shoulders and arms, two bent legs, Tina and setting preserved."
+}

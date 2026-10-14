@@ -1,0 +1,10 @@
+{
+  "character": "iris",
+  "output": "design-tina-style-v1.png",
+  "mode": "built-in image_gen style-transfer",
+  "style_reference": "C:/Users/takas/project/MiechauGuildMaster/artifacts/source-art/characters/tina/design-approved-v1.png",
+  "design_reference": "C:/Users/takas/project/MiechauGuildMaster/artifacts/source-art/characters/iris/design-approved-v1.png",
+  "style_rules": "Use Tina only for style: strong dark-brown contours, bold upper eyelids, large vertical irises with dark upper section and simple white highlight, rounded youthful face, angular hair locks, 2-3 hard cel shadows, stronger contrast, rustic manga/old-RPG finish.",
+  "preserve": "Iris's silver-white long hair and braided half-up ribbon, violet eyes, gentle composed expression, exact no-coat inner clothing (ivory blouse, purple ribbon, purple vest with gold buttons, brown belt, navy skirt with pale-lavender hem band and ivory ruffle, brown button boots), brown book, pose, full-body framing and warm ivory background.",
+  "avoid": "Copying Tina's red hair, ponytail, sword armor, scarf, face or expression; adding a coat; changing clothes or book; childification; cropping; text or watermark."
+}

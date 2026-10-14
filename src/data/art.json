@@ -1,5 +1,16 @@
 {
-  "backgrounds": {"guild": null, "town": null, "night": null, "tavern": null, "office": null},
+  "backgrounds": {
+    "guild": "backgrounds/guild-reception-v1.webp",
+    "town": "backgrounds/street-morning-v1.webp",
+    "night": "backgrounds/guild-office-night-v1.webp",
+    "tavern": "backgrounds/guild-tavern-v1.webp",
+    "office": "backgrounds/guild-office-day-v1.webp",
+    "bg_street_morning": "backgrounds/street-morning-v1.webp",
+    "bg_guild_office": "backgrounds/guild-office-day-v1.webp",
+    "bg_guild_reception": "backgrounds/guild-reception-v1.webp",
+    "bg_guild_office_night": "backgrounds/guild-office-night-v1.webp",
+    "bg_guild_tavern": "backgrounds/guild-tavern-v1.webp"
+  },
   "characters": {
     "master": {"neutral": null, "happy": null, "thoughtful": null},
     "clerk": {"neutral": null, "happy": null, "worried": null},

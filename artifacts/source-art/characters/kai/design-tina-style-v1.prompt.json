@@ -1,0 +1,9 @@
+{
+  "character": "カイ",
+  "status": "style-transfer-candidate",
+  "source": "built-in image_gen",
+  "style_reference": "artifacts/source-art/characters/tina/design-approved-v1.png",
+  "design_reference": "artifacts/source-art/characters/kai/design-candidate-v1.png",
+  "prompt": "Use Image 1 only as style: Tina's strong dark-brown lines, simple hard 2-3 step cel shadows, saturated readable blocks and rustic manga/RPG finish. Use Image 2 only as design. Preserve Kai as a clearly male 19-year-old with messy short black hair, sleepy half-lidded dark eyes, tired expression, slouched pose, off-white shirt, navy jacket, brown trousers and light leather shoes. Keep male jaw and proportions; do not make him feminine or give oversized moe eyes. Replace thin pale glossy rendering with Tina's bold cel-shaded language. Do not copy Tina's red hair, amber eyes, scarf, armor or sword. No weapons, armor, crop, text or watermark.",
+  "output": "artifacts/source-art/characters/kai/design-tina-style-v1.png"
+}

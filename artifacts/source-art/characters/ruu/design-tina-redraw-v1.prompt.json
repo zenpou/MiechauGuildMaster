@@ -1,0 +1,8 @@
+{
+  "character": "ruu",
+  "mode": "built-in image_gen generate",
+  "reference_images": ["C:/Users/takas/project/MiechauGuildMaster/artifacts/source-art/characters/tina/design-approved-v1.png"],
+  "reference_role": "唯一の画風・頭身・顔配置・構図参照。旧ルゥ画像は生成入力に使用していない。",
+  "prompt_summary": "ティナ原画と同じ大きな頭、広めの丸顔、短い丸い顎、コンパクトな胴、しっかりした脚、大きめの靴、太い濃褐色輪郭線、単純な縦長虹彩、2〜3段の硬いセル影、素朴な漫画/昔のRPG立ち絵として描画。ルゥは19歳成人、小柄でしなやか、黒に近い紫の短髪、金色の猫目、警戒の混じった小悪魔的な笑顔。暗色と紫アクセントの機動性ある軽装、手袋、大きめのブーツ、腰に鞘入り短剣。フードなし、盗品なし。無地生成り背景、全身足まで。",
+  "avoid": "ティナの赤髪・ポニーテール・剣・胸当て・マフラー・絆創膏、長身現代美少女体型、子供化、フード、抜刀、余分な人物、文字、透かし、見切れ"
+}

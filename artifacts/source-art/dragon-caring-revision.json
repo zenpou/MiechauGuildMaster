@@ -1,0 +1,39 @@
+{
+  "tool": "built-in image_gen",
+  "assets": [
+    {
+      "id": "aurelia",
+      "pose": "dragon",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-637a9114-a844-476b-8a35-11829dea1ec3.png",
+      "prompt": "Use case: precise-object-edit. Redesign ONLY the POSE of the reference fire dragon as a natural quadrupedal dragon sprite, not a humanoid standing monster. Preserve its species identity: crimson and near-black scales, swept backward layered horns and flame-shaped mane, golden eyes, pale gold throat/belly armor, burnt-orange wing membranes and flame-orange accents. Entire dragon visible in three-quarter SIDE view facing left. Horizontal spine and long torso parallel to the ground, low muscular shoulders and haunches, FOUR weight-bearing reptilian legs with claws resting at the same implied ground level; long neck curves forward, head held just above shoulder height. TWO separate wings folded naturally high along its back, not replacing the forelegs. Tail sweeps behind and curls beside rear feet, visibly attached to pelvis. Poised, ancient, dignified, calm but formidable, mouth mostly closed. No upright human chest, no bipedal stance, no human arms, no extra legs or disconnected appendages. Preserve detailed clean anime cel shading and warm outlined style. Use a SQUARE 1024x1024 canvas so anatomy has room; do not squeeze its body to fill a tall human portrait. Comfortable transparent margins around the entire silhouette. Isolated transparent alpha background; NO ground plane, cast shadow, environment, text, fire particles, watermark.",
+      "size": [
+        1024,
+        1024
+      ],
+      "reference": "previous same asset (retained under revisions/dragon-caring-redesign/)"
+    },
+    {
+      "id": "adv_caring",
+      "pose": "neutral",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-70344e04-8c8b-4bf8-ba16-c646de2e793e.png",
+      "prompt": "Use case: precise-object-edit. Redesign the generic caring adventurer in the reference so she is unmistakably a DIFFERENT person from a brown-haired braided bespectacled clerk heroine. Keep the project's clean warm anime linework, cel shading, full-body 512x1024 transparent sprite framing, bandage-in-one-hand pose and ordinary guild field-medic role. NEW character: adult woman in her late twenties, short BLACK tousled pixie haircut, clearly exposed neck and ears, no braid or ponytail, warm medium-brown tanned skin, round friendly mature face with small freckles, amber-brown eyes, sturdy athletic build, gentle confident closed-mouth smile. Clothing: rolled-sleeve muted SAGE-GREEN work shirt, short practical BEIGE canvas utility vest, small rust-ORANGE neckerchief, brown belt and dark charcoal trousers, plain brown hiking boots, fingerless gloves. Practical tan canvas medical shoulder satchel with rolled bandages and small medicine bottles, simple ivory leaf emblem instead of a red cross. Holds one white bandage roll up in her right hand, left hand on satchel strap. No glasses, no books, no apron dress, no blue uniform, no long brown hair, no heroine ornaments. Clearly readable caring dependable personality, distinct short-hair silhouette and green/beige/orange palette. Full head and feet visible, small margins, genuinely transparent alpha background, no ground shadow, no writing, no watermark.",
+      "size": [
+        512,
+        1024
+      ],
+      "reference": "previous same asset (retained under revisions/dragon-caring-redesign/)"
+    },
+    {
+      "id": "adv_caring",
+      "pose": "happy",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-04e4348c-5460-407e-9e23-253f783ad341.png",
+      "prompt": "Use case: identity-preserve expression edit. Edit this caring adventurer neutral transparent full-body sprite into her HAPPY expression. Change only facial expression: brighter warm friendly smile with mouth slightly open, eyes gently curved with happiness, reassuring and cheerful. Preserve EXACT same short black pixie hair, tanned skin, facial identity, green shirt, beige vest, orange neckerchief, bandage roll and medical satchel with leaf emblem, trousers, boots, pose, all clothing folds, head/body position and scale, clean anime cel shading and transparency. Full head and feet visible, portrait 1:2 aspect for 512x1024 sprite, genuinely transparent alpha, no ground or shadow or text, no extra people or props.",
+      "size": [
+        512,
+        1024
+      ],
+      "reference": "generated neutral from this revision"
+    }
+  ],
+  "scope": "Asset revisions only; Noel unchanged; no game integration."
+}

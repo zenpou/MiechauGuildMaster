@@ -1,0 +1,9 @@
+{
+  "character": "ノエル",
+  "status": "style-transfer-candidate",
+  "source": "built-in image_gen",
+  "style_reference": "artifacts/source-art/characters/tina/design-approved-v1.png",
+  "design_reference": "artifacts/source-art/characters/noel/design-approved-v1.png",
+  "prompt": "Use Image 1 only as style: Tina's strong dark-brown contour lines, thick upper eyelids, simple large irises, angular hair clumps, 2-3 hard cel shadows, saturated classic manga/RPG finish. Use Image 2 only as design. Preserve Noel's brown side braid, round glasses, green eyes, cream blouse, navy vest and skirt, cream apron, red collar ribbon, guild badge, brown lace-up boots and large brown ledger. Preserve braid, glasses, green eyes, uniform apron, ledger, age, pose and silhouette. Replace thin pale glossy rendering with Tina's bold cel-shaded language. Do not copy Tina's red hair, amber eyes, scarf, light swordswoman outfit or sword. No ponytail, hair color change, armor, crop, text or watermark.",
+  "output": "artifacts/source-art/characters/noel/design-tina-style-v1.png"
+}

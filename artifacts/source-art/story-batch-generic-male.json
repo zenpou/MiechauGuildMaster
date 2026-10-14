@@ -1,0 +1,243 @@
+{
+  "createdAt": "2026-10-14",
+  "tool": "built-in image_gen",
+  "outputCount": 12,
+  "sharedReference": "artifacts/source-art/characters/kai/neutral.png",
+  "sharedStyle": "warm clean anime cel shading, transparent full-body sprite, head near top, feet visible, 512x1024 final canvas",
+  "constraints": [
+    "profession-independent ordinary fantasy travel clothing",
+    "no modern clothing",
+    "no armor",
+    "no weapons, shields, staffs, books, medical gear",
+    "transparent background",
+    "no text or watermark"
+  ],
+  "neutralPromptByPersonality": {
+    "brave": "Use case: stylized-concept. Asset type: full-body transparent game character sprite, 512x1024 portrait canvas. Reference image 1 is Kai's existing villager sprite: use it for the shared warm clean anime cel-shaded rendering, line quality, proportions, lighting, and transparent presentation only; do not copy Kai's face or hair. Generate one clearly distinct male generic adventurer, brave personality, neutral expression. Athletic adult with short auburn swept-back hair, square face, confident open stance. Ordinary fantasy travel clothing only: ochre lace-up tunic, brown sleeveless vest, plain belt with one small pouch, loose trousers, worn leather boots. No profession-specific equipment, no weapon, no shield, no staff, no book, no medical gear, no armor, no modern clothing, no noble ornaments. Full body centered, head near top with clear margin, feet fully visible, hands visible, transparent background, no text, no watermark. Keep the pose and alignment suitable for a matching happy expression edit later. The character must be visually distinct from Kai and Gald.",
+    "cautious": "Use case: stylized-concept. Asset type: full-body transparent game character sprite, 512x1024 portrait canvas. Reference image 1 is Kai's existing villager sprite: use it for shared warm clean anime cel-shaded rendering, line quality, proportions, lighting, and transparent presentation only; do not copy Kai's face or hair. Generate one clearly distinct male generic adventurer, cautious personality, neutral expression. Lean adult with straight dark blue-black hair parted to one side, long thoughtful face, composed watchful eyes and slightly guarded posture. Muted blue ordinary fantasy travel tunic, simple gray short shoulder cape, plain belt with one pouch, loose trousers, worn leather boots. No profession-specific equipment, no weapon, no shield, no staff, no book, no medical gear, no armor, no modern clothing, no noble ornaments. Full body centered, head near top with clear margin, feet fully visible, hands visible, transparent background, no text, no watermark. Keep pose and alignment suitable for a matching happy expression edit later. Distinct from Kai, Gald, and brave_male.",
+    "greedy": "Use case: stylized-concept. Asset type: full-body transparent game character sprite, 512x1024 portrait canvas. Reference image 1 is Kai's existing villager sprite: use it for shared warm clean anime cel-shaded rendering, line quality, proportions, lighting, and transparent presentation only; do not copy Kai's face or hair. Generate one clearly distinct male generic adventurer, greedy personality, neutral expression. Stocky adult with short curly dark brown hair, round face, small neat mustache, eager calculating eyes and slightly forward-leaning posture. Plum-brown ordinary fantasy travel tunic, plain belt with exactly one small closed coin pouch, loose trousers, worn leather boots. No visible coins, no profession-specific equipment, no weapon, no shield, no staff, no book, no medical gear, no armor, no modern clothing, no noble ornaments. Full body centered, head near top with clear margin, feet fully visible, hands visible, transparent background, no text, no watermark. Keep pose and alignment suitable for matching happy expression edit later. Distinct from Kai, Gald, and other male variants.",
+    "caring": "Use case: stylized-concept. Asset type: full-body transparent game character sprite, 512x1024 portrait canvas. Reference image 1 is Kai's existing villager sprite: use it for shared warm clean anime cel-shaded rendering, line quality, proportions, lighting, and transparent presentation only; do not copy Kai's face or hair. Generate one clearly distinct male generic adventurer, caring personality, neutral gentle expression. Broad middle-aged adult with tied-back ash-brown hair and short gentle beard, tan skin, kind eyes, relaxed welcoming open hand. Sage green ordinary fantasy travel tunic, beige vest, plain belt with one pouch, loose trousers, worn leather boots. No medicine props, no profession-specific equipment, no weapon, no shield, no staff, no book, no armor, no modern clothing, no noble ornaments. Full body centered, head near top with clear margin, feet fully visible, hands visible, transparent background, no text, no watermark. Keep pose and alignment suitable for matching happy expression edit later. Distinct from Kai, Gald, and other male variants.",
+    "proud": "Use case: stylized-concept. Asset type: full-body transparent game character sprite, 512x1024 portrait canvas. Reference image 1 is Kai's existing villager sprite: use it for shared warm clean anime cel-shaded rendering, line quality, proportions, lighting, and transparent presentation only; do not copy Kai's face or hair. Generate one clearly distinct male generic adventurer, proud personality, neutral expression. Tall slim adult with long silver-gray hair tied low, angular face, composed self-assured eyes, chin raised and one hand on hip. Dark teal ordinary fantasy travel tunic, plain rust-colored sash, simple belt and pouch, loose trousers, worn leather boots. No noble ornaments, no crown, no weapon, no shield, no staff, no book, no medical gear, no armor, no modern clothing. Full body centered, head near top with clear margin, feet fully visible, hands visible, transparent background, no text, no watermark. Keep pose and alignment suitable for matching happy expression edit later. Distinct from Kai, Gald, and all other male variants.",
+    "timid": "Use case: stylized-concept. Asset type: full-body transparent game character sprite, 512x1024 portrait canvas. Reference image 1 is the existing timid male generic sprite: preserve his short sandy-blond hair, lean elongated face, blue-gray cape identity and warm clean anime cel-shaded rendering, but redesign as a weapon-free ordinary fantasy traveler. Generate a neutral timid male expression and hunched wary posture, both hands grasping a simple satchel strap across the chest. Keep the blue-gray short cape, plain travel tunic, belt with small pouch, loose trousers, worn leather boots. Remove shield and sword completely. No weapon, no shield, no staff, no book, no medical gear, no armor, no modern clothes, no noble ornaments. Full body centered, head near top with clear margin, feet fully visible, transparent background, no text, no watermark. Maintain pose/alignment suitable for a matching happy expression edit later."
+  },
+  "happyPromptByPersonality": {
+    "brave": "Edit the referenced full-body character sprite. Preserve identity, hairstyle, face shape, body proportions, exact clothing, colors, pose, hands, boots, framing, transparent background, and alignment. Change only the facial expression from neutral/confident to a warm confident happy smile with slightly brighter eyes. No new props, no weapons, no shield, no text, no watermark. Keep full body and feet visible.",
+    "cautious": "Edit the referenced full-body character sprite. Preserve identity, hairstyle, face shape, body proportions, exact clothing, colors, pose, hands, cape, boots, framing, transparent background, and alignment. Change only the facial expression from cautious neutral to a small relieved happy smile with softened watchful eyes. No new props, no weapons, no shield, no text, no watermark. Keep full body and feet visible.",
+    "greedy": "Edit the referenced full-body character sprite. Preserve identity, short curly dark brown hair, round face, small mustache, exact plum-brown tunic, belt and single closed coin pouch, body proportions, pose, hands, boots, framing, transparent background, and alignment. Change only the facial expression to a sly pleased happy grin with eager calculating eyes. No new props, no coins, no weapons, no shield, no text, no watermark. Keep full body and feet visible.",
+    "caring": "Edit the referenced full-body character sprite. Preserve identity, tied-back ash-brown hair, short gentle beard, tan skin, exact sage tunic, beige vest, belt, body proportions, pose, welcoming hand, boots, framing, transparent background, and alignment. Change only the facial expression to a warm kind happy smile with gentle bright eyes. No new props, no medicine items, no weapons, no shield, no text, no watermark. Keep full body and feet visible.",
+    "proud": "Edit the referenced full-body character sprite. Preserve identity, long silver-gray hair tied low, angular face, exact dark teal tunic, plain rust sash, belt and pouch, body proportions, chin-up pose, hand on hip, boots, framing, transparent background, and alignment. Change only the facial expression to a restrained proud happy smile with bright confident eyes. No new props, no ornaments, no weapons, no shield, no text, no watermark. Keep full body and feet visible.",
+    "timid": "Edit the referenced full-body character sprite. Preserve identity, short sandy-blond hair, lean elongated face, blue-gray short cape, simple satchel strap held by both hands, exact clothing, hunched wary pose, body proportions, boots, framing, transparent background, and alignment. Change only the facial expression to a small shy happy smile with relieved eyes, keeping the timid posture. No shield, no sword, no weapons, no new props, no text, no watermark. Keep full body and feet visible."
+  },
+  "assets": [
+    {
+      "id": "adv_brave_male",
+      "pose": "neutral",
+      "source": "artifacts/source-art/characters/adv_brave_male/neutral.png",
+      "distribution": "public/art/characters/adv_brave_male/neutral.webp",
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_brave_male",
+      "pose": "happy",
+      "source": "artifacts/source-art/characters/adv_brave_male/happy.png",
+      "distribution": "public/art/characters/adv_brave_male/happy.webp",
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_cautious_male",
+      "pose": "neutral",
+      "source": "artifacts/source-art/characters/adv_cautious_male/neutral.png",
+      "distribution": "public/art/characters/adv_cautious_male/neutral.webp",
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_cautious_male",
+      "pose": "happy",
+      "source": "artifacts/source-art/characters/adv_cautious_male/happy.png",
+      "distribution": "public/art/characters/adv_cautious_male/happy.webp",
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_greedy_male",
+      "pose": "neutral",
+      "source": "artifacts/source-art/characters/adv_greedy_male/neutral.png",
+      "distribution": "public/art/characters/adv_greedy_male/neutral.webp",
+      "selectionStatus": "active",
+      "history": [
+        {
+          "id": "adv_greedy_male",
+          "pose": "neutral",
+          "source": "artifacts/source-art/characters/adv_greedy_male/neutral.png",
+          "distribution": "public/art/characters/adv_greedy_male/neutral.webp",
+          "selectionStatus": "active"
+        }
+      ],
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-6f0fcc95-9adb-4ed3-9cba-983ebe32948c.png",
+      "prompt": "Use case: precise-object-edit. Correct ONLY the HEAD AND FACE anatomy of this male generic greedy adventurer sprite. Current face looks like a squashed child's face with a pasted-on mustache. Make a balanced recognizable ADULT man in his thirties, ordinary fantasy villager, slightly stocky. Preserve short curly dark brown hair and a small natural mustache, but redraw head with normal adult cranial proportions, properly spaced eyes on the same perspective plane, a more defined midface and believable nose, enough space between eyes/nose/mouth/chin, naturally proportioned jaw and neck. Slight calculating closed-mouth smile, subtly arched brows, interested eyes; not villain caricature, not chibi. Head size proportional to existing body, same approximate position and three-quarter angle. Preserve EXACT rest of body, plum-brown plain laced tunic, belt and closed pouch, trousers, boots, hand by chin and hand on hip, pose, warm anime cel shading and clean outline. Do not enlarge head or eyes, no weapon or profession equipment. Full-body transparent sprite 1:2 ratio for 512x1024, full feet and hair visible, genuine transparent alpha, no background or ground shadow, no text.",
+      "references": [
+        "artifacts/source-art/revisions/greedy-single-sprite/characters/adv_greedy_male/neutral.png"
+      ],
+      "revision_record": "artifacts/source-art/greedy-single-sprite-revision.json"
+    },
+    {
+      "id": "adv_greedy_male",
+      "pose": "happy",
+      "source": "artifacts/source-art/characters/adv_greedy_male/happy.png",
+      "distribution": "public/art/characters/adv_greedy_male/happy.webp",
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_caring_male",
+      "pose": "neutral",
+      "source": "artifacts/source-art/characters/adv_caring_male/neutral.png",
+      "distribution": "public/art/characters/adv_caring_male/neutral.webp",
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_caring_male",
+      "pose": "happy",
+      "source": "artifacts/source-art/characters/adv_caring_male/happy.png",
+      "distribution": "public/art/characters/adv_caring_male/happy.webp",
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_proud_male",
+      "pose": "neutral",
+      "source": "artifacts/source-art/characters/adv_proud_male/neutral.png",
+      "distribution": "public/art/characters/adv_proud_male/neutral.webp",
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_proud_male",
+      "pose": "happy",
+      "source": "artifacts/source-art/characters/adv_proud_male/happy.png",
+      "distribution": "public/art/characters/adv_proud_male/happy.webp",
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_timid_male",
+      "pose": "neutral",
+      "source": "artifacts/source-art/characters/adv_timid_male/neutral.png",
+      "distribution": "public/art/characters/adv_timid_male/neutral.webp",
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_timid_male",
+      "pose": "happy",
+      "source": "artifacts/source-art/characters/adv_timid_male/happy.png",
+      "distribution": "public/art/characters/adv_timid_male/happy.webp",
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    }
+  ],
+  "records": [
+    {
+      "id": "adv_brave_male/neutral",
+      "personality": "brave",
+      "expression": "neutral",
+      "reference": "artifacts/source-art/characters/kai/neutral.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-1774dee3-ec68-46cc-afa9-06ce7250b37a.png",
+      "png": "artifacts/source-art/characters/adv_brave_male/neutral.png",
+      "webp": "public/art/characters/adv_brave_male/neutral.webp"
+    },
+    {
+      "id": "adv_brave_male/happy",
+      "personality": "brave",
+      "expression": "happy",
+      "reference": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-1774dee3-ec68-46cc-afa9-06ce7250b37a.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-06182e62-2c52-4e42-8b46-9ed2d00a10de.png",
+      "png": "artifacts/source-art/characters/adv_brave_male/happy.png",
+      "webp": "public/art/characters/adv_brave_male/happy.webp"
+    },
+    {
+      "id": "adv_cautious_male/neutral",
+      "personality": "cautious",
+      "expression": "neutral",
+      "reference": "artifacts/source-art/characters/kai/neutral.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-b638f077-1e2c-447c-a9f0-b7966b6663ee.png",
+      "png": "artifacts/source-art/characters/adv_cautious_male/neutral.png",
+      "webp": "public/art/characters/adv_cautious_male/neutral.webp"
+    },
+    {
+      "id": "adv_cautious_male/happy",
+      "personality": "cautious",
+      "expression": "happy",
+      "reference": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-b638f077-1e2c-447c-a9f0-b7966b6663ee.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-f00028b5-803c-42ac-a202-4f2d467c12db.png",
+      "png": "artifacts/source-art/characters/adv_cautious_male/happy.png",
+      "webp": "public/art/characters/adv_cautious_male/happy.webp"
+    },
+    {
+      "id": "adv_greedy_male/neutral",
+      "personality": "greedy",
+      "expression": "neutral",
+      "reference": "artifacts/source-art/characters/kai/neutral.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-3edbe384-9b0a-4c5c-b0ba-d17d20ee05f2.png",
+      "png": "artifacts/source-art/characters/adv_greedy_male/neutral.png",
+      "webp": "public/art/characters/adv_greedy_male/neutral.webp"
+    },
+    {
+      "id": "adv_greedy_male/happy",
+      "personality": "greedy",
+      "expression": "happy",
+      "reference": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-3edbe384-9b0a-4c5c-b0ba-d17d20ee05f2.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-54f7b69a-fb85-4e15-9472-e8fd24a47a7b.png",
+      "png": "artifacts/source-art/characters/adv_greedy_male/happy.png",
+      "webp": "public/art/characters/adv_greedy_male/happy.webp"
+    },
+    {
+      "id": "adv_caring_male/neutral",
+      "personality": "caring",
+      "expression": "neutral",
+      "reference": "artifacts/source-art/characters/kai/neutral.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-f9944840-832c-4d4c-a7a5-ad695008e05e.png",
+      "png": "artifacts/source-art/characters/adv_caring_male/neutral.png",
+      "webp": "public/art/characters/adv_caring_male/neutral.webp"
+    },
+    {
+      "id": "adv_caring_male/happy",
+      "personality": "caring",
+      "expression": "happy",
+      "reference": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-f9944840-832c-4d4c-a7a5-ad695008e05e.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-5e395ba6-46c5-45c0-b97d-2543c4529131.png",
+      "png": "artifacts/source-art/characters/adv_caring_male/happy.png",
+      "webp": "public/art/characters/adv_caring_male/happy.webp"
+    },
+    {
+      "id": "adv_proud_male/neutral",
+      "personality": "proud",
+      "expression": "neutral",
+      "reference": "artifacts/source-art/characters/kai/neutral.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-f717eab6-6c11-46bf-b9f3-398e8aad8a3a.png",
+      "png": "artifacts/source-art/characters/adv_proud_male/neutral.png",
+      "webp": "public/art/characters/adv_proud_male/neutral.webp"
+    },
+    {
+      "id": "adv_proud_male/happy",
+      "personality": "proud",
+      "expression": "happy",
+      "reference": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-f717eab6-6c11-46bf-b9f3-398e8aad8a3a.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-21263f0b-b073-484f-81be-1dd396b5868e.png",
+      "png": "artifacts/source-art/characters/adv_proud_male/happy.png",
+      "webp": "public/art/characters/adv_proud_male/happy.webp"
+    },
+    {
+      "id": "adv_timid_male/neutral",
+      "personality": "timid",
+      "expression": "neutral",
+      "reference": "artifacts/source-art/characters/adv_timid/neutral.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-127f8172-9f71-484c-ba1f-55aa992ca107.png",
+      "png": "artifacts/source-art/characters/adv_timid_male/neutral.png",
+      "webp": "public/art/characters/adv_timid_male/neutral.webp"
+    },
+    {
+      "id": "adv_timid_male/happy",
+      "personality": "timid",
+      "expression": "happy",
+      "reference": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-127f8172-9f71-484c-ba1f-55aa992ca107.png",
+      "generated": "C:/Users/takas/.codex/generated_images/01a13816-6f4c-77b2-a93f-842430ed548b/exec-a33f8b35-c1af-4b16-bc5a-7dea4cc3e4d9.png",
+      "png": "artifacts/source-art/characters/adv_timid_male/happy.png",
+      "webp": "public/art/characters/adv_timid_male/happy.webp"
+    }
+  ],
+  "currentUsage": "Use neutral only for all six characters; happy files are unused reserves. assets entries with revision_record supersede original prompts/records."
+}

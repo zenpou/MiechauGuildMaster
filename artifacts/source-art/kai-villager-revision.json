@@ -1,0 +1,85 @@
+{
+  "tool": "built-in image_gen",
+  "reason": "Replace modern-looking jacket and shirt with humble medieval fantasy villager clothes across all six expressions.",
+  "assets": [
+    {
+      "id": "kai",
+      "pose": "neutral",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png",
+      "prompt": "Use case: precise-object-edit. Edit this transparent full-body KAI sprite, replacing ONLY his modern-looking clothes with humble medieval fantasy VILLAGER clothes. Preserve exactly his recognizable spiky black hair, youthful male face, gray half-lidded sleepy eyes, mildly listless neutral expression, slim build, proportions, head position and relaxed stance. New clothing: plain warm unbleached cream LINEN TUNIC extending to upper-mid thigh, simple round collar with short V slit secured by three coarse brown lace ties, no modern shirt collar, loose sleeves rolled to elbows; narrow worn brown leather waist belt with simple small iron buckle and tiny drawstring pouch; plain muted dark olive-brown loose woven trousers tucked into soft worn brown leather mid-calf boots with simple wrap ties, thin leather soles. Rustic small-village commoner, modest and practical, no armor, no weapons, no jewelry, no cape. Remove navy modern lapel jacket, button-down dress shirt, tailored trousers and modern oxford shoes entirely. His original left hand in pocket becomes a relaxed hand loosely resting at belt/pouch, other hand hangs naturally; maintain original overall pose and proportions. Keep same clean warm anime linework, subtle cel shading and visual quality, ordinary cloth folds and restrained earthy palette. Single full body character, portrait 1:2 for 512x1024, full hair and feet visible, small transparent margins, matching original scale. Genuine transparent alpha background, no floor or cast shadow, no text, no watermark.",
+      "references": [
+        "artifacts/source-art/revisions/kai-villager/characters/kai/neutral.png"
+      ],
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "kai",
+      "pose": "happy",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-416c6e67-fe8c-4876-a7b4-0ea61610ba2e.png",
+      "prompt": "Use case: identity-preserve expression edit. Edit the supplied KAI villager neutral sprite. Change ONLY facial expression to HAPPY: a small relaxed friendly smile, subtly brighter half-lidded gray eyes, gently lifted brows. Preserve EXACT character identity, spiky black hair, face shape, cream lace-neck linen tunic, three brown lace ties, rolled sleeves, brown belt and drawstring pouch, olive-brown cloth trousers, simple soft leather boots, hand at pouch, other hand resting down, full body pose, proportions, framing, all folds, palette and clean anime cel shading. Full body portrait 1:2 for 512x1024. Genuinely transparent alpha, no ground or shadow, no text, no modern jacket or new equipment.",
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "kai",
+      "pose": "angry",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-b31f36a6-e628-4cda-9933-b7ae35ee67af.png",
+      "prompt": "Use case: identity-preserve expression edit. Edit supplied KAI villager neutral sprite. Change ONLY face to ANGRY: brows lowered and angled inward, gray eyes narrowed with mild irritation, mouth a tense small frown. Recognizable sleepy young man annoyed, not screaming. Preserve EXACT spiky black hair, face identity, cream lace-neck linen tunic with three ties, rolled sleeves, brown belt and drawstring pouch, olive-brown trousers, soft leather boots, hand positions, body pose, all folds, proportions, scale and placement, anime linework and cel shading. Full-body 1:2 portrait for 512x1024 with complete hair and feet. Genuinely transparent alpha, no backdrop or ground shadow, no text or added props. Only expression changes.",
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "kai",
+      "pose": "surprised",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-f51712c2-bd88-4cdc-a530-1afc51ad3541.png",
+      "prompt": "Use case: identity-preserve expression edit. Edit supplied KAI villager neutral sprite. Change ONLY face to SURPRISED: gray eyes widened, eyebrows raised, small open mouth with genuine startled look. Keep his recognizable youthful male face and spiky black hair. Preserve EXACT cream lace-neck linen tunic with three brown ties, rolled sleeves, waist belt and drawstring pouch, olive-brown cloth trousers, soft leather boots, same hands and full-body pose, body scale and placement, every clothing fold, proportions, anime lines and shading. Do not raise hands or change pose. Full-body 1:2 portrait for 512x1024, no clipping. Genuinely transparent alpha, no ground or shadow, no text or added props.",
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "kai",
+      "pose": "shy",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-57459a73-e55d-4a8b-a3f6-ca231967cb5b.png",
+      "prompt": "Use case: identity-preserve expression edit. Edit supplied KAI villager neutral sprite. Change ONLY face to SHY: subtle warm blush across cheeks, gray half-lidded eyes looking a little aside, slightly uneasy small closed-mouth smile and softened brows. Preserve EXACT spiky black hair and youthful male identity, face shape, cream lace-neck linen tunic with three ties, rolled sleeves, belt and pouch, olive-brown trousers, simple soft leather boots, relaxed hands and full-body pose, head/body position, scale, every fold, colors, clean anime cel shading. Do not move hands or head. Full-body 1:2 portrait intended 512x1024, hair and feet fully visible. Genuinely transparent alpha, no ground or shadow, no text, no new equipment.",
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "kai",
+      "pose": "sleep",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-76239f1c-bd49-4112-828a-4b2ad190cba0.png",
+      "prompt": "Use case: identity-preserve expression edit. Edit supplied KAI villager neutral sprite. Change ONLY face to SLEEP: both eyes fully closed in relaxed downward arcs, brows relaxed, mouth slightly half-open as he dozes while standing. No snoring letters or symbols. Preserve EXACT spiky black hair, youthful male face identity, cream lace-neck linen tunic with three brown ties, rolled sleeves, waist belt and drawstring pouch, olive-brown cloth trousers, soft leather boots, relaxed hand positions, full-body standing pose, body scale, head angle and placement, clothing folds, colors, clean anime cel shading. He remains upright in same pose, only eyes and mouth change. Full-body 1:2 portrait intended 512x1024, hair and feet visible. Genuinely transparent alpha, no ground or shadow, no text, no extra props.",
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "size": [
+        512,
+        1024
+      ]
+    }
+  ],
+  "scope": "Asset revision only; game integration unchanged."
+}

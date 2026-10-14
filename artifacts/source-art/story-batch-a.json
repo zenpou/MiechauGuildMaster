@@ -1,0 +1,435 @@
+{
+  "batch": "story-batch-a",
+  "source": "docs/art/STORY-ASSETS.md",
+  "shared": {
+    "styleReference": "artifacts/characters/tina.png",
+    "canvas": "512x1024",
+    "background": "transparent",
+    "constraints": [
+      "full body",
+      "head near top",
+      "feet visible",
+      "no text",
+      "no watermark",
+      "no floor shadow"
+    ],
+    "tool": "built-in image_gen",
+    "promptRecord": "asset prompt fields are concise normalized summaries; each was sent to built-in image_gen with the shared constraints above and the per-asset expression variation"
+  },
+  "assets": [
+    {
+      "id": "kai",
+      "pose": "neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png",
+      "source": "artifacts/source-art/characters/kai/neutral.png",
+      "distribution": "public/art/characters/kai/neutral.webp",
+      "prompt": "Use case: precise-object-edit. Edit this transparent full-body KAI sprite, replacing ONLY his modern-looking clothes with humble medieval fantasy VILLAGER clothes. Preserve exactly his recognizable spiky black hair, youthful male face, gray half-lidded sleepy eyes, mildly listless neutral expression, slim build, proportions, head position and relaxed stance. New clothing: plain warm unbleached cream LINEN TUNIC extending to upper-mid thigh, simple round collar with short V slit secured by three coarse brown lace ties, no modern shirt collar, loose sleeves rolled to elbows; narrow worn brown leather waist belt with simple small iron buckle and tiny drawstring pouch; plain muted dark olive-brown loose woven trousers tucked into soft worn brown leather mid-calf boots with simple wrap ties, thin leather soles. Rustic small-village commoner, modest and practical, no armor, no weapons, no jewelry, no cape. Remove navy modern lapel jacket, button-down dress shirt, tailored trousers and modern oxford shoes entirely. His original left hand in pocket becomes a relaxed hand loosely resting at belt/pouch, other hand hangs naturally; maintain original overall pose and proportions. Keep same clean warm anime linework, subtle cel shading and visual quality, ordinary cloth folds and restrained earthy palette. Single full body character, portrait 1:2 for 512x1024, full hair and feet visible, small transparent margins, matching original scale. Genuine transparent alpha background, no floor or cast shadow, no text, no watermark.",
+      "status": "generated",
+      "history": [
+        {
+          "id": "kai",
+          "pose": "neutral",
+          "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-51ab7a7d-0ee9-4bd3-a111-ee7d62c3c3af.png",
+          "source": "artifacts/source-art/characters/kai/neutral.png",
+          "distribution": "public/art/characters/kai/neutral.webp",
+          "prompt": "Kai neutral full-body standing sprite; preserve Kai design from artifacts/characters/kai.png and turnaround; shared Tina style; transparent background; 512x1024 framing; mildly languid half-lidded eyes; no floor shadow, text, watermark, props, or cropped feet.",
+          "status": "generated"
+        }
+      ],
+      "references": [
+        "artifacts/source-art/revisions/kai-villager/characters/kai/neutral.png"
+      ],
+      "revision_record": "artifacts/source-art/kai-villager-revision.json"
+    },
+    {
+      "id": "kai",
+      "pose": "happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-416c6e67-fe8c-4876-a7b4-0ea61610ba2e.png",
+      "source": "artifacts/source-art/characters/kai/happy.png",
+      "distribution": "public/art/characters/kai/happy.webp",
+      "prompt": "Use case: identity-preserve expression edit. Edit the supplied KAI villager neutral sprite. Change ONLY facial expression to HAPPY: a small relaxed friendly smile, subtly brighter half-lidded gray eyes, gently lifted brows. Preserve EXACT character identity, spiky black hair, face shape, cream lace-neck linen tunic, three brown lace ties, rolled sleeves, brown belt and drawstring pouch, olive-brown cloth trousers, simple soft leather boots, hand at pouch, other hand resting down, full body pose, proportions, framing, all folds, palette and clean anime cel shading. Full body portrait 1:2 for 512x1024. Genuinely transparent alpha, no ground or shadow, no text, no modern jacket or new equipment.",
+      "status": "generated",
+      "history": [
+        {
+          "id": "kai",
+          "pose": "happy",
+          "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-3d754564-2cb7-4bf6-8c6e-a9f1b03cfdfe.png",
+          "source": "artifacts/source-art/characters/kai/happy.png",
+          "distribution": "public/art/characters/kai/happy.webp",
+          "prompt": "Edit Kai neutral base: change only face to warm restrained happy smile with gently lifted eyebrows and brighter eyes; preserve exact identity, pose, clothing, placement, transparency, and full-body framing.",
+          "status": "generated"
+        }
+      ],
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "revision_record": "artifacts/source-art/kai-villager-revision.json"
+    },
+    {
+      "id": "kai",
+      "pose": "angry",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-b31f36a6-e628-4cda-9933-b7ae35ee67af.png",
+      "source": "artifacts/source-art/characters/kai/angry.png",
+      "distribution": "public/art/characters/kai/angry.webp",
+      "prompt": "Use case: identity-preserve expression edit. Edit supplied KAI villager neutral sprite. Change ONLY face to ANGRY: brows lowered and angled inward, gray eyes narrowed with mild irritation, mouth a tense small frown. Recognizable sleepy young man annoyed, not screaming. Preserve EXACT spiky black hair, face identity, cream lace-neck linen tunic with three ties, rolled sleeves, brown belt and drawstring pouch, olive-brown trousers, soft leather boots, hand positions, body pose, all folds, proportions, scale and placement, anime linework and cel shading. Full-body 1:2 portrait for 512x1024 with complete hair and feet. Genuinely transparent alpha, no backdrop or ground shadow, no text or added props. Only expression changes.",
+      "status": "generated",
+      "history": [
+        {
+          "id": "kai",
+          "pose": "angry",
+          "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-51a5c10f-35b9-4d03-b75c-9f409d6400dd.png",
+          "source": "artifacts/source-art/characters/kai/angry.png",
+          "distribution": "public/art/characters/kai/angry.webp",
+          "prompt": "Edit Kai neutral base: restrained anger with brows down, narrowed half-lidded eyes, firm mouth; preserve all non-face details and transparent full-body framing.",
+          "status": "generated"
+        }
+      ],
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "revision_record": "artifacts/source-art/kai-villager-revision.json"
+    },
+    {
+      "id": "kai",
+      "pose": "surprised",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-f51712c2-bd88-4cdc-a530-1afc51ad3541.png",
+      "source": "artifacts/source-art/characters/kai/surprised.png",
+      "distribution": "public/art/characters/kai/surprised.webp",
+      "prompt": "Use case: identity-preserve expression edit. Edit supplied KAI villager neutral sprite. Change ONLY face to SURPRISED: gray eyes widened, eyebrows raised, small open mouth with genuine startled look. Keep his recognizable youthful male face and spiky black hair. Preserve EXACT cream lace-neck linen tunic with three brown ties, rolled sleeves, waist belt and drawstring pouch, olive-brown cloth trousers, soft leather boots, same hands and full-body pose, body scale and placement, every clothing fold, proportions, anime lines and shading. Do not raise hands or change pose. Full-body 1:2 portrait for 512x1024, no clipping. Genuinely transparent alpha, no ground or shadow, no text or added props.",
+      "status": "generated",
+      "history": [
+        {
+          "id": "kai",
+          "pose": "surprised",
+          "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-c085d1a7-ed4f-4b56-a2c1-a6e7dc0db119.png",
+          "source": "artifacts/source-art/characters/kai/surprised.png",
+          "distribution": "public/art/characters/kai/surprised.webp",
+          "prompt": "Edit Kai neutral base: clear surprise with wide eyes, raised eyebrows, small open mouth; preserve all non-face details and transparent full-body framing.",
+          "status": "generated"
+        }
+      ],
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "revision_record": "artifacts/source-art/kai-villager-revision.json"
+    },
+    {
+      "id": "kai",
+      "pose": "shy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-57459a73-e55d-4a8b-a3f6-ca231967cb5b.png",
+      "source": "artifacts/source-art/characters/kai/shy.png",
+      "distribution": "public/art/characters/kai/shy.webp",
+      "prompt": "Use case: identity-preserve expression edit. Edit supplied KAI villager neutral sprite. Change ONLY face to SHY: subtle warm blush across cheeks, gray half-lidded eyes looking a little aside, slightly uneasy small closed-mouth smile and softened brows. Preserve EXACT spiky black hair and youthful male identity, face shape, cream lace-neck linen tunic with three ties, rolled sleeves, belt and pouch, olive-brown trousers, simple soft leather boots, relaxed hands and full-body pose, head/body position, scale, every fold, colors, clean anime cel shading. Do not move hands or head. Full-body 1:2 portrait intended 512x1024, hair and feet fully visible. Genuinely transparent alpha, no ground or shadow, no text, no new equipment.",
+      "status": "generated",
+      "history": [
+        {
+          "id": "kai",
+          "pose": "shy",
+          "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-2fbc0382-5475-4d52-ac12-d496f18df8ad.png",
+          "source": "artifacts/source-art/characters/kai/shy.png",
+          "distribution": "public/art/characters/kai/shy.webp",
+          "prompt": "Edit Kai neutral base: shy embarrassment with cheek blush, eyes glancing aside, hesitant mouth; preserve all non-face details and transparent full-body framing.",
+          "status": "generated"
+        }
+      ],
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "revision_record": "artifacts/source-art/kai-villager-revision.json"
+    },
+    {
+      "id": "kai",
+      "pose": "sleep",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-76239f1c-bd49-4112-828a-4b2ad190cba0.png",
+      "source": "artifacts/source-art/characters/kai/sleep.png",
+      "distribution": "public/art/characters/kai/sleep.webp",
+      "prompt": "Use case: identity-preserve expression edit. Edit supplied KAI villager neutral sprite. Change ONLY face to SLEEP: both eyes fully closed in relaxed downward arcs, brows relaxed, mouth slightly half-open as he dozes while standing. No snoring letters or symbols. Preserve EXACT spiky black hair, youthful male face identity, cream lace-neck linen tunic with three brown ties, rolled sleeves, waist belt and drawstring pouch, olive-brown cloth trousers, soft leather boots, relaxed hand positions, full-body standing pose, body scale, head angle and placement, clothing folds, colors, clean anime cel shading. He remains upright in same pose, only eyes and mouth change. Full-body 1:2 portrait intended 512x1024, hair and feet visible. Genuinely transparent alpha, no ground or shadow, no text, no extra props.",
+      "status": "generated",
+      "history": [
+        {
+          "id": "kai",
+          "pose": "sleep",
+          "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-a28fe00f-0d9e-4c02-8e3c-5abdf8ad1c54.png",
+          "source": "artifacts/source-art/characters/kai/sleep.png",
+          "distribution": "public/art/characters/kai/sleep.webp",
+          "prompt": "Edit Kai neutral base: standing asleep with fully closed eyes and tiny relaxed half-open mouth; preserve all non-face details and transparent full-body framing.",
+          "status": "generated"
+        }
+      ],
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-de601807-8a33-49b4-99a4-5be1ec68d265.png"
+      ],
+      "revision_record": "artifacts/source-art/kai-villager-revision.json"
+    },
+    {
+      "id": "tina",
+      "pose": "neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-8e738f38-fb59-4a22-ab3d-1c02883085c4.png",
+      "source": "artifacts/source-art/characters/tina/neutral.png",
+      "distribution": "public/art/characters/tina/neutral.webp",
+      "prompt": "Tina neutral full-body standing sprite from tina.png and turnaround; preserve red high ponytail, amber eyes, cheek bandage, gray armor, green scarf, red-and-cream tunic, brown shorts, leggings, wrapped boots, and sword; shared Tina style; transparent 512x1024 framing; no shadow/text/watermark.",
+      "status": "generated"
+    },
+    {
+      "id": "tina",
+      "pose": "happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-952bde38-8d6d-4afa-96f9-e92892ac5cb5.png",
+      "source": "artifacts/source-art/characters/tina/happy.png",
+      "distribution": "public/art/characters/tina/happy.webp",
+      "prompt": "Edit Tina neutral base: bright happy confidence with open cheerful smile, lively eyes, raised brows; preserve all non-face details and transparent full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "tina",
+      "pose": "angry",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-52537569-dcf9-49be-aae3-6e01fa46099a.png",
+      "source": "artifacts/source-art/characters/tina/angry.png",
+      "distribution": "public/art/characters/tina/angry.webp",
+      "prompt": "Edit Tina neutral base: determined anger with sharply lowered brows, focused eyes, firm mouth; preserve all non-face details and transparent full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "tina",
+      "pose": "surprised",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-4cf2df5f-7871-40ee-8609-a8c9edd2e4a4.png",
+      "source": "artifacts/source-art/characters/tina/surprised.png",
+      "distribution": "public/art/characters/tina/surprised.webp",
+      "prompt": "Edit Tina neutral base: clear surprise with wide eyes, raised brows, small open mouth; preserve all non-face details and transparent full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "tina",
+      "pose": "shy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-87ca9613-03f7-4c12-a8a1-1daf729d1bf8.png",
+      "source": "artifacts/source-art/characters/tina/shy.png",
+      "distribution": "public/art/characters/tina/shy.webp",
+      "prompt": "Edit Tina neutral base: shy with warm cheek blush, eyes glancing aside, hesitant little mouth; preserve all non-face details and transparent full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "tina",
+      "pose": "sulky",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-bad3225c-f139-402d-8d14-f3fbcd246270.png",
+      "source": "artifacts/source-art/characters/tina/sulky.png",
+      "distribution": "public/art/characters/tina/sulky.webp",
+      "prompt": "Edit Tina neutral base: puffed cheeks, sideways glance, cute restrained pout; preserve all non-face details and transparent full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "iris",
+      "pose": "neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-5a132e6d-00d4-4509-9b8e-1aace3d22c90.png",
+      "source": "artifacts/source-art/characters/iris/neutral.png",
+      "distribution": "public/art/characters/iris/neutral.webp",
+      "prompt": "Iris neutral full-body standing sprite using mandatory iris-coat.png and iris-coat turnaround; preserve white hair, purple ribbon and eyes, purple/navy dress, brown father's coat worn in every pose; shared Tina style; transparent 512x1024 framing; no shadow/text/watermark.",
+      "status": "generated"
+    },
+    {
+      "id": "iris",
+      "pose": "happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-30322d41-8228-40e7-a349-65071270b4ba.png",
+      "source": "artifacts/source-art/characters/iris/happy.png",
+      "distribution": "public/art/characters/iris/happy.webp",
+      "prompt": "Edit Iris coat-wearing neutral base: subtle happy expression with barely lifted mouth corners and soft warm eyes; preserve all non-face details and coat.",
+      "status": "generated"
+    },
+    {
+      "id": "iris",
+      "pose": "angry",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-3ff91c8d-a9e2-453f-a29e-f67c111aa010.png",
+      "source": "artifacts/source-art/characters/iris/angry.png",
+      "distribution": "public/art/characters/iris/angry.webp",
+      "prompt": "Edit Iris coat-wearing neutral base: very restrained anger, nearly expressionless face with quiet intense eyes and slightly lowered brows; preserve all non-face details and coat.",
+      "status": "generated"
+    },
+    {
+      "id": "iris",
+      "pose": "surprised",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-b6f0b146-793c-4238-9efd-16893b386826.png",
+      "source": "artifacts/source-art/characters/iris/surprised.png",
+      "distribution": "public/art/characters/iris/surprised.webp",
+      "prompt": "Edit Iris coat-wearing neutral base: controlled surprise with slightly widened eyes, raised brows, tiny open mouth; preserve all non-face details and coat.",
+      "status": "generated"
+    },
+    {
+      "id": "iris",
+      "pose": "shy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-f7d190af-2053-4fb4-a75c-80ff8232aa92.png",
+      "source": "artifacts/source-art/characters/iris/shy.png",
+      "distribution": "public/art/characters/iris/shy.webp",
+      "prompt": "Edit Iris coat-wearing neutral base: delicate blush, eyes looking aside, tiny hesitant smile; preserve all non-face details and coat.",
+      "status": "generated"
+    },
+    {
+      "id": "iris",
+      "pose": "dizzy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-2474d1d9-a1db-4deb-bcd0-342cfa06b27e.png",
+      "source": "artifacts/source-art/characters/iris/dizzy.png",
+      "distribution": "public/art/characters/iris/dizzy.webp",
+      "prompt": "Edit Iris coat-wearing neutral base: narrowed unfocused eyes, flushed cheeks, one hand touching forehead and slight unsteady lean; preserve coat, identity, transparency, and full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "noel",
+      "pose": "neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-dc24d487-903f-42da-8990-f1acfaf1c81f.png",
+      "source": "artifacts/source-art/characters/noel/neutral.png",
+      "distribution": "public/art/characters/noel/neutral.webp",
+      "prompt": "Noel neutral full-body sprite from noel.png and turnaround; preserve glasses, green eyes, side braid, navy vest, cream apron, brown boots, and ledger hugged to chest; shared Tina style; transparent 512x1024; no shadow/text/watermark.",
+      "status": "generated"
+    },
+    {
+      "id": "noel",
+      "pose": "happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-ea0c15e2-afea-408e-b873-cc37d20f337a.png",
+      "source": "artifacts/source-art/characters/noel/happy.png",
+      "distribution": "public/art/characters/noel/happy.webp",
+      "prompt": "Edit Noel neutral base: warm modest happy smile and kind bright eyes; preserve ledger, glasses, braid, clothing, pose and transparency.",
+      "status": "generated"
+    },
+    {
+      "id": "noel",
+      "pose": "angry",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-78698b97-652d-4687-b359-f83c6a8f3684.png",
+      "source": "artifacts/source-art/characters/noel/angry.png",
+      "distribution": "public/art/characters/noel/angry.webp",
+      "prompt": "Edit Noel neutral base: mild restrained anger with lowered brows, focused eyes and firm mouth; preserve ledger, glasses, braid, clothing, pose and transparency.",
+      "status": "generated"
+    },
+    {
+      "id": "noel",
+      "pose": "surprised",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-9633fecf-98ea-4868-a09f-cbf8cd8eceb6.png",
+      "source": "artifacts/source-art/characters/noel/surprised.png",
+      "distribution": "public/art/characters/noel/surprised.webp",
+      "prompt": "Edit Noel neutral base: wide-eyed surprise, raised brows, small open mouth and glasses kicked slightly crooked; preserve ledger, clothing, pose and transparency.",
+      "status": "generated"
+    },
+    {
+      "id": "noel",
+      "pose": "shy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-cc50f614-a82a-4ff9-b32c-80e63a274ab3.png",
+      "source": "artifacts/source-art/characters/noel/shy.png",
+      "distribution": "public/art/characters/noel/shy.webp",
+      "prompt": "Edit Noel neutral base: shy blush, eyes glancing down and aside, bashful smile; preserve ledger, glasses, braid, clothing, pose and transparency.",
+      "status": "generated"
+    },
+    {
+      "id": "noel",
+      "pose": "worried",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-3438db13-05a1-49a6-9e7f-ff301bb175de.png",
+      "source": "artifacts/source-art/characters/noel/worried.png",
+      "distribution": "public/art/characters/noel/worried.webp",
+      "prompt": "Edit Noel neutral base: worried brows sloping upward toward center, anxious eyes and tense small mouth; preserve ledger, glasses, braid, clothing, pose and transparency.",
+      "status": "generated"
+    },
+    {
+      "id": "sera",
+      "pose": "neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-331a8906-90dd-43ec-ab35-e4c2e16cc801.png",
+      "source": "artifacts/source-art/characters/sera/neutral.png",
+      "distribution": "public/art/characters/sera/neutral.webp",
+      "prompt": "Sera neutral full-body sprite from sera.png and turnaround; preserve short pink braided hair, white bow, brown eyes, white-and-gold cleric robe, dark tights and boots; shared Tina style; transparent 512x1024; no shadow/text/watermark.",
+      "status": "generated"
+    },
+    {
+      "id": "sera",
+      "pose": "happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-5bb91e17-e3a4-4af7-af77-5828a5665a4b.png",
+      "source": "artifacts/source-art/characters/sera/happy.png",
+      "distribution": "public/art/characters/sera/happy.webp",
+      "prompt": "Edit Sera neutral base: gentle happy smile and warm bright eyes; preserve robe, bow, pose, transparency and full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "sera",
+      "pose": "angry",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-4d6286b5-9a1a-45db-a067-ed35b44a31f2.png",
+      "source": "artifacts/source-art/characters/sera/angry.png",
+      "distribution": "public/art/characters/sera/angry.webp",
+      "prompt": "Edit Sera neutral base: very weak restrained anger with slight brow tension and serious eyes; preserve robe, bow, pose, transparency and full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "sera",
+      "pose": "surprised",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-6bc36c63-7bd6-434c-9555-7d1198c4467a.png",
+      "source": "artifacts/source-art/characters/sera/surprised.png",
+      "distribution": "public/art/characters/sera/surprised.webp",
+      "prompt": "Edit Sera neutral base: mild surprise with widened eyes, raised brows and tiny open mouth; preserve robe, bow, pose, transparency and full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "sera",
+      "pose": "shy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-e5dab1f2-03e6-4778-b492-133525020ab4.png",
+      "source": "artifacts/source-art/characters/sera/shy.png",
+      "distribution": "public/art/characters/sera/shy.webp",
+      "prompt": "Edit Sera neutral base: shy blush, eyes glancing aside and small embarrassed smile; preserve robe, bow, pose, transparency and full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "sera",
+      "pose": "teary",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-a5462b72-b8b6-49b7-bf01-06cd5c2e9531.png",
+      "source": "artifacts/source-art/characters/sera/teary.png",
+      "distribution": "public/art/characters/sera/teary.webp",
+      "prompt": "Edit Sera neutral base: large tears rolling down both cheeks, trembling lips and tiny quiver; preserve robe, bow, pose, transparency and full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "gald",
+      "pose": "neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-b057958d-edec-48ab-bc00-1585e44f1968.png",
+      "source": "artifacts/source-art/characters/gald/neutral.png",
+      "distribution": "public/art/characters/gald/neutral.webp",
+      "prompt": "Gald neutral full-body sprite from gald.png and turnaround; preserve muscular bearded man, spiky brown hair, brown long coat with cream lapels, black shirt, brown trousers and boots; calm closed-mouth expression; shared Tina style; transparent 512x1024; no shadow/text/watermark.",
+      "status": "generated"
+    },
+    {
+      "id": "gald",
+      "pose": "happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-e4a21d78-22ba-493f-83a4-e995a3a868f6.png",
+      "source": "artifacts/source-art/characters/gald/happy.png",
+      "distribution": "public/art/characters/gald/happy.webp",
+      "prompt": "Edit Gald neutral base: huge hearty laugh with broad open toothy grin and joyful eyes; preserve coat, body, pose, transparency and full-body framing.",
+      "status": "generated"
+    },
+    {
+      "id": "viola",
+      "pose": "scout_neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-ff452e97-31a5-4a5f-ac71-2aeda7234dfd.png",
+      "source": "artifacts/source-art/characters/viola/scout_neutral.png",
+      "distribution": "public/art/characters/viola/scout_neutral.webp",
+      "prompt": "Viola scout_neutral full-body sprite from viola identity/turnaround; long navy hair and blue eyes; ill-fitting lightweight scout armor, tight shoulders, loose belt slack, short dagger, no shield or plate armor; shared Tina style; transparent 512x1024; no shadow/text/watermark.",
+      "status": "generated"
+    },
+    {
+      "id": "viola",
+      "pose": "scout_happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-5baffaff-b170-40a1-abee-f33480381653.png",
+      "source": "artifacts/source-art/characters/viola/scout_happy.png",
+      "distribution": "public/art/characters/viola/scout_happy.webp",
+      "prompt": "Edit Viola scout_neutral base: bright happy smile and lively confident eyes; preserve scout outfit, loose belt slack, dagger, pose and transparency.",
+      "status": "generated"
+    },
+    {
+      "id": "viola",
+      "pose": "scout_angry",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-7aa69f10-19b2-4e35-9220-cd9e4e6c5f5c.png",
+      "source": "artifacts/source-art/characters/viola/scout_angry.png",
+      "distribution": "public/art/characters/viola/scout_angry.webp",
+      "prompt": "Edit Viola scout_neutral base: restrained anger with lowered brows and focused blue eyes; preserve scout outfit, loose belt slack, dagger, pose and transparency.",
+      "status": "generated"
+    },
+    {
+      "id": "viola",
+      "pose": "scout_flustered",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b8-dfbc-7cd2-b1d2-e401c019cd61/exec-00951ddd-db10-4a28-b85b-af25a46c8824.png",
+      "source": "artifacts/source-art/characters/viola/scout_flustered.png",
+      "distribution": "public/art/characters/viola/scout_flustered.webp",
+      "prompt": "Edit Viola scout_neutral base: cool facade breaking into flustered startled face with blush and wide uneasy eyes; preserve scout outfit, loose belt slack, dagger, pose and transparency.",
+      "status": "generated"
+    }
+  ]
+}

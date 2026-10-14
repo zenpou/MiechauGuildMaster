@@ -1,0 +1,15 @@
+{
+  "character": "ガルド",
+  "input_paths": [
+    "artifacts/characters/gald.png"
+  ],
+  "tool": "built-in image_gen",
+  "output": "artifacts/characters/turnarounds/gald-turnaround-v1.png",
+  "views": "左から FRONT 0度、SIDE 真横90度で顔は画面右、BACK 180度。3体のみ、同じ身長スケールと頭頂・足底ライン、自然に腕を下ろした中立立ち姿。",
+  "design_constraints": "50歳前後の筋骨隆々な男性、短い茶髪、茶髭、茶色の大襟ロングコート、金ボタン、暗色シャツ、茶パンツ、大きなブーツ。",
+  "back_view_completion_note": "コートの背面、襟、袖口、金ボタンの位置、髭と短髪の後面だけを合理的に補完。新装飾・武器追加なし。",
+  "prompt": "Use the single input image only as the exact adopted character design and style reference. Create ONE wide horizontal character turnaround sheet containing exactly three full-body views of the same person, arranged left to right: FRONT, SIDE, BACK. Put a small unobtrusive English label FRONT, SIDE, BACK beneath each view; no other text. This is a strict orthographic design sheet, not a scene.\nAll three figures must have identical height scale, identical head-top and sole baseline, the same neutral standing pose with arms naturally slightly away from the body, and generous margin around every figure. Front is exactly 0 degrees, side is exactly 90 degrees in profile with the face looking toward screen right, back is exactly 180 degrees. No 3/4 angle, no perspective, no dramatic lighting, no large cast shadow, no extra character, no duplicate limbs. Preserve the adopted design's exact face, head shape, hair color, hairstyle, eye color, clothing, palette, equipment and proportions. Use the established Tina-style bold dark outline, large simple color areas, hard 2-3 step cel shading, warm ivory/white flat background. Keep long hair at its adopted length and let it fall naturally down the back. For asymmetrical equipment, keep it attached to the same character side and rotate it correctly in side/back views. Do not invent new decorations or weapons; only make minimal logical hidden/back-surface completion where necessary.\nCharacter: Gald from the adopted image. Preserve the mature man around 50: very muscular broad build, short brown hair, full brown beard, strong friendly face and large hearty smile in front view, brown long coat with broad light lapels and large gold buttons, dark shirt, brown trousers and large brown boots. Keep coat hem, lapels, cuffs and gold buttons consistent across front, exact side, and back. Do not make him young or slim. No armor, weapon, cape or extra decoration.",
+  "requested_side_facing": "right",
+  "observed_side_facing": "right",
+  "side_facing_note": "要求どおり、SIDEの横顔は画面右向きとして生成・確認。"
+}

@@ -1,0 +1,76 @@
+{
+  "tool": "built-in image_gen",
+  "assets": [
+    {
+      "id": "bg_guild_office_sunset",
+      "category": "backgrounds",
+      "prompt": "Use case: lighting-weather. Asset type: Japanese fantasy adventure visual novel background, 1536x1024 landscape 3:2. Edit the reference guild office DAY into SUNSET. Preserve the exact composition, perspective, architectural details, central wooden desk with piles of documents, map and two green banners, left bookcase, green sofa beneath right window, rug, and every furniture placement. Change only time of day: low orange sunlight enters from right arched window, casts long warm shadows across floor and desk, peaceful evening amber and russet atmosphere. Same polished hand-painted anime game background, rich detailed wood and soft painterly light. Empty room, no people, no text labels, no watermarks. Maintain clear central framing compatible with narrow mobile center crop.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a137b7-afea-7602-833e-adcfe0cfb6c7\\exec-9185fc0e-f92e-4c7a-ace0-711fcccf541f.png",
+      "reference": "artifacts/source-art/backgrounds/guild-office-day-v1.png"
+    },
+    {
+      "id": "bg_dungeon_mine",
+      "category": "backgrounds",
+      "prompt": "Use case: illustration-story. Asset type: 1536x1024 landscape 3:2 environment background for Japanese fantasy guild visual novel. An old abandoned mine tunnel with damp dark stone, heavy ancient timber supports, torchlight in iron brackets, scattered collapsed rocks and a partly collapsed side passage. Eye-level viewpoint looking into depth along a traversable central path; important mine supports, passage and collapse are concentrated around central third so scene still reads on narrow smartphone center crop. Polished richly detailed hand-painted anime JRPG background, warm amber torches contrasting cool desaturated slate rock, confident ink-like edge definition and painterly textures. Abandoned but believable medieval mining setting; quiet tense discovery, no horror. No people, no creatures, no dragon, no readable text, no interface, no watermark.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a137b7-afea-7602-833e-adcfe0cfb6c7\\exec-18903811-3228-47d0-8f47-5580c76dfc6b.png",
+      "reference": null
+    },
+    {
+      "id": "bg_dungeon_crystal",
+      "category": "backgrounds",
+      "prompt": "Use case: illustration-story. Asset type: fantasy visual novel background 1536x1024 landscape 3:2. Deep inside an ancient abandoned mine, a recent collapse has revealed a breathtaking enormous crystal vein. Huge translucent crystals growing from ceiling and floor glow with their own faint pale-blue and violet light, bathing the entire underground cavern in blue-green turquoise. Rough wet stone, broken timber supports at the entrance, small collapsed boulders, a clear central rocky path opens onto the luminous crystalline chamber. Eye-level perspective, strong depth, main crystal discovery placed in central third so narrow mobile center crop retains scene identity. Polished detailed hand-painted Japanese anime JRPG background, elegant painterly textures, jewel-like lighting, readable shapes, mysterious wonder rather than sci-fi. Empty location: no humans, creatures, dragons, labels, writing, interface or watermark.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a137b7-afea-7602-833e-adcfe0cfb6c7\\exec-19d2dcc5-3cfc-4d26-865a-4d1a1b5b76ee.png",
+      "reference": null
+    },
+    {
+      "id": "bg_dungeon_dragon",
+      "category": "backgrounds",
+      "prompt": "Use case: illustration-story. Asset type: Japanese fantasy visual novel environment background, landscape 1536x1024 3:2. A fire dragon's lair inside a volcanic crater: red-black jagged rock walls, glowing molten magma emerging through cracks, a massive ancient weathered stone altar in the middle, heat-haze in air, orange-red light beneath black basalt and smoky high ceiling. Clear central stone approach leading to the altar, main focal altar centered and visible even on a narrow smartphone center crop; foreground clear enough for overlaid character sprites. Polished detailed hand-painted anime JRPG background, readable silhouettes and convincing perspective, restrained epic solemn mood, no photorealistic photo. Absolutely NO DRAGON and no people/creatures in this background. No writing, labels, user interface, symbols resembling text, or watermark.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a137b7-afea-7602-833e-adcfe0cfb6c7\\exec-813876ca-a024-410e-b51e-7194a3db5aea.png",
+      "reference": null
+    },
+    {
+      "id": "prologue",
+      "category": "stills",
+      "prompt": "Use case: precise-object-edit. Edit the supplied prologue illustration into an EMPTY BACKGROUND PLATE for a fantasy visual novel. Remove BOTH people completely: the black-haired man on the left and the red-haired armored woman on the right, including all clothing, equipment and character cast shadows. Also remove every curved white motion streak, airborne dust cloud and flying particle associated with their action. Reconstruct the obscured wooden gate, stone street, town buildings and distant castle naturally. Preserve the same open massive wooden family-house gate on the left, cobbled foreground, medieval street and castle in distance, cheerful morning blue sky, warm lighting and polished painted anime background style. Keep the existing landscape framing and perspective, 1536x1024. Foreground must be calm and unobstructed, suitable for separately overlaid character sprites and animated effects. No people, no animals, no silhouettes, no action effects, no text, no UI, no watermark. The result is ONLY the original setting without characters.",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-86a940a9-d1aa-47f4-8b84-82f3c3281f01.png",
+      "references": [
+        "artifacts/source-art/revisions/prologue-before-background-only.png"
+      ],
+      "revision_record": "artifacts/source-art/prologue-background-revision.json",
+      "history": [
+        {
+          "id": "prologue",
+          "category": "stills",
+          "prompt": "Use case: illustration-story. Asset type: prologue chapter-opening still for Japanese comedic fantasy visual novel, landscape 1536x1024 3:2. Use reference 1 Kai and reference 2 Tina for exact character identity, outfit, hair and visual style. Scene: at his family home's large wooden gate onto a medieval town road in morning light, Kai is comically being kicked out from the gate and tumbling head-over-heels in mid-air just outside it; his knees and elbows loose in a readable cartwheel-like tumble, a broad curved dust-motion arc makes the rotation clear. He has spiky black hair, half-lidded dark eyes now mildly startled, navy short jacket cream shirt brown trousers and shoes as reference. Tina stands firmly on the road beside his landing area, looking down at him with unimpressed affectionate exasperation, hand on hip. Tina red high ponytail, amber eyes, cheek bandage, green scarf, gray-gold armor, reddish tunic brown shorts black leggings brown boots and sheathed sword exactly as reference. Only these two named characters visible; the kick is implied by open gate and trajectory. Wide dynamic composition, both full figures readable in small chapter thumbnail. Bold clean anime lines, simple confident cel shading, warm light, expressive comedy, tasteful fully clothed non-graphic slapstick. No letters, captions, speech bubbles, labels, UI, watermarks. Do not depict a posed character sheet.",
+          "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a137b7-afea-7602-833e-adcfe0cfb6c7\\exec-3a5e5b3c-27c6-4808-95ce-943795158cab.png",
+          "references": [
+            "artifacts/characters/kai.png",
+            "artifacts/characters/tina.png"
+          ]
+        },
+        {
+          "id": "prologue",
+          "category": "stills",
+          "prompt": "Use case: precise-object-edit. Edit target: image 1, existing prologue still. Supporting character identity reference: image 2, Kai. Correct ONLY Kai's broken anatomy on the left. Keep Tina on the right, her exact face/outfit/pose, gate, street, castle, lighting, framing and clean anime rendering unchanged. The current Kai has an impossible neck/head orientation and confused shoulders. Redraw his entire pose as ONE anatomically coherent young man tumbling forward out of the gate, seen in clear SIDE / three-quarter SIDE profile, curled naturally into a loose forward somersault. Head at lower-right of his silhouette, pelvis upper-left; spine gently curved, head follows torso orientation with short natural neck, chin slightly tucked toward chest. His facial orientation must rotate with his body rather than remain upright. Show exactly two arms attached to their appropriate shoulders and two legs attached to one pelvis, with ordinary elbows and knees bending in natural directions; clearly separate limb silhouettes and simple readable foreshortening. Knees loosely bent toward belly, one a little more open; arms reaching downward/forward from shoulders, five fingers per hand. Preserve Kai's recognizable black spiky hair, startled comic face, navy short jacket over cream button shirt, brown trousers and brown lace-up shoes from reference 2, normal proportions. He is airborne, humorously kicked out, no one kicking visible, retain curved dust motion arc and non-graphic comedy. Do not retain the malformed upright face attached to inverted torso. No extra limbs, no disconnected shoulders, no twisted neck or waist, no added objects or text. Output 1536x1024 landscape.",
+          "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-73a3e8a6-d148-4a2c-a5b8-0b44a436c0ff.png",
+          "references": [
+            "artifacts/source-art/revisions/prologue-before-anatomy-fix.png",
+            "artifacts/characters/kai.png"
+          ],
+          "revision_record": "artifacts/source-art/prologue-anatomy-revision.json"
+        }
+      ]
+    },
+    {
+      "id": "dragon",
+      "category": "stills",
+      "prompt": "Use case: illustration-story. Asset type: final battle climactic still for Japanese fantasy visual novel, 1536x1024 landscape 3:2. Reference image 1 establishes the EXACT fire dragon design: crimson and near-black scales, flame-orange accents and wing membranes, pale gold chest scales, swept backward layered horns/mane and gold dragon eyes. Reference image 2 establishes the volcanic altar location, red-black basalt, ancient monumental altar and glowing magma cracks. Compose a new cinematic wide battle scene at this altar: a party of exactly FOUR small anonymous adventurers coordinating the final decisive blow against that huge fire dragon. Dragon recoils at a bright concentrated white-gold weapon impact, dramatic diagonal action and sparks, triumphant non-graphic fantasy combat, no blood/gore. Party seen from rear or three-quarter rear; ordinary silhouettes with sword, shield, staff and bow, neutral brown/gray practical equipment. Their faces remain tiny, no recognizable named heroine, no close-up or prominent individual character. Show all four fighters distinct and countable, foreground and middle distance around dragon. Strong epic composition readable as small chapter thumbnail, central action, polished anime illustration with clean confident outlines, cel shading on figures and painterly warm volcanic background matching references. No text, UI, captions, labels or watermarks.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a137b7-afea-7602-833e-adcfe0cfb6c7\\exec-527c53ba-2831-46f3-9de6-0a3e92b91133.png",
+      "references": [
+        "artifacts/source-art/characters/aurelia/dragon.png",
+        "artifacts/source-art/backgrounds/bg_dungeon_dragon.png"
+      ]
+    }
+  ]
+}

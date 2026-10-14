@@ -1,0 +1,579 @@
+{
+  "batch": "story-batch-b",
+  "tool": "built-in image_gen",
+  "spec": "36 assigned character assets; transparent full-body portraits; source 512x1024 RGBA PNG and lossless alpha WebP",
+  "promptTemplates": {
+    "mainNeutral": "Use case: stylized-concept. Asset type: game character standing portrait, final source PNG. Input images: Image 1 is shared anime cel-shaded style reference; Images 2 and 3 are exact character design and turnaround references. Generate one clean full-body standing portrait of the described character. Match tina.png's warm cel-shaded linework, crisp dark outlines, subtle painterly highlights. Single character, straight full-body three-quarter front standing pose, centered, stable pose for expression variants, head very near top edge with small margin, feet fully visible with generous bottom margin, exactly 512x1024 portrait. Transparent background with alpha; no ground plane, floor shadow, backdrop; no text, logo, watermark; preserve face, hair, outfit, colors, props, and proportions from references; no cropped head or feet. Avoid extra characters, duplicate props, alternate outfit, chibi proportions, photorealism, scenery, typography.",
+    "mainVariant": "Use case: precise-object-edit. Asset type: game character standing portrait. Image 1 is the generated neutral edit target; Images 2-4 are exact design/style references. Change only the specified facial expression. Preserve identical face identity, hair, outfit, props, body pose, camera, scale and placement. Match tina.png warm anime cel-shaded linework. Exactly 512x1024 portrait, full head near top and feet visible. Genuine transparent alpha; no ground, floor shadow, backdrop, text, logo, watermark, extra characters, alternate outfit, cropped limbs.",
+    "genericNeutral": "Use case: stylized-concept. Asset type: generic game character standing portrait. Image 1 is the shared anime cel-shaded style reference (tina.png). Generate one ordinary, non-unique guild adventurer with the specified face, hair, general guild leather/cloth equipment, props, and personality cue. Make the face plain and clearly distinct from named heroines; no ornate hero costume. Match tina.png warm cel-shaded linework, crisp dark outlines, subtle painterly highlights. Single full-body three-quarter front portrait, centered, stable neutral pose, head near top, boots fully visible, exactly 512x1024. Genuine transparent alpha; no ground plane, floor shadow, backdrop, text, logo, watermark, extra characters, cropped head or feet.",
+    "genericVariant": "Use case: precise-object-edit. Image 1 is the generated neutral generic adventurer edit target; Image 2 is shared tina.png style reference. Change only the specified facial expression. Preserve exact identity, ordinary plain face, hair, outfit, leather/cloth gear, all props, body pose, camera, scale and placement. Keep the personality readable but secondary to the fixed silhouette. Match warm anime cel-shaded linework. Exactly 512x1024 full-body portrait, head near top, boots visible. Genuine transparent alpha; no ground, shadow, backdrop, text, logo, watermark, extra characters, alternate outfit, cropped limbs."
+  },
+  "assets": [
+    {
+      "id": "viola",
+      "pose": "neutral",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-7cd42510-922e-4134-a31a-495bd56b61ba.png",
+      "sourcePath": "artifacts/source-art/characters/viola/neutral.png",
+      "publicPath": "public/art/characters/viola/neutral.webp",
+      "references": [
+        "artifacts/characters/tina.png",
+        "artifacts/characters/viola.png",
+        "artifacts/characters/turnarounds/viola-turnaround-v1.png",
+        "artifacts/source-art/characters/viola/neutral.png"
+      ],
+      "discardedCandidates": [
+        {
+          "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-f5d7b7ef-dbec-4a60-a3f9-2543fce262d8.png",
+          "reason": "Replaced after visual review: shield was too short and thigh armor read too light for the required heavy plate silhouette."
+        }
+      ],
+      "prompt": "Edit Viola neutral while preserving face, long navy hair, expression, body proportions, camera angle, centered placement, and full-body silhouette. Make the tower shield shoulder-to-floor and approximately full standing height with a broad blue-gray armored face. Add substantial waist fauld, hip plates, and overlapping thigh cuisses over both thighs for unmistakable heavy full plate. No helmet. Match tina.png cel-shaded style. Transparent background, no ground/shadow/backdrop/text/logo/watermark, no cropped head/feet."
+    },
+    {
+      "id": "aurelia",
+      "pose": "dragon",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-637a9114-a844-476b-8a35-11829dea1ec3.png",
+      "sourcePath": "artifacts/source-art/characters/aurelia/dragon.png",
+      "publicPath": "public/art/characters/aurelia/dragon.webp",
+      "references": [
+        "artifacts/source-art/revisions/dragon-caring-redesign/characters/aurelia/dragon.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Redesign ONLY the POSE of the reference fire dragon as a natural quadrupedal dragon sprite, not a humanoid standing monster. Preserve its species identity: crimson and near-black scales, swept backward layered horns and flame-shaped mane, golden eyes, pale gold throat/belly armor, burnt-orange wing membranes and flame-orange accents. Entire dragon visible in three-quarter SIDE view facing left. Horizontal spine and long torso parallel to the ground, low muscular shoulders and haunches, FOUR weight-bearing reptilian legs with claws resting at the same implied ground level; long neck curves forward, head held just above shoulder height. TWO separate wings folded naturally high along its back, not replacing the forelegs. Tail sweeps behind and curls beside rear feet, visibly attached to pelvis. Poised, ancient, dignified, calm but formidable, mouth mostly closed. No upright human chest, no bipedal stance, no human arms, no extra legs or disconnected appendages. Preserve detailed clean anime cel shading and warm outlined style. Use a SQUARE 1024x1024 canvas so anatomy has room; do not squeeze its body to fill a tall human portrait. Comfortable transparent margins around the entire silhouette. Isolated transparent alpha background; NO ground plane, cast shadow, environment, text, fire particles, watermark.",
+      "history": [
+        {
+          "id": "aurelia",
+          "pose": "dragon",
+          "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-12e761dd-daec-4d03-ac1d-25b1d42d2b69.png",
+          "sourcePath": "artifacts/source-art/characters/aurelia/dragon.png",
+          "publicPath": "public/art/characters/aurelia/dragon.webp",
+          "references": [
+            "artifacts/characters/tina.png",
+            "artifacts/characters/aurelia.png",
+            "artifacts/characters/turnarounds/aurelia-turnaround-v1.png"
+          ],
+          "prompt": "Generate Aurelia true dragon form: tall upright ancient fire dragon, folded wings, crimson and black-red scales with ember-orange accents, golden eyes, black-red crest/mane with flame-orange tips, fully contained in 512x1024, head near top and feet/tail visible. Match tina.png cel-shaded style. Transparent background, no scenery/ground/shadow/humans/text/logo/watermark."
+        }
+      ],
+      "revision_record": "artifacts/source-art/dragon-caring-revision.json",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "id": "ruu",
+      "pose": "neutral",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-ba6da2ae-b384-4e7b-b6ba-91bc6828ddc5.png",
+      "sourcePath": "artifacts/source-art/characters/ruu/neutral.png",
+      "publicPath": "public/art/characters/ruu/neutral.webp",
+      "references": [
+        "artifacts/characters/tina.png",
+        "artifacts/characters/ruu.png",
+        "artifacts/characters/turnarounds/ruu-turnaround-v1.png"
+      ],
+      "prompt": "Generate Ruu full-body neutral: preserve short tousled dark purple hair, golden eyes, confident small devilish smile, black/charcoal cropped jacket with purple accents, black shorts, thigh-high stockings, brown boots, belts and short sword. Match tina.png warm cel-shaded style, stable centered pose, head near top, boots visible, 512x1024, transparent alpha, no ground/shadow/backdrop/text/logo/watermark."
+    },
+    {
+      "id": "fine",
+      "pose": "neutral",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-2501cd7c-97c3-402a-90d9-c9c5db35e108.png",
+      "sourcePath": "artifacts/source-art/characters/fine/neutral.png",
+      "publicPath": "public/art/characters/fine/neutral.webp",
+      "references": [
+        "artifacts/characters/tina.png",
+        "artifacts/characters/fine.png",
+        "artifacts/characters/turnarounds/fine-turnaround-v1.png"
+      ],
+      "prompt": "Generate Fine full-body neutral: preserve long wavy honey-blonde hair with side braid, warm brown eyes, green dress over white blouse, blue sash, brown overskirt, large woven backpack basket with gathered plants and leather satchel. Gentle neutral expression. Match tina.png warm cel-shaded style, stable centered pose, head near top, boots visible, 512x1024, transparent alpha, no ground/shadow/backdrop/text/logo/watermark."
+    },
+    {
+      "id": "aurelia",
+      "pose": "neutral",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-06f8781a-9288-4062-b229-a66bfb867173.png",
+      "sourcePath": "artifacts/source-art/characters/aurelia/neutral.png",
+      "publicPath": "public/art/characters/aurelia/neutral.webp",
+      "references": [
+        "artifacts/characters/tina.png",
+        "artifacts/characters/aurelia.png",
+        "artifacts/characters/turnarounds/aurelia-turnaround-v1.png"
+      ],
+      "prompt": "Generate Aurelia human full-body neutral: preserve long black hair with ember-orange tips, golden eyes, black and orange high-collar long dress with geometric trim, belt, leggings and brown boots. Almost expressionless calm gaze. Match tina.png warm cel-shaded style, stable centered pose, head near top, boots visible, 512x1024, transparent alpha, no ground/shadow/backdrop/text/logo/watermark."
+    },
+    {
+      "id": "viola",
+      "pose": "happy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-9f9323d4-3457-48b8-8c9c-12c3606051f7.png",
+      "sourcePath": "artifacts/source-art/characters/viola/happy.png",
+      "publicPath": "public/art/characters/viola/happy.webp",
+      "references": [
+        "artifacts/source-art/characters/viola/neutral.png",
+        "artifacts/characters/viola.png",
+        "artifacts/characters/turnarounds/viola-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Viola's facial expression to a restrained warm smile. Preserve neutral reference identity, heavy full plate including waist/hip/thigh plates, shoulder-to-floor tower shield, pose, framing and transparent background; match tina.png style; no text or scenery."
+    },
+    {
+      "id": "viola",
+      "pose": "angry",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-8a505742-8fd7-4e2e-b022-362c168e1522.png",
+      "sourcePath": "artifacts/source-art/characters/viola/angry.png",
+      "publicPath": "public/art/characters/viola/angry.webp",
+      "references": [
+        "artifacts/source-art/characters/viola/neutral.png",
+        "artifacts/characters/viola.png",
+        "artifacts/characters/turnarounds/viola-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Viola's facial expression to a controlled stern glare. Preserve neutral reference identity, heavy full plate including waist/hip/thigh plates, shoulder-to-floor tower shield, pose, framing and transparent background; match tina.png style; no text or scenery."
+    },
+    {
+      "id": "viola",
+      "pose": "surprised",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-88c33049-ecab-4425-a0d5-50a01b685755.png",
+      "sourcePath": "artifacts/source-art/characters/viola/surprised.png",
+      "publicPath": "public/art/characters/viola/surprised.webp",
+      "references": [
+        "artifacts/source-art/characters/viola/neutral.png",
+        "artifacts/characters/viola.png",
+        "artifacts/characters/turnarounds/viola-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Viola's facial expression to widened eyes and slightly parted mouth. Preserve neutral reference identity, heavy full plate including waist/hip/thigh plates, shoulder-to-floor tower shield, pose, framing and transparent background; match tina.png style; no text or scenery."
+    },
+    {
+      "id": "viola",
+      "pose": "shy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-ec2f84ef-48d6-4dac-b0d2-5e07ded44b96.png",
+      "sourcePath": "artifacts/source-art/characters/viola/shy.png",
+      "publicPath": "public/art/characters/viola/shy.webp",
+      "references": [
+        "artifacts/source-art/characters/viola/neutral.png",
+        "artifacts/characters/viola.png",
+        "artifacts/characters/turnarounds/viola-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Viola's facial expression to a restrained shy blush and softened eyes. Preserve neutral reference identity, heavy full plate, shoulder-to-floor tower shield, pose, framing, transparent alpha, and tina.png style; no text/scenery."
+    },
+    {
+      "id": "viola",
+      "pose": "flustered",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-a4dfec07-14ca-41f5-beef-2317e6438c2d.png",
+      "sourcePath": "artifacts/source-art/characters/viola/flustered.png",
+      "publicPath": "public/art/characters/viola/flustered.webp",
+      "references": [
+        "artifacts/source-art/characters/viola/neutral.png",
+        "artifacts/characters/viola.png",
+        "artifacts/characters/turnarounds/viola-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Viola's facial expression to visibly flustered, widened eyes, embarrassed blush, composure breaking. Preserve neutral reference identity, heavy full plate, shoulder-to-floor tower shield, pose, framing, transparent alpha, and tina.png style; no text/scenery."
+    },
+    {
+      "id": "ruu",
+      "pose": "happy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-e0d54ed4-4060-429e-b25f-350b29aecef7.png",
+      "sourcePath": "artifacts/source-art/characters/ruu/happy.png",
+      "publicPath": "public/art/characters/ruu/happy.webp",
+      "references": [
+        "artifacts/source-art/characters/ruu/neutral.png",
+        "artifacts/characters/ruu.png",
+        "artifacts/characters/turnarounds/ruu-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Ruu's face to a bright confident grin; preserve the neutral reference identity, outfit, props, pose, placement, transparent background, and tina.png style."
+    },
+    {
+      "id": "ruu",
+      "pose": "angry",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-f88ff55e-f416-4cd0-9cae-7f6f56ab68c3.png",
+      "sourcePath": "artifacts/source-art/characters/ruu/angry.png",
+      "publicPath": "public/art/characters/ruu/angry.webp",
+      "references": [
+        "artifacts/source-art/characters/ruu/neutral.png",
+        "artifacts/characters/ruu.png",
+        "artifacts/characters/turnarounds/ruu-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Ruu's face to a sharp irritated glare with lowered brows; preserve the neutral reference identity, outfit, props, pose, placement, transparent background, and tina.png style."
+    },
+    {
+      "id": "ruu",
+      "pose": "surprised",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-f0cde55f-326d-4279-b330-2c035d9053a2.png",
+      "sourcePath": "artifacts/source-art/characters/ruu/surprised.png",
+      "publicPath": "public/art/characters/ruu/surprised.webp",
+      "references": [
+        "artifacts/source-art/characters/ruu/neutral.png",
+        "artifacts/characters/ruu.png",
+        "artifacts/characters/turnarounds/ruu-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Ruu's face to wide surprised eyes and a small open mouth; preserve the neutral reference identity, outfit, props, pose, placement, transparent background, and tina.png style."
+    },
+    {
+      "id": "ruu",
+      "pose": "shy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-79f9b795-d919-47d1-b5d2-7f814c186952.png",
+      "sourcePath": "artifacts/source-art/characters/ruu/shy.png",
+      "publicPath": "public/art/characters/ruu/shy.webp",
+      "references": [
+        "artifacts/source-art/characters/ruu/neutral.png",
+        "artifacts/characters/ruu.png",
+        "artifacts/characters/turnarounds/ruu-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Ruu's face to a shy smile with a deep blush reaching the ears; preserve the neutral reference identity, outfit, props, pose, placement, transparent background, and tina.png style."
+    },
+    {
+      "id": "ruu",
+      "pose": "bluff",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-16241008-a374-4eeb-a647-7c47ac8b130d.png",
+      "sourcePath": "artifacts/source-art/characters/ruu/bluff.png",
+      "publicPath": "public/art/characters/ruu/bluff.webp",
+      "references": [
+        "artifacts/source-art/characters/ruu/neutral.png",
+        "artifacts/characters/ruu.png",
+        "artifacts/characters/turnarounds/ruu-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Ruu's face to a forced confident smirk while the eyes dart nervously, trying to bluff; preserve the neutral reference identity, outfit, props, pose, placement, transparent background, and tina.png style."
+    },
+    {
+      "id": "fine",
+      "pose": "happy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-b6ed0cb9-ec1f-483d-9270-8d4698d3b89a.png",
+      "sourcePath": "artifacts/source-art/characters/fine/happy.png",
+      "publicPath": "public/art/characters/fine/happy.webp",
+      "references": [
+        "artifacts/source-art/characters/fine/neutral.png",
+        "artifacts/characters/fine.png",
+        "artifacts/characters/turnarounds/fine-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Fine's face to a gentle cheerful smile with bright eyes; preserve the neutral reference identity, hair/braid, green dress, basket, satchel, pose, placement, transparent background, and tina.png style."
+    },
+    {
+      "id": "fine",
+      "pose": "angry",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-6a204b11-a9cc-40f1-8a2e-7a66efa26a96.png",
+      "sourcePath": "artifacts/source-art/characters/fine/angry.png",
+      "publicPath": "public/art/characters/fine/angry.webp",
+      "references": [
+        "artifacts/source-art/characters/fine/neutral.png",
+        "artifacts/characters/fine.png",
+        "artifacts/characters/turnarounds/fine-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Fine's face to a smiling but quietly forceful look, pressure without losing warmth; preserve the neutral reference identity, hair/braid, green dress, basket, satchel, pose, placement, transparent background, and tina.png style."
+    },
+    {
+      "id": "fine",
+      "pose": "surprised",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-e40a57af-8899-4e47-8ca6-d83d21fd4ec1.png",
+      "sourcePath": "artifacts/source-art/characters/fine/surprised.png",
+      "publicPath": "public/art/characters/fine/surprised.webp",
+      "references": [
+        "artifacts/source-art/characters/fine/neutral.png",
+        "artifacts/characters/fine.png",
+        "artifacts/characters/turnarounds/fine-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Fine's face to softly widened eyes and a small round mouth, an 'oh my' surprise; preserve the neutral reference identity, hair/braid, green dress, basket, satchel, pose, placement, transparent background, and tina.png style."
+    },
+    {
+      "id": "fine",
+      "pose": "shy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-eb833ab5-591d-4613-b6d3-18eda64a7e40.png",
+      "sourcePath": "artifacts/source-art/characters/fine/shy.png",
+      "publicPath": "public/art/characters/fine/shy.webp",
+      "references": [
+        "artifacts/source-art/characters/fine/neutral.png",
+        "artifacts/characters/fine.png",
+        "artifacts/characters/turnarounds/fine-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Fine's face to a bashful smile with warm cheek blush; preserve neutral reference identity, hair/braid, green dress, basket, satchel, pose, placement, transparent alpha, and tina.png style."
+    },
+    {
+      "id": "fine",
+      "pose": "sparkle",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-301f0cec-4497-40f1-8064-75cdaf3509c1.png",
+      "sourcePath": "artifacts/source-art/characters/fine/sparkle.png",
+      "publicPath": "public/art/characters/fine/sparkle.webp",
+      "references": [
+        "artifacts/source-art/characters/fine/neutral.png",
+        "artifacts/characters/fine.png",
+        "artifacts/characters/turnarounds/fine-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Fine's face to eyes gleaming with excited greedy sparkle; preserve neutral reference identity, hair/braid, green dress, basket, satchel, pose, placement, transparent alpha, and tina.png style."
+    },
+    {
+      "id": "aurelia",
+      "pose": "happy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-0aa7dc6d-bd6c-42ee-b45e-7c93a48eba62.png",
+      "sourcePath": "artifacts/source-art/characters/aurelia/happy.png",
+      "publicPath": "public/art/characters/aurelia/happy.webp",
+      "references": [
+        "artifacts/source-art/characters/aurelia/neutral.png",
+        "artifacts/characters/aurelia.png",
+        "artifacts/characters/turnarounds/aurelia-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Aurelia's face to the smallest upward curve at the mouth, otherwise nearly expressionless; preserve neutral identity, black-orange dress, pose, placement, transparent alpha, and tina.png style."
+    },
+    {
+      "id": "aurelia",
+      "pose": "angry",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-0725597b-8c7d-4bf5-8131-2a65d674a129.png",
+      "sourcePath": "artifacts/source-art/characters/aurelia/angry.png",
+      "publicPath": "public/art/characters/aurelia/angry.webp",
+      "references": [
+        "artifacts/source-art/characters/aurelia/neutral.png",
+        "artifacts/characters/aurelia.png",
+        "artifacts/characters/turnarounds/aurelia-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Aurelia's face to a quiet intense gaze of pressure with almost no movement; preserve neutral identity, black-orange dress, pose, placement, transparent alpha, and tina.png style."
+    },
+    {
+      "id": "aurelia",
+      "pose": "surprised",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-3ac4a3d8-38dd-46b1-92f2-0ddd4ecfe1d9.png",
+      "sourcePath": "artifacts/source-art/characters/aurelia/surprised.png",
+      "publicPath": "public/art/characters/aurelia/surprised.webp",
+      "references": [
+        "artifacts/source-art/characters/aurelia/neutral.png",
+        "artifacts/characters/aurelia.png",
+        "artifacts/characters/turnarounds/aurelia-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Aurelia's face to slightly widened eyes while keeping the rest nearly still; preserve neutral identity, black-orange dress, pose, placement, transparent alpha, and tina.png style."
+    },
+    {
+      "id": "aurelia",
+      "pose": "shy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-01b4a3c5-ad01-4b3f-8e86-e98231dde0dc.png",
+      "sourcePath": "artifacts/source-art/characters/aurelia/shy.png",
+      "publicPath": "public/art/characters/aurelia/shy.webp",
+      "references": [
+        "artifacts/source-art/characters/aurelia/neutral.png",
+        "artifacts/characters/aurelia.png",
+        "artifacts/characters/turnarounds/aurelia-turnaround-v1.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only Aurelia's face to nearly expressionless shy look with red tint on ears and neck; preserve neutral identity, black-orange dress, pose, placement, transparent alpha, and tina.png style."
+    },
+    {
+      "id": "adv_brave",
+      "pose": "neutral",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-a3708bdb-4b03-4d13-b55b-d912b6e37c14.png",
+      "sourcePath": "artifacts/source-art/characters/adv_brave/neutral.png",
+      "publicPath": "public/art/characters/adv_brave/neutral.webp",
+      "references": [
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Use case stylized-concept; Image 1 shared style. Generate an ordinary male guild adventurer with broad friendly face, short auburn hair, red scarf, worn brown leather cuirass over cream shirt, trousers, boots, plain sword over shoulder. Neutral brave forward-ready stance. Plain face, general leather/cloth, no ornate hero costume. Full-body centered 512x1024 transparent alpha, no ground/shadow/backdrop/text/logo/watermark/crops."
+    },
+    {
+      "id": "adv_cautious",
+      "pose": "neutral",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-df3efe5d-ea18-43cc-865e-21c4b0fb66f7.png",
+      "sourcePath": "artifacts/source-art/characters/adv_cautious/neutral.png",
+      "publicPath": "public/art/characters/adv_cautious/neutral.webp",
+      "references": [
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Use case stylized-concept; Image 1 shared style. Generate an ordinary androgynous guild adventurer with short dark hair, round blue-gray shield held in front, olive cloak over modest leather armor, trousers and boots. Careful neutral gaze scanning sideways, shield ready. Plain face, general leather/cloth, no ornate hero costume. Full-body centered 512x1024 transparent alpha, no ground/shadow/backdrop/text/logo/watermark/crops."
+    },
+    {
+      "id": "adv_greedy",
+      "pose": "neutral",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-e168e97b-3111-4038-8043-dcab92b65a50.png",
+      "sourcePath": "artifacts/source-art/characters/adv_greedy/neutral.png",
+      "publicPath": "public/art/characters/adv_greedy/neutral.webp",
+      "references": [
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Use case stylized-concept; Image 1 shared style. Generate an ordinary male guild adventurer with narrow plain face, messy sandy hair, tan leather vest, many pouches, heavy coin pouch held close, simple trousers and boots. Neutral calculating look toward coin pouch. Plain face, general leather/cloth, no ornate hero costume. Full-body centered 512x1024 transparent alpha, no ground/shadow/backdrop/text/logo/watermark/crops."
+    },
+    {
+      "id": "adv_caring",
+      "pose": "neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-70344e04-8c8b-4bf8-ba16-c646de2e793e.png",
+      "sourcePath": "artifacts/source-art/characters/adv_caring/neutral.png",
+      "publicPath": "public/art/characters/adv_caring/neutral.webp",
+      "references": [
+        "artifacts/source-art/revisions/dragon-caring-redesign/characters/adv_caring/neutral.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Redesign the generic caring adventurer in the reference so she is unmistakably a DIFFERENT person from a brown-haired braided bespectacled clerk heroine. Keep the project's clean warm anime linework, cel shading, full-body 512x1024 transparent sprite framing, bandage-in-one-hand pose and ordinary guild field-medic role. NEW character: adult woman in her late twenties, short BLACK tousled pixie haircut, clearly exposed neck and ears, no braid or ponytail, warm medium-brown tanned skin, round friendly mature face with small freckles, amber-brown eyes, sturdy athletic build, gentle confident closed-mouth smile. Clothing: rolled-sleeve muted SAGE-GREEN work shirt, short practical BEIGE canvas utility vest, small rust-ORANGE neckerchief, brown belt and dark charcoal trousers, plain brown hiking boots, fingerless gloves. Practical tan canvas medical shoulder satchel with rolled bandages and small medicine bottles, simple ivory leaf emblem instead of a red cross. Holds one white bandage roll up in her right hand, left hand on satchel strap. No glasses, no books, no apron dress, no blue uniform, no long brown hair, no heroine ornaments. Clearly readable caring dependable personality, distinct short-hair silhouette and green/beige/orange palette. Full head and feet visible, small margins, genuinely transparent alpha background, no ground shadow, no writing, no watermark.",
+      "history": [
+        {
+          "id": "adv_caring",
+          "pose": "neutral",
+          "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-9907461f-4e72-4aed-a9e2-90e1828b08d6.png",
+          "sourcePath": "artifacts/source-art/characters/adv_caring/neutral.png",
+          "publicPath": "public/art/characters/adv_caring/neutral.webp",
+          "references": [
+            "artifacts/characters/tina.png"
+          ],
+          "prompt": "Use case stylized-concept; Image 1 shared style. Generate an ordinary female guild adventurer with soft plain face, medium brown braid, blue-gray tunic under simple leather armor, medicine satchel and bandage roll, trousers and boots. Gentle caring neutral expression. Plain face, general leather/cloth, no ornate hero costume. Full-body centered 512x1024 transparent alpha, no ground/shadow/backdrop/text/logo/watermark/crops."
+        }
+      ],
+      "revision_record": "artifacts/source-art/dragon-caring-revision.json",
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "adv_proud",
+      "pose": "neutral",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-b598d67a-6c4b-4a1f-a109-d8ba26990605.png",
+      "sourcePath": "artifacts/source-art/characters/adv_proud/neutral.png",
+      "publicPath": "public/art/characters/adv_proud/neutral.webp",
+      "references": [
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Use case stylized-concept; Image 1 shared style. Generate an ordinary tall male guild adventurer with plain face, dark curly hair, basic polished brown leather armor, blue sash, simple sword, trousers and boots. Chest-out confident neutral expression and slight upward chin. Plain face, general leather/cloth, no ornate hero costume. Full-body centered 512x1024 transparent alpha, no ground/shadow/backdrop/text/logo/watermark/crops."
+    },
+    {
+      "id": "adv_timid",
+      "pose": "neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-72e77101-8c23-4e51-82e6-c5ba9a24aa5a.png",
+      "sourcePath": "artifacts/source-art/characters/adv_timid/neutral.png",
+      "publicPath": "public/art/characters/adv_timid/neutral.webp",
+      "references": [
+        "artifacts/source-art/revisions/timid-redesign/characters/adv_timid/neutral.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Redesign the generic TIMID guild adventurer in the supplied reference, keeping ONLY the shared clean warm anime cel-shaded rendering style and ordinary medieval adventurer role. Replace the young round-faced bob-haired girl design entirely. New character: plainly recognizable adult MAN around thirty, lean lanky build, narrow elongated face, somewhat prominent straight nose, thin worried eyebrows, small gray-blue eyes glancing sideways, short sandy-blond cropped hair with uneven fringe ABOVE eyebrows and visible ears, no bob haircut, no long bangs, no glasses, no beard. Timid personality conveyed through slightly hunched shoulders and softly bent knees, guarded posture; NOT a cute praying priestess. Holds a small battered round wooden buckler with metal rim against his lower chest with left arm, right hand nervously gripping a satchel strap near his waist, hands spatially separated. Plain blue-gray hooded short shoulder cape with hood DOWN, faded rust-brown leather vest over muted slate-blue long-sleeve shirt, gray-brown trousers, simple brown boots, worn belt with a SHEATHED short sword at hip and plain small travel satchel. No drawn knife, no white/gold robes, no religious motifs, no pink or brown bob hairstyle, no ornaments. Neutral expression: apprehensive closed mouth, lifted inner brows, wary eyes, restrained readable anxiety. Single FULL BODY transparent sprite, head near top with margin, feet fully visible, 1:2 portrait ratio for 512x1024. Same polished anime linework and cel shading as reference, ordinary supporting character. Genuine alpha transparency, NO scenery, ground plane, cast shadow, labels, text, watermark.",
+      "history": [
+        {
+          "id": "adv_timid",
+          "pose": "neutral",
+          "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-13600fcb-e3c7-47d9-b17f-5bd903b1f416.png",
+          "sourcePath": "artifacts/source-art/characters/adv_timid/neutral.png",
+          "publicPath": "public/art/characters/adv_timid/neutral.webp",
+          "references": [
+            "artifacts/characters/tina.png"
+          ],
+          "prompt": "Use case stylized-concept; Image 1 shared style. Generate an ordinary short female guild adventurer with plain light-brown bob, oversized muted-green cloak over simple cloth/leather gear, small dagger held close, trousers and boots. Timid neutral expression, lowered shoulders, alert eyes. Plain face, general leather/cloth, no ornate hero costume. Full-body centered 512x1024 transparent alpha, no ground/shadow/backdrop/text/logo/watermark/crops."
+        }
+      ],
+      "revision_record": "artifacts/source-art/timid-redesign-revision.json",
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "adv_brave",
+      "pose": "happy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-aa8fac79-90ad-444d-a5a3-bbe6c613f616.png",
+      "sourcePath": "artifacts/source-art/characters/adv_brave/happy.png",
+      "publicPath": "public/art/characters/adv_brave/happy.webp",
+      "references": [
+        "artifacts/source-art/characters/adv_brave/neutral.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only the ordinary brave adventurer's face to a bright open confident grin; preserve exact neutral identity, plain face, auburn hair, red scarf, leather/cloth gear, sword, pose, placement, transparent alpha and tina.png style."
+    },
+    {
+      "id": "adv_cautious",
+      "pose": "happy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-26a3f113-f217-450b-80e5-36dcb2fe8bac.png",
+      "sourcePath": "artifacts/source-art/characters/adv_cautious/happy.png",
+      "publicPath": "public/art/characters/adv_cautious/happy.webp",
+      "references": [
+        "artifacts/source-art/characters/adv_cautious/neutral.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only the ordinary cautious adventurer's face to a small relieved smile while remaining alert behind the shield; preserve exact neutral identity, dark hair, olive cloak, shield, leather/cloth gear, pose, placement, transparent alpha and tina.png style."
+    },
+    {
+      "id": "adv_greedy",
+      "pose": "happy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-dfc61f59-27c4-4e08-bd88-01ca7510854d.png",
+      "sourcePath": "artifacts/source-art/characters/adv_greedy/happy.png",
+      "publicPath": "public/art/characters/adv_greedy/happy.webp",
+      "references": [
+        "artifacts/source-art/characters/adv_greedy/neutral.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only the ordinary greedy adventurer's face to a delighted possessive grin with eyes gleaming toward the coin pouch; preserve exact neutral identity, sandy hair, tan vest, pouches, coin pouch, gear, pose, placement, transparent alpha and tina.png style."
+    },
+    {
+      "id": "adv_caring",
+      "pose": "happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-04e4348c-5460-407e-9e23-253f783ad341.png",
+      "sourcePath": "artifacts/source-art/characters/adv_caring/happy.png",
+      "publicPath": "public/art/characters/adv_caring/happy.webp",
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-70344e04-8c8b-4bf8-ba16-c646de2e793e.png"
+      ],
+      "prompt": "Use case: identity-preserve expression edit. Edit this caring adventurer neutral transparent full-body sprite into her HAPPY expression. Change only facial expression: brighter warm friendly smile with mouth slightly open, eyes gently curved with happiness, reassuring and cheerful. Preserve EXACT same short black pixie hair, tanned skin, facial identity, green shirt, beige vest, orange neckerchief, bandage roll and medical satchel with leaf emblem, trousers, boots, pose, all clothing folds, head/body position and scale, clean anime cel shading and transparency. Full head and feet visible, portrait 1:2 aspect for 512x1024 sprite, genuinely transparent alpha, no ground or shadow or text, no extra people or props.",
+      "history": [
+        {
+          "id": "adv_caring",
+          "pose": "happy",
+          "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-48bffd33-425c-4533-bf78-01122efbe1d9.png",
+          "sourcePath": "artifacts/source-art/characters/adv_caring/happy.png",
+          "publicPath": "public/art/characters/adv_caring/happy.webp",
+          "references": [
+            "artifacts/source-art/characters/adv_caring/neutral.png",
+            "artifacts/characters/tina.png"
+          ],
+          "prompt": "Change only the ordinary caring adventurer's face to a warm reassuring smile; preserve exact neutral identity, brown braid, blue-gray tunic, medicine satchel, bandage roll, leather/cloth gear, pose, placement, transparent alpha and tina.png style."
+        }
+      ],
+      "revision_record": "artifacts/source-art/dragon-caring-revision.json",
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "adv_proud",
+      "pose": "happy",
+      "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-0bff1119-8a11-497d-a5e7-1b5847324e05.png",
+      "sourcePath": "artifacts/source-art/characters/adv_proud/happy.png",
+      "publicPath": "public/art/characters/adv_proud/happy.webp",
+      "references": [
+        "artifacts/source-art/characters/adv_proud/neutral.png",
+        "artifacts/characters/tina.png"
+      ],
+      "prompt": "Change only the ordinary proud adventurer's face to a broad self-satisfied grin with confident eyes; preserve exact neutral identity, curly hair, brown armor, blue sash, sword, gear, pose, placement, transparent alpha and tina.png style."
+    },
+    {
+      "id": "adv_timid",
+      "pose": "happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-e22e5dc8-3ea0-4013-840f-0332fc33e825.png",
+      "sourcePath": "artifacts/source-art/characters/adv_timid/happy.png",
+      "publicPath": "public/art/characters/adv_timid/happy.webp",
+      "references": [
+        "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-72e77101-8c23-4e51-82e6-c5ba9a24aa5a.png"
+      ],
+      "prompt": "Use case: identity-preserve expression edit. Edit this adult male timid adventurer neutral full-body transparent sprite into HAPPY. Change ONLY his face: a small relieved, slightly awkward friendly smile, mouth gently open, worried brows relaxed but still a little shy, softer eyes. Retain his timid personality, not a heroic grin. Preserve EXACT same adult male identity, narrow face and nose, short sandy-blond cropped hair, blue-gray cape, rust-brown leather vest, round wooden shield, hands, satchel, sheathed sword, trousers, boots, every clothing fold, full body pose, head/body placement, proportions, colors, clean anime cel shading and alpha transparency. Full body including feet, 1:2 portrait canvas for 512x1024. No additional props, no ground plane or floor shadow, no background, no writing, no watermark.",
+      "history": [
+        {
+          "id": "adv_timid",
+          "pose": "happy",
+          "sourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a137b9-1016-7fa0-b13d-a19c5c754e31\\exec-c6c6c00d-f4fc-486f-bac1-a1d9ae70569c.png",
+          "sourcePath": "artifacts/source-art/characters/adv_timid/happy.png",
+          "publicPath": "public/art/characters/adv_timid/happy.webp",
+          "references": [
+            "artifacts/source-art/characters/adv_timid/neutral.png",
+            "artifacts/characters/tina.png"
+          ],
+          "prompt": "Change only the ordinary timid adventurer's face to a tentative relieved smile, still shy and cautious; preserve exact neutral identity, light-brown bob, muted-green cloak, small dagger, leather/cloth gear, pose, placement, transparent alpha and tina.png style."
+        }
+      ],
+      "revision_record": "artifacts/source-art/timid-redesign-revision.json",
+      "size": [
+        512,
+        1024
+      ]
+    }
+  ]
+}

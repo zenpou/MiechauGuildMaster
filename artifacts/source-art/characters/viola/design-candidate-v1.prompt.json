@@ -1,0 +1,11 @@
+{
+  "character": "ヴィオラ",
+  "status": "candidate",
+  "source": "built-in image_gen",
+  "references": [
+    "artifacts/source-art/characters/tina/design-approved-v1.png",
+    "artifacts/source-art/characters/iris/design-approved-v1.png"
+  ],
+  "prompt": "Full-body character design candidate for a game dialogue standing portrait. Viola is a 21-year-old adult human woman, a tavern owner's daughter who pretends to be a cool scout but is actually friendly and clumsy. Navy-blue straight long hair, clear blue eyes, neat attractive youthful adult face with a slightly self-confident expression. Practical concise medium-heavy armor for a tank, dark steel breastplate, layered shoulder and arm guards, sturdy belt, armored boots, and a large tower shield held at her side without hiding her face. Plain warm ivory background, full body with feet and hair visible, front-facing slight three-quarter conversational pose. Clean Japanese anime/manga illustration, bold dark outlines, simple flat cel shading, restrained detail. No royal dress, ornate decoration, cape, red hair, white hair, glasses, braid, ponytail, text, or watermark.",
+  "output": "artifacts/source-art/characters/viola/design-candidate-v1.png"
+}

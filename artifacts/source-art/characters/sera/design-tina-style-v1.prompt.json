@@ -1,0 +1,10 @@
+{
+  "character": "sera",
+  "output": "design-tina-style-v1.png",
+  "mode": "built-in image_gen style-transfer",
+  "style_reference": "C:/Users/takas/project/MiechauGuildMaster/artifacts/source-art/characters/tina/design-approved-v1.png",
+  "design_reference": "C:/Users/takas/project/MiechauGuildMaster/artifacts/source-art/characters/sera/design-candidate-v1.png",
+  "style_rules": "Use Tina only for style: strong dark-brown contours, bold upper eyelids, large vertical irises with dark upper section and simple white highlight, rounded youthful face, angular hair locks, 2-3 hard cel shadows, stronger contrast, rustic manga/old-RPG finish.",
+  "preserve": "Sera's 19-year-old adult petite healer identity, sakura-pink fluffy short hair, gentle round eyes, timid kind uncertain smile, simple white priest robe, pose, full-body framing and warm ivory background.",
+  "avoid": "Copying Tina's red hair, ponytail, sword armor, scarf, face or expression; childification; redesigning clothes; cropping; text or watermark."
+}

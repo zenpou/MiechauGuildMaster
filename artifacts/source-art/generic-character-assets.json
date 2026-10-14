@@ -1,0 +1,127 @@
+{
+  "purpose": "Asset catalog for gender/personality appearance selection. Runtime integration pending.",
+  "appearanceRule": "Select once on character creation and persist; never select by current job or equipment.",
+  "characters": [
+    {
+      "id": "adv_brave_male",
+      "gender": "male",
+      "personality": "brave",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_brave_male",
+      "distributionDirectory": "public/art/characters/adv_brave_male"
+    },
+    {
+      "id": "adv_brave_female",
+      "gender": "female",
+      "personality": "brave",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_brave_female",
+      "distributionDirectory": "public/art/characters/adv_brave_female"
+    },
+    {
+      "id": "adv_cautious_male",
+      "gender": "male",
+      "personality": "cautious",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_cautious_male",
+      "distributionDirectory": "public/art/characters/adv_cautious_male"
+    },
+    {
+      "id": "adv_cautious_female",
+      "gender": "female",
+      "personality": "cautious",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_cautious_female",
+      "distributionDirectory": "public/art/characters/adv_cautious_female"
+    },
+    {
+      "id": "adv_greedy_male",
+      "gender": "male",
+      "personality": "greedy",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_greedy_male",
+      "distributionDirectory": "public/art/characters/adv_greedy_male"
+    },
+    {
+      "id": "adv_greedy_female",
+      "gender": "female",
+      "personality": "greedy",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_greedy_female",
+      "distributionDirectory": "public/art/characters/adv_greedy_female"
+    },
+    {
+      "id": "adv_caring_male",
+      "gender": "male",
+      "personality": "caring",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_caring_male",
+      "distributionDirectory": "public/art/characters/adv_caring_male"
+    },
+    {
+      "id": "adv_caring_female",
+      "gender": "female",
+      "personality": "caring",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_caring_female",
+      "distributionDirectory": "public/art/characters/adv_caring_female"
+    },
+    {
+      "id": "adv_proud_male",
+      "gender": "male",
+      "personality": "proud",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_proud_male",
+      "distributionDirectory": "public/art/characters/adv_proud_male"
+    },
+    {
+      "id": "adv_proud_female",
+      "gender": "female",
+      "personality": "proud",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_proud_female",
+      "distributionDirectory": "public/art/characters/adv_proud_female"
+    },
+    {
+      "id": "adv_timid_male",
+      "gender": "male",
+      "personality": "timid",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_timid_male",
+      "distributionDirectory": "public/art/characters/adv_timid_male"
+    },
+    {
+      "id": "adv_timid_female",
+      "gender": "female",
+      "personality": "timid",
+      "poses": [
+        "neutral"
+      ],
+      "sourceDirectory": "artifacts/source-art/characters/adv_timid_female",
+      "distributionDirectory": "public/art/characters/adv_timid_female"
+    }
+  ],
+  "expressionRule": "One sprite per generic character; neutral only. Existing happy files are unused reserves."
+}

@@ -1,0 +1,15 @@
+{
+  "character": "ノエル",
+  "input_paths": [
+    "artifacts/characters/noel.png"
+  ],
+  "tool": "built-in image_gen",
+  "output": "artifacts/characters/turnarounds/noel-turnaround-v1.png",
+  "views": "左から FRONT 0度、SIDE 真横90度で顔は画面右、BACK 180度。3体のみ、同じ身長スケールと頭頂・足底ライン、自然に腕を下ろした中立立ち姿。台帳は胴体を塞がないためシート下端に小さな小物図1つ。",
+  "design_constraints": "茶色の太い片側三つ編み、丸眼鏡、緑目、紺制服、生成りエプロン、赤リボン、胸バッジ、黒い三つ編みリボン、茶ブーツ。",
+  "back_view_completion_note": "三つ編みの背面位置と黒い結びリボン、エプロンの背面リボン、制服とスカートの背面だけを合理的に補完。新装飾なし。",
+  "prompt": "Use the single input image only as the exact adopted character design and style reference. Create ONE wide horizontal character turnaround sheet containing exactly three full-body views of the same person, arranged left to right: FRONT, SIDE, BACK. Put a small unobtrusive English label FRONT, SIDE, BACK beneath each view; no other text. This is a strict orthographic design sheet, not a scene.\nAll three figures must have identical height scale, identical head-top and sole baseline, the same neutral standing pose with arms naturally slightly away from the body, and generous margin around every figure. Front is exactly 0 degrees, side is exactly 90 degrees in profile with the face looking toward screen right, back is exactly 180 degrees. No 3/4 angle, no perspective, no dramatic lighting, no large cast shadow, no extra character, no duplicate limbs. Preserve the adopted design's exact face, head shape, hair color, hairstyle, eye color, clothing, palette, equipment and proportions. Use the established Tina-style bold dark outline, large simple color areas, hard 2-3 step cel shading, warm ivory/white flat background. Keep long hair at its adopted length and let it fall naturally down the back. For asymmetrical equipment, keep it attached to the same character side and rotate it correctly in side/back views. Do not invent new decorations or weapons; only make minimal logical hidden/back-surface completion where necessary.\nCharacter: Noel from the adopted image. Preserve brown hair in a thick side braid on her character's right side (viewer left in front view), round glasses, green eyes, cream blouse, navy vest and long navy skirt, cream apron, red collar ribbon, guild badge, large brown ledger and brown lace-up boots. The black ribbon tying the side braid must remain black. To keep the three figures' arms naturally down, place one small separate ledger accessory inset beneath the sheet near the labels, while the three bodies keep natural lowered arms; do not add a second ledger to the figures. Keep the braid, glasses, apron, skirt and badge consistent in front/side/back.",
+  "requested_side_facing": "right",
+  "observed_side_facing": "left",
+  "side_facing_note": "要求は画面右向きだが、生成画像の実測ではSIDEの横顔が画面左向き。再生成せず観測値を記録。"
+}

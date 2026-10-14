@@ -253,6 +253,8 @@ interface Run {
   dragonDay: number | null;
   endDay: number;
   ms: Record<string, number | null>;
+  /** 物語の章を開く節目(坑道の確認・遺跡の鍵・竜の紋章)に初めて達した日の、達成済みの依頼数(unlock を除く)。章の解放条件(questsDone)の重さを測る */
+  questsAtStory: Record<string, number | null>;
   /** 目標(PATH)ごとの達成日 */
   stepDay: (number | null)[];
   snaps: Snap[];
@@ -285,6 +287,8 @@ function runSeed(seed: number, log: boolean): Run {
   /** 階ごとの、探索率が増えなかった探索の続いた回数(今の目標の階への探索だけ数える) */
   const stalls = new Map<string, number>();
   const ms: Record<string, number | null> = Object.fromEntries(MILESTONES.map((m) => [m.id, null]));
+  const questsAtStory: Record<string, number | null> = { 'confirm:old_mine': null, ruin_key: null, dragon_crest: null };
+  const questsDoneNow = () => s.quests.filter((q) => q.status === 'done' && q.type !== 'unlock').length;
   const stepDay: (number | null)[] = PATH.map(() => null);
   let front = 0;
   let frontSince = s.day;
@@ -1068,6 +1072,8 @@ function runSeed(seed: number, log: boolean): Run {
     if (done >= 10) ms.fac10 ??= s.day;
     if (s.achievements.length >= 10) ms.ach10 ??= s.day;
     if ('crest' in ms && heldKeys(s).includes('dragon_crest')) ms.crest ??= s.day;
+    if (s.dungeons.old_mine?.confirmed) questsAtStory['confirm:old_mine'] ??= questsDoneNow();
+    for (const k of ['ruin_key', 'dragon_crest']) if (heldKeys(s).includes(k)) questsAtStory[k] ??= questsDoneNow();
     if ('lair' in ms && s.dungeons[LAIR]?.confirmed) ms.lair ??= s.day;
     PATH.forEach((st, i) => {
       if (stepDay[i] === null && reached(st)) stepDay[i] = s.day;
@@ -1181,6 +1187,7 @@ function runSeed(seed: number, log: boolean): Run {
     dragonDay: s.dragonDefeated ? (typeof s.flags.clearDay === 'number' ? s.flags.clearDay : s.day) : null,
     endDay: s.day,
     ms,
+    questsAtStory,
     stepDay,
     snaps: snaps.map((x) => x ?? last),
     periods,
@@ -1303,6 +1310,21 @@ const msRow = (label: string, v: number[]) => [label, fix(median(v), 1), v.lengt
 out.push(table(['項目', '中央値', '最小〜最大', '到達'], [
   ...(ROUTE === 'fast' ? PATH.map((st, i) => msRow(`${MARK[st.goal]} ${st.label}`, days(runs.map((r) => r.stepDay[i])))) : []),
   ...MILESTONES.map((m) => msRow(m.label, days(runs.map((r) => r.ms[m.id])))),
+]));
+out.push('');
+
+out.push('#### 章の節目に達した時点の依頼達成数(物語の解放条件 questsDone の目安)');
+out.push('');
+out.push('第二章は坑道の確認、第三章は遺跡の鍵、第五章は竜の紋章で開く。第四章は「第三章読了+依頼N件」なので、紋章を取った時点で N 件に届いていないと第五章が止まる。');
+out.push('');
+const qRow = (label: string, key: string) => {
+  const v = runs.map((r) => r.questsAtStory[key]).filter((x): x is number => x !== null);
+  return [label, fix(median(v), 1), v.length ? `${Math.min(...v)}〜${Math.max(...v)}` : '-', `${v.filter((x) => x < 10).length}/${v.length}`, `${v.length}/${runs.length}`];
+};
+out.push(table(['節目', '中央値', '最小〜最大', '10件未満の seed', '到達'], [
+  qRow('古い坑道を確認(第二章)', 'confirm:old_mine'),
+  qRow('遺跡の鍵を取得(第三章)', 'ruin_key'),
+  qRow('竜の紋章を取得(第五章)', 'dragon_crest'),
 ]));
 out.push('');
 

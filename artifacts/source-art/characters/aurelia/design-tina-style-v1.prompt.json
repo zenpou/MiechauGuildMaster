@@ -1,0 +1,9 @@
+{
+  "character": "アウレリア",
+  "status": "style-transfer-candidate",
+  "source": "built-in image_gen",
+  "style_reference": "artifacts/source-art/characters/tina/design-approved-v1.png",
+  "design_reference": "artifacts/source-art/characters/aurelia/design-candidate-v1.png",
+  "prompt": "Use Image 1 only as style: Tina's strong dark-brown lines, thick upper eyelids, simple large irises, angular hair clumps, 2-3 hard cel shadows, saturated classic manga/RPG finish. Use Image 2 only as design. Preserve Aurelia's black-to-flame-orange long hair, gold vertical-slit eyes, neck and hand scales, emotionless kuudere expression, modest black/orange human-form outfit, age and pose. Replace thin pale watercolor rendering with Tina's bold cel-shaded language. Do not copy Tina's red hair, amber eyes, scarf, outfit or sword. No horns, wings, tail, dragon body, crop, text or watermark.",
+  "output": "artifacts/source-art/characters/aurelia/design-tina-style-v1.png"
+}

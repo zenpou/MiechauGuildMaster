@@ -1,0 +1,12 @@
+{
+  "character": "セラ",
+  "tool": "built-in image_gen",
+  "use_case": "precise-object-edit",
+  "input_paths": [
+    "artifacts/characters/turnarounds/sera-turnaround-v1.png"
+  ],
+  "approved_source": "artifacts/characters/sera.png",
+  "prompt": "Use case: precise-object-edit. Edit this three-view Sera model sheet. Change ONLY the arms and hands in the LEFTMOST FRONT view: let both arms hang naturally downward slightly away from her torso, with open relaxed hands beside her thighs, matching the neutral arms-down stance already used by the SIDE and BACK views. The hands must NOT be clasped together in front. Adjust only the sleeve folds around these arms as required by the pose. Preserve the entire rest of this exact sheet: all three heads, faces, hair, hair ribbon, expressions, body proportions and scale, robe design and gold motifs, belt and pouch, legs, boots, the middle left-facing pure side view, the rightmost back view, positions, labels FRONT SIDE BACK, background, linework and cel shading. Do not mirror any panel, do not recolor, and do not add props. Full sheet, three figures.",
+  "observed_side_facing": "left",
+  "back_view_completion_note": "背面のフード、法衣、ストール、ベルトとポーチのつながりは原画から補完した案。v2で正面の腕を他の2方向と同じ中立姿勢へ修正。"
+}

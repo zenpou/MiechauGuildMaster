@@ -1,0 +1,13 @@
+{
+  "character": "アイリス（コートなし）",
+  "tool": "built-in image_gen",
+  "use_case": "precise-object-edit",
+  "input_paths": [
+    "artifacts/characters/turnarounds/iris-turnaround-v1.png",
+    "artifacts/characters/iris-coat.png"
+  ],
+  "approved_source": "artifacts/characters/iris.png",
+  "prompt": "Use case: precise-object-edit. Edit image 1, the three-view Iris model sheet, with image 2 as a garment detail reference ONLY. Correct ONLY the purple vest on the LEFTMOST FRONT figure: replace the double-breasted two parallel columns of six gold buttons with a single-breasted opening with ONE vertical row of THREE gold buttons, as shown in reference image 2. Keep the gold piping along the front opening and neckline; match its simple single closure from the reference. Preserve the middle SIDE and rightmost BACK panels, all faces, hair, eyes, body proportions, poses, blouse, bow, belt, skirt, boots, book inset, panel positions, FRONT SIDE BACK labels, background, dark linework and cel shading. This sheet is the NO-COAT outfit: do NOT add a coat. No other changes. Output the complete same landscape three-view sheet.",
+  "observed_side_facing": "left",
+  "back_view_completion_note": "背面や隠れていた部分は採用原画から補完した案。v2で正面のベストを原画と同じ一列3個の金ボタンに修正。"
+}

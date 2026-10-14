@@ -1,0 +1,514 @@
+{
+  "manifestVersion": 1,
+  "generatedAt": "2026-10-14",
+  "generationMode": "built-in image_gen",
+  "assetCount": 12,
+  "sharedReferenceImages": [
+    {
+      "role": "style_and_clothing_reference",
+      "path": "artifacts/source-art/characters/kai/neutral.png"
+    }
+  ],
+  "constraints": [
+    "female generic adventurer appearance is independent of profession",
+    "ordinary fantasy village/travel clothing only",
+    "no profession-specific weapons, shields, staves, books, medical gear, armor, uniforms, modern clothes, text, or watermark",
+    "full-body transparent sprite with head near top and feet visible",
+    "each happy pose is an identity-preserving expression edit of its neutral pose"
+  ],
+  "assets": [
+    {
+      "id": "adv_brave_female",
+      "pose": "neutral",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-f72e1fd1-80d1-497d-ba98-263e2d24da64.png",
+      "outputPng": "artifacts/source-art/characters/adv_brave_female/neutral.png",
+      "outputWebp": "public/art/characters/adv_brave_female/neutral.webp",
+      "prompt": "Use case: stylized-concept. Asset type: game character transparent full-body sprite. Input image: the attached Kai villager sprite is a style and clothing reference only; do not copy his gender or face. Create one distinct adult woman, brave_female, in a warm clean anime cel-shaded fantasy game illustration style matching the reference. Full body from top of hair to visible boots, centered, upright stable neutral pose, hands relaxed, 512x1024 portrait composition, genuinely transparent background. Design: athletic adult woman, short cropped dark-red hair, broad face, confident calm expression and open alert stance. Clothing must be ordinary non-modern fantasy travel wear: ochre tunic, brown short vest, simple belt with small pouch, plain brown trousers, simple leather boots. No ponytail, no cheek bandage, no armor, no uniform, no weapon, no shield, no staff, no book, no medical gear, no profession-specific items, no text, no watermark. Keep the head near the top, feet fully visible, and leave consistent transparent padding.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_brave_female",
+      "pose": "happy",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-971ea5d6-c93f-4945-b9cd-08c7bcbeafe2.png",
+      "outputPng": "artifacts/source-art/characters/adv_brave_female/happy.png",
+      "outputWebp": "public/art/characters/adv_brave_female/happy.webp",
+      "prompt": "Use case: identity-preserve. Asset type: game character transparent full-body sprite variant. Edit target: the attached brave_female neutral sprite. Preserve the exact same woman, short cropped dark-red hair, broad face, ochre tunic, brown short vest, belt, pouch, trousers, boots, full-body framing, proportions, pose, alignment, transparent background and all clothing details. Change only the expression to a warm confident open smile with bright eyes, still brave and welcoming. No new objects, no weapon, no shield, no armor, no uniform, no text, no watermark. Keep head near top and feet fully visible.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_cautious_female",
+      "pose": "neutral",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-90c884cc-b960-456a-990b-e3a16c96d045.png",
+      "outputPng": "artifacts/source-art/characters/adv_cautious_female/neutral.png",
+      "outputWebp": "public/art/characters/adv_cautious_female/neutral.webp",
+      "prompt": "Use case: stylized-concept. Asset type: game character transparent full-body sprite. Input image: attached Kai villager sprite is style and ordinary fantasy travel-clothing reference only; do not copy his gender or face. Create one distinct adult woman, cautious_female, in the same warm clean anime cel-shaded fantasy game illustration style. Full body from top of hair to visible boots, centered, stable neutral pose with thoughtful watchful posture, hands relaxed, portrait composition, genuinely transparent background. Design: adult woman with straight ink-blue shoulder-length hair tucked behind both ears, narrow observant eyes, muted slate and lilac ordinary fantasy travel tunic, short charcoal cape, simple belt with small pouch, plain trousers, simple leather boots. No braid, no glasses, no armor, no uniform, no weapon, no shield, no staff, no book, no medical gear, no profession-specific item, no modern clothing, no text, no watermark. Avoid named heroine hairstyles/colors, especially pink bob, silver hair, blue twin tails. Keep head near top, feet fully visible, consistent transparent padding, no cropped body.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_cautious_female",
+      "pose": "happy",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-9482314d-37df-442f-86d8-40c0e18aa9f7.png",
+      "outputPng": "artifacts/source-art/characters/adv_cautious_female/happy.png",
+      "outputWebp": "public/art/characters/adv_cautious_female/happy.webp",
+      "prompt": "Use case: identity-preserve. Asset type: game character transparent full-body sprite variant. Edit target: attached cautious_female neutral sprite. Preserve exact same adult woman, straight ink-blue shoulder-length hair tucked behind ears, narrow eyes, muted slate/lilac tunic, short charcoal cape, belt, pouch, trousers, boots, full-body composition, pose, alignment, proportions, transparent background and clothing. Change only her expression to a small relieved friendly smile with softened watchful eyes; keep her cautious personality and all design details. No new objects, no weapon, no shield, no staff, no book, no armor, no uniform, no text, no watermark. Keep head near top and feet fully visible.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_greedy_female",
+      "pose": "neutral",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-931b7d9b-8d55-4361-87dd-0eac7cb426a2.png",
+      "outputPng": "artifacts/source-art/characters/adv_greedy_female/neutral.png",
+      "outputWebp": "public/art/characters/adv_greedy_female/neutral.webp",
+      "prompt": "Use case: precise-object-edit. Edit this female generic greedy adventurer to look like an ORDINARY modestly dressed village traveler, not a glamorous voluptuous character. Preserve her recognizable curly copper hair in a high bun, freckles, adult face, slightly sly pleased expression, raised small closed coin pouch, general pose and warm clean anime style. Change body silhouette to natural AVERAGE adult proportions: moderate shoulders and hips, small-to-average bust, relaxed natural waist, ordinary limbs. No exaggerated hourglass or emphasized breasts/thighs. Replace fitted deep-neckline garment with a LOOSE straight-cut burgundy LINEN TUNIC, simple high round neckline with a small CLOSED lace slit, fully covering upper chest and NO cleavage. Belt loosely at natural waist, fabric hangs naturally rather than hugging bust/hips. Plain brown loose trousers, simple leather boots, no armor/weapons/profession-specific gear. Keep both hands and pouch readable, complete full body including feet and hair. 1:2 portrait for 512x1024, genuine transparent alpha background, no floor shadow, no text or watermark.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "active",
+      "history": [
+        {
+          "id": "adv_greedy_female",
+          "pose": "neutral",
+          "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-931b7d9b-8d55-4361-87dd-0eac7cb426a2.png",
+          "outputPng": "artifacts/source-art/characters/adv_greedy_female/neutral.png",
+          "outputWebp": "public/art/characters/adv_greedy_female/neutral.webp",
+          "prompt": "Use case: stylized-concept. Asset type: game character transparent full-body sprite. Input image: attached Kai villager sprite is style and ordinary fantasy travel-clothing reference only; do not copy his gender or face. Create one distinct adult woman, greedy_female, in the same warm clean anime cel-shaded fantasy game illustration style. Full body, centered, stable neutral pose, genuinely transparent background, head near top and feet fully visible. Design: curvy stocky adult woman, copper curly hair gathered into a high bun, freckles, sly eager expression and slightly forward leaning posture. Burgundy ordinary fantasy travel tunic, dark brown pants, simple belt, and a small closed coin pouch held in one hand. The pouch is generic and closed, not a profession item. Simple leather boots. No armor, no uniform, no weapon, no shield, no staff, no book, no medical gear, no modern clothing, no extra characters, no text, no watermark. Avoid named heroine hairstyles and colors; make her clearly distinct from all named women and from other generic women. Keep transparent padding and full body.",
+          "validation": {
+            "png": {
+              "format": "PNG",
+              "size": [
+                512,
+                1024
+              ],
+              "mode": "RGBA",
+              "alphaExtrema": [
+                0,
+                255
+              ]
+            },
+            "webp": {
+              "format": "WEBP",
+              "size": [
+                512,
+                1024
+              ],
+              "mode": "RGBA",
+              "alphaExtrema": [
+                0,
+                255
+              ]
+            },
+            "visualReview": true
+          },
+          "selectionStatus": "active"
+        }
+      ],
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-d2d81fd7-18a7-4fdd-a8cc-a0c208637ebc.png",
+      "references": [
+        "artifacts/source-art/revisions/greedy-single-sprite/characters/adv_greedy_female/neutral.png"
+      ],
+      "revision_record": "artifacts/source-art/greedy-single-sprite-revision.json"
+    },
+    {
+      "id": "adv_greedy_female",
+      "pose": "happy",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-add744c2-0c04-4f10-8b02-e7db28a01cf7.png",
+      "outputPng": "artifacts/source-art/characters/adv_greedy_female/happy.png",
+      "outputWebp": "public/art/characters/adv_greedy_female/happy.webp",
+      "prompt": "Use case: identity-preserve. Asset type: game character transparent full-body sprite variant. Edit target: attached greedy_female neutral sprite. Preserve exact same adult woman, curvy stocky build, copper curly high bun, freckles, burgundy tunic, dark brown pants, belt, closed coin pouch, boots, full-body framing, pose, alignment, proportions, transparent background and clothing details. Change only her expression to a broad delighted greedy grin with sparkling eager eyes; keep the coin pouch closed and the rest unchanged. No new objects, no weapon, no shield, no staff, no book, no armor, no uniform, no medical gear, no text, no watermark.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_caring_female",
+      "pose": "neutral",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-2cbcc25a-e25d-4307-bcc0-2cbd7935bcb2.png",
+      "outputPng": "artifacts/source-art/characters/adv_caring_female/neutral.png",
+      "outputWebp": "public/art/characters/adv_caring_female/neutral.webp",
+      "prompt": "Use case: stylized-concept. Asset type: game character transparent full-body sprite. Input image: attached Kai villager sprite is style and ordinary fantasy travel-clothing reference only; do not copy his gender or face. Create a clearly adult WOMAN with feminine face, feminine body proportions and hips, caring_female. Warm clean anime cel-shaded fantasy game illustration, same linework and palette family as the reference. Full body centered from hair top to visible boots, stable pose, one open welcoming hand, 2D character cutout ONLY on a genuinely transparent background with no glow, no vignette and no background color. Design: short black pixie haircut with feminine side-swept bangs, medium-brown tan skin, gentle oval face, kind eyes. Sage green plain shirt, beige simple utility vest, orange scarf, ordinary brown trousers, simple belt, plain satchel, simple leather boots. Ordinary village/travel clothing. Absolutely no bandages, medicine bottle, medical leaf, healer symbol, weapon, shield, staff, book, armor, uniform, modern clothing, text, watermark. Do not make a boy or androgynous teen; make a visibly adult woman. Do not copy named heroine hairstyles or colors. Head near top, feet fully visible, consistent padding.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_caring_female",
+      "pose": "happy",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-b13cac09-a1a3-470e-8fec-a0240c26f547.png",
+      "outputPng": "artifacts/source-art/characters/adv_caring_female/happy.png",
+      "outputWebp": "public/art/characters/adv_caring_female/happy.webp",
+      "prompt": "Use case: identity-preserve. Asset type: game character transparent full-body sprite variant. Edit target: attached caring_female neutral sprite. Preserve exact same adult woman, feminine proportions, short black pixie haircut, medium-brown tan skin, sage green shirt, beige simple utility vest, orange scarf, plain satchel, trousers, boots, full-body framing, welcoming hand, pose, alignment, transparent background and all clothing. Change only her expression to a warm open happy smile with kind bright eyes; keep the welcoming hand and ordinary traveler design. No new objects, no medical items, no weapon, no shield, no staff, no book, no armor, no uniform, no text, no watermark.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_proud_female",
+      "pose": "neutral",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-d079360c-01d2-4d72-8204-adab06fc78c0.png",
+      "outputPng": "artifacts/source-art/characters/adv_proud_female/neutral.png",
+      "outputWebp": "public/art/characters/adv_proud_female/neutral.webp",
+      "prompt": "Use case: stylized-concept. Asset type: game character transparent full-body sprite. Input image: attached Kai villager sprite is style and ordinary fantasy travel-clothing reference only; do not copy his gender or face. Create one distinct tall adult woman, proud_female, same warm clean anime cel-shaded fantasy game style. Full body centered, stable upright pose, chin raised and one hand on hip, other hand relaxed, genuinely transparent background, head near top and feet fully visible. Design: tall adult woman, long charcoal hair tied low at the nape, strong angular face and confident eyes. Rust-colored long ordinary fantasy travel tunic, cream simple neckcloth, plain belt with small pouch, dark trousers, simple leather boots. Modest village/traveler clothing, practical and unadorned. No elaborate heroine styling, no armor, no uniform, no weapon, no shield, no staff, no book, no medical gear, no modern clothing, no text, no watermark. Avoid named heroine hairstyles, especially silver hair and twin tails. Distinct from other generic women through tall stature, angular face, charcoal low tie, rust tunic, proud posture.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_proud_female",
+      "pose": "happy",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-e298ebcc-0264-428c-b326-7951a7097ba6.png",
+      "outputPng": "artifacts/source-art/characters/adv_proud_female/happy.png",
+      "outputWebp": "public/art/characters/adv_proud_female/happy.webp",
+      "prompt": "Use case: identity-preserve. Asset type: game character transparent full-body sprite variant. Edit target: attached proud_female neutral sprite. Preserve exact same tall adult woman, long charcoal hair tied low, angular face, rust long tunic, cream neckcloth, belt, pouch, dark trousers, boots, hand-on-hip pose, full-body alignment, proportions, transparent background and all clothing. Change only her expression to a small self-assured proud smile while keeping chin raised and posture. No new objects, no armor, no weapon, no shield, no staff, no book, no uniform, no text, no watermark.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    },
+    {
+      "id": "adv_timid_female",
+      "pose": "neutral",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-a7ab6214-9a01-4af7-b0f7-298bcd4a2507.png",
+      "outputPng": "artifacts/source-art/characters/adv_timid_female/neutral.png",
+      "outputWebp": "public/art/characters/adv_timid_female/neutral.webp",
+      "prompt": "Use case: stylized-concept. Asset type: game character transparent full-body sprite. Input image: attached Kai villager sprite is style and ordinary fantasy travel-clothing reference only; do not copy his gender or face. Create one distinct adult woman, timid_female, same warm clean anime cel-shaded fantasy game style. Full body centered, stable shy neutral pose with shoulders drawn inward; both hands separated, each gripping a plain satchel strap, genuinely transparent background, head near top and feet fully visible. Design: adult woman with dark ash-blond hair in TWO LOW COMPACT BUNS at the back (not a braid), long face and small gray eyes, hesitant expression. Dusty mauve short cloak over a tan ordinary fantasy travel tunic, simple belt, plain satchel, dark trousers, simple leather boots. No pink bob, no praying pose, no braid, no Noel-like hairstyle, no armor, no uniform, no weapon, no shield, no staff, no book, no medical gear, no modern clothes, no text, no watermark. Clearly adult woman, distinct from Sera, Noel, and every other generic woman. Keep hands apart gripping the satchel straps and preserve transparent padding.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "active"
+    },
+    {
+      "id": "adv_timid_female",
+      "pose": "happy",
+      "generatedSource": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-a4bf269f-2b8d-4322-a845-f40f5bae6a6b.png",
+      "outputPng": "artifacts/source-art/characters/adv_timid_female/happy.png",
+      "outputWebp": "public/art/characters/adv_timid_female/happy.webp",
+      "prompt": "Use case: identity-preserve. Asset type: game character transparent full-body sprite variant. Edit target: attached timid_female neutral sprite. Preserve exact same adult woman, dark ash-blond hair in low compact buns, long face, small gray eyes, dusty mauve short cloak, tan tunic, satchel, trousers, boots, shy shoulders-in pose, separated hands on satchel strap, full-body framing, alignment, proportions, transparent background and clothing details. Change only her expression to a small bashful happy smile with slightly softened eyes; keep timid posture and both hands separated. No new objects, no braid, no pink bob, no praying pose, no armor, no weapon, no shield, no staff, no book, no text, no watermark.",
+      "validation": {
+        "png": {
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "webp": {
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "alphaExtrema": [
+            0,
+            255
+          ]
+        },
+        "visualReview": true
+      },
+      "selectionStatus": "unused reserve; generic characters now use a single sprite"
+    }
+  ],
+  "batchValidation": {
+    "expectedAssets": 12,
+    "pngFiles": 12,
+    "webpFiles": 12,
+    "allFilesDecode": true,
+    "allPngsAre512x1024Rgba": true,
+    "allWebpsAre512x1024Rgba": true,
+    "allAlphaExtremaAre0_255": true,
+    "visualReviewComplete": true,
+    "rejectedDrafts": [
+      {
+        "character": "adv_caring_female",
+        "source": "C:/Users/takas/.codex/generated_images/01a13816-de20-7dd2-81ee-7f148bd38433/exec-71234efd-e23e-40f8-8f22-6d24e34be69a.png",
+        "reason": "Rejected because the draft read as masculine and included a non-transparent vignette background; it was not copied to project outputs."
+      }
+    ]
+  },
+  "currentUsage": "Use neutral only for all six characters; happy files are unused reserves. assets entries with revision_record supersede original prompts/records."
+}

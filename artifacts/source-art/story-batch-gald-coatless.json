@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen",
+  "assets": [
+    {
+      "id": "gald",
+      "pose": "coatless_neutral",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-ffb31d18-0426-4aa8-8423-d7afa26f702b.png",
+      "source": "artifacts/source-art/characters/gald/coatless_neutral.png",
+      "distribution": "public/art/characters/gald/coatless_neutral.webp",
+      "prompt": "Use case: precise-object-edit. Asset: transparent full body anime visual novel sprite, Gald coatless neutral variant. Edit the provided Gald sprite. Remove ONLY the entire brown long coat, including its cream lapels, gold coat buttons, sleeves and long tails. Underneath he wears the same dark charcoal collared shirt, now fully visible across his broad chest, shoulders and upper arms. Shirt sleeves rolled up naturally to elbows, charcoal fabric cuffs, strong bare forearms. No replacement jacket or vest. Preserve his EXACT recognizable middle-aged face, short spiky brown hair, beard and mustache, calm confident neutral expression, muscular broad build, exact hands-on-hips pose and hand positions, brown belt with square brass buckle, brown trousers and side pouch, brown boots. Same linework and cel shading, no extra objects, no floor shadow or text. Preserve original full body scale, alignment, head at top, feet at bottom with no clipping. Portrait 1:2 ratio intended for 512x1024. Background genuinely transparent alpha, not white/black/checkerboard.",
+      "references": [
+        "artifacts/source-art/characters/gald/neutral.png"
+      ],
+      "status": "generated"
+    },
+    {
+      "id": "gald",
+      "pose": "coatless_happy",
+      "sourceOutput": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-844bc4e8-04de-44a4-971e-876db87ebc59.png",
+      "source": "artifacts/source-art/characters/gald/coatless_happy.png",
+      "distribution": "public/art/characters/gald/coatless_happy.webp",
+      "prompt": "Use case: identity-preserve expression edit. Image 1 is the edit target: Gald coatless neutral transparent full-body sprite. Image 2 is reference ONLY for his hearty laughing facial expression. Change ONLY image 1's facial expression to the joyous hearty laugh in image 2: eyes happily shut, eyebrows raised, mouth open wide laughing with white upper teeth. Preserve EXACT image 1 hair, beard, head position and size, full-body pose, muscular build, charcoal collared shirt with sleeves rolled to elbows, NO COAT, belt, trousers, pouch, boots, every clothing fold, composition, linework, colors, cel shading, and transparent background. Do not add image 2's coat! One full-body character only; no text, no floor shadow, no cropping. Same portrait canvas and alignment as image 1, intended 512x1024 sprite. Genuinely transparent alpha.",
+      "references": [
+        "artifacts/source-art/characters/gald/coatless_neutral.png",
+        "artifacts/source-art/characters/gald/happy.png"
+      ],
+      "status": "generated"
+    }
+  ]
+}

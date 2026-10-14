@@ -1,0 +1,12 @@
+{
+  "assets": 80,
+  "files": 160,
+  "manifest_records": 80,
+  "valid_gallery_links": 241,
+  "source_bytes": 54537733,
+  "webp_bytes": 24010394,
+  "latest_revision": "Single-sprite generic characters; greedy faces/body revised; all active assets verified",
+  "scope": "Asset files only; game integration and final portrait cropping pending",
+  "previous_files_unchanged": 136,
+  "previous_files_moved_to_revisions": 24
+}

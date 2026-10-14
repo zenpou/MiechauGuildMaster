@@ -1,0 +1,66 @@
+{
+  "created": "2026-10-13",
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "id": "street-morning",
+      "name": "朝の街路",
+      "keys": [
+        "town",
+        "bg_street_morning"
+      ],
+      "scene": "A quiet cobblestone main street in a modest medieval fantasy frontier town, morning. On the left edge a modest family house with a wooden front door, low stone wall and open garden gate; the street leads gently toward an adventurers guild district. Timber framed plaster houses, terracotta roofs, a few potted plants, distant green hills. Welcoming lived-in town, not a royal capital. No people. Broad clear foreground pavement for overlay characters. The central third must read as a town street even in a portrait crop.",
+      "prompt": "Use case: illustration-story. Asset type: production background plate for a Japanese fantasy comedy visual novel, Miechau Guild Master. Landscape 1536x1024, 3:2 composition. Full bleed standalone background, no borders, no contact sheet. Style matches clean warm hand-drawn Japanese fantasy RPG character art: precise fine brown linework, restrained cel-shaded forms with softly painted ambient lighting, muted warm creams, wood browns and forest greens, crisp readable shapes; polished anime game art, not photorealistic, not 3D, not pixel art. Eye-level camera, moderate perspective, no fisheye. Characters will be overlaid at left and right and a dialogue box over the lower quarter, so keep those regions visually calm. No people, silhouettes, characters, writing, captions, logos, watermark, UI, or letters. Draw the full environment rather than blank margins.\nScene: A quiet cobblestone main street in a modest medieval fantasy frontier town, morning. On the left edge a modest family house with a wooden front door, low stone wall and open garden gate; the street leads gently toward an adventurers guild district. Timber framed plaster houses, terracotta roofs, a few potted plants, distant green hills. Welcoming lived-in town, not a royal capital. No people. Broad clear foreground pavement for overlay characters. The central third must read as a town street even in a portrait crop.\nThe previously established office uses forest green textiles, weathered oak, warm stone and brass lights; match that art direction.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a1341b-4b96-73d0-b3c0-0417823cac44\\exec-8805d4fc-01b0-441e-8e26-03d8b7ea6b83.png",
+      "reference": null
+    },
+    {
+      "id": "guild-office-day",
+      "name": "ギルド執務室・昼",
+      "keys": [
+        "office",
+        "bg_guild_office"
+      ],
+      "scene": "The master's office in an old but cared-for adventurers guild. Human-scale comfortable room, oak structural beams and cream plaster walls. A substantial old oak desk at the rear center with uneven stacks of parchment ledgers, inkpot and rolled maps, empty high-backed chair behind it, bookshelves along rear left wall. A tall arched window on rear right casts soft daylight; a worn forest-green upholstered nap sofa beneath the right window, clearly a place for an adult to lie down. Small brass-and-glass magical lamps, modest furnishings. Warm but burdened by paperwork, not ruined or palatial. Clear open floor in the foreground to overlay speaking characters; visible desk stays in central vertical third. No people.",
+      "prompt": "Use case: illustration-story. Asset type: production background plate for a Japanese fantasy comedy visual novel, Miechau Guild Master. Landscape 1536x1024, 3:2 composition. Full bleed standalone background, no borders, no contact sheet. Style matches clean warm hand-drawn Japanese fantasy RPG character art: precise fine brown linework, restrained cel-shaded forms with softly painted ambient lighting, muted warm creams, wood browns and forest greens, crisp readable shapes; polished anime game art, not photorealistic, not 3D, not pixel art. Eye-level camera, moderate perspective, no fisheye. Characters will be overlaid at left and right and a dialogue box over the lower quarter, so keep those regions visually calm. No people, silhouettes, characters, writing, captions, logos, watermark, UI, or letters. Draw the full environment rather than blank margins.\nScene: The master's office in an old but cared-for adventurers guild. Human-scale comfortable room, oak structural beams and cream plaster walls. A substantial old oak desk at the rear center with uneven stacks of parchment ledgers, inkpot and rolled maps, empty high-backed chair behind it, bookshelves along rear left wall. A tall arched window on rear right casts soft daylight; a worn forest-green upholstered nap sofa beneath the right window, clearly a place for an adult to lie down. Small brass-and-glass magical lamps, modest furnishings. Warm but burdened by paperwork, not ruined or palatial. Clear open floor in the foreground to overlay speaking characters; visible desk stays in central vertical third. No people.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a1341b-4b96-73d0-b3c0-0417823cac44\\exec-7dc369f8-f153-43cf-a0d3-cfed7c7b3c4f.png",
+      "reference": null
+    },
+    {
+      "id": "guild-reception",
+      "name": "ギルド受付",
+      "keys": [
+        "guild",
+        "bg_guild_reception"
+      ],
+      "scene": "Reception hall of the SAME modest frontier adventurers guild, oak beams, cream plaster, worn warm stone floor. Human-scale room not cathedral sized. A wooden reception counter across the rear middle, empty clerk chair, ledgers and brass-and-glass magical lamps. Noticeboard to left with blank parchment slips with no readable glyphs; stairs along far right lead upstairs to the master's office, simple wooden double entrance doors on side. Hint of daylight and a few benches at side edges. Main foreground is clear space for large character overlays. Warm and grounded atmosphere, a guild that can recover from hard times. No people.",
+      "prompt": "Use case: illustration-story. Asset type: production background plate for a Japanese fantasy comedy visual novel, Miechau Guild Master. Landscape 1536x1024, 3:2 composition. Full bleed standalone background, no borders, no contact sheet. Style matches clean warm hand-drawn Japanese fantasy RPG character art: precise fine brown linework, restrained cel-shaded forms with softly painted ambient lighting, muted warm creams, wood browns and forest greens, crisp readable shapes; polished anime game art, not photorealistic, not 3D, not pixel art. Eye-level camera, moderate perspective, no fisheye. Characters will be overlaid at left and right and a dialogue box over the lower quarter, so keep those regions visually calm. No people, silhouettes, characters, writing, captions, logos, watermark, UI, or letters. Draw the full environment rather than blank margins.\nScene: Reception hall of the SAME modest frontier adventurers guild, oak beams, cream plaster, worn warm stone floor. Human-scale room not cathedral sized. A wooden reception counter across the rear middle, empty clerk chair, ledgers and brass-and-glass magical lamps. Noticeboard to left with blank parchment slips with no readable glyphs; stairs along far right lead upstairs to the master's office, simple wooden double entrance doors on side. Hint of daylight and a few benches at side edges. Main foreground is clear space for large character overlays. Warm and grounded atmosphere, a guild that can recover from hard times. No people.\nThe previously established office uses forest green textiles, weathered oak, warm stone and brass lights; match that art direction.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a1341b-4b96-73d0-b3c0-0417823cac44\\exec-5ae9adb6-ac50-4160-b498-540b8bff578c.png",
+      "reference": null
+    },
+    {
+      "id": "guild-office-night",
+      "name": "ギルド執務室・夜",
+      "keys": [
+        "night",
+        "bg_guild_office_night"
+      ],
+      "scene": "NIGHT LIGHTING VARIANT of the supplied daytime guild office. Preserve EXACT same architecture, camera, desk, ledgers, shelves, sofa, window, furniture positions and framing. Change only time and illumination: deep indigo night visible through the window, subtle blue moonlight and warm brass magical desk lamp illuminating the parchment. Quiet reflective decision-before-the-battle atmosphere, legible middle values, not horror or pitch dark. No people.",
+      "prompt": "Use case: illustration-story. Asset type: production background plate for a Japanese fantasy comedy visual novel, Miechau Guild Master. Landscape 1536x1024, 3:2 composition. Full bleed standalone background, no borders, no contact sheet. Style matches clean warm hand-drawn Japanese fantasy RPG character art: precise fine brown linework, restrained cel-shaded forms with softly painted ambient lighting, muted warm creams, wood browns and forest greens, crisp readable shapes; polished anime game art, not photorealistic, not 3D, not pixel art. Eye-level camera, moderate perspective, no fisheye. Characters will be overlaid at left and right and a dialogue box over the lower quarter, so keep those regions visually calm. No people, silhouettes, characters, writing, captions, logos, watermark, UI, or letters. Draw the full environment rather than blank margins.\nUse the input image as the exact edit target. NIGHT LIGHTING VARIANT of the supplied daytime guild office. Preserve EXACT same architecture, camera, desk, ledgers, shelves, sofa, window, furniture positions and framing. Change only time and illumination: deep indigo night visible through the window, subtle blue moonlight and warm brass magical desk lamp illuminating the parchment. Quiet reflective decision-before-the-battle atmosphere, legible middle values, not horror or pitch dark. No people.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a1341b-4b96-73d0-b3c0-0417823cac44\\exec-73addf87-d2c4-488e-9c21-298f02d27a3b.png",
+      "reference": "guild-office-day-v1.png"
+    },
+    {
+      "id": "guild-tavern",
+      "name": "ギルドの酒場",
+      "keys": [
+        "tavern",
+        "bg_guild_tavern"
+      ],
+      "scene": "An inviting modest tavern attached to the frontier adventurers guild, same oak beams and cream plaster architectural family. A hearth on back left, a wooden bar at rear center, shelves of ceramic pitchers and wooden cups, barrels to rear right, warm brass lanterns and sunset light from a small window. Few sturdy communal tables kept at side edges, clear central foreground floor for dialogue character overlays, no large foreground table blocking characters. Cozy place for a successful expedition's celebration, human-scale rather than a huge banquet hall. No patrons, no people, no food closeup.",
+      "prompt": "Use case: illustration-story. Asset type: production background plate for a Japanese fantasy comedy visual novel, Miechau Guild Master. Landscape 1536x1024, 3:2 composition. Full bleed standalone background, no borders, no contact sheet. Style matches clean warm hand-drawn Japanese fantasy RPG character art: precise fine brown linework, restrained cel-shaded forms with softly painted ambient lighting, muted warm creams, wood browns and forest greens, crisp readable shapes; polished anime game art, not photorealistic, not 3D, not pixel art. Eye-level camera, moderate perspective, no fisheye. Characters will be overlaid at left and right and a dialogue box over the lower quarter, so keep those regions visually calm. No people, silhouettes, characters, writing, captions, logos, watermark, UI, or letters. Draw the full environment rather than blank margins.\nScene: An inviting modest tavern attached to the frontier adventurers guild, same oak beams and cream plaster architectural family. A hearth on back left, a wooden bar at rear center, shelves of ceramic pitchers and wooden cups, barrels to rear right, warm brass lanterns and sunset light from a small window. Few sturdy communal tables kept at side edges, clear central foreground floor for dialogue character overlays, no large foreground table blocking characters. Cozy place for a successful expedition's celebration, human-scale rather than a huge banquet hall. No patrons, no people, no food closeup.\nThe previously established office uses forest green textiles, weathered oak, warm stone and brass lights; match that art direction.",
+      "generated": "C:\\Users\\takas\\.codex\\generated_images\\01a1341b-4b96-73d0-b3c0-0417823cac44\\exec-db3a314f-9524-4fe2-9696-7d57814603e0.png",
+      "reference": null
+    }
+  ]
+}

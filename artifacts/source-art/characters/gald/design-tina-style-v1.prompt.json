@@ -1,0 +1,9 @@
+{
+  "character": "ガルド",
+  "status": "style-transfer-candidate",
+  "source": "built-in image_gen",
+  "style_reference": "artifacts/source-art/characters/tina/design-approved-v1.png",
+  "design_reference": "artifacts/source-art/characters/gald/design-candidate-v1.png",
+  "prompt": "Use Image 1 only as style: Tina's strong dark-brown outlines, simplified shapes, hard 2-3 step cel shadows, saturated classic manga/RPG finish. Use Image 2 only as design. Preserve Gald as a muscular mature man around 50 with short brown hair, full brown beard, rugged friendly face, big smile, fitted long brown coat with broad tan lapels and large round gold buttons, dark shirt, brown trousers and boots. Keep mature male proportions, beard, coat and buttons. Replace thin pale glossy detail with Tina's bold cel language. Do not make him young, slim or feminine and do not copy Tina's red hair, amber eyes, scarf, armor or sword. No ornate armor, royal clothing, weapons, crop, text or watermark.",
+  "output": "artifacts/source-art/characters/gald/design-tina-style-v1.png"
+}

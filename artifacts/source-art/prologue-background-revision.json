@@ -1,0 +1,11 @@
+{
+  "tool": "built-in image_gen",
+  "asset": "stills/prologue",
+  "purpose": "Empty background plate; characters and effects will be composed separately in future integration.",
+  "prompt": "Use case: precise-object-edit. Edit the supplied prologue illustration into an EMPTY BACKGROUND PLATE for a fantasy visual novel. Remove BOTH people completely: the black-haired man on the left and the red-haired armored woman on the right, including all clothing, equipment and character cast shadows. Also remove every curved white motion streak, airborne dust cloud and flying particle associated with their action. Reconstruct the obscured wooden gate, stone street, town buildings and distant castle naturally. Preserve the same open massive wooden family-house gate on the left, cobbled foreground, medieval street and castle in distance, cheerful morning blue sky, warm lighting and polished painted anime background style. Keep the existing landscape framing and perspective, 1536x1024. Foreground must be calm and unobstructed, suitable for separately overlaid character sprites and animated effects. No people, no animals, no silhouettes, no action effects, no text, no UI, no watermark. The result is ONLY the original setting without characters.",
+  "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-86a940a9-d1aa-47f4-8b84-82f3c3281f01.png",
+  "references": [
+    "artifacts/source-art/revisions/prologue-before-background-only.png"
+  ],
+  "scope": "Background replacement only. No game animation implementation."
+}

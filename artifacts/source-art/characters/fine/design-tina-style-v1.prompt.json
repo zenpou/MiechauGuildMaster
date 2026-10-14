@@ -1,0 +1,10 @@
+{
+  "character": "fine",
+  "output": "design-tina-style-v1.png",
+  "mode": "built-in image_gen style-transfer",
+  "style_reference": "C:/Users/takas/project/MiechauGuildMaster/artifacts/source-art/characters/tina/design-approved-v1.png",
+  "design_reference": "C:/Users/takas/project/MiechauGuildMaster/artifacts/source-art/characters/fine/design-candidate-v1.png",
+  "style_rules": "Use Tina only for style: strong dark-brown contours, bold upper eyelids, large vertical irises with dark upper section and simple white highlight, rounded youthful face, angular hair locks, 2-3 hard cel shadows, stronger contrast, rustic manga/old-RPG finish.",
+  "preserve": "Fine's 22-year-old adult young-adult older-sister identity, honey-colored loose wavy long hair, kind drooping eyes, relaxed confident smile, rustic mountain-village clothes, large woven basket, simplified medicinal herbs, pose, full-body framing and warm ivory background.",
+  "avoid": "Copying Tina's red hair, ponytail, sword armor, scarf, face or expression; priest robe; armor; weapon; aging into motherly/elderly appearance; redesigning clothes; cropping; text or watermark."
+}

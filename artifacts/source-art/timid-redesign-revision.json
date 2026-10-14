@@ -1,0 +1,27 @@
+{
+  "tool": "built-in image_gen",
+  "reason": "Distinguish generic timid adventurer from Sera; Sera unchanged.",
+  "assets": [
+    {
+      "id": "adv_timid",
+      "pose": "neutral",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-72e77101-8c23-4e51-82e6-c5ba9a24aa5a.png",
+      "prompt": "Use case: precise-object-edit. Redesign the generic TIMID guild adventurer in the supplied reference, keeping ONLY the shared clean warm anime cel-shaded rendering style and ordinary medieval adventurer role. Replace the young round-faced bob-haired girl design entirely. New character: plainly recognizable adult MAN around thirty, lean lanky build, narrow elongated face, somewhat prominent straight nose, thin worried eyebrows, small gray-blue eyes glancing sideways, short sandy-blond cropped hair with uneven fringe ABOVE eyebrows and visible ears, no bob haircut, no long bangs, no glasses, no beard. Timid personality conveyed through slightly hunched shoulders and softly bent knees, guarded posture; NOT a cute praying priestess. Holds a small battered round wooden buckler with metal rim against his lower chest with left arm, right hand nervously gripping a satchel strap near his waist, hands spatially separated. Plain blue-gray hooded short shoulder cape with hood DOWN, faded rust-brown leather vest over muted slate-blue long-sleeve shirt, gray-brown trousers, simple brown boots, worn belt with a SHEATHED short sword at hip and plain small travel satchel. No drawn knife, no white/gold robes, no religious motifs, no pink or brown bob hairstyle, no ornaments. Neutral expression: apprehensive closed mouth, lifted inner brows, wary eyes, restrained readable anxiety. Single FULL BODY transparent sprite, head near top with margin, feet fully visible, 1:2 portrait ratio for 512x1024. Same polished anime linework and cel shading as reference, ordinary supporting character. Genuine alpha transparency, NO scenery, ground plane, cast shadow, labels, text, watermark.",
+      "size": [
+        512,
+        1024
+      ]
+    },
+    {
+      "id": "adv_timid",
+      "pose": "happy",
+      "generated": "C:/Users/takas/.codex/generated_images/01a137b7-afea-7602-833e-adcfe0cfb6c7/exec-e22e5dc8-3ea0-4013-840f-0332fc33e825.png",
+      "prompt": "Use case: identity-preserve expression edit. Edit this adult male timid adventurer neutral full-body transparent sprite into HAPPY. Change ONLY his face: a small relieved, slightly awkward friendly smile, mouth gently open, worried brows relaxed but still a little shy, softer eyes. Retain his timid personality, not a heroic grin. Preserve EXACT same adult male identity, narrow face and nose, short sandy-blond cropped hair, blue-gray cape, rust-brown leather vest, round wooden shield, hands, satchel, sheathed sword, trousers, boots, every clothing fold, full body pose, head/body placement, proportions, colors, clean anime cel shading and alpha transparency. Full body including feet, 1:2 portrait canvas for 512x1024. No additional props, no ground plane or floor shadow, no background, no writing, no watermark.",
+      "size": [
+        512,
+        1024
+      ]
+    }
+  ],
+  "scope": "Asset revision only; no game integration."
+}
