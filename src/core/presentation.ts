@@ -12,9 +12,9 @@ export type BackgroundId = string;
 
 export const POSITIONS = ['left', 'center', 'right'] as const;
 export type StagePosition = typeof POSITIONS[number];
-export const MOTIONS = ['enter-left', 'enter-right', 'jump', 'nod', 'shake', 'recoil'] as const;
+export const MOTIONS = ['enter-left', 'enter-right', 'jump', 'nod', 'shake', 'recoil', 'spin-out', 'hit', 'tremble'] as const;
 export type CharacterMotion = typeof MOTIONS[number];
-export const SOUND_CUES = ['paper', 'door', 'step', 'bow', 'chime', 'water', 'cup'] as const;
+export const SOUND_CUES = ['paper', 'door', 'step', 'bow', 'chime', 'water', 'cup', 'slash', 'blow', 'roar', 'flame'] as const;
 export type SoundCue = typeof SOUND_CUES[number];
 export const EFFECTS = ['shake', 'flash', 'impact'] as const;
 export type StageEffect = typeof EFFECTS[number];

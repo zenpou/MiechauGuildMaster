@@ -20,6 +20,69 @@ export interface StoryAudioController {
   dispose(): void;
 }
 
+/** 1つの合成音。start と duration は秒、gain は主音量に掛ける前の大きさ */
+export interface SoundPart {
+  frequency: number;
+  start: number;
+  duration: number;
+  gain: number;
+  type: OscillatorType;
+}
+
+/** 効果音ごとの部品の表。鳴らし方の分岐に埋めると、語彙を足したのに音が無いことにテストで気づけない */
+export const SOUND_PARTS: Record<SoundCue, readonly SoundPart[]> = {
+  paper: [
+    { frequency: 620, start: 0, duration: 0.06, gain: 0.06, type: 'triangle' },
+    { frequency: 940, start: 0.045, duration: 0.08, gain: 0.045, type: 'triangle' },
+  ],
+  door: [
+    { frequency: 150, start: 0, duration: 0.14, gain: 0.11, type: 'square' },
+    { frequency: 95, start: 0.12, duration: 0.18, gain: 0.08, type: 'triangle' },
+  ],
+  step: [
+    { frequency: 120, start: 0, duration: 0.09, gain: 0.09, type: 'triangle' },
+    { frequency: 72, start: 0.045, duration: 0.1, gain: 0.06, type: 'sine' },
+  ],
+  bow: [
+    { frequency: 440, start: 0, duration: 0.16, gain: 0.06, type: 'sine' },
+    { frequency: 660, start: 0.08, duration: 0.22, gain: 0.05, type: 'sine' },
+  ],
+  chime: [
+    { frequency: 880, start: 0, duration: 0.34, gain: 0.07, type: 'sine' },
+    { frequency: 1320, start: 0.1, duration: 0.42, gain: 0.045, type: 'sine' },
+  ],
+  water: [
+    { frequency: 260, start: 0, duration: 0.28, gain: 0.04, type: 'sine' },
+    { frequency: 390, start: 0.08, duration: 0.35, gain: 0.035, type: 'triangle' },
+    { frequency: 520, start: 0.19, duration: 0.3, gain: 0.025, type: 'sine' },
+  ],
+  cup: [
+    { frequency: 300, start: 0, duration: 0.1, gain: 0.08, type: 'triangle' },
+    { frequency: 520, start: 0.06, duration: 0.22, gain: 0.045, type: 'sine' },
+  ],
+  slash: [
+    { frequency: 2400, start: 0, duration: 0.05, gain: 0.035, type: 'sawtooth' },
+    { frequency: 1500, start: 0.025, duration: 0.07, gain: 0.045, type: 'sawtooth' },
+    { frequency: 780, start: 0.06, duration: 0.12, gain: 0.04, type: 'triangle' },
+  ],
+  blow: [
+    { frequency: 180, start: 0, duration: 0.05, gain: 0.07, type: 'square' },
+    { frequency: 88, start: 0.01, duration: 0.14, gain: 0.12, type: 'square' },
+    { frequency: 55, start: 0.03, duration: 0.24, gain: 0.1, type: 'sine' },
+  ],
+  roar: [
+    { frequency: 62, start: 0, duration: 0.75, gain: 0.08, type: 'sawtooth' },
+    { frequency: 93, start: 0.06, duration: 0.6, gain: 0.06, type: 'sawtooth' },
+    { frequency: 41, start: 0.12, duration: 0.85, gain: 0.1, type: 'sine' },
+  ],
+  flame: [
+    { frequency: 170, start: 0, duration: 0.45, gain: 0.045, type: 'sawtooth' },
+    { frequency: 255, start: 0.07, duration: 0.4, gain: 0.035, type: 'square' },
+    { frequency: 340, start: 0.15, duration: 0.36, gain: 0.03, type: 'sawtooth' },
+    { frequency: 130, start: 0.22, duration: 0.4, gain: 0.04, type: 'triangle' },
+  ],
+};
+
 type AudioContextConstructor = new () => AudioContext;
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
@@ -149,38 +212,8 @@ export function createStoryAudio(): StoryAudioController {
     if (!ctx || ctx.state === 'closed') return;
     try {
       const at = ctx.currentTime + 0.005;
-      switch (cue) {
-        case 'paper':
-          tone(ctx, 620, at, 0.06, 0.06, 'triangle');
-          tone(ctx, 940, at + 0.045, 0.08, 0.045, 'triangle');
-          break;
-        case 'door':
-          tone(ctx, 150, at, 0.14, 0.11, 'square');
-          tone(ctx, 95, at + 0.12, 0.18, 0.08, 'triangle');
-          break;
-        case 'step':
-          tone(ctx, 120, at, 0.09, 0.09, 'triangle');
-          tone(ctx, 72, at + 0.045, 0.1, 0.06, 'sine');
-          break;
-        case 'bow':
-          tone(ctx, 440, at, 0.16, 0.06, 'sine');
-          tone(ctx, 660, at + 0.08, 0.22, 0.05, 'sine');
-          break;
-        case 'chime':
-          tone(ctx, 880, at, 0.34, 0.07, 'sine');
-          tone(ctx, 1320, at + 0.1, 0.42, 0.045, 'sine');
-          break;
-        case 'water':
-          tone(ctx, 260, at, 0.28, 0.04, 'sine');
-          tone(ctx, 390, at + 0.08, 0.35, 0.035, 'triangle');
-          tone(ctx, 520, at + 0.19, 0.3, 0.025, 'sine');
-          break;
-        case 'cup':
-          tone(ctx, 300, at, 0.1, 0.08, 'triangle');
-          tone(ctx, 520, at + 0.06, 0.22, 0.045, 'sine');
-          break;
-        default:
-          break;
+      for (const part of SOUND_PARTS[cue] ?? []) {
+        tone(ctx, part.frequency, at + part.start, part.duration, part.gain, part.type);
       }
     } catch {
       // Web Audio が失敗しても、場面はそのまま読める

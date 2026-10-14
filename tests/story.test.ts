@@ -7,6 +7,7 @@ import {
 import { markStorySeen, STORY, storyDue, storySeen, storySeenDay, triggerMet } from '../src/core/story';
 import type { StoryTrigger } from '../src/core/story';
 import type { GameState } from '../src/core/types';
+import { SOUND_PARTS } from '../src/ui/storyAudio';
 
 function triggerProblems(t: unknown, where: string): string[] {
   if (typeof t !== 'object' || t === null || Array.isArray(t)) return [`${where}: trigger がオブジェクトでない`];
@@ -314,5 +315,25 @@ describe('storySeen', () => {
     markStorySeen(s, 'ch2');
     markStorySeen(s, 'prologue');
     expect(ids(storySeen(s))).toEqual(['prologue', 'ch2']);
+  });
+});
+
+describe('演出の語彙', () => {
+  it('動きは既存6語に spin-out・hit・tremble を足した9語', () => {
+    expect([...MOTIONS]).toEqual(['enter-left', 'enter-right', 'jump', 'nod', 'shake', 'recoil', 'spin-out', 'hit', 'tremble']);
+  });
+
+  it('効果音は既存7語に slash・blow・roar・flame を足した11語', () => {
+    expect([...SOUND_CUES]).toEqual(['paper', 'door', 'step', 'bow', 'chime', 'water', 'cup', 'slash', 'blow', 'roar', 'flame']);
+  });
+
+  it('どの効果音にも音の部品が1つ以上ある', () => {
+    const silent = SOUND_CUES.filter((cue) => (SOUND_PARTS[cue]?.length ?? 0) === 0);
+    expect(silent).toEqual([]);
+  });
+
+  it('音の部品は周波数・長さ・音量が正で、開始は0以上', () => {
+    const bad = SOUND_CUES.flatMap((cue) => SOUND_PARTS[cue].filter((p) => !(p.frequency > 0 && p.duration > 0 && p.gain > 0 && p.start >= 0)).map(() => cue));
+    expect(bad).toEqual([]);
   });
 });

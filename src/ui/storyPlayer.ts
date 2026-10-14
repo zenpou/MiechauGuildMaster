@@ -4,6 +4,7 @@ import {
   backgroundArt,
   castMember,
   characterArt,
+  MOTIONS,
   POSITIONS,
   speakerCharacter,
   stillArt,
@@ -28,14 +29,7 @@ export interface StoryPlayer {
 
 const PLAYER_COUNTER = { value: 0 };
 const STORY_MOTION_KEY = 'miechau_story_motion_enabled_v1';
-const MOTION_CLASSES = [
-  'is-motion-enter-left',
-  'is-motion-enter-right',
-  'is-motion-jump',
-  'is-motion-nod',
-  'is-motion-shake',
-  'is-motion-recoil',
-] as const;
+const MOTION_CLASSES = MOTIONS.map((motion) => `is-motion-${motion}` as const);
 const FALLBACK_COLOR = '#8e7650';
 
 type Slot = {
@@ -530,6 +524,9 @@ export function createStoryPlayer(options: CreateStoryPlayerOptions): StoryPlaye
     slot.motion.classList.add(`is-motion-${cue.actor.motion}`);
     const motion = cue.actor.motion;
     scheduleVisualCleanup(620, () => {
+      // 退場した人物は次の行で updateStage が出し直すまで伏せる。クラスを残すだけだと、
+      // 演出OFFや次の行の場面の写し(クラス名が替わる)で元の位置に戻って見える
+      if (motion === 'spin-out') slot.figure.hidden = true;
       slot.motion.classList.remove(`is-motion-${motion}`);
       if (slot.motion.dataset.motion === motion) delete slot.motion.dataset.motion;
     });

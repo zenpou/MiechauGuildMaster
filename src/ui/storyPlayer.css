@@ -334,6 +334,10 @@
 @keyframes vn-player-motion-nod { 0%, 100% { transform: translateY(0) scaleY(1); } 42% { transform: translateY(1.5%) scaleY(.985); } }
 @keyframes vn-player-motion-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.5%); } 60% { transform: translateX(1.5%); } }
 @keyframes vn-player-motion-recoil { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 28% { transform: translate3d(-9%, 0, 0) scale(.98); } 62% { transform: translate3d(2%, 0, 0) scale(1); } }
+@keyframes vn-player-motion-spin-out { from { opacity: 1; transform: translate3d(0, 0, 0) rotate(0); } 70% { opacity: .85; } to { opacity: 0; transform: translate3d(var(--vn-spin-out-x, 320%), -14%, 0) rotate(720deg); } }
+/* 立ち絵は透過 WebP なので、背景色ではなく filter で絵そのものを赤く寄せる */
+@keyframes vn-player-motion-hit { 0%, 100% { transform: translateY(0); filter: none; } 8% { transform: translateY(2.5%); filter: sepia(.9) saturate(5) hue-rotate(-40deg) brightness(.92); } 26% { transform: translateY(-1.8%); filter: none; } 48% { transform: translateY(1.2%); } 72% { transform: translateY(-.6%); } }
+@keyframes vn-player-motion-tremble { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-2.5px); } 20%, 40%, 60%, 80% { transform: translateX(2.5px); } }
 
 .vn-player-scene-snapshot.is-transition-fade { animation: vn-player-transition-fade .46s ease both; }
 .vn-player-scene-snapshot.is-transition-wipe { animation: vn-player-transition-wipe .56s cubic-bezier(.2, .75, .2, 1) both; }
@@ -352,6 +356,11 @@
 .vn-player-character-motion.is-motion-nod { animation: vn-player-motion-nod .54s ease both; }
 .vn-player-character-motion.is-motion-shake { animation: vn-player-motion-shake .54s ease both; }
 .vn-player-character-motion.is-motion-recoil { animation: vn-player-motion-recoil .54s cubic-bezier(.25, .8, .3, 1) both; }
+/* 左の人物は左へ飛ばす。全員を右へ飛ばすと、隣の人物の上を横切る */
+.vn-player-character-left .vn-player-character-motion.is-motion-spin-out { --vn-spin-out-x: -320%; }
+.vn-player-character-motion.is-motion-spin-out { animation: vn-player-motion-spin-out .54s cubic-bezier(.45, 0, .8, .6) both; }
+.vn-player-character-motion.is-motion-hit { animation: vn-player-motion-hit .54s ease-out both; }
+.vn-player-character-motion.is-motion-tremble { animation: vn-player-motion-tremble .54s linear both; }
 
 .vn-player-dialogue {
   position: relative;
