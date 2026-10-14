@@ -37,14 +37,14 @@ function equipText(def: ItemDef | undefined): string {
   return parts.join(' ');
 }
 
-/** 最初の数日の「次にやること」。受付のティナが案内する体裁。赤字のヒントは状態で消えるので閉じるボタンを出さない */
+/** 最初の数日の「次にやること」。受付のノエルが案内する体裁(心配性なので顔は worried)。赤字のヒントは状態で消えるので閉じるボタンを出さない */
 function hintBlock(): HTMLElement | null {
   const hint = hintFor(state);
   if (!hint) return null;
   return div('hint', { role: 'note' },
-    h('img', { class: 'hint-face', src: artUrl('faces/tina/neutral.webp'), alt: '', width: 56, height: 56 }),
+    h('img', { class: 'hint-face', src: artUrl('faces/noel/worried.webp'), alt: '', width: 56, height: 56 }),
     div('hint-body',
-      div('hint-name', '受付のティナ'),
+      div('hint-name', 'ノエル(受付)'),
       div('hint-text', hint.text),
       div('row tight',
         hint.id === 'debt' ? null : h('button', { class: 'small', onclick: () => { dismissHint(state, hint.id); commit(); } }, '閉じる'),
