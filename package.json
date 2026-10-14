@@ -12,10 +12,12 @@
     "sim:styles": "tsx scripts/playstyles.ts",
     "sim:dragon": "tsx scripts/dragon.ts",
     "sim:boss": "tsx scripts/boss.ts",
+    "font:subset": "node scripts/subset-font.cjs",
     "preview": "vite preview --host 127.0.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
+    "subset-font": "^2.9.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",

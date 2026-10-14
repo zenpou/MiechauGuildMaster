@@ -1,0 +1,6 @@
+# 明朝(Shippori Mincho)で描く文字。src/ui/minchoText.ts と src/ui/tabs.ts の文字がすべて入っていることを tests/font-glyphs.test.ts が検査する
+見えちゃうギルドマスター
+拠点受信箱依頼派遣ワールド募集施設地図ログ記録
+日目評判未読次の日へ支出
+0123456789GLv
+−-+,.%/:()
