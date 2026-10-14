@@ -1,0 +1,35 @@
+{
+  // F5: Vite の開発サーバー(npm run dev、port 5173)を起動してから Chrome で開く。
+  // 止めるときはデバッグの停止で Chrome が閉じ、サーバーは tasks.json の終了を待つ
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ゲームを起動(Vite + Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173/",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "vite: dev",
+      "postDebugTask": "vite: stop",
+      "sourceMaps": true
+    },
+    {
+      "name": "テストを実行(vitest)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vitest", "run"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "開いているテストファイルだけ(vitest)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vitest", "run", "${relativeFile}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

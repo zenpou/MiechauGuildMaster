@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // バックグラウンドで動かし、「ready in」の行が出たら launch.json の Chrome 起動へ進む。5173 が塞がっていたら別の番号に逃げず失敗させる(URL と食い違わないように)
+      "label": "vite: dev",
+      "type": "shell",
+      "command": "npx vite --port 5173 --strictPort",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE v",
+          "endsPattern": "(ready in|Local:)"
+        }
+      },
+      "presentation": { "reveal": "silent", "panel": "dedicated" }
+    },
+    {
+      "label": "vite: stop",
+      "type": "process",
+      "command": "${command:workbench.action.tasks.terminate}",
+      "args": ["vite: dev"],
+      "problemMatcher": []
+    }
+  ]
+}
