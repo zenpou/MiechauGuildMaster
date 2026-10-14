@@ -52,7 +52,7 @@
 - `Adventurer` に `gender: 'male' | 'female'` と `appearance: string` を足す。`generateAdventurer` で rng から決める(`adv_<性格>_<性別>`)。ユニークは人物 id
 - `SAVE_VERSION` を 2 に上げ、読み込み時に無い冒険者へ `hash(seed, 'appearance', adv.id)` から一度だけ補完して保存。`Math.random` は使わない
 - 転職・装備変更・再読み込みで変わらないことをテストで固定する
-- 名簿・候補への顔表示は顔ファイルが揃ってから。今回は保存まで
+- 名簿・候補への顔表示は次の依頼。今回は型・生成・保存・移行まで
 
 ### やらないこと(次の依頼)
 
@@ -64,7 +64,7 @@
 
 ### 守ること
 
-- 画像は `artifacts/source-art/story-assets-verification.json` にある80枚だけ使う。`revisions/` の予備は登録しない
+- 画像は `artifacts/source-art/story-assets-verification.json` にある素材82枚と顔76枚だけ使う。`revisions/` の予備は登録しない
 - `src/core/` に DOM を書かない。数値はコードに埋めず JSON へ
 - 既存セーブが読めること(`tests/save.test.ts` に版2の移行テストを足す)
 - 終わったら `npm test`、`npm run build`、`npm run test:browser` を通し、スマートフォン幅(375px)で序章と第二章(ヴィオラの鎧・斥候服の切り替え)と終章(竜の立ち絵)の見え方をスクリーンショットで確認して `docs/VERIFICATION.md` に日付付きで追記
