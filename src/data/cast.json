@@ -1,4 +1,16 @@
 [
+  {"id": "kai", "name": "カイ", "color": "#6b7f99", "poses": ["neutral", "happy", "angry", "surprised", "shy", "sleep"]},
+  {"id": "tina", "name": "ティナ", "color": "#d9533f", "poses": ["neutral", "happy", "angry", "surprised", "shy", "sulky"]},
+  {"id": "iris", "name": "アイリス", "color": "#b9a7dc", "poses": ["neutral", "happy", "angry", "surprised", "shy", "dizzy", "coatless_happy", "coatless_neutral"]},
+  {"id": "noel", "name": "ノエル", "color": "#9c6b45", "poses": ["neutral", "happy", "angry", "surprised", "shy", "worried"]},
+  {"id": "sera", "name": "セラ", "color": "#f0a3b6", "poses": ["neutral", "happy", "angry", "surprised", "shy", "teary"]},
+  {"id": "viola", "name": "ヴィオラ", "color": "#2f4f8f", "poses": ["neutral", "happy", "angry", "surprised", "shy", "flustered", "scout_angry", "scout_flustered", "scout_happy", "scout_neutral"]},
+  {"id": "ruu", "name": "ルゥ", "color": "#6d3f9e", "poses": ["neutral", "happy", "angry", "surprised", "shy", "bluff"]},
+  {"id": "fine", "name": "フィーネ", "color": "#d9a64a", "poses": ["neutral", "happy", "angry", "surprised", "shy", "sparkle"]},
+  {"id": "aurelia", "name": "アウレリア", "color": "#f0702a", "poses": ["neutral", "happy", "angry", "surprised", "shy", "dragon"], "poseDisplay": {"dragon": {"scale": 1, "top": 0}}},
+  {"id": "gald", "name": "ガルド", "color": "#8a6240", "poses": ["neutral", "happy", "coatless_happy", "coatless_neutral"]},
+  {"id": "mother", "name": "母", "color": "#9b8b7b", "poses": ["neutral"]},
+  {"id": "everyone", "name": "全員", "color": "#d9c27a", "poses": ["neutral"]},
   {"id": "master", "name": "ギルドマスター(仮)", "color": "#d9b45f", "poses": ["neutral", "happy", "thoughtful"]},
   {"id": "clerk", "name": "受付(仮)", "color": "#6fb0d8", "poses": ["neutral", "happy", "worried"]},
   {"id": "unique", "name": "ユニーク冒険者(仮)", "color": "#d9786f", "poses": ["neutral", "happy", "angry"]}

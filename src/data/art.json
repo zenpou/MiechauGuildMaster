@@ -1,20 +1,126 @@
 {
   "backgrounds": {
+    "bg_street_gate": "stills/prologue.webp",
+    "bg_street_morning": "backgrounds/street-morning-v1.webp",
+    "bg_guild_office": "backgrounds/guild-office-day-v1.webp",
+    "bg_guild_office_night": "backgrounds/guild-office-night-v1.webp",
+    "bg_guild_office_sunset": "backgrounds/bg_guild_office_sunset.webp",
+    "bg_guild_hall": "backgrounds/guild-reception-v1.webp",
+    "bg_dungeon_mine": "backgrounds/bg_dungeon_mine.webp",
+    "bg_dungeon_crystal": "backgrounds/bg_dungeon_crystal.webp",
+    "bg_dungeon_dragon": "backgrounds/bg_dungeon_dragon.webp",
     "guild": "backgrounds/guild-reception-v1.webp",
     "town": "backgrounds/street-morning-v1.webp",
     "night": "backgrounds/guild-office-night-v1.webp",
     "tavern": "backgrounds/guild-tavern-v1.webp",
-    "office": "backgrounds/guild-office-day-v1.webp",
-    "bg_street_morning": "backgrounds/street-morning-v1.webp",
-    "bg_guild_office": "backgrounds/guild-office-day-v1.webp",
-    "bg_guild_reception": "backgrounds/guild-reception-v1.webp",
-    "bg_guild_office_night": "backgrounds/guild-office-night-v1.webp",
-    "bg_guild_tavern": "backgrounds/guild-tavern-v1.webp"
+    "office": "backgrounds/guild-office-day-v1.webp"
   },
   "characters": {
-    "master": {"neutral": null, "happy": null, "thoughtful": null},
-    "clerk": {"neutral": null, "happy": null, "worried": null},
-    "unique": {"neutral": null, "happy": null, "angry": null}
+    "kai": {
+      "neutral": {"image": "characters/kai/neutral.webp", "face": "faces/kai/neutral.webp"},
+      "happy": {"image": "characters/kai/happy.webp", "face": "faces/kai/happy.webp"},
+      "angry": {"image": "characters/kai/angry.webp", "face": "faces/kai/angry.webp"},
+      "surprised": {"image": "characters/kai/surprised.webp", "face": "faces/kai/surprised.webp"},
+      "shy": {"image": "characters/kai/shy.webp", "face": "faces/kai/shy.webp"},
+      "sleep": {"image": "characters/kai/sleep.webp", "face": "faces/kai/sleep.webp"}
+    },
+    "tina": {
+      "neutral": {"image": "characters/tina/neutral.webp", "face": "faces/tina/neutral.webp"},
+      "happy": {"image": "characters/tina/happy.webp", "face": "faces/tina/happy.webp"},
+      "angry": {"image": "characters/tina/angry.webp", "face": "faces/tina/angry.webp"},
+      "surprised": {"image": "characters/tina/surprised.webp", "face": "faces/tina/surprised.webp"},
+      "shy": {"image": "characters/tina/shy.webp", "face": "faces/tina/shy.webp"},
+      "sulky": {"image": "characters/tina/sulky.webp", "face": "faces/tina/sulky.webp"}
+    },
+    "iris": {
+      "neutral": {"image": "characters/iris/neutral.webp", "face": "faces/iris/neutral.webp"},
+      "happy": {"image": "characters/iris/happy.webp", "face": "faces/iris/happy.webp"},
+      "angry": {"image": "characters/iris/angry.webp", "face": "faces/iris/angry.webp"},
+      "surprised": {"image": "characters/iris/surprised.webp", "face": "faces/iris/surprised.webp"},
+      "shy": {"image": "characters/iris/shy.webp", "face": "faces/iris/shy.webp"},
+      "dizzy": {"image": "characters/iris/dizzy.webp", "face": "faces/iris/dizzy.webp"},
+      "coatless_happy": {"image": "characters/iris/coatless_happy.webp", "face": "faces/iris/coatless_happy.webp"},
+      "coatless_neutral": {"image": "characters/iris/coatless_neutral.webp", "face": "faces/iris/coatless_neutral.webp"}
+    },
+    "noel": {
+      "neutral": {"image": "characters/noel/neutral.webp", "face": "faces/noel/neutral.webp"},
+      "happy": {"image": "characters/noel/happy.webp", "face": "faces/noel/happy.webp"},
+      "angry": {"image": "characters/noel/angry.webp", "face": "faces/noel/angry.webp"},
+      "surprised": {"image": "characters/noel/surprised.webp", "face": "faces/noel/surprised.webp"},
+      "shy": {"image": "characters/noel/shy.webp", "face": "faces/noel/shy.webp"},
+      "worried": {"image": "characters/noel/worried.webp", "face": "faces/noel/worried.webp"}
+    },
+    "sera": {
+      "neutral": {"image": "characters/sera/neutral.webp", "face": "faces/sera/neutral.webp"},
+      "happy": {"image": "characters/sera/happy.webp", "face": "faces/sera/happy.webp"},
+      "angry": {"image": "characters/sera/angry.webp", "face": "faces/sera/angry.webp"},
+      "surprised": {"image": "characters/sera/surprised.webp", "face": "faces/sera/surprised.webp"},
+      "shy": {"image": "characters/sera/shy.webp", "face": "faces/sera/shy.webp"},
+      "teary": {"image": "characters/sera/teary.webp", "face": "faces/sera/teary.webp"}
+    },
+    "viola": {
+      "neutral": {"image": "characters/viola/neutral.webp", "face": "faces/viola/neutral.webp"},
+      "happy": {"image": "characters/viola/happy.webp", "face": "faces/viola/happy.webp"},
+      "angry": {"image": "characters/viola/angry.webp", "face": "faces/viola/angry.webp"},
+      "surprised": {"image": "characters/viola/surprised.webp", "face": "faces/viola/surprised.webp"},
+      "shy": {"image": "characters/viola/shy.webp", "face": "faces/viola/shy.webp"},
+      "flustered": {"image": "characters/viola/flustered.webp", "face": "faces/viola/flustered.webp"},
+      "scout_angry": {"image": "characters/viola/scout_angry.webp", "face": "faces/viola/scout_angry.webp"},
+      "scout_flustered": {"image": "characters/viola/scout_flustered.webp", "face": "faces/viola/scout_flustered.webp"},
+      "scout_happy": {"image": "characters/viola/scout_happy.webp", "face": "faces/viola/scout_happy.webp"},
+      "scout_neutral": {"image": "characters/viola/scout_neutral.webp", "face": "faces/viola/scout_neutral.webp"}
+    },
+    "ruu": {
+      "neutral": {"image": "characters/ruu/neutral.webp", "face": "faces/ruu/neutral.webp"},
+      "happy": {"image": "characters/ruu/happy.webp", "face": "faces/ruu/happy.webp"},
+      "angry": {"image": "characters/ruu/angry.webp", "face": "faces/ruu/angry.webp"},
+      "surprised": {"image": "characters/ruu/surprised.webp", "face": "faces/ruu/surprised.webp"},
+      "shy": {"image": "characters/ruu/shy.webp", "face": "faces/ruu/shy.webp"},
+      "bluff": {"image": "characters/ruu/bluff.webp", "face": "faces/ruu/bluff.webp"}
+    },
+    "fine": {
+      "neutral": {"image": "characters/fine/neutral.webp", "face": "faces/fine/neutral.webp"},
+      "happy": {"image": "characters/fine/happy.webp", "face": "faces/fine/happy.webp"},
+      "angry": {"image": "characters/fine/angry.webp", "face": "faces/fine/angry.webp"},
+      "surprised": {"image": "characters/fine/surprised.webp", "face": "faces/fine/surprised.webp"},
+      "shy": {"image": "characters/fine/shy.webp", "face": "faces/fine/shy.webp"},
+      "sparkle": {"image": "characters/fine/sparkle.webp", "face": "faces/fine/sparkle.webp"}
+    },
+    "aurelia": {
+      "neutral": {"image": "characters/aurelia/neutral.webp", "face": "faces/aurelia/neutral.webp"},
+      "happy": {"image": "characters/aurelia/happy.webp", "face": "faces/aurelia/happy.webp"},
+      "angry": {"image": "characters/aurelia/angry.webp", "face": "faces/aurelia/angry.webp"},
+      "surprised": {"image": "characters/aurelia/surprised.webp", "face": "faces/aurelia/surprised.webp"},
+      "shy": {"image": "characters/aurelia/shy.webp", "face": "faces/aurelia/shy.webp"},
+      "dragon": {"image": "characters/aurelia/dragon.webp", "face": "faces/aurelia/dragon.webp"}
+    },
+    "gald": {
+      "neutral": {"image": "characters/gald/neutral.webp", "face": "faces/gald/neutral.webp"},
+      "happy": {"image": "characters/gald/happy.webp", "face": "faces/gald/happy.webp"},
+      "coatless_happy": {"image": "characters/gald/coatless_happy.webp", "face": "faces/gald/coatless_happy.webp"},
+      "coatless_neutral": {"image": "characters/gald/coatless_neutral.webp", "face": "faces/gald/coatless_neutral.webp"}
+    },
+    "mother": {
+      "neutral": null
+    },
+    "everyone": {
+      "neutral": null
+    },
+    "master": {
+      "neutral": null,
+      "happy": null,
+      "thoughtful": null
+    },
+    "clerk": {
+      "neutral": null,
+      "happy": null,
+      "worried": null
+    },
+    "unique": {
+      "neutral": null,
+      "happy": null,
+      "angry": null
+    }
   },
-  "stills": {"founding": null, "dragon": null}
+  "stills": {"prologue": "stills/prologue.webp", "dragon": "stills/dragon.webp", "founding": null}
 }
