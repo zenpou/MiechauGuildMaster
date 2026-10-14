@@ -4,11 +4,15 @@ import {
   backgroundArt,
   castMember,
   characterArt,
+  characterFace,
+  figureDisplay,
+  linePortrait,
   MOTIONS,
   POSITIONS,
   speakerCharacter,
   stillArt,
   type CharacterId,
+  type CharacterPose,
   type PresentedLine,
   type StageActor,
 } from '../core/presentation';
@@ -151,6 +155,17 @@ function normalizedActors(line: PresentedLine): StageActor[] {
 /** cast.json に無い人物は id のまま出す。差し替えの途中で台本とキャストが食い違っても止めない */
 const characterName = (id: CharacterId): string => castMember(id)?.name ?? id;
 const characterColor = (id: CharacterId): string => castMember(id)?.color ?? FALLBACK_COLOR;
+
+/** 枠の inline style に置くので、場面の写し(cloneNode)にも同じ収め方が写る */
+const applyFigureDisplay = (figure: HTMLElement, id: CharacterId | null, pose: CharacterPose): void => {
+  const display = id === null ? null : figureDisplay(id, pose);
+  const set = (name: string, value: number | undefined) => {
+    if (value === undefined) figure.style.removeProperty(name);
+    else figure.style.setProperty(name, String(value));
+  };
+  set('--vn-figure-scale', display?.scale);
+  set('--vn-figure-top', display?.top);
+};
 
 /**
  * 1つの章を演じる。外枠と舞台の枠は最初に一度だけ作り、行の移動では文字・属性・表示だけを変える。
@@ -668,6 +683,7 @@ export function createStoryPlayer(options: CreateStoryPlayerOptions): StoryPlaye
         slot.figure.dataset.pose = '';
         slot.figure.dataset.motion = '';
         slot.motion.dataset.motion = '';
+        applyFigureDisplay(slot.figure, null, '');
         slot.image.removeAttribute('src');
         delete slot.image.dataset.src;
         return;
@@ -678,6 +694,7 @@ export function createStoryPlayer(options: CreateStoryPlayerOptions): StoryPlaye
       slot.figure.dataset.pose = actor.pose;
       slot.figure.dataset.motion = actor.motion ?? '';
       slot.figure.style.setProperty('--vn-cast-color', characterColor(actor.character));
+      applyFigureDisplay(slot.figure, actor.character, actor.pose);
       // data-motion は動きが始まった印。motionAt のある動きは、その語句が出るまで空のままにする
       delete slot.motion.dataset.motion;
       slot.figure.classList.toggle('is-speaker', Boolean(speakerId && actor.character === speakerId));
@@ -691,13 +708,14 @@ export function createStoryPlayer(options: CreateStoryPlayerOptions): StoryPlaye
   };
 
   const updatePortrait = (line: PresentedLine) => {
-    const data = line.portrait;
+    const data = linePortrait(line);
     dialogue.classList.toggle('has-portrait', Boolean(data));
     portrait.hidden = !data;
     if (!data) {
       portraitImage.hidden = true;
       portraitImage.removeAttribute('src');
       delete portraitImage.dataset.src;
+      portraitImage.classList.remove('is-crop');
       portraitImage.alt = '';
       portraitFallback.hidden = true;
       portraitFallback.textContent = '';
@@ -711,7 +729,9 @@ export function createStoryPlayer(options: CreateStoryPlayerOptions): StoryPlaye
     portrait.style.setProperty('--vn-cast-color', characterColor(data.character));
     portraitImage.alt = `${name}の表情`;
     portraitFallback.textContent = name.slice(0, 1);
-    showArt(portraitImage, portraitFallback, characterArt(data.character, data.pose));
+    const face = characterFace(data.character, data.pose);
+    portraitImage.classList.toggle('is-crop', face?.crop === true);
+    showArt(portraitImage, portraitFallback, face?.path ?? null);
   };
 
   const createLineCueState = (index: number, line: PresentedLine, text: string, mode: 'initial' | 'forward' | 'back'): LineCueState => {

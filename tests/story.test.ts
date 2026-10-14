@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { DUNGEON, ITEM } from '../src/core/data';
 import { newGame } from '../src/core/game';
 import {
-  ART, backgroundArt, CAST, characterArt, EFFECTS, MOTIONS, POSITIONS, SOUND_CUES, speakerCharacter, stillArt, TRANSITIONS,
+  ART, backgroundArt, CAST, characterArt, characterFace, EFFECTS, figureDisplay, linePortrait, MOTIONS, POSITIONS, SOUND_CUES,
+  speakerCharacter, stillArt, TRANSITIONS,
 } from '../src/core/presentation';
+import type { CastMember, CharacterArt } from '../src/core/presentation';
 import { markStorySeen, STORY, storyDue, storySeen, storySeenDay, triggerMet } from '../src/core/story';
 import type { StoryTrigger } from '../src/core/story';
 import type { GameState } from '../src/core/types';
@@ -121,9 +123,33 @@ describe('台本データ', () => {
     }
   });
 
+  it('cast.json の display・poseDisplay は倍率が正、上端のずれは数で、poseDisplay のキーはその人物のポーズ', () => {
+    const bad = CAST.flatMap((c) => {
+      const shapes = [
+        ...(c.display ? [{ at: `${c.id}.display`, d: c.display }] : []),
+        ...Object.entries(c.poseDisplay ?? {}).map(([pose, d]) => ({ at: `${c.id}.poseDisplay.${pose}`, d })),
+      ];
+      return [
+        ...Object.keys(c.poseDisplay ?? {}).filter((pose) => !c.poses.includes(pose)).map((pose) => `${c.id}: 知らないポーズ ${pose}`),
+        ...shapes.filter(({ d }) => d.scale !== undefined && !(typeof d.scale === 'number' && d.scale > 0)).map(({ at }) => `${at}: scale`),
+        ...shapes.filter(({ d }) => d.top !== undefined && !(typeof d.top === 'number' && Number.isFinite(d.top))).map(({ at }) => `${at}: top`),
+      ];
+    });
+    expect(bad).toEqual([]);
+  });
+
   it('art.json の立ち絵は cast.json の全員・全ポーズの枠を持つ', () => {
     expect(Object.keys(ART.characters).sort()).toEqual(CAST.map((c) => c.id).sort());
     for (const c of CAST) expect(Object.keys(ART.characters[c.id]).sort()).toEqual([...c.poses].sort());
+  });
+
+  it('art.json の立ち絵の値は null・パスの文字列・image と face の両方が文字列のオブジェクトのどれか', () => {
+    const ok = (v: unknown) => v === null || typeof v === 'string'
+      || (typeof v === 'object' && !Array.isArray(v)
+        && typeof (v as Record<string, unknown>).image === 'string' && typeof (v as Record<string, unknown>).face === 'string');
+    const bad = Object.entries(ART.characters).flatMap(([id, poses]) =>
+      Object.entries(poses).filter(([, v]) => !ok(v)).map(([pose]) => `${id}/${pose}`));
+    expect(bad).toEqual([]);
   });
 });
 
@@ -162,6 +188,145 @@ describe('絵の引き当て', () => {
     } finally {
       ART.backgrounds.guild = keep;
     }
+  });
+});
+
+describe('顔の引き当て', () => {
+  const withArt = (pose: string, art: CharacterArt, check: (id: string) => void) => {
+    const [c] = CAST;
+    const keep = ART.characters[c.id][pose];
+    ART.characters[c.id][pose] = art;
+    try {
+      check(c.id);
+    } finally {
+      ART.characters[c.id][pose] = keep;
+    }
+  };
+
+  it('image と face があれば、立ち絵は image、顔は face をそのまま出す', () => {
+    withArt('neutral', { image: 'characters/x/neutral.webp', face: 'faces/x/neutral.webp' }, (id) => {
+      expect(characterArt(id, 'neutral')).toBe('characters/x/neutral.webp');
+      expect(characterFace(id, 'neutral')).toEqual({ path: 'faces/x/neutral.webp', crop: false });
+    });
+  });
+
+  it('パスの文字列だけなら、顔は立ち絵から切り出す', () => {
+    withArt('neutral', 'characters/x/neutral.webp', (id) => {
+      expect(characterArt(id, 'neutral')).toBe('characters/x/neutral.webp');
+      expect(characterFace(id, 'neutral')).toEqual({ path: 'characters/x/neutral.webp', crop: true });
+    });
+  });
+
+  it('null・知らない人物・知らないポーズは null', () => {
+    withArt('neutral', null, (id) => {
+      expect(characterFace(id, 'neutral')).toBeNull();
+      expect(characterFace(id, 'no-such-pose')).toBeNull();
+      expect(characterFace('nobody', 'neutral')).toBeNull();
+    });
+  });
+});
+
+describe('台詞枠の顔(linePortrait)', () => {
+  const [first, second] = CAST;
+  const withFaces = (faces: Record<string, CharacterArt>, check: () => void) => {
+    const keep = Object.keys(faces).map((key) => {
+      const [id, pose] = key.split('/');
+      return { id, pose, v: ART.characters[id][pose] };
+    });
+    for (const [key, v] of Object.entries(faces)) {
+      const [id, pose] = key.split('/');
+      ART.characters[id][pose] = v;
+    }
+    try {
+      check();
+    } finally {
+      for (const { id, pose, v } of keep) ART.characters[id][pose] = v;
+    }
+  };
+  const face = (id: string, pose: string): CharacterArt => ({ image: `characters/${id}/${pose}.webp`, face: `faces/${id}/${pose}.webp` });
+
+  it('portrait を書いた行はその人物とポーズ(絵が無くても出す)。立ち絵から外す印が付く', () => {
+    withFaces({ [`${first.id}/neutral`]: null }, () => {
+      expect(linePortrait({ text: '…', portrait: { character: first.id, pose: 'neutral' } }))
+        .toEqual({ character: first.id, pose: 'neutral', explicit: true });
+    });
+  });
+
+  it('話し手が舞台にいれば、その行のポーズの顔を出す。立ち絵には残す', () => {
+    const [, pose] = first.poses;
+    withFaces({ [`${first.id}/${pose}`]: face(first.id, pose) }, () => {
+      expect(linePortrait({
+        speaker: first.name, text: '…',
+        cast: [{ character: second.id, pose: 'neutral', position: 'left' }, { character: first.id, pose, position: 'right' }],
+      })).toEqual({ character: first.id, pose, explicit: false });
+    });
+  });
+
+  it('話し手が舞台にいなければ neutral の顔', () => {
+    withFaces({ [`${first.id}/neutral`]: face(first.id, 'neutral') }, () => {
+      expect(linePortrait({ speaker: first.name, text: '…', cast: [{ character: second.id, pose: 'neutral', position: 'left' }] }))
+        .toEqual({ character: first.id, pose: 'neutral', explicit: false });
+      expect(linePortrait({ speaker: first.name, text: '…' })).toEqual({ character: first.id, pose: 'neutral', explicit: false });
+    });
+  });
+
+  it('話し手の顔の絵が無ければ出さない', () => {
+    withFaces({ [`${first.id}/neutral`]: null }, () => {
+      expect(linePortrait({ speaker: first.name, text: '…' })).toBeNull();
+    });
+  });
+
+  it('地の文と cast.json に無い話し手は出さない', () => {
+    expect(linePortrait({ text: '…' })).toBeNull();
+    expect(linePortrait({ speaker: '通りすがり', text: '…' })).toBeNull();
+  });
+});
+
+describe('立ち絵の表示の調整', () => {
+  const withDisplay = (display: CastMember['display'], poseDisplay: CastMember['poseDisplay'], check: (c: CastMember) => void) => {
+    const [c] = CAST;
+    const keep = { display: c.display, poseDisplay: c.poseDisplay };
+    c.display = display;
+    c.poseDisplay = poseDisplay;
+    try {
+      check(c);
+    } finally {
+      if (keep.display === undefined) delete c.display; else c.display = keep.display;
+      if (keep.poseDisplay === undefined) delete c.poseDisplay; else c.poseDisplay = keep.poseDisplay;
+    }
+  };
+
+  it('display も poseDisplay も無ければ null(CSS の既定で出す)', () => {
+    withDisplay(undefined, undefined, (c) => {
+      expect(figureDisplay(c.id, 'neutral')).toBeNull();
+    });
+  });
+
+  it('知らない人物は null', () => {
+    expect(figureDisplay('nobody', 'neutral')).toBeNull();
+  });
+
+  it('display だけなら、どのポーズもその人物の値', () => {
+    withDisplay({ scale: 2.4, top: -0.1 }, undefined, (c) => {
+      expect(figureDisplay(c.id, 'neutral')).toEqual({ scale: 2.4, top: -0.1 });
+      expect(figureDisplay(c.id, c.poses[1])).toEqual({ scale: 2.4, top: -0.1 });
+    });
+  });
+
+  it('poseDisplay はそのポーズだけ上書きし、書いていない値は人物の値のまま', () => {
+    const [, pose] = CAST[0].poses;
+    withDisplay({ scale: 2.4, top: -0.1 }, { [pose]: { scale: 1 } }, (c) => {
+      expect(figureDisplay(c.id, pose)).toEqual({ scale: 1, top: -0.1 });
+      expect(figureDisplay(c.id, 'neutral')).toEqual({ scale: 2.4, top: -0.1 });
+    });
+  });
+
+  it('poseDisplay だけなら、そのポーズは書いた値だけ、他のポーズは null', () => {
+    const [, pose] = CAST[0].poses;
+    withDisplay(undefined, { [pose]: { scale: 1, top: 0 } }, (c) => {
+      expect(figureDisplay(c.id, pose)).toEqual({ scale: 1, top: 0 });
+      expect(figureDisplay(c.id, 'neutral')).toBeNull();
+    });
   });
 });
 

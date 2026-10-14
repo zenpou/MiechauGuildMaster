@@ -51,19 +51,42 @@ export interface PresentedLine {
   transition?: StageTransition;
 }
 
+/** 立ち絵の収め方。scale は枠の高さに対する絵の高さの倍率、top は枠の高さに対する上端のずれ(負で上へ) */
+export interface FigureDisplay {
+  scale?: number;
+  top?: number;
+}
+
 export interface CastMember {
   id: CharacterId;
   name: string;
   /** 立ち絵が無いあいだのシルエットの色 */
   color: string;
   poses: CharacterPose[];
+  /** 無ければ CSS の既定。既定を TS に写すと、CSS と二重に持つことになる */
+  display?: FigureDisplay;
+  /** ポーズごとに display を上書きする。横長の絵(竜の姿)など、そのポーズだけ収め方が違うときに使う */
+  poseDisplay?: Record<CharacterPose, FigureDisplay>;
 }
+
+/**
+ * 人物1ポーズぶんの絵。文字列は立ち絵だけの旧形式で、顔は立ち絵から切り出して代用する。
+ * 旧形式を残すのは、顔の絵が揃う前の人物も止めずに出すため
+ */
+export type CharacterArt = string | { image: string; face: string } | null;
 
 /** 絵の置き場所。値は public/art/ からの相対パス。null のあいだは画面が仮の見た目を出す */
 export interface ArtManifest {
   backgrounds: Record<BackgroundId, string | null>;
-  characters: Record<CharacterId, Record<CharacterPose, string | null>>;
+  characters: Record<CharacterId, Record<CharacterPose, CharacterArt>>;
   stills: Record<string, string | null>;
+}
+
+/** 台詞枠の横に出す顔。explicit は台本の portrait で指定した顔で、その人物を立ち絵に重ねない */
+export interface LinePortrait {
+  character: CharacterId;
+  pose: CharacterPose;
+  explicit: boolean;
 }
 
 export const CAST = castJson as unknown as CastMember[];
@@ -81,12 +104,41 @@ export function speakerCharacter(speaker?: string): CharacterId | null {
   return CAST.find((c) => c.name === speaker)?.id ?? null;
 }
 
+/** 人物の display にポーズの poseDisplay を重ねる。どちらも無ければ null */
+export function figureDisplay(id: CharacterId, pose: CharacterPose): FigureDisplay | null {
+  const member = castMember(id);
+  const base = member?.display;
+  const override = member?.poseDisplay?.[pose];
+  if (!base && !override) return null;
+  return { ...base, ...override };
+}
+
 export function backgroundArt(id: BackgroundId): string | null {
   return ART.backgrounds[id] ?? null;
 }
 
 export function characterArt(id: CharacterId, pose: CharacterPose): string | null {
-  return ART.characters[id]?.[pose] ?? null;
+  const art = ART.characters[id]?.[pose] ?? null;
+  return typeof art === 'string' || art === null ? art : art.image;
+}
+
+/** 顔の絵。crop は立ち絵から切り出して代用するとき */
+export function characterFace(id: CharacterId, pose: CharacterPose): { path: string; crop: boolean } | null {
+  const art = ART.characters[id]?.[pose] ?? null;
+  if (art === null) return null;
+  return typeof art === 'string' ? { path: art, crop: true } : { path: art.face, crop: false };
+}
+
+/**
+ * 台詞枠の横の顔を決める。portrait を書いた行はそれを使い、無ければ話し手の顔を出す。
+ * 話し手の顔は舞台でのポーズに合わせ、舞台にいなければ neutral。顔の絵の無い話し手と地の文は出さない
+ */
+export function linePortrait(line: PresentedLine): LinePortrait | null {
+  if (line.portrait) return { character: line.portrait.character, pose: line.portrait.pose, explicit: true };
+  const id = speakerCharacter(line.speaker);
+  if (id === null) return null;
+  const pose = line.cast?.find((actor) => actor.character === id)?.pose ?? 'neutral';
+  return characterFace(id, pose) ? { character: id, pose, explicit: false } : null;
 }
 
 export function stillArt(id: string): string | null {
