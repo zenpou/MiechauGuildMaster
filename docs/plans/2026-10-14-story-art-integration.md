@@ -41,7 +41,7 @@ Codex が素材生成の過程で変えた仕様(汎用キャラの男女化、�
 | `src/data/art.json` | 旧キー + 新背景の一部。`founding` が残る | 全人物・全ポーズの枠と `public/art/characters/<id>/<pose>.webp` のパス、新背景4枚、`bg_guild_hall`→`guild-reception-v1.webp` の流用、`stills.prologue` / `stills.dragon`。`founding` と旧キー(guild / town / night / tavern / office)は story.json を書き換えたら削除 |
 | `src/core/presentation.ts` の `MOTIONS` | spin-out / hit / tremble が無い | RULES 3-2 の追加予定どおり3つ足し、`storyPlayer.css` にアニメーションを書く。効果音 `slash` / `blow` / `roar` / `flame` も `SOUND_CUES` と `storyAudio.ts` に追加 |
 | `storyPlayer.css` の立ち絵表示(`height: 280%`、上端基準) | 全人物に同じ倍率。竜(1024×1024)は横長に見えるべきなのに縦長の枠に合わされる | 人物ごとの表示設定(`data-character` で倍率・基準位置を上書き)。竜は専用の倍率と位置 |
-| `storyPlayer.css` の顔(`height: 650%`、上端中央) | ティナのポニーテール、ヴィオラの鎧で顔が切れる(Codex の一覧で確認済み) | **顔は別ファイルにする**。`public/art/faces/<id>/<pose>.webp`(正方形、48/58/76px で目と口が収まる)を Codex が切り出し、`art.json` の各ポーズを `{ "image": …, "face": … }` の形にするか `faces` の表を別に持つ。`storyPlayer.ts` の顔表示を切り出しから単純な画像表示に変える。`tests/story.test.ts` の art.json 検査も更新 |
+| `storyPlayer.css` の顔(`height: 650%`、上端中央) | ティナのポニーテール、ヴィオラの鎧で顔が切れる(Codex の一覧で確認済み) | **顔は別ファイルにする**。`public/art/faces/<id>/<pose>.webp`(256×256、48/58/76px で目と口が収まることを確認済み。**納品済**)を使い、`art.json` の各ポーズを `{ "image": …, "face": … }` の形にするか `faces` の表を別に持つ。`storyPlayer.ts` の顔表示を切り出しから単純な画像表示に変える。`tests/story.test.ts` の art.json 検査も更新 |
 | `Adventurer` 型(`src/core/types.ts`) | 性別・外見IDが無い | `gender: 'male' \| 'female'` と `appearance: string`(`adv_<性格>_<性別>`)を足す。`generateAdventurer` で `rng` から決めて保存。転職・装備・再読み込みで変えない(表示時に職業から引かない) |
 | `src/core/save.ts` | `SAVE_VERSION = 1` | 2 に上げ、読み込み時に `gender` / `appearance` が無い冒険者へ `hash(seed, 'appearance', adv.id)` から一度だけ補完して保存(決定論の方針どおり `Math.random` は使わない) |
 | ユニーク冒険者 | `uniques.json` は仮の1人 | 10人分を書くとき `appearance` を人物 id(tina など)にする。汎用の抽選対象から外す |
@@ -69,7 +69,7 @@ Codex が素材生成の過程で変えた仕様(汎用キャラの男女化、�
 2. **第四章の解放条件**: 第三章読了 + 累計依頼10件で決定。sim 30 seed で紋章の時点の最小が10件(VERIFICATION 2026-10-14)。依頼を受けない遊び方で止まるならテストプレイ後に7〜8件へ。
 3. **ガルドのコート**: 終章の目覚めはコートなし版(`coatless_*`)で始め、アイリスが「お父様、これ……」とコートを返す一拍を台本に足し、その行からガルドをコートあり版(`neutral` / `happy`)に、アイリスをコートなし版に切り替える。
    - 台本の追記は Antigravity。終章シーン3のガルド登場〜称賛の間に2〜3行。
-   - **素材の追加(Codex)**: アイリスのコートなし立ち絵。終章で返した後に使う `coatless_neutral` と `coatless_happy` の2枚(512×1024、顔・髪・中の衣装はコート版と同じ。`artifacts/source-art/characters/iris/design-tina-redraw-v1.png` のコートなしデザイン画が基準)。他の表情は当面不要。
+   - **済**: 台本の追記(終章30〜31行目)、アイリスの `coatless_neutral` / `coatless_happy`、顔専用 WebP 76枚(`public/art/faces/<id>/<pose>.webp`、256×256 透過、範囲は `artifacts/source-art/faces/face-regions.json`)。現行素材は82枚。
    - `cast.json` の iris の poses に `coatless_neutral` / `coatless_happy` を足す。
 
 4. **配布フォルダと履歴**: `public/art/` は現行素材だけ。現行外の汎用24ファイル(旧 `adv_*`、男女版の `happy`)は配布WebP・元PNGとも `artifacts/source-art/revisions/generic-unused/` へ移動。`revisions/` と `tina-design-ideas*` は `.gitignore` に足し、手元だけに置く。`verify-story-assets.py` は移動済みファイルを「moved」と数える。

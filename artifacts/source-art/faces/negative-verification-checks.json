@@ -1,0 +1,38 @@
+[
+  {
+    "case": "missing face PNG",
+    "exit_code": 1,
+    "rejected": true,
+    "reason": "AssertionError: Face file set mismatch: [\"source face set mismatch: missing=['kai/neutral'], extra=[]\"]"
+  },
+  {
+    "case": "wrong face dimensions",
+    "exit_code": 1,
+    "rejected": true,
+    "reason": "AssertionError: Face asset verification incomplete"
+  },
+  {
+    "case": "missing alpha",
+    "exit_code": 1,
+    "rejected": true,
+    "reason": "AssertionError: Face asset verification incomplete"
+  },
+  {
+    "case": "region outside source",
+    "exit_code": 1,
+    "rejected": true,
+    "reason": "AssertionError: Face asset verification incomplete"
+  },
+  {
+    "case": "unknown pose override",
+    "exit_code": 1,
+    "rejected": true,
+    "reason": "AssertionError: Face asset verification incomplete"
+  },
+  {
+    "case": "previous SHA256 mismatch",
+    "exit_code": 1,
+    "rejected": true,
+    "reason": "AssertionError: Existing file changed: artifacts/source-art/backgrounds/bg_guild_office_sunset.png"
+  }
+]

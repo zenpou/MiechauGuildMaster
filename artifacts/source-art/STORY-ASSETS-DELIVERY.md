@@ -1,5 +1,7 @@
 # 物語画像素材の納品記録
 
+> 2026-10-14 追納: 現行素材は **82枚・164ファイル**、別途顔専用 **76枚・152ファイル**。以下の80枚という記載と650%表示の説明は前回納品時の記録。今回の詳細は末尾「顔専用素材とアイリスのコートなし版」を参照。
+
 対象: `docs/art/STORY-ASSETS.md`（2026-10-14）。画像生成は内蔵 `image_gen` を使用。
 
 **現行素材80枚をPNG・WebPの両形式、計160ファイルで保存済み。** 汎用キャラは男女×6性格の各neutral1枚へ整理。強欲な男女のneutralを修正し、happy差分と旧素材は予備として保存。寸法・形式・読み込み・アルファ・重複なしと生成記録・リンクを検証。[最終集計](story-assets-final-check.json)。
@@ -81,3 +83,43 @@ Redrew Kai with a coherent forward-tumbling pose, correcting the neck and should
 ## 汎用キャラ各1枚への整理と強欲キャラの修正
 
 男女×6性格のneutral12枚を採用し、happy12枚は予備として元の場所に保持。`generic-character-assets.json` と検証器・一覧をneutralのみへ変更。強欲男性は顔の成人らしい比率を整え、女性は標準的な体格と控えめなゆったりした服装へ修正。両neutralのPNG・WebPを差し替え、旧版は `revisions/greedy-single-sprite/` に保存。内蔵image_genの実行プロンプトは [greedy-single-sprite-revision.json](greedy-single-sprite-revision.json)。予備happyは旧デザインなのでゲームに登録しない。現行80枚・160ファイル。ゲーム組み込みと最終顔切り出しは未実施。
+
+## 顔専用素材とアイリスのコートなし版（2026-10-14）
+
+前回の現行立ち絵74枚（アウレリアの竜を含む）に、アイリスの `coatless_neutral` / `coatless_happy` を追加。立ち絵76枚、背景4枚、一枚絵2枚で素材総数82枚。顔画像は派生素材として別に76枚を数える。予備の `revisions/` は切り出し対象外。
+
+### 顔の切り出し
+
+- 元PNG: `faces/<id>/<pose>.png`、配布: `../../public/art/faces/<id>/<pose>.webp`。すべて256×256 RGBA、WebPは可逆圧縮。
+- [face-regions.json](faces/face-regions.json) の元PNG座標（左上x/yと正方形のsize）で切り出し、Pillow LANCZOSで256×256に縮小・拡大。元のアルファを保持し、顔の描き直し・背景の描き足し・色変更は行わない。
+- 人物ごとに同じ範囲を全ポーズへ適用。額から顎までの縦幅がおよそ枠の55〜70%になるようにし、顔中心と目・口の判別を優先。髪全体や帽子を入れるために顔を小さくしない。
+- 範囲の判断に注意した人物: **ティナ**は高いポニーテールを基準にせず顔へ寄せた。**ヴィオラ**は肩当てを除き、鎧・斥候服とも同じ範囲で目と口が収まることを確認。**アイリス**のdizzy（額の手）、**フィーネ**のsparkle、**ガルド**のコート有無も共通範囲で確認。**高慢な男性冒険者**は横向き顔の中心に合わせて人物の基本xを調整。**竜**は角・たてがみ全体ではなく横顔の目・鼻先・口・下顎を優先。
+- 個別上書きしたポーズは **`aurelia/dragon` のみ**（x=12, y=142, size=212）。元画像が1024×1024で人型と位置・大きさが異なるため。それ以外の75枚にポーズ別上書きはない。
+- [素材一覧](story-assets-review.html) 右下は新しい顔WebPを48px・58px・76pxで並べる。竜も表示対象。透過・暗色・白背景の切り替えを維持。
+- 全76枚の3サイズを目視確認した記録: [1](../story-assets-review/faces/faces-1.png)、[2](../story-assets-review/faces/faces-2.png)、[3](../story-assets-review/faces/faces-3.png)、[4](../story-assets-review/faces/faces-4.png)。閉じた目は元の表情どおり。目と口の位置が枠内に収まり、縮小後も表情を判別できる。
+
+再生成コマンド（AI呼び出しなし）:
+
+```powershell
+python artifacts/source-art/crop-story-faces.py
+```
+
+### アイリス2枚の生成
+
+内蔵 `image_gen` で既存neutral/happyを編集。肩に掛けた茶色のコートを外し、生成りのブラウス・金縁の紫ベスト・紺のロングスカートを露出。衣装基準は `characters/iris/design-tina-redraw-v1.png`。顔・銀髪・リボン・頭の配置・前で手を合わせる立ち姿を既存版と比較した。[比較画像](../story-assets-review/faces/iris-comparison.jpg)。生成差分のため元画像との全画素一致は主張しない。
+
+実行プロンプト全文、入力参照、生成元パスは [story-batch-iris-coatless.json](story-batch-iris-coatless.json) に保存。neutralは既存neutral＋デザイン画を参照し「コート全体だけを除去、表情・頭位置・髪・姿勢を保持」、happyは既存happy＋生成済みcoatless_neutral＋デザイン画を参照し「笑顔を保持して同じコートなし衣装にする」と指定。生成画像887×1774をLANCZOSで512×1024へ変換し、透過PNGと可逆WebPを保存。顔も各完成PNGから同じアイリス用範囲で切り出した。
+
+### 検証・変更範囲
+
+`verify-story-assets.py` は82枚の素材と76枚の顔を別々に検証し、顔の対応集合・寸法・形式・アルファ・範囲設定・元PNGからの切り出し一致を検査する。`story-assets-verification.json` に `faces` を追加。前回の検証JSONを [変更前記録](faces/previous-delivery-verification.json) に保持し、既存80枚のPNG/WebP計160ファイルが前回SHA256と一致することを必須チェックにした。
+
+```powershell
+python artifacts/source-art/verify-story-assets.py --require-complete
+```
+
+今回の変更は画像の作成・検証・一覧・納品記録のみ。`src/` と `src/data/*.json` は変更しない。ゲームへの登録と実ゲームの台詞枠での表示確認は別セッションの担当。
+
+最終結果: `--require-complete` は終了コード0、素材82/82、顔76/76、既存160ファイルのSHA256一致。全顔PNGが設定範囲からの切り出しと一致し、全顔WebPがPNGのRGBA画素と一致。PNG/WebP計316ファイル（立ち絵・背景・一枚絵164＋顔152）。
+
+一覧はChromeで全314画像の読み込み、全228顔表示の48/58/76px実寸、1280px幅・375px幅で横はみ出しなしを確認した。[ブラウザー検証結果](faces/gallery-browser-check.json)、[アイリス](../story-assets-review/faces/gallery-iris.png)、[竜](../story-assets-review/faces/gallery-dragon.png)、[スマートフォン幅](../story-assets-review/faces/gallery-mobile-tina.png)。白・暗色・透過背景の切り替えも確認。複製した一時ワークスペースでは、顔PNG欠落・寸法違い・アルファなし・範囲外座標・未知ポーズ上書き・前回SHA256不一致の6ケースすべてを終了コード1で検出した。[失敗条件の検証結果](faces/negative-verification-checks.json)。
