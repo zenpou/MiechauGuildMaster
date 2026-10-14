@@ -1,0 +1,22 @@
+/* 本編と紙芝居が共有する色・寸法。値を変えるのはここだけ。紙芝居の --vn-* はこれを参照する */
+:root {
+  --bg: #0e1719;
+  --panel: #142326;
+  --panel-strong: #1d3033;
+  --line: #8e7650;
+  --line-soft: #4a4634;
+  --text: #f7f0df;
+  --dim: #b7c0b7;
+  --accent: #efc878;
+  --focus: #f8dc95;
+  --pos: #9ad89a;
+  --neg: #ff8f80;
+  --warn: #ffe08a;
+  --danger: #a0463a;
+  --font-display: "Shippori Mincho Subset", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius: 2px;
+  --hud-h: 56px;
+  --nav-w: 132px;
+  --nav-bar-h: 104px;
+}

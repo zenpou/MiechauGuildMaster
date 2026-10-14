@@ -1,3 +1,4 @@
+@import './tokens.css';
 /* 紙芝居プレイヤー。前作から持ち込み。セレクタはすべて .vn-player / .vn-overlay / .story- の下に閉じる */
 .vn-overlay {
   position: fixed;
@@ -13,14 +14,14 @@
 .vn-overlay > .vn-player { max-width: 1100px; }
 
 .vn-player {
-  --vn-bg: #0e1719;
-  --vn-panel: #142326;
-  --vn-panel-strong: #1d3033;
-  --vn-line: #8e7650;
-  --vn-text: #f7f0df;
-  --vn-dim: #b7c0b7;
-  --vn-accent: #efc878;
-  --vn-focus: #f8dc95;
+  --vn-bg: var(--bg);
+  --vn-panel: var(--panel);
+  --vn-panel-strong: var(--panel-strong);
+  --vn-line: var(--line);
+  --vn-text: var(--text);
+  --vn-dim: var(--dim);
+  --vn-accent: var(--accent);
+  --vn-focus: var(--focus);
   position: relative;
   display: grid;
   grid-template-rows: auto auto minmax(220px, 1fr) auto auto auto;
