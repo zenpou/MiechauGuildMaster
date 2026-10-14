@@ -165,6 +165,7 @@ const applyFigureDisplay = (figure: HTMLElement, id: CharacterId | null, pose: C
   };
   set('--vn-figure-scale', display?.scale);
   set('--vn-figure-top', display?.top);
+  set('--vn-figure-width', display?.width);
 };
 
 /**

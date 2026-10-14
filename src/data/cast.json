@@ -7,7 +7,7 @@
   {"id": "viola", "name": "ヴィオラ", "color": "#2f4f8f", "poses": ["neutral", "happy", "angry", "surprised", "shy", "flustered", "scout_angry", "scout_flustered", "scout_happy", "scout_neutral"]},
   {"id": "ruu", "name": "ルゥ", "color": "#6d3f9e", "poses": ["neutral", "happy", "angry", "surprised", "shy", "bluff"]},
   {"id": "fine", "name": "フィーネ", "color": "#d9a64a", "poses": ["neutral", "happy", "angry", "surprised", "shy", "sparkle"]},
-  {"id": "aurelia", "name": "アウレリア", "color": "#f0702a", "poses": ["neutral", "happy", "angry", "surprised", "shy", "dragon"], "poseDisplay": {"dragon": {"scale": 1, "top": 0}}},
+  {"id": "aurelia", "name": "アウレリア", "color": "#f0702a", "poses": ["neutral", "happy", "angry", "surprised", "shy", "dragon"], "poseDisplay": {"dragon": {"scale": 1, "top": 0, "width": 1}}},
   {"id": "gald", "name": "ガルド", "color": "#8a6240", "poses": ["neutral", "happy", "coatless_happy", "coatless_neutral"]},
   {"id": "mother", "name": "母", "color": "#9b8b7b", "poses": ["neutral"]},
   {"id": "everyone", "name": "全員", "color": "#d9c27a", "poses": ["neutral"]}

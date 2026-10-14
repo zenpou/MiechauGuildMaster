@@ -135,6 +135,7 @@ describe('台本データ', () => {
         ...Object.keys(c.poseDisplay ?? {}).filter((pose) => !c.poses.includes(pose)).map((pose) => `${c.id}: 知らないポーズ ${pose}`),
         ...shapes.filter(({ d }) => d.scale !== undefined && !(typeof d.scale === 'number' && d.scale > 0)).map(({ at }) => `${at}: scale`),
         ...shapes.filter(({ d }) => d.top !== undefined && !(typeof d.top === 'number' && Number.isFinite(d.top))).map(({ at }) => `${at}: top`),
+        ...shapes.filter(({ d }) => d.width !== undefined && !(typeof d.width === 'number' && d.width > 0 && d.width <= 1)).map(({ at }) => `${at}: width`),
       ];
     });
     expect(bad).toEqual([]);
@@ -321,6 +322,18 @@ describe('立ち絵の表示の調整', () => {
       expect(figureDisplay(c.id, pose)).toEqual({ scale: 1, top: -0.1 });
       expect(figureDisplay(c.id, 'neutral')).toEqual({ scale: 2.4, top: -0.1 });
     });
+  });
+
+  it('width(舞台の幅に対する絵の最大の幅)も scale・top と同じく poseDisplay で上書きできる', () => {
+    const [, pose] = CAST[0].poses;
+    withDisplay({ scale: 2.4 }, { [pose]: { scale: 1, width: 1 } }, (c) => {
+      expect(figureDisplay(c.id, pose)).toEqual({ scale: 1, width: 1 });
+      expect(figureDisplay(c.id, 'neutral')).toEqual({ scale: 2.4 });
+    });
+  });
+
+  it('竜の姿は舞台の幅いっぱいに出す(横長の絵を半分の枠に収めると小さくなる)', () => {
+    expect(figureDisplay('aurelia', 'dragon')).toEqual({ scale: 1, top: 0, width: 1 });
   });
 
   it('poseDisplay だけなら、そのポーズは書いた値だけ、他のポーズは null', () => {

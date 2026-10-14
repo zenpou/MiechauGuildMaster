@@ -51,10 +51,15 @@ export interface PresentedLine {
   transition?: StageTransition;
 }
 
-/** 立ち絵の収め方。scale は枠の高さに対する絵の高さの倍率、top は枠の高さに対する上端のずれ(負で上へ) */
+/**
+ * 立ち絵の収め方。scale は枠の高さに対する絵の高さの倍率、top は枠の高さに対する上端のずれ(負で上へ)、
+ * width は舞台の幅に対する絵の最大の幅(0〜1。省略時は CSS の既定で、2人までは 0.5)。
+ * 高さだけで決めると縦に広い窓で絵が舞台の幅を超えて左右が切れるので、幅の上限を別に持つ
+ */
 export interface FigureDisplay {
   scale?: number;
   top?: number;
+  width?: number;
 }
 
 export interface CastMember {

@@ -115,6 +115,8 @@
   min-height: 220px;
   height: 100%;
   overflow: hidden;
+  /* 立ち絵の幅の上限を舞台の幅(cqw)で決めるため */
+  container-type: inline-size;
   background: #26393b;
   isolation: isolate;
 }
@@ -190,6 +192,17 @@
 .vn-player-character-left { left: 0; }
 .vn-player-character-center { left: 33.333%; }
 .vn-player-character-right { right: 0; }
+/* 1人・2人の場面は舞台を半分ずつ使う。3等分のままだと、幅を枠に収めた絵が小さくなり中央が空く */
+.vn-player-stage[data-cast-count='1'] .vn-player-character,
+.vn-player-stage[data-cast-count='2'] .vn-player-character,
+.vn-player-scene-snapshot.vn-player-transition-cast-1 .vn-player-transition-character,
+.vn-player-scene-snapshot.vn-player-transition-cast-2 .vn-player-transition-character { width: 50%; }
+.vn-player-stage[data-cast-count='1'] .vn-player-character-center,
+.vn-player-stage[data-cast-count='2'] .vn-player-character-center,
+.vn-player-scene-snapshot.vn-player-transition-cast-1 .vn-player-character-center,
+.vn-player-scene-snapshot.vn-player-transition-cast-2 .vn-player-character-center { left: 25%; }
+.vn-player-stage[data-cast-count='3'],
+.vn-player-scene-snapshot.vn-player-transition-cast-3 { --vn-figure-width: 0.3333; }
 .vn-player-character-motion,
 .vn-player-transition-character-motion {
   position: absolute;
@@ -206,7 +219,9 @@
   transform: translateX(-50%);
   display: block;
   width: auto;
-  max-width: none;
+  /* 高さは枠の倍率で決め、幅は舞台の幅で上限する。高さだけだと縦に広い窓で絵が舞台の幅を超えて左右が切れる。
+     上限に当たると object-fit で絵が縮み、胸から上の寄りが腰から上の引きになる */
+  max-width: calc(var(--vn-figure-width, 0.5) * 100cqw);
   height: calc(var(--vn-figure-scale, 2.8) * 100%);
   object-fit: contain;
   object-position: top center;
