@@ -215,14 +215,14 @@ Expected: 2 passed
 - `hintBlock()` を次にする(`artUrl` は `./storyPlayer` から import する):
 
 ```ts
-/** 最初の数日の「次にやること」。受付のティナが案内する体裁。赤字のヒントは状態で消えるので閉じるボタンを出さない */
+/** 最初の数日の「次にやること」。受付のノエルが案内する体裁。赤字のヒントは状態で消えるので閉じるボタンを出さない */
 function hintBlock(): HTMLElement | null {
   const hint = hintFor(state);
   if (!hint) return null;
   return div('hint', { role: 'note' },
-    h('img', { class: 'hint-face', src: artUrl('faces/tina/neutral.webp'), alt: '', width: 56, height: 56 }),
+    h('img', { class: 'hint-face', src: artUrl('faces/noel/worried.webp'), alt: '', width: 56, height: 56 }),
     div('hint-body',
-      div('hint-name', '受付のティナ'),
+      div('hint-name', 'ノエル(受付)'),
       div('hint-text', hint.text),
       div('row tight',
         hint.id === 'debt' ? null : h('button', { class: 'small', onclick: () => { dismissHint(state, hint.id); commit(); } }, '閉じる'),
@@ -412,7 +412,7 @@ npm test
 npm run build
 ```
 
-Expected: すべて緑。`npm run dev` で 1280 幅: HUD が上、コマンドが左縦、窓の見出しがタブ名。390 幅: 下に 5×2 のバー、窓が横にはみ出さない。拠点タブに「N日目」が HUD に見える。ヒントにティナの顔。
+Expected: すべて緑。`npm run dev` で 1280 幅: HUD が上、コマンドが左縦、窓の見出しがタブ名。390 幅: 下に 5×2 のバー、窓が横にはみ出さない。拠点タブに「N日目」が HUD に見える。ヒントにノエルの顔。
 
 **Step 9: Commit**
 

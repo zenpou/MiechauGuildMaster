@@ -34,7 +34,6 @@ table { border-collapse: collapse; width: 100%; font-size: 0.85rem; white-space:
 th, td { border: none; padding: 4px 6px; text-align: left; }
 td { border-bottom: 1px solid #ffffff0d; }
 th { color: var(--accent); font-size: 0.75rem; letter-spacing: 0.05em; background: none; border-bottom: 1px solid var(--line-soft); }
-/* 名簿は2行で1人なので、1行おきではなく2行ずつ帯にする */
 /* 名簿は2行で1人なので2行ずつ帯にする。他の表は1行1件なので1行おき */
 .roster tbody tr:nth-child(4n+1), .roster tbody tr:nth-child(4n+2), table:not(.roster) tbody tr:nth-child(odd) { background: #ffffff08; }
 td.num { text-align: right; }
