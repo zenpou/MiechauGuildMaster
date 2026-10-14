@@ -1,12 +1,12 @@
 # 依頼: 物語(序章〜終章)をゲームに組み込む
 
-新規セッションに貼る依頼文。2026-10-14 時点で台本と素材は揃っている(台本 3e56f48、素材 6e86daf)。
+新規セッションに貼る依頼文。2026-10-14 時点で台本と素材は揃っている(台本 3e56f48・7f3c8e8、素材 6e86daf・9bb3551。顔専用画像とアイリスのコートなし立ち絵、終章のコートを返す追記まで済み)。
 
 ---
 
 ## 依頼文(ここから貼る)
 
-`docs/story/scripts/*_script.md` の台本7章(序章・第一〜五章・終章)を、紙芝居エンジンで再生できるようにゲームへ組み込んでください。素材は `public/art/` に揃っています。進め方は CLAUDE.md(TDD、決定論、セーブ互換、計測)に従い、設計の判断が要る所は止まって聞いてください。
+`docs/story/scripts/*_script.md` の台本7章(序章・第一〜五章・終章)を、紙芝居エンジンで再生できるようにゲームへ組み込んでください。素材は `public/art/` に全部揃っています(立ち絵76枚、顔専用画像76枚、背景、一枚絵)。足りない素材はありません。進め方は CLAUDE.md(TDD、決定論、セーブ互換、計測)に従い、設計の判断が要る所は止まって聞いてください。
 
 ### 先に読むもの
 
@@ -15,7 +15,7 @@
 3. `docs/story/RULES.md` 3-2 — 演出タグの語彙(現行+追加予定)
 4. `docs/story/PLOT.md` の各章の「解放条件」 — `story.ts` の語彙で書いてある
 5. `src/core/story.ts`、`src/core/presentation.ts`、`src/ui/storyPlayer.ts`、`tests/story.test.ts` — 現行の仕組み
-6. `artifacts/source-art/story-assets-verification.json` — 現行素材80枚の一覧(これに無い画像は使わない)
+6. `artifacts/source-art/story-assets-verification.json` — 現行素材82枚と顔76枚の一覧(これに無い画像は使わない)
 
 ### やること(この順で。1段ごとにテストを緑にしてコミット)
 
@@ -28,13 +28,13 @@
 - 今は全人物が `height: 280%`・上端基準。人物ごとに倍率と基準位置を上書きできる口を作る(`cast.json` に `display` を持たせるか、`data-character` 属性で CSS を分ける)
 - アウレリアの `dragon` ポーズは 1024×1024 の横長なので、縦長に変形させず枠に収める専用の設定
 
-**3. 顔(台詞枠の横)を別ファイルで読めるようにする**
+**3. 顔(台詞枠の横)を別ファイルで読む**
 - 今は立ち絵の上端を 650% に拡大して切り出しているが、ティナのポニーテールやヴィオラの鎧で顔が切れる
-- `art.json` の各ポーズを `{ "image": "...", "face": "..." }` の形にできるようにし、`face` があればそれを表示、無ければ従来の切り出しに戻す(顔ファイルは Codex が `public/art/faces/<id>/<pose>.webp` に後から納める。無い間も動くこと)
-- `tests/story.test.ts` の art.json 検査を新しい形に対応させる
+- 顔専用の画像が `public/art/faces/<id>/<pose>.webp`(256×256、透過)に全ポーズぶんある。`art.json` の各ポーズを `{ "image": "characters/<id>/<pose>.webp", "face": "faces/<id>/<pose>.webp" }` の形にし、`face` を台詞枠の顔にそのまま表示する(拡大切り出しはやめる)。`face` が無いポーズ(値が文字列だけの旧形式)は従来の切り出しに戻す互換を残す
+- `tests/story.test.ts` の art.json 検査を新しい形に対応させ、全ポーズに `face` があることも検査する
 
 **4. cast.json / art.json を本番の人物で作り直す**
-- 人物: kai, tina, iris, noel, sera, viola, ruu, fine, aurelia, gald。ポーズは `public/art/characters/<id>/` にある WebP の通り(viola は `scout_*` 4つを含む10、gald は coat あり/なし4、aurelia は人型5+`dragon`)。`color` と `name`(台本の話し手名と一字一句同じ)を決める
+- 人物: kai, tina, iris, noel, sera, viola, ruu, fine, aurelia, gald。ポーズは `public/art/characters/<id>/` にある WebP の通り(viola は `scout_*` 4つを含む10、iris は `coatless_*` 2つを含む8、gald は coat あり/なし4、aurelia は人型5+`dragon`)。`color` と `name`(台本の話し手名と一字一句同じ)を決める
 - 話し手だけで立ち絵の無い「母」と、終章27行目の「全員」も cast に要る(絵は null)。「全員」は分割して各人に言わせる案でもよい。どちらにするかは聞いてから
 - 背景: `bg_street_morning` `bg_guild_office` `bg_guild_office_night` `bg_guild_office_sunset` `bg_guild_hall`(受付背景 `guild-reception-v1.webp` を流用) `bg_dungeon_mine` `bg_dungeon_crystal` `bg_dungeon_dragon`。序章シーン1(門前)には `stills/prologue.webp` を背景として使う(人物なしの門前の絵)
 - 一枚絵: `prologue`(序章の扉絵)、`dragon`(終章の決着と扉絵)。旧 `founding` と旧キー(guild / town / night / tavern / office、master / clerk / unique)は story.json の書き換え後に削除
@@ -45,7 +45,7 @@
 - 演出の `motionAt` / `effectAt` / `sfxAt` は、その行の本文にある語に結びつける(テストが検査する)
 - 独白(序章1〜4行)は話し手なしの地の文として `text` だけで書く
 - 終章のシーン1(竜との戦闘)は、ボス戦の紙芝居(戦闘ログ連動)が別の仕組みなので、**今回は固定の台本として**ユニーク全員が出る版で書く。汎用冒険者の行は入れない。戦闘ログ連動は次の依頼
-- 終章シーン3の「アイリスがコートを父に返す」追記は Antigravity が台本に足す予定。足される前なら、ガルドは `coatless_*` のまま最後まで通し、追記が来たら差し替える
+- 終章シーン3は台本どおり、26〜30行目のガルドは `coatless_happy`、31行目でコートを受け取ってから `happy`。アイリスは31行目以降 `coatless_happy`(台本の「喜び・コートなし」)
 - 章の `art`(扉絵)は序章=`prologue`、終章=`dragon`、他は無し
 
 **6. 冒険者の性別と外見IDを持たせる**(物語とは独立。別コミット)
@@ -81,14 +81,14 @@
 - 解放条件(PLOT.md、`story.ts` の語彙で書いてある)
 - 演出タグの語彙(RULES 3-2)
 
-### 足りないが、組み込みを止めないもの
+### 2026-10-14 時点で揃ったもの(当初「足りない」としていた分)
 
-| 足りないもの | 担当 | 無い間の扱い |
-|---|---|---|
-| 顔専用 WebP(全ポーズ) | Codex | 従来の切り出しに戻す(手順3でそう作る) |
-| アイリスのコートなし立ち絵2枚 | Codex | 終章の返す場面が来るまで不要 |
-| 終章の「コートを返す」追記 | Antigravity | ガルドは coatless のまま通す |
-| 第二章・終章の文章版の差し戻し2件 | Antigravity | 文章版は組み込みに使わない |
+| 項目 | 状態 |
+|---|---|
+| 顔専用 WebP 76枚 | 納品済(9bb3551)。`public/art/faces/` |
+| アイリスのコートなし立ち絵2枚 | 納品済(9bb3551) |
+| 終章の「コートを返す」追記 | 台本・文章版とも済(7f3c8e8) |
+| 第二章・終章の文章版の差し戻し2件 | 済(7f3c8e8) |
 
 ### 組み込みの後に判断するもの
 
