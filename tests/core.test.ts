@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DUNGEONS, ENEMIES, ENEMY, FACILITIES, FACILITY, ITEM, JOBS, LOWER_JOBS, PERSONALITIES, RECIPES, ROLE_SKILLS, SYNERGIES, TUNING, UPPER_JOBS, upperJobsFrom } from '../src/core/data';
 import { Rng, rngFor } from '../src/core/rng';
 import { deserialize, load, migrate, save, serialize, type KeyValueStore } from '../src/core/save';
-import { emptyState } from '../src/core/state';
+import { newGame } from '../src/core/game';
 import { ROLE_IDS, SAVE_VERSION } from '../src/core/types';
 
 describe('rng', () => {
@@ -66,7 +66,7 @@ describe('save', () => {
     return { data, getItem: (k) => data[k] ?? null, setItem: (k, v) => { data[k] = v; } };
   };
   it('直列化して戻すと同じ状態', () => {
-    const s = emptyState(7, 'テスト');
+    const s = newGame(7, 'テスト');
     s.gold = 123;
     expect(deserialize(serialize(s))).toEqual(s);
   });
@@ -92,7 +92,7 @@ describe('save', () => {
   });
   it('store に保存して読み戻せる', () => {
     const store = memStore();
-    const s = emptyState(9);
+    const s = newGame(9);
     expect(save(store, s)).toBe(true);
     expect(load(store)).toEqual(s);
   });

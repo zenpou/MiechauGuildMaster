@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { DUNGEON } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
-import { newGame } from '../src/core/game';
 import { assessReadiness, gradeOf, uncertaintyOf } from '../src/core/readiness';
 import type { DispatchOrder, GameState } from '../src/core/types';
+import { fullGame } from './helpers';
 
 function order(s: GameState, o: Partial<DispatchOrder> = {}): DispatchOrder {
   const ids = s.adventurers.map((a) => a.id);
@@ -20,7 +20,7 @@ const all = grid.cells.flatMap((c, i) => (c.kind !== 'wall' && c.kind !== 'hidde
 
 describe('見込み', () => {
   it('同じ条件なら同じ値で、状態を変えない', () => {
-    const s = newGame(5);
+    const s = fullGame(5);
     s.dungeons.forest_cave.floors.f1.visited = all.slice(0, 30);
     const before = structuredClone(s);
     const a = assessReadiness(s, order(s));
@@ -30,7 +30,7 @@ describe('見込み', () => {
   });
 
   it('探索率0なら戦闘0回・不確かさ「高」', () => {
-    const s = newGame(5);
+    const s = fullGame(5);
     const r = assessReadiness(s, order(s), 10);
     expect(r.avgFights).toBe(0);
     expect(r.wipeRate).toBe(0);
@@ -38,7 +38,7 @@ describe('見込み', () => {
   });
 
   it('既知のマスが多いと戦闘が見込まれ、不確かさが下がる', () => {
-    const s = newGame(5);
+    const s = fullGame(5);
     s.dungeons.forest_cave.floors.f1.visited = all;
     const r = assessReadiness(s, order(s, { action: 'hunt' }), 10);
     expect(r.avgFights).toBeGreaterThan(0);
@@ -58,7 +58,7 @@ describe('見込み', () => {
   });
 
   it('隊が弱いと戦力比と評価が下がる', () => {
-    const s = newGame(5);
+    const s = fullGame(5);
     const full = assessReadiness(s, order(s), 2);
     const ids = s.adventurers.map((a) => a.id);
     const solo = assessReadiness(s, order(s, { partyIds: [ids[0]], leaderId: ids[0] }), 2);

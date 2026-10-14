@@ -11,6 +11,8 @@ import { acceptQuest, advanceDay, buildFacility, dispatch, exploredRateOf, newGa
 import { dispatchBlock, markRead, replyMail } from '../src/core/mail';
 import { activeQuests, deliver, visibleQuests } from '../src/core/quests';
 import { capacity, hire, hireFee } from '../src/core/recruit';
+import { readDueStories } from '../src/core/story';
+import { addStarterParty } from './roster';
 import {
   PARTIES_MAX, PARTY_MAX,
   type ActionKind, type Adventurer, type DispatchOrder, type GameState, type Mail, type Quest,
@@ -110,7 +112,7 @@ interface Run {
 type Target = { action: ActionKind; target: DispatchOrder['target']; questId?: string };
 
 function runStyle(style: Style, seed: number): Run {
-  const s = newGame(seed);
+  const s = addStarterParty(newGame(seed), seed);
   const takesQuests = style !== 'no-quests';
   const seen = new Set<string>();
   const accepted = new Set<string>();
@@ -348,6 +350,8 @@ function runStyle(style: Style, seed: number): Run {
     hireOne();
     dispatchAll();
     advanceDay(s);
+    // 物語を読まないので、出た章はその日に読んだことにする(章の読了で仲間が加入する)
+    readDueStories(s);
     if (s.debt) debtDays++;
   }
 

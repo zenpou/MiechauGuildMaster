@@ -1,13 +1,13 @@
 // ゲーム状態の進行。派遣は出発時に 往路・現地・復路 を全部確定し、帰還日に applyReturn で開示する。
-import { addExp, carryCapacity, generateAdventurer, powerOf, salaryOf } from './adventurer';
+import { addExp, carryCapacity, powerOf } from './adventurer';
 import { achievementExpMult, checkAchievements } from './achievements';
 import { bonus, build, completeConstructions, dailyProduction, facilityUpkeep, synergyValue } from './base';
 import { completeCrafts } from './craft';
 import { completeTraining } from './training';
-import { DUNGEON, EDGE, ITEM, JOB, NODE, POLICY, QUEST_TEMPLATES, TUNING, type ReturnOutcome } from './data';
+import { DUNGEON, EDGE, ITEM, NODE, POLICY, QUEST_TEMPLATES, TUNING, type ReturnOutcome } from './data';
 import { exploredRate, parseFloor } from './dungeon';
 import { onDragonDefeated } from './ending';
-import { onReturn, advanceUniqueChain } from './events';
+import { onReturn, advanceUniqueChain, joinInitialUniques } from './events';
 import { floorTransit, returnDialogue, simulateExploration } from './explore';
 import {
   QUEST_TOWNS, REP_LEVELS, accept, createQuest, expireQuests, generateDailyQuests, progressFromReturn, questCargo,
@@ -17,7 +17,7 @@ import { arriveCandidates, expireCandidates, spawnCandidate } from './recruit';
 import { addRelation } from './relations';
 import { rngFor, type Rng } from './rng';
 import { addInventory, heldKeys, ledger } from './ledger';
-import { applyResignations, checkMails, dispatchBlock, markGreeted, markTired, recordParty } from './mail';
+import { applyResignations, checkMails, dispatchBlock, markTired, recordParty } from './mail';
 import { resolveScenes } from './scenes';
 import { emptyState } from './state';
 import {
@@ -38,7 +38,6 @@ const SHORTCUT_EDGE = 'mountain_village__old_mine_short';
 const SHORTCUT_VISITS = 3;
 /** 見張り台とシナジーを重ねても、道中の遭遇はこの割合までしか減らさない */
 const ROAD_ENCOUNTER_OFF_MAX = 0.8;
-const START_JOBS = ['fighter', 'warrior', 'priest', 'scout'];
 const BUYABLE = ['potion'];
 const NOTICES_MAX = 80;
 const HISTORY_MAX = 40;
@@ -50,7 +49,7 @@ const BOSS_KINDS = ['symbol', 'boss'];
 const HOME = 'base';
 const START_NODES = [HOME, 'forest_cave'];
 const START_QUESTS = 2;
-const START_CANDIDATES = 2;
+const START_CANDIDATES = T.startCandidates;
 // sim で調整する値
 /** 推奨戦力のこの割合未満で成功すると return_underdog */
 const UNDERDOG_RATIO = 0.8;
@@ -146,16 +145,7 @@ export function newGame(seed: number, playerName = ''): GameState {
   const s = emptyState(seed, playerName);
   s.gold = START_GOLD;
   ledger(s, '開業資金', START_GOLD);
-  const usedNames = new Set<string>();
-  START_JOBS.forEach((job, i) => {
-    const a = generateAdventurer(rngFor(seed, 'init', i), { id: `a${s.counters.nextId++}`, usedNames });
-    a.job = job;
-    for (const r of JOB[job].roles) a.apt[r] = Math.max(a.apt[r], T.startApt);
-    a.salary = salaryOf(a);
-    a.history.hiredDay = 1;
-    markGreeted(s, a);
-    s.adventurers.push(a);
-  });
+  joinInitialUniques(s);
   s.world.visitedNodes = [...START_NODES];
   s.inventory.potion = START_POTIONS;
   seedUnlockQuests(s);

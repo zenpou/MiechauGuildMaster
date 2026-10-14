@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { addExp, generateAdventurer } from '../src/core/adventurer';
 import { assignWorker } from '../src/core/base';
 import { startCraft } from '../src/core/craft';
-import { DUNGEON, FACILITY, ITEM, JOB, RECIPES, TUNING } from '../src/core/data';
+import { DUNGEON, FACILITY, ITEM, RECIPES, TUNING } from '../src/core/data';
 
 const G0 = TUNING.game.startGold;
 const SUP = TUNING.game.supportGold;
@@ -16,9 +16,9 @@ import { hire } from '../src/core/recruit';
 import { rngFor } from '../src/core/rng';
 import { planSteps, route } from '../src/core/world';
 import { trainSkill } from '../src/core/training';
-import { uniqueAdventurer } from '../src/core/events';
 import { pairKey } from '../src/core/relations';
-import { DUNGEON as DUNGEONS_T, UNIQUE } from '../src/core/data';
+import { fullGame } from './helpers';
+import { DUNGEON as DUNGEONS_T } from '../src/core/data';
 import type { DispatchOrder, Expedition, GameState, Quest } from '../src/core/types';
 
 function order(s: GameState, o: Partial<DispatchOrder> = {}): DispatchOrder {
@@ -40,17 +40,12 @@ function sent(s: GameState, o: Partial<DispatchOrder> = {}): Expedition {
 const wages = (s: GameState) => s.adventurers.reduce((t, a) => t + a.salary, 0);
 
 describe('newGame', () => {
-  it('固定4人(剣士・戦士・僧侶・斥候)・初期資金・回復薬2・森の洞窟の進捗0', () => {
+  it('名簿はティナ1人・初期資金・回復薬2・森の洞窟の進捗0', () => {
     const s = newGame(7);
     expect(s.gold).toBe(G0);
-    expect(s.adventurers.map((a) => a.job)).toEqual(['fighter', 'warrior', 'priest', 'scout']);
-    for (const a of s.adventurers) {
-      for (const r of JOB[a.job].roles) expect(a.apt[r]).toBeGreaterThanOrEqual(70);
-      expect(a.history.hiredDay).toBe(1);
-      expect(a.unique).toBeUndefined();
-      expect(a.status).toBe('idle');
-    }
-    expect(new Set(s.adventurers.map((a) => a.name)).size).toBe(4);
+    expect(s.adventurers).toHaveLength(1);
+    expect(s.adventurers[0]).toMatchObject({ unique: 'tina', appearance: 'tina', job: 'fighter', status: 'idle' });
+    expect(s.adventurers[0].history.hiredDay).toBe(1);
     expect(s.inventory.potion).toBe(2);
     expect(s.dungeons.forest_cave).toEqual({ confirmed: true, floors: { f1: { visited: [], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false });
     expect(s.world.visitedNodes).toEqual(['base', 'forest_cave']);
@@ -61,7 +56,7 @@ describe('newGame', () => {
 
 describe('dispatch の検証', () => {
   it('重複・0人・5人・在庫不足・隊長が隊外・日数外・負傷者は ok:false で、状態を変えない', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     const ids = s.adventurers.map((a) => a.id);
     s.adventurers.push(generateAdventurer(rngFor(3, 'extra'), { id: 'x5' }));
     const before = structuredClone(s);
@@ -78,14 +73,14 @@ describe('dispatch の検証', () => {
   });
 
   it('派遣中の者は重ねて出せない', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     const ids = s.adventurers.map((a) => a.id);
     sent(s, { partyIds: ids.slice(0, 2), items: {} });
     expect(dispatch(s, order(s, { partyIds: [ids[1], ids[2]], leaderId: ids[1], items: {} })).ok).toBe(false);
   });
 
   it('出発後、隊員は away になり持ち物が在庫から減る。地図は帰還日まで変わらない', () => {
-    const s = newGame(5);
+    const s = fullGame(5);
     const e = sent(s, { days: 3, items: { potion: 1 } });
     expect(s.adventurers.every((a) => a.status === 'away')).toBe(true);
     expect(s.inventory.potion).toBe(1);
@@ -100,7 +95,7 @@ describe('dispatch の検証', () => {
 
 describe('advanceDay', () => {
   it('日給と維持費30が引かれ、台帳に載る(1日目は初期支援金が入る)', () => {
-    const s = newGame(9);
+    const s = fullGame(9);
     const w = wages(s);
     const r = advanceDay(s);
     expect(r.day).toBe(2);
@@ -111,7 +106,7 @@ describe('advanceDay', () => {
   });
 
   it('赤字なら利息(debtInterest)・忠誠(debtLoyalty)・評判−1', () => {
-    const s = newGame(9);
+    const s = fullGame(9);
     s.gold = -1000;
     s.rep = 5;
     const loyal = s.adventurers.map((a) => a.loyalty);
@@ -126,7 +121,7 @@ describe('advanceDay', () => {
 
   describe('再建支援(全員が去ったあとに詰まない)', () => {
     const empty = (gold: number) => {
-      const s = newGame(9);
+      const s = fullGame(9);
       s.adventurers = [];
       s.gold = gold;
       return s;
@@ -144,6 +139,7 @@ describe('advanceDay', () => {
 
     it('そのあと候補者を雇って立て直せる', () => {
       const s = empty(-150_000);
+      s.day = Math.max(s.day, TUNING.game.candidateFromDay);
       advanceDay(s);
       const cand = s.candidates[0];
       expect(hire(s, cand.adv.id)).toEqual({ ok: true });
@@ -159,7 +155,7 @@ describe('advanceDay', () => {
     });
 
     it('名簿に人がいるあいだは、借金が深くても何もしない(派遣で稼いで返せる)', () => {
-      const s = newGame(9);
+      const s = fullGame(9);
       s.gold = -50_000;
       advanceDay(s);
       expect(s.gold).toBeLessThan(0);
@@ -167,7 +163,9 @@ describe('advanceDay', () => {
     });
 
     it('idle のまま長く放置しても、名簿が空になった日以降は資金がマイナスのまま残らず、借金が膨らみ続けない', () => {
-      const s = newGame(9);
+      const s = fullGame(9);
+      // ユニークは去らないので、名簿が空になる状況は汎用の者だけで作る
+      s.adventurers = s.adventurers.filter((a) => !a.unique);
       let emptyDays = 0;
       for (let d = 0; d < 400; d++) {
         advanceDay(s);
@@ -181,7 +179,7 @@ describe('advanceDay', () => {
   });
 
   it('忠誠は全員毎日+1(派遣中も)、上限255', () => {
-    const s = newGame(11);
+    const s = fullGame(11);
     const ids = s.adventurers.map((a) => a.id);
     sent(s, { partyIds: ids.slice(0, 2), days: 5, items: {} });
     s.adventurers[3].loyalty = 255;
@@ -191,7 +189,7 @@ describe('advanceDay', () => {
   });
 
   it('待機者は疲労−25・負傷−1', () => {
-    const s = newGame(11);
+    const s = fullGame(11);
     s.adventurers[0].fatigue = 30;
     s.adventurers[0].injuryDays = 2;
     advanceDay(s);
@@ -200,7 +198,9 @@ describe('advanceDay', () => {
   });
 
   it('帰還日に結果が反映される(素材・持ち物・地図・状態・履歴・お知らせ)', () => {
-    const s = newGame(13);
+    const s = fullGame(13);
+    // ティナの頼み(牙の納品)が帰還の素材を在庫から引くので、名簿から外して素材の反映だけを見る
+    s.adventurers = s.adventurers.filter((a) => !a.unique);
     const e = sent(s, { days: 2 });
     const res = structuredClone(e.result);
     const potionsLeft = res.items.potion ?? 0;
@@ -227,7 +227,7 @@ describe('advanceDay', () => {
   });
 
   it('地図の進捗は重複なくマージされる', () => {
-    const s = newGame(13);
+    const s = fullGame(13);
     const e = sent(s, { days: 1 });
     e.result.mapDeltas = [{ dungeon: 'forest_cave', floor: 'f1', cells: [60, 61, 62], hidden: [67] }];
     s.dungeons.forest_cave.floors.f1 = { visited: [60, 63], hiddenFound: [67] };
@@ -237,7 +237,7 @@ describe('advanceDay', () => {
   });
 
   it('成功で忠誠+3(+日次1)、負傷で−3', () => {
-    const s = newGame(17);
+    const s = fullGame(17);
     const e = sent(s, { days: 1 });
     const [a0, a1] = s.adventurers;
     Object.assign(e.result, { success: true, retreated: false, wiped: false, injuries: { [a1.id]: 2 } });
@@ -249,7 +249,7 @@ describe('advanceDay', () => {
   });
 
   it('全滅の帰還: 救助費用が引かれ、失った素材は入らず、忠誠−20', () => {
-    const s = newGame(19);
+    const s = fullGame(19);
     const e = sent(s, { days: 1, items: {} });
     const ids = s.adventurers.map((a) => a.id);
     Object.assign(e.result, {
@@ -270,7 +270,7 @@ describe('advanceDay', () => {
 
 describe('売買', () => {
   it('素材を売ると価格×個数が入り台帳に載る。持っていない数は売れない', () => {
-    const s = newGame(1);
+    const s = fullGame(1);
     s.inventory.fang = 3;
     expect(sellItem(s, 'fang', 4).ok).toBe(false);
     expect(sellItem(s, 'potion', 1).ok).toBe(false);
@@ -286,7 +286,7 @@ describe('売買', () => {
 
     it('使わなくなった装備(武器・防具・装飾)を、素材と同じ相場の計算で売れる。台帳には「中古売却」で載る', () => {
       for (const id of gear) {
-        const s = newGame(1);
+        const s = fullGame(1);
         s.inventory[id] = 2;
         expect(sellItem(s, id, 1)).toEqual({ ok: true });
         const price = Math.round(ITEM[id].price * TUNING.game.sellScale);
@@ -298,13 +298,13 @@ describe('売買', () => {
     });
 
     it('市場の上乗せは、中古にも同じように掛かる', () => {
-      const s = newGame(1);
+      const s = fullGame(1);
       place(s, 'market', 0, 0);
       expect(sellGold(s, 'iron_armor', 1)).toBe(Math.round(ITEM.iron_armor.price * TUNING.game.sellScale * 1.1));
     });
 
     it('着けている装備は在庫に無いので売れない(外してから)', () => {
-      const s = newGame(1);
+      const s = fullGame(1);
       s.adventurers[0].equipment.weapon = 'bone_dagger';
       s.inventory.bone_dagger = 0;
       expect(sellItem(s, 'bone_dagger', 1).ok).toBe(false);
@@ -312,7 +312,7 @@ describe('売買', () => {
     });
 
     it('回復薬・鍵・建材・知らない品・持っていない数は売れない(回復薬は買値より高く売れてしまうので特に)', () => {
-      const s = newGame(1);
+      const s = fullGame(1);
       s.inventory.ruin_key = 1;
       s.inventory.lumber = 5;
       s.inventory.bone_dagger = 1;
@@ -336,7 +336,7 @@ describe('売買', () => {
   });
 
   it('回復薬だけ買える。資金不足では買えない', () => {
-    const s = newGame(1);
+    const s = fullGame(1);
     expect(buyItem(s, 'potion', 2).ok).toBe(true);
     expect(s.inventory.potion).toBe(4);
     expect(s.gold).toBe(G0 - 60);
@@ -349,7 +349,7 @@ describe('売買', () => {
 describe('決定論', () => {
   it('同seedで同じ手順なら同じ状態', () => {
     const play = () => {
-      const s = newGame(42);
+      const s = fullGame(42);
       sent(s, { days: 3 });
       for (let i = 0; i < 4; i++) advanceDay(s);
       sent(s, { days: 2, items: {} });
@@ -367,14 +367,14 @@ const caveAll = caveCells((k) => k !== 'wall');
 
 describe('行動種別の検証', () => {
   it('護衛・運搬は受注中の依頼が無ければ出せない', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     expect(dispatch(s, order(s, { action: 'escort' })).ok).toBe(false);
     expect(dispatch(s, order(s, { action: 'transport' })).ok).toBe(false);
     expect(dispatch(s, order(s, { action: 'escort', target: { questId: 'nope' } })).ok).toBe(false);
   });
 
   it('踏査は未確認のダンジョンにだけ、他は確認済みにだけ出せる', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     expect(s.dungeons.old_mine.confirmed).toBe(false);
     expect(dispatch(s, order(s, { action: 'survey' })).ok).toBe(false);
     expect(dispatch(s, order(s, { target: { dungeon: 'old_mine', floor: 'f1' } })).ok).toBe(false);
@@ -382,7 +382,7 @@ describe('行動種別の検証', () => {
   });
 
   it('踏査から帰ると(全滅でも)入口が確認済みになり、お知らせが出る', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     const e = sent(s, { action: 'survey', target: { dungeon: 'old_mine', floor: 'f1' }, days: 1, items: {} });
     expect(e.order.target.route).toEqual(['base', 'mountain_village', 'old_mine']);
     Object.assign(e.result, { success: false, wiped: true, materials: {}, rescueCost: 0 });
@@ -393,25 +393,25 @@ describe('行動種別の検証', () => {
   });
 
   it('採集は対象素材が必須で、そのフロアの採取点にある素材だけ', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     expect(dispatch(s, order(s, { action: 'gather' })).ok).toBe(false);
     expect(dispatch(s, order(s, { action: 'gather', target: { dungeon: 'forest_cave', floor: 'f1', item: 'iron_ore' } })).ok).toBe(false);
     expect(dispatch(s, order(s, { action: 'gather', target: { dungeon: 'forest_cave', floor: 'f1', item: 'herb' } })).ok).toBe(true);
   });
 
   it('討伐の対象指定は探索率100%から、そのフロアの巣・シンボルの敵だけ', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     const hunt = (enemy?: string) => order(s, { action: 'hunt', target: { dungeon: 'forest_cave', floor: 'f1', enemy } });
     expect(dispatch(s, hunt('wolf')).ok).toBe(false);
     s.dungeons.forest_cave.floors.f1.visited = caveAll;
     expect(dispatch(s, hunt('slime')).ok).toBe(false);
     expect(dispatch(s, hunt('wolf')).ok).toBe(true);
-    const t = newGame(3);
+    const t = fullGame(3);
     expect(dispatch(t, order(t, { action: 'hunt' })).ok).toBe(true);
   });
 
   it('ボスはシンボルを踏んだことがあるときだけ出せ、直行して戦う', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     expect(dispatch(s, order(s, { action: 'boss' })).ok).toBe(false);
     // 隠し通路を開けていないと往復が日数に収まらないので、近道込みの知識にする
     s.dungeons.forest_cave.floors.f1 = { visited: caveAll, hiddenFound: caveCells((k) => k === 'hidden') };
@@ -422,7 +422,7 @@ describe('行動種別の検証', () => {
   });
 
   it('シンボルの敵を倒すと bossDefeated が増え、全マス踏むと踏破のお知らせ', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     const e = sent(s, { days: 1 });
     e.result.kills = { goblin_chief: 1, goblin: 2 };
     e.result.mapDeltas = [{ dungeon: 'forest_cave', floor: 'f1', cells: caveAll, hidden: caveCells((k) => k === 'hidden') }];
@@ -439,7 +439,7 @@ function place(s: GameState, id: string, x: number, y: number, level = 1) {
 
 describe('初期支援金', () => {
   it('supportDays 日目までの日送りで supportGold ずつ台帳「初期支援金」に載り、その後は無い', () => {
-    const s = newGame(13);
+    const s = fullGame(13);
     const days = TUNING.game.supportDays;
     for (let i = 0; i < days + 2; i++) advanceDay(s);
     const support = s.ledger.filter((l) => l.label === '初期支援金');
@@ -450,7 +450,7 @@ describe('初期支援金', () => {
 
 describe('施設の維持費', () => {
   it('完成済みの施設の upkeep 合計が台帳「施設維持費」に載る。建設中は掛からない', () => {
-    const s = newGame(13);
+    const s = fullGame(13);
     place(s, 'dorm', 0, 0);
     place(s, 'workshop', 1, 0);
     s.base.facilities.push({ id: 'clinic', level: 0, x: 2, y: 0, builtDay: 1, construction: { toLevel: 1, untilDay: 9 } });
@@ -466,7 +466,7 @@ describe('施設の維持費', () => {
 
 describe('施設勤務と派遣', () => {
   it('勤務中の者は派遣できず、待機者と同じく回復する', () => {
-    const s = newGame(17);
+    const s = fullGame(17);
     place(s, 'workshop', 0, 0);
     const a = s.adventurers[0];
     expect(assignWorker(s, a.id, 'workshop').ok).toBe(true);
@@ -482,7 +482,7 @@ describe('施設勤務と派遣', () => {
 
 describe('治療所', () => {
   it('帰還時の負傷日数を −Lv(最低1)、待機者の疲労回復 +5×Lv', () => {
-    const s = newGame(19);
+    const s = fullGame(19);
     place(s, 'clinic', 0, 0);
     const ids = s.adventurers.map((a) => a.id);
     const e = sent(s, { partyIds: ids.slice(0, 2), days: 1, items: {} });
@@ -499,7 +499,7 @@ describe('治療所', () => {
   });
 
   it('静かな寮(治療所×宿舎)で待機者の疲労回復がさらに+10', () => {
-    const s = newGame(19);
+    const s = fullGame(19);
     place(s, 'clinic', 0, 0);
     place(s, 'dorm', 0, 1);
     s.adventurers[0].fatigue = 60;
@@ -511,7 +511,7 @@ describe('治療所', () => {
 describe('訓練所', () => {
   it('帰還時の経験値が ×(1+0.2×Lv)', () => {
     const run = (level: number) => {
-      const s = newGame(23);
+      const s = fullGame(23);
       if (level) place(s, 'training', 0, 0, level);
       const ids = s.adventurers.map((a) => a.id);
       const e = sent(s, { partyIds: ids.slice(0, 1), days: 1, items: {} });
@@ -528,7 +528,7 @@ describe('訓練所', () => {
   });
 
   it('朝練(訓練所×宿舎)で待機者に毎日経験値+2', () => {
-    const s = newGame(23);
+    const s = fullGame(23);
     place(s, 'training', 0, 0);
     place(s, 'dorm', 1, 0);
     const exp = s.adventurers.map((a) => a.exp);
@@ -540,7 +540,7 @@ describe('訓練所', () => {
 describe('施設込みの決定論', () => {
   it('建設・クラフト・勤務・派遣を混ぜても同seedで同じ状態', () => {
     const play = () => {
-      const s = newGame(42);
+      const s = fullGame(42);
       s.gold = 3000;
       s.inventory = { ...s.inventory, moss_ore: 10, herb: 10, slime_gel: 5 };
       place(s, 'alchemy', 2, 2);
@@ -555,19 +555,19 @@ describe('施設込みの決定論', () => {
   });
 });
 
-describe('newGame(フェーズ4)', () => {
+describe('fullGame(フェーズ4)', () => {
   it('候補者2人・拠点の依頼2件・解放依頼が置かれる', () => {
-    const s = newGame(7);
+    const s = fullGame(7);
     expect(s.candidates.length).toBe(2);
     expect(s.quests.filter((q) => q.town === 'base' && q.status === 'posted').length).toBe(2);
     expect(s.quests.some((q) => q.templateId === 'u_forge_iron')).toBe(true);
-    expect(newGame(7)).toEqual(s);
+    expect(fullGame(7)).toEqual(s);
   });
 });
 
 /** 拠点から2日の古い坑道へ出せるようにする */
 function mineReady(seed: number): GameState {
-  const s = newGame(seed);
+  const s = fullGame(seed);
   s.dungeons.old_mine.confirmed = true;
   return s;
 }
@@ -586,7 +586,7 @@ describe('移動込みの派遣', () => {
   });
 
   it('森は0日の道なので returnDay は従来どおり', () => {
-    const s = newGame(5);
+    const s = fullGame(5);
     const e = sent(s, { days: 3 });
     expect(e.returnDay).toBe(1 + Math.max(1, e.result.daysSpent));
     expect(e.steps.filter((x) => x.phase === 'stay').length).toBe(Math.max(1, e.result.daysSpent));
@@ -620,7 +620,7 @@ describe('移動込みの派遣', () => {
   });
 
   it('行き先のダンジョンが無ければ出せない', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     expect(dispatch(s, order(s, { target: { dungeon: 'nowhere', floor: 'f1' } })).ok).toBe(false);
   });
 });
@@ -633,7 +633,7 @@ function postQuest(s: GameState, templateId: string): Quest {
 
 describe('護衛・運搬', () => {
   it('護衛は出発日だけ出せ、拠点→山村→拠点で戻り、着けば達成', () => {
-    const s = newGame(31);
+    const s = fullGame(31);
     const q = postQuest(s, 't_escort_village');
     expect(acceptQuest(s, q.id).ok).toBe(true);
     expect(dispatch(s, order(s, { action: 'escort', target: { questId: q.id }, items: {} })).ok).toBe(false);
@@ -651,7 +651,7 @@ describe('護衛・運搬', () => {
   });
 
   it('同じ依頼に2隊は出せない', () => {
-    const s = newGame(34);
+    const s = fullGame(34);
     s.world.visitedNodes.push('mountain_village');
     const q = postQuest(s, 't_transport_village');
     acceptQuest(s, q.id);
@@ -661,7 +661,7 @@ describe('護衛・運搬', () => {
   });
 
   it('運搬は荷の重さが積載を超えると出せず、山村経由で拠点に戻る', () => {
-    const s = newGame(32);
+    const s = fullGame(32);
     s.world.visitedNodes.push('mountain_village');
     const q = postQuest(s, 't_transport_village');
     expect(acceptQuest(s, q.id).ok).toBe(true);
@@ -682,7 +682,7 @@ describe('護衛・運搬', () => {
   });
 
   it('持ち物は道中で使わず、そのまま戻る', () => {
-    const s = newGame(33);
+    const s = fullGame(33);
     s.world.visitedNodes.push('mountain_village');
     const q = postQuest(s, 't_transport_village');
     acceptQuest(s, q.id);
@@ -695,7 +695,7 @@ describe('護衛・運搬', () => {
 
 describe('呼び戻し', () => {
   it('現地にいる隊は即復路。現地の成果は捨て、ログに「呼び戻し」', () => {
-    const s = newGame(41);
+    const s = fullGame(41);
     const e = sent(s, { days: 3 });
     expect(recall(s, e.id)).toEqual({ ok: true });
     expect(e.recalledDay).toBe(1);
@@ -725,14 +725,14 @@ describe('呼び戻し', () => {
   });
 
   it('派遣中でない隊は呼び戻せない', () => {
-    const s = newGame(43);
+    const s = fullGame(43);
     expect(recall(s, 'nope').ok).toBe(false);
   });
 });
 
 describe('依頼の日次処理', () => {
   it('日送りで依頼が出て、受注期限を過ぎた掲示は消える', () => {
-    const s = newGame(51);
+    const s = fullGame(51);
     s.gold = 100000;
     const first = s.quests.find((q) => q.town === 'base')!;
     first.acceptBy = s.day;
@@ -742,7 +742,7 @@ describe('依頼の日次処理', () => {
   });
 
   it('帰還で討伐の進捗が進む', () => {
-    const s = newGame(52);
+    const s = fullGame(52);
     const q = postQuest(s, 't_hunt_goblin');
     expect(acceptQuest(s, q.id).ok).toBe(true);
     const e = sent(s, { days: 3 });
@@ -754,7 +754,7 @@ describe('依頼の日次処理', () => {
   });
 
   it('評判Lvが上がった日にお知らせが出る', () => {
-    const s = newGame(53);
+    const s = fullGame(53);
     s.rep = 8;
     const r = advanceDay(s);
     expect(r.notices.some((n) => n.includes('評判'))).toBe(true);
@@ -762,8 +762,9 @@ describe('依頼の日次処理', () => {
   });
 
   it('候補者は日送りで到着し、期限で入れ替わる', () => {
-    const s = newGame(54);
+    const s = fullGame(54);
     const firstIds = s.candidates.map((c) => c.adv.id);
+    s.day = TUNING.game.candidateFromDay - 1;
     advanceDay(s);
     expect(s.candidates.length).toBeGreaterThan(2);
     for (let i = 0; i < TUNING.game.candidateDays; i++) advanceDay(s);
@@ -773,7 +774,7 @@ describe('依頼の日次処理', () => {
 
 describe('解放依頼とレシピ', () => {
   it('解放前は鉄の剣が作れず、鉄鉱石5個を納めると作れる', () => {
-    const s = newGame(61);
+    const s = fullGame(61);
     s.gold = 5000;
     s.inventory = { ...s.inventory, iron_ore: 20, fang: 20, bone_shard: 20, slime_gel: 20, moss_ore: 20 };
     s.base.facilities.push({ id: 'workshop', level: 1, x: 0, y: 0, builtDay: 1, construction: null });
@@ -791,7 +792,7 @@ describe('解放依頼とレシピ', () => {
 
 describe('勘違いの種', () => {
   it('buildFacility は建てて facility_built を積み、日送りで噂になる', () => {
-    const s = newGame(71);
+    const s = fullGame(71);
     s.gold = 5000;
     s.inventory = { ...s.inventory, moss_ore: 20, iron_ore: 20, slime_gel: 20, glow_moss: 20, herb: 20 };
     expect(buildFacility(s, 'dorm', 0, 0)).toEqual({ ok: true });
@@ -802,7 +803,7 @@ describe('勘違いの種', () => {
   });
 
   it('安全第一で低Lvの隊を出すと dispatch_safe_weak', () => {
-    const s = newGame(72);
+    const s = fullGame(72);
     sent(s, { policy: 'safe' });
     expect(s.pendingTags).toContain('dispatch_safe_weak');
   });
@@ -811,7 +812,7 @@ describe('勘違いの種', () => {
 describe('フェーズ4込みの決定論', () => {
   it('護衛・運搬・呼び戻し・候補者・依頼を混ぜても同seedで同じ状態', () => {
     const play = () => {
-      const s = newGame(77);
+      const s = fullGame(77);
       s.gold = 5000;
       s.world.visitedNodes.push('mountain_village');
       const q = postQuest(s, 't_transport_village');
@@ -830,7 +831,7 @@ describe('フェーズ4込みの決定論', () => {
 
 describe('近道の発見', () => {
   it('山村を3回訪れると、山村と古い坑道の近道が開く', () => {
-    const s = newGame(21);
+    const s = fullGame(21);
     s.gold = 5000;
     const go = () => {
       const ids = s.adventurers.filter((a) => a.status === 'idle' && a.injuryDays === 0).map((a) => a.id);
@@ -858,7 +859,7 @@ describe('近道の発見', () => {
 
 describe('訓練・親友・ユニークの日送りへの組み込み', () => {
   it('訓練は日数後に完了してスキルが付き、訓練中も疲労は回復する', () => {
-    const s = newGame(31);
+    const s = fullGame(31);
     place(s, 'training', 0, 0);
     const a = s.adventurers[0];
     a.fatigue = 60;
@@ -873,7 +874,7 @@ describe('訓練・親友・ユニークの日送りへの組み込み', () => {
   });
 
   it('関係値60以上の2人は、同じ隊で5回目に帰還すると親友になる', () => {
-    const s = newGame(32);
+    const s = fullGame(32);
     const [a, b] = s.adventurers;
     s.relations[pairKey(a.id, b.id)] = 70;
     s.flags[`pair:${pairKey(a.id, b.id)}`] = 4;
@@ -883,17 +884,16 @@ describe('訓練・親友・ユニークの日送りへの組み込み', () => {
     expect(s.flags[`friends:${pairKey(a.id, b.id)}`]).toBe(true);
   });
 
-  it('ユニークの最初の頼み(薬草の納品)は、在庫があれば日送りで進む', () => {
-    const s = newGame(33);
-    s.adventurers.push(uniqueAdventurer(UNIQUE.u_alpha, 'ux'));
-    s.inventory.herb = 5;
+  it('ユニークの最初の頼み(ティナの牙の納品)は、在庫があれば日送りで進む', () => {
+    const s = fullGame(33);
+    s.inventory.fang = 5;
     advanceDay(s);
-    expect(s.flags['u_alpha:step']).toBe(1);
-    expect(s.inventory.herb ?? 0).toBe(0);
+    expect(s.flags['tina:step']).toBe(1);
+    expect(s.inventory.fang ?? 0).toBe(0);
   });
 
   it('帰還のひとことは最終結果で全員分作られる(現地なしの護衛・呼び戻しでも空にならない)', () => {
-    const s = newGame(34);
+    const s = fullGame(34);
     const r = dispatch(s, order(s, { days: 1 }));
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.expedition.result.returnDialogue).toHaveLength(s.adventurers.length);
@@ -905,7 +905,7 @@ describe('実績・竜の討伐の組み込み', () => {
   const FIVE = ['m_gold1', 'm_gold2', 'm_rep3', 'm_rep5', 'd_10'];
 
   const returnWithExp = (stageIds: string[]) => {
-    const s = newGame(41);
+    const s = fullGame(41);
     s.achievements = [...stageIds];
     const r = dispatch(s, order(s, { days: 1 }));
     expect(r.ok).toBe(true);
@@ -916,7 +916,7 @@ describe('実績・竜の討伐の組み込み', () => {
   };
 
   it('日送りで実績が判定される', () => {
-    const s = newGame(40);
+    const s = fullGame(40);
     s.gold = 2000;
     advanceDay(s);
     expect(s.achievements).toContain('m_gold1');
@@ -931,7 +931,7 @@ describe('実績・竜の討伐の組み込み', () => {
   });
 
   it('竜を倒した帰還で討伐済みになり、竜鱗装備が解放され、同じ日に s_dragon が付く', () => {
-    const s = newGame(42);
+    const s = fullGame(42);
     const r = dispatch(s, order(s, { days: 1 }));
     expect(r.ok).toBe(true);
     s.expeditions[0].result.kills = { dragon: 1 };
@@ -951,7 +951,7 @@ describe('複数フロア・鍵の組み込み', () => {
     order(s, { target: { dungeon: dungeonId, floor: 'f2' }, days: 7 });
 
   it('2階は、前の階の下り階段を踏んでいないと出せない', () => {
-    const s = newGame(60);
+    const s = fullGame(60);
     s.dungeons.ruined_tower.confirmed = true;
     const r = dispatch(s, toFloor2(s, 'ruined_tower'));
     expect(r.ok).toBe(false);
@@ -959,7 +959,7 @@ describe('複数フロア・鍵の組み込み', () => {
   });
 
   it('階段を踏んでいれば2階へ出せて、前の階を抜ける歩数を払う', () => {
-    const s = newGame(60);
+    const s = fullGame(60);
     s.dungeons.ruined_tower.confirmed = true;
     s.dungeons.ruined_tower.floors.f1.visited = walkable('ruined_tower');
     const r = dispatch(s, toFloor2(s, 'ruined_tower'));
@@ -970,7 +970,7 @@ describe('複数フロア・鍵の組み込み', () => {
   });
 
   it('階段までの道に鍵の扉があるなら、鍵を持っていないと2階へ出せない(持っていれば出せる)', () => {
-    const s = newGame(61);
+    const s = fullGame(61);
     s.dungeons.sunken_ruins.confirmed = true;
     s.dungeons.sunken_ruins.floors.f1.visited = walkable('sunken_ruins');
     expect(dispatch(s, toFloor2(s, 'sunken_ruins')).ok).toBe(false);
@@ -980,7 +980,7 @@ describe('複数フロア・鍵の組み込み', () => {
 
   it('帰還で持ち帰った鍵は在庫に入り、すでに持っていれば増えない(最大1個)', () => {
     const keyReturn = (have: number) => {
-      const s = newGame(62);
+      const s = fullGame(62);
       if (have) s.inventory.ruin_key = have;
       const r = dispatch(s, order(s, { days: 1 }));
       expect(r.ok).toBe(true);
@@ -995,7 +995,7 @@ describe('複数フロア・鍵の組み込み', () => {
 
 describe('新しい施設の効果(売却・日送りの産出・派遣)', () => {
   it('市場で素材の売却額が増える: Lv1 で1割、Lv2 で2割、鍛冶場と隣り合う(商い)とさらに1割。端数は四捨五入', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     s.inventory.fang = 30;
     const p = ITEM.fang.price;
     const sell = (n: number) => {
@@ -1016,7 +1016,7 @@ describe('新しい施設の効果(売却・日送りの産出・派遣)', () =>
   });
 
   it('日送りで製材所・石切場の産出が在庫に入る。完成した日から産み、台帳とお知らせには出ない', () => {
-    const s = newGame(3);
+    const s = fullGame(3);
     s.gold = 5000;
     expect(buildFacility(s, 'sawmill', 0, 0)).toEqual({ ok: true });
     place(s, 'quarry', 4, 4, 2);
@@ -1035,7 +1035,7 @@ describe('新しい施設の効果(売却・日送りの産出・派遣)', () =>
     const found = (withMap: boolean) => {
       let n = 0;
       for (let seed = 1; seed <= 40; seed++) {
-        const s = newGame(seed);
+        const s = fullGame(seed);
         if (withMap) {
           place(s, 'map_room', 0, 0, 2);
           place(s, 'tavern', 1, 0);
@@ -1053,7 +1053,7 @@ describe('新しい施設の効果(売却・日送りの産出・派遣)', () =>
     const encounters = (withTower: boolean) => {
       let n = 0;
       for (let seed = 1; seed <= 100; seed++) {
-        const s = newGame(seed);
+        const s = fullGame(seed);
         s.dungeons.old_mine = { confirmed: true, floors: { f1: { visited: [], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false };
         if (withTower) {
           place(s, 'watchtower', 0, 0, 2);

@@ -4,6 +4,7 @@ import { FACILITY, JOB, TUNING } from '../src/core/data';
 import { newGame } from '../src/core/game';
 import { canChangeJob, changeJob, promotionCost, promotionOptions } from '../src/core/jobs';
 import type { Adventurer, GameState, Result } from '../src/core/types';
+import { fullGame } from './helpers';
 
 const PROMO = TUNING.jobs.promotionGold;
 const FLAT = { attacker: 50, tank: 50, healer: 50, gatherer: 50, scout: 50 };
@@ -192,7 +193,7 @@ describe('転職: 決定論', () => {
 
 describe('転職と防具', () => {
   const wear = (job: string, armor: string) => {
-    const s = newGame(2);
+    const s = fullGame(2);
     const a = s.adventurers[1];
     a.job = job;
     a.status = 'idle';

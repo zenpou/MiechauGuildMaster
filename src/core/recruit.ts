@@ -44,13 +44,15 @@ export function spawnCandidate(s: GameState, rng: Rng): Candidate {
 
 /** 日送りで呼ぶ。1 +(評判Lv3以上で+1)+(40%で+1)+(酒場とシナジー)人、保持の上限まで */
 export function arriveCandidates(s: GameState, rng: Rng): Candidate[] {
+  if (s.day < T.candidateFromDay) return [];
   // 上限で打ち切っても到着数の抽選は先に済ませ、乱数の列を保持数に左右させない
   const extra = rng.chance(EXTRA_ARRIVAL_CHANCE) ? 1 : 0;
   const n = 1 + (repLevel(s.rep) >= EXTRA_ARRIVAL_REP_LV ? 1 : 0) + extra + bonus(s, 'candidateBonus');
   const out: Candidate[] = [];
   for (let i = 0; i < n && s.candidates.length < T.candidateMax; i++) out.push(spawnCandidate(s, rng));
   for (const u of UNIQUES) {
-    if (s.flags[`unique:${u.id}`] || s.day < u.join.minDay || s.rep < u.join.minRep || s.candidates.length >= T.candidateMax) continue;
+    const j = u.join;
+    if (!('minDay' in j) || s.flags[`unique:${u.id}`] || s.day < j.minDay || s.rep < j.minRep || s.candidates.length >= T.candidateMax) continue;
     s.flags[`unique:${u.id}`] = true;
     const c: Candidate = { adv: uniqueAdventurer(u, `a${s.counters.nextId++}`), arrivedDay: s.day, expiresDay: s.day + UNIQUE_DAYS };
     s.candidates.push(c);
@@ -87,6 +89,8 @@ export function dismiss(s: GameState, advId: string): Result {
   const a = s.adventurers.find((x) => x.id === advId);
   if (!a) return fail('その冒険者はいません');
   if (a.status !== 'idle') return fail(`${a.name}は待機中ではないので解雇できません`);
+  // RULES 3-4: ユニークは離脱しない。解雇できても次の読み込みで戻ってくるので、最初から断る
+  if (a.unique) return fail(`${a.name}はギルドを離れません`);
   s.adventurers = s.adventurers.filter((x) => x !== a);
   return ok();
 }

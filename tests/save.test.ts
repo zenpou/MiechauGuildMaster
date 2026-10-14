@@ -7,12 +7,13 @@ import { changeJob } from '../src/core/jobs';
 import { deserialize, migrate, serialize } from '../src/core/save';
 import { markStorySeen, storyDue } from '../src/core/story';
 import { SAVE_VERSION, type Adventurer, type GameState } from '../src/core/types';
+import { fullGame } from './helpers';
 
 const clone = (s: GameState) => JSON.parse(JSON.stringify(s));
 
 /** フェーズ4以前のセーブ: 冒険者に skills / persona / equipment / assignment と history の後付け項目が無い */
 function oldSave() {
-  const old = clone(newGame(5));
+  const old = clone(fullGame(5));
   for (const a of [...old.adventurers, ...old.candidates.map((c: { adv: unknown }) => c.adv)] as Record<string, any>[]) {
     delete a.skills;
     delete a.persona;
@@ -130,9 +131,11 @@ describe('セーブの書き出しと読み込み(deserialize / serialize)', () 
 });
 
 describe('性別と外見(版1 → 版2)', () => {
-  /** 版1のセーブ: 冒険者に gender / appearance が無い */
+  /** 版1のセーブ: 冒険者に gender / appearance が無く、名簿は汎用の者だけ */
   function v1Save() {
-    const old = clone(newGame(5));
+    const s = fullGame(5);
+    s.adventurers = s.adventurers.filter((a) => !a.unique);
+    const old = clone(s);
     old.version = 1;
     for (const a of [...old.adventurers, ...old.candidates.map((c: { adv: unknown }) => c.adv)] as Record<string, any>[]) {
       delete a.gender;
@@ -148,10 +151,11 @@ describe('性別と外見(版1 → 版2)', () => {
     expect(SAVE_VERSION).toBe(2);
     expect(s.version).toBe(2);
     expect(s.candidates.length).toBeGreaterThan(0);
-    for (const a of everyone(s)) {
+    for (const a of everyone(s).filter((x) => !x.unique)) {
       expect(['male', 'female']).toContain(a.gender);
       expect(a.appearance).toBe(`adv_${a.personality}_${a.gender}`);
     }
+    expect(s.adventurers.find((a) => a.unique === 'tina')).toMatchObject({ gender: 'female', appearance: 'tina' });
   });
 
   it('同じ古いセーブを何度読んでも同じ性別と外見になる', () => {
@@ -176,9 +180,9 @@ describe('性別と外見(版1 → 版2)', () => {
 
   it('ユニークの性別と外見は定義の値になる(hash で決めない)', () => {
     const src = v1Save();
-    src.adventurers[0].unique = 'u_alpha';
+    src.adventurers[0].unique = 'tina';
     const s = migrate(src)!;
-    expect([s.adventurers[0].gender, s.adventurers[0].appearance]).toEqual(['male', 'u_alpha']);
+    expect([s.adventurers[0].gender, s.adventurers[0].appearance]).toEqual(['female', 'tina']);
   });
 
   it('定義が見つからないユニークの外見は unique の値になる', () => {

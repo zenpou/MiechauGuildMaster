@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { effectiveStats, generateAdventurer } from '../src/core/adventurer';
 import { UNIQUE } from '../src/core/data';
 import { advanceUniqueChain, onReturn, uniqueAdventurer, uniqueDef } from '../src/core/events';
@@ -6,6 +6,7 @@ import { newGame } from '../src/core/game';
 import { pairKey } from '../src/core/relations';
 import { rngFor } from '../src/core/rng';
 import type { Adventurer, Expedition, ExpeditionResult, GameState } from '../src/core/types';
+import { U_ALPHA, registerUnique } from './helpers';
 
 function result(over: Partial<ExpeditionResult> = {}): ExpeditionResult {
   return {
@@ -64,14 +65,17 @@ describe('組み合わせイベント(親友)', () => {
 });
 
 describe('ユニーク冒険者', () => {
-  it('定義: 仮名・斥候・慎重・固有スキル(偵察+3)', () => {
-    const def = uniqueDef('u_alpha');
-    expect(def).toBe(UNIQUE.u_alpha);
-    expect(def.name).toContain('(仮)');
-    expect(def.job).toBe('scout');
-    expect(def.personality).toBe('cautious');
-    expect(def.skill).toMatchObject({ id: 'u_alpha_skill', mods: { scout: 3 } });
-    expect(def.join).toEqual({ minDay: 10, minRep: 8 });
+  let unregister: () => void;
+  beforeEach(() => { unregister = registerUnique(U_ALPHA); });
+  afterEach(() => unregister());
+  it('定義: ティナは剣士・勇敢・固有スキル(攻撃+3)で、初日の名簿に入る', () => {
+    const def = uniqueDef('tina');
+    expect(def).toBe(UNIQUE.tina);
+    expect(def.name).toBe('ティナ');
+    expect(def.job).toBe('fighter');
+    expect(def.personality).toBe('brave');
+    expect(def.skill).toMatchObject({ id: 'tina_skill', mods: { atk: 3 } });
+    expect(def.join).toEqual({ initial: true });
     expect(def.chain).toHaveLength(3);
   });
 

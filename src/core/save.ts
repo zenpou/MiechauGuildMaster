@@ -3,7 +3,8 @@ import { emptyState, initialDungeonProgress } from './state';
 import { genericAppearance } from './adventurer';
 import { DUNGEONS, UNIQUE } from './data';
 import { hashSeed, Rng } from './rng';
-import { markStorySeen, storyDue } from './story';
+import { joinInitialUniques, joinStoryUniques } from './events';
+import { readDueStories, storySeen } from './story';
 import { SAVE_VERSION, type Adventurer, type GameState } from './types';
 
 export interface KeyValueStore {
@@ -61,11 +62,11 @@ export function migrate(raw: unknown): GameState | null {
   // 物語の導入前から遊んでいたセーブ(章の旗が1つも無く、1日目を過ぎている)は、過ぎた章を開いた直後に
   // 連続で出さず、既読にする。出す・出さないを章ごとに選ばせないのは、台本があとから増えても同じ扱いで済ませるため
   if (merged.day > 1 && !Object.keys(merged.flags).some((k) => k.startsWith('story:'))) {
-    // 章は前章の読了を条件にして鎖になっているので、1つ既読にすると次が出る。出なくなるまで繰り返す
-    for (let due = storyDue(merged); due.length > 0; due = storyDue(merged)) {
-      for (const c of due) markStorySeen(merged, c.id, 0);
-    }
+    readDueStories(merged, 0);
   }
+  // 名簿を物語に合わせる前のセーブ(汎用4人で始めた)にも、初日の仲間と既読の章で加入する者を入れる。汎用の者はそのまま残す
+  for (const a of joinInitialUniques(merged)) merged.notices.unshift({ day: merged.day, text: `${a.name}がギルドに加入した。` });
+  for (const c of storySeen(merged)) joinStoryUniques(merged, c.id);
   merged.version = SAVE_VERSION;
   return merged;
 }

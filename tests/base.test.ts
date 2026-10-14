@@ -10,9 +10,10 @@ import { accept, activeMax, activeQuests } from '../src/core/quests';
 import { rngFor } from '../src/core/rng';
 import { completeTraining, trainableSkills, trainDays, trainSkill } from '../src/core/training';
 import type { GameState } from '../src/core/types';
+import { fullGame } from './helpers';
 
 function rich(seed = 5): GameState {
-  const s = newGame(seed);
+  const s = fullGame(seed);
   s.gold = 5000;
   s.inventory = { ...s.inventory, moss_ore: 20, iron_ore: 20, slime_gel: 20, glow_moss: 20, herb: 20 };
   return s;

@@ -1,6 +1,7 @@
 // 物語の章。どの章をいつ出すかは台本(story.json)の trigger に書き、ここは GameState と照らすだけ。
 // 読んだ章は flags['story:<id>'] に読んだ日を残す。GameState に項目を足すとセーブの版を上げることになる
 import storyJson from '../data/story.json';
+import { joinStoryUniques } from './events';
 import { heldKeys } from './ledger';
 import type { PresentedLine } from './presentation';
 import type { GameState } from './types';
@@ -63,6 +64,17 @@ export function storyDue(s: GameState): StoryChapter[] {
 export function markStorySeen(s: GameState, id: string, day: number = s.day): void {
   if (storySeenDay(s, id) !== null || !STORY.some((c) => c.id === id)) return;
   s.flags[SEEN_PREFIX + id] = day;
+  joinStoryUniques(s, id);
+}
+
+/**
+ * 出ている章を全部読んだことにする。物語を読まない bot・計測用。
+ * 章は前章の読了を条件にした鎖なので、1つ既読にすると次が出る。出なくなるまで繰り返す
+ */
+export function readDueStories(s: GameState, day: number = s.day): void {
+  for (let due = storyDue(s); due.length > 0; due = storyDue(s)) {
+    for (const c of due) markStorySeen(s, c.id, day);
+  }
 }
 
 /** 読み終えた章(台本の並び順)。読み返し用 */

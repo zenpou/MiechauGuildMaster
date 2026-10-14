@@ -102,8 +102,9 @@ export function markTired(s: GameState, members: Adventurer[]) {
   for (const a of members) if (a.fatigue > M.restFatigue) s.flags['tiredDispatch:' + a.id] = s.day;
 }
 
+/** RULES 3-4: ユニークヒロインは退職しない。昇給の要求は届くが、断っても去りはしない */
 function warningOf(s: GameState, a: Adventurer): Pending | null {
-  if (a.history.warnedDay !== null) return null;
+  if (a.unique || a.history.warnedDay !== null) return null;
   const retained = s.flags['retained:' + a.id];
   const cooling = typeof retained === 'number' && s.day - retained <= M.resignDays;
   const low = a.loyalty < (cooling ? M.resignLoyalty : M.warnLoyalty);
@@ -249,7 +250,7 @@ export function applyResignations(s: GameState, notices: string[]): Mail[] {
   const out: Mail[] = [];
   for (const a of [...s.adventurers]) {
     const w = a.history.warnedDay;
-    if (w === null || s.day <= w + M.resignDays || a.status === 'away' || a.status === 'training') continue;
+    if (a.unique || w === null || s.day <= w + M.resignDays || a.status === 'away' || a.status === 'training') continue;
     out.push(send(s, 'resign', a, {}, {}));
     s.adventurers = s.adventurers.filter((x) => x !== a);
     s.flags['gone:' + a.id] = true;

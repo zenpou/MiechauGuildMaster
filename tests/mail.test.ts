@@ -8,6 +8,7 @@ import { pairKey } from '../src/core/relations';
 import { rngFor } from '../src/core/rng';
 import { deserialize, serialize } from '../src/core/save';
 import type { DispatchOrder, GameState, Mail } from '../src/core/types';
+import { fullGame } from './helpers';
 
 const M = TUNING.mail;
 
@@ -21,7 +22,9 @@ function order(ids: string[], o: Partial<DispatchOrder> = {}): DispatchOrder {
 }
 
 function rich(seed = 1): GameState {
-  const s = newGame(seed);
+  const s = fullGame(seed);
+  // 退職の対象は汎用の者だけなので、先頭を汎用にする(ティナは末尾へ)
+  s.adventurers.push(s.adventurers.shift()!);
   s.gold = 1_000_000;
   return s;
 }
@@ -317,7 +320,8 @@ describe('噂', () => {
 describe('受信箱', () => {
   it('1日3通まで、溢れた分は翌日以降に届く', () => {
     const s = rich();
-    for (const a of s.adventurers) a.loyalty = 120;
+    // 節目50が残っている人は翌日に120を出すので、1人1通に揃える
+    for (const a of s.adventurers) { a.loyalty = 120; s.flags[`loyal:${a.id}:50`] = true; }
     const notices: string[] = [];
     expect(check(s, notices)).toHaveLength(M.perDay);
     expect(notices.length).toBeGreaterThan(0);

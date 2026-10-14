@@ -1,15 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { TUNING } from '../src/core/data';
 import { newGame } from '../src/core/game';
 import { arriveCandidates, capacity, dismiss, expireCandidates, hire, spawnCandidate } from '../src/core/recruit';
 import { rngFor } from '../src/core/rng';
 import type { GameState } from '../src/core/types';
+import { U_ALPHA, fullGame, registerUnique } from './helpers';
 
 const T = TUNING.game;
 
+/** 候補なし、募集が来はじめる日に立った状態 */
 function bare(seed = 11): GameState {
   const s = newGame(seed);
   s.candidates = [];
+  s.day = T.candidateFromDay;
   return s;
 }
 
@@ -130,8 +133,8 @@ describe('雇用', () => {
 
 describe('解雇', () => {
   it('待機中だけ解雇でき、費用は掛からない', () => {
-    const s = bare();
-    const [a, b] = s.adventurers;
+    const s = fullGame(11);
+    const [a, b] = s.adventurers.filter((x) => !x.unique);
     const gold = s.gold;
     b.status = 'away';
     expect(dismiss(s, b.id).ok).toBe(false);
@@ -143,6 +146,9 @@ describe('解雇', () => {
 });
 
 describe('ユニーク冒険者の出現', () => {
+  let unregister: () => void;
+  beforeEach(() => { unregister = registerUnique(U_ALPHA); });
+  afterEach(() => unregister());
   it('10日目以降・評判8以上で一度だけ現れ、期限10日、契約金なしで雇える', () => {
     const uniques = (s: GameState) => s.candidates.filter((c) => c.adv.unique === 'u_alpha');
     const early = bare();
@@ -231,5 +237,26 @@ describe('酒場', () => {
       boosted += b.base.hp + b.base.atk + b.base.def + b.base.mag + b.base.spd;
     }
     expect(boosted).toBeGreaterThan(plain);
+  });
+});
+
+describe('募集が来はじめる日(candidateFromDay)', () => {
+  it('その日より前は候補が来ず、当日から来る', () => {
+    const keep = [T.candidateFromDay, T.startCandidates];
+    T.candidateFromDay = 4;
+    try {
+      const s = newGame(1);
+      s.candidates = [];
+      s.day = 3;
+      expect(arriveCandidates(s, rngFor(1, 'recruit', 3))).toEqual([]);
+      s.day = 4;
+      expect(arriveCandidates(s, rngFor(1, 'recruit', 4)).length).toBeGreaterThan(0);
+    } finally {
+      [T.candidateFromDay, T.startCandidates] = keep;
+    }
+  });
+
+  it('初日の候補の人数は startCandidates', () => {
+    expect(newGame(1).candidates).toHaveLength(T.startCandidates);
   });
 });

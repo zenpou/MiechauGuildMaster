@@ -11,6 +11,8 @@ import { parseFloor } from '../src/core/dungeon';
 import { cellDepths } from '../src/core/explore';
 import { advanceDay, dispatch, exploredRateOf, newGame, sellItem } from '../src/core/game';
 import { addInventory } from '../src/core/ledger';
+import { readDueStories } from '../src/core/story';
+import { addStarterParty } from './roster';
 import { PARTY_MAX, type ActionKind, type Adventurer, type DispatchOrder, type Expedition } from '../src/core/types';
 
 const FLOOR_ID = 'f1';
@@ -76,7 +78,7 @@ interface RunResult {
 const ready = (a: Adventurer) => a.status === 'idle' && a.injuryDays === 0;
 
 function run(seed: number, leaderPersonality?: string): RunResult {
-  const s = newGame(seed);
+  const s = addStarterParty(newGame(seed), seed);
   if (leaderPersonality) s.adventurers[0].personality = leaderPersonality;
   const rate: number[] = [];
   rate[s.day] = exploredRateOf(s, DUNGEON_ID, FLOOR_ID);
@@ -107,6 +109,8 @@ function run(seed: number, leaderPersonality?: string): RunResult {
     else if (s.expeditions.length === 0) skip('出られる隊員が2人未満');
 
     const rep = advanceDay(s);
+    // 物語を読まないので、出た章はその日に読んだことにする(章の読了で仲間が加入する)
+    readDueStories(s);
     rate[s.day] = exploredRateOf(s, DUNGEON_ID, FLOOR_ID);
     for (const e of rep.returned) dispatches.push(record(e, pending.get(e.id)!));
     // 人が遊ぶときは帰還した素材を売って日給に充てるので、sim も毎日全部売る
@@ -196,7 +200,7 @@ interface PlanRun {
 }
 
 function runPlan(plan: PlanId, seed: number): PlanRun {
-  const s = newGame(seed);
+  const s = addStarterParty(newGame(seed), seed);
   const prepare = plan === 'forest-then-mine';
   if (plan === 'mine-geared') {
     for (const [it, n] of Object.entries(GEAR_KIT)) addInventory(s, it, n);
@@ -286,6 +290,8 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
     } else if (s.expeditions.length === 0) skip('出られる隊員が2人未満');
 
     const rep = advanceDay(s);
+    // 物語を読まないので、出た章はその日に読んだことにする(章の読了で仲間が加入する)
+    readDueStories(s);
     for (const e of rep.returned) {
       if (!pending.has(e.id)) continue;
       const res = e.result;

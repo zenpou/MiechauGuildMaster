@@ -129,6 +129,9 @@ export interface Tuning {
     supportGold: number;
     supportDays: number;
     candidateMax: number;
+    /** 初日の候補の人数と、募集が来はじめる日(没落したギルドに最初は人が来ない、を数値で持つ) */
+    startCandidates: number;
+    candidateFromDay: number;
     candidateDays: number;
     hireSalaryDays: number;
     baseCapacity: number;
@@ -182,6 +185,11 @@ export interface UniqueChainStep {
   item?: string; dungeon?: string; enemy?: string; n: number;
   text: string;
 }
+/**
+ * initial: 初日の名簿。story: その章を読み終えた日に名簿へ直接入る(雇用費なし、宿舎の定員を見ない)。
+ * minDay・minRep: 条件を満たすと候補一覧に出る
+ */
+export type UniqueJoin = { initial: true } | { story: string } | { minDay: number; minRep: number };
 export interface UniqueDef {
   id: string; name: string; job: string; personality: string; age: number;
   gender: Gender; appearance: string;
@@ -190,7 +198,7 @@ export interface UniqueDef {
   salary: number;
   persona: Persona;
   skill: TrainedSkillDef;
-  join: { minDay: number; minRep: number };
+  join: UniqueJoin;
   chain: UniqueChainStep[];
   chainLoyalty: number;
 }

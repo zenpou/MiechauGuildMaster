@@ -560,7 +560,9 @@ describe('台本(docs/story/scripts)との照合', () => {
   function parseScript(id: string): Row[] {
     const text = readFileSync(resolve(__dirname, '../docs/story/scripts', SCRIPT_FILES[id]), 'utf8');
     const rows: Row[] = [];
+    let scene = '';
     for (const raw of text.split('\n')) {
+      if (raw.startsWith('### ')) scene = raw;
       if (!raw.startsWith('| ')) continue;
       const cells = raw.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
       if (cells.length !== 7 || !/^\d+$/.test(cells[0])) continue; // 見出し・区切り・汎用差分(No が -)は飛ばす
@@ -571,7 +573,7 @@ describe('台本(docs/story/scripts)との照合', () => {
         row.text = row.text.replace(/^「+/, '').replace(/」+$/, '');
       }
       // 序章シーン1(門前)は一枚絵 prologue を背景にする(組み込みの決定。台本は bg_street_morning のまま)
-      if (id === 'prologue' && row.no <= 7) row.background = 'bg_street_gate';
+      if (id === 'prologue' && scene.includes('シーン1: 実家の前')) row.background = 'bg_street_gate';
       if (!['なし', '', '-'].includes(castCell)) {
         for (const part of castCell.split(/<br\s*\/?>/)) {
           const m = part.trim().match(/^(\S+)\s*\((左|中央|右)\s*\/\s*(.+?)\)$/);

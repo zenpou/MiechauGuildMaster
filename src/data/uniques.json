@@ -1,17 +1,81 @@
 [
   {
-    "id": "u_alpha", "name": "ユニークA(仮)", "job": "scout", "personality": "cautious", "age": 24,
-    "gender": "male", "appearance": "u_alpha",
-    "base": {"hp": 66, "atk": 11, "def": 9, "mag": 8, "spd": 12, "dex": 13, "scout": 15, "gather": 10},
-    "apt": {"attacker": 45, "tank": 30, "healer": 35, "scout": 92, "gatherer": 60},
-    "growth": 1.2, "salary": 0,
-    "persona": {"hobby": "星を眺めること(仮)", "talent": "足跡の見分け(仮)", "likes": "静かな森(仮)", "dislikes": "大きな音(仮)"},
-    "skill": {"id": "u_alpha_skill", "name": "見通す目(仮)", "desc": "固有。道の先を読む。偵察+3。", "mods": {"scout": 3}},
-    "join": {"minDay": 10, "minRep": 8},
+    "id": "tina", "name": "ティナ", "job": "fighter", "personality": "brave", "age": 19,
+    "gender": "female", "appearance": "tina",
+    "base": {"hp": 70, "atk": 14, "def": 9, "mag": 5, "spd": 11, "dex": 10, "scout": 8, "gather": 6},
+    "apt": {"attacker": 92, "tank": 72, "healer": 12, "scout": 50, "gatherer": 30},
+    "growth": 1.25, "salary": 0,
+    "persona": {"hobby": "剣の手入れ", "talent": "早起き", "likes": "甘い菓子", "dislikes": "苦い薬"},
+    "skill": {"id": "tina_skill", "name": "守るための剣", "desc": "固有。仲間を守るために振る剣。攻撃+3。", "mods": {"atk": 3}},
+    "join": {"initial": true},
     "chain": [
-      {"kind": "deliver", "item": "herb", "n": 5, "text": "森の薬草を5つ届けてほしい(仮)"},
-      {"kind": "visit", "dungeon": "old_mine", "n": 3, "text": "坑道へ3回連れて行ってほしい(仮)"},
-      {"kind": "soloKill", "enemy": "goblin_chief", "n": 1, "text": "1人でゴブリンの頭を討ちたい(仮)"}
+      {"kind": "deliver", "item": "fang", "n": 5, "text": "剣の柄飾りにする魔物の牙を5つ届けてほしい"},
+      {"kind": "visit", "dungeon": "old_mine", "n": 3, "text": "腕試しに古い坑道へ3回連れて行ってほしい"},
+      {"kind": "soloKill", "enemy": "goblin_chief", "n": 1, "text": "ゴブリンの頭を1人で討ちたい"}
+    ],
+    "chainLoyalty": 30
+  },
+  {
+    "id": "sera", "name": "セラ", "job": "priest", "personality": "caring", "age": 19,
+    "gender": "female", "appearance": "sera",
+    "base": {"hp": 54, "atk": 6, "def": 7, "mag": 14, "spd": 8, "dex": 9, "scout": 7, "gather": 9},
+    "apt": {"attacker": 10, "tank": 25, "healer": 92, "scout": 30, "gatherer": 40},
+    "growth": 1.2, "salary": 0,
+    "persona": {"hobby": "祈り", "talent": "聞き上手", "likes": "アイリスの笑顔", "dislikes": "大きな声"},
+    "skill": {"id": "sera_skill", "name": "癒しの祈り", "desc": "固有。教会で毎日練習した回復の祈り。魔力+3。", "mods": {"mag": 3}},
+    "join": {"story": "ch1"},
+    "chain": [
+      {"kind": "deliver", "item": "herb", "n": 5, "text": "アイリスちゃんの体に良い薬草を5つ届けてほしい"},
+      {"kind": "visit", "dungeon": "forest_cave", "n": 3, "text": "怖いけれど、森の洞窟へ3回ついていきたい"},
+      {"kind": "deliver", "item": "glow_moss", "n": 3, "text": "祈りの灯りに使う光苔を3つ届けてほしい"}
+    ],
+    "chainLoyalty": 30
+  },
+  {
+    "id": "viola", "name": "ヴィオラ", "job": "warrior", "personality": "proud", "age": 21,
+    "gender": "female", "appearance": "viola",
+    "base": {"hp": 76, "atk": 9, "def": 14, "mag": 6, "spd": 7, "dex": 8, "scout": 6, "gather": 8},
+    "apt": {"attacker": 40, "tank": 88, "healer": 60, "scout": 20, "gatherer": 30},
+    "growth": 1.2, "salary": 0,
+    "persona": {"hobby": "斥候の本", "talent": "力仕事", "likes": "宿の賄い", "dislikes": "窮屈な服"},
+    "skill": {"id": "viola_skill", "name": "転んでも無傷", "desc": "固有。階段から落ちても客の荷物の下敷きになっても平気な頑丈さ。守備+3。", "mods": {"def": 3}},
+    "join": {"story": "ch2"},
+    "chain": [
+      {"kind": "visit", "dungeon": "old_mine", "n": 3, "text": "一番前を歩きたい。古い坑道へ3回連れて行ってほしい"},
+      {"kind": "deliver", "item": "iron_ore", "n": 5, "text": "大盾の手入れに鉄鉱石を5つ届けてほしい"},
+      {"kind": "soloKill", "enemy": "golem", "n": 1, "text": "坑道のゴーレムを1人で受け止めてみたい"}
+    ],
+    "chainLoyalty": 30
+  },
+  {
+    "id": "ruu", "name": "ルゥ", "job": "scout", "personality": "timid", "age": 19,
+    "gender": "female", "appearance": "ruu",
+    "base": {"hp": 52, "atk": 9, "def": 6, "mag": 6, "spd": 14, "dex": 14, "scout": 15, "gather": 9},
+    "apt": {"attacker": 55, "tank": 10, "healer": 20, "scout": 90, "gatherer": 50},
+    "growth": 1.2, "salary": 0,
+    "persona": {"hobby": "屋根の上で昼寝", "talent": "結び目", "likes": "温かいスープ", "dislikes": "鉄の罠"},
+    "skill": {"id": "ruu_skill", "name": "抜け道の勘", "desc": "固有。路上で身についた、隠れた道を嗅ぎ分ける勘。偵察+3。", "mods": {"scout": 3}},
+    "join": {"story": "ch3"},
+    "chain": [
+      {"kind": "visit", "dungeon": "ruined_tower", "n": 3, "text": "借りを返す。廃れた塔へ3回ついていく"},
+      {"kind": "deliver", "item": "old_coin", "n": 3, "text": "盗まずに拾った古銭を3枚、ボクに預けてほしい"},
+      {"kind": "soloKill", "enemy": "ghoul", "n": 1, "text": "逃げ足だけじゃないところを見せる。グールを1人で仕留めたい"}
+    ],
+    "chainLoyalty": 30
+  },
+  {
+    "id": "fine", "name": "フィーネ", "job": "gatherer", "personality": "greedy", "age": 22,
+    "gender": "female", "appearance": "fine",
+    "base": {"hp": 64, "atk": 7, "def": 8, "mag": 9, "spd": 7, "dex": 12, "scout": 9, "gather": 15},
+    "apt": {"attacker": 25, "tank": 40, "healer": 55, "scout": 45, "gatherer": 92},
+    "growth": 1.15, "salary": 0,
+    "persona": {"hobby": "薬草の下ごしらえ", "talent": "目利き", "likes": "のんびりした午後", "dislikes": "急かされること"},
+    "skill": {"id": "fine_skill", "name": "目利きの籠", "desc": "固有。家業で身についた素材の目利きと大きな背負い籠。採取+3。", "mods": {"gather": 3}},
+    "join": {"story": "ch4"},
+    "chain": [
+      {"kind": "deliver", "item": "herb", "n": 8, "text": "お薬の調合に薬草を8つ届けてほしいのよぉ"},
+      {"kind": "deliver", "item": "crystal", "n": 3, "text": "坑道の水晶を3つ、お姉さんに見せてほしいのよぉ"},
+      {"kind": "visit", "dungeon": "forest_cave", "n": 3, "text": "森の洞窟へ3回、のんびり採取に連れて行ってほしいのよぉ"}
     ],
     "chainLoyalty": 30
   }

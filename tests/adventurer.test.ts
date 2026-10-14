@@ -7,6 +7,7 @@ import { ITEM, JOB, LOWER_JOBS, PERSONA, PERSONALITY, TRAIT, TUNING, UNIQUES } f
 import { uniqueAdventurer } from '../src/core/events';
 import { Rng, rngFor } from '../src/core/rng';
 import { ROLE_IDS, type Adventurer, type RoleId } from '../src/core/types';
+import { U_ALPHA } from './helpers';
 
 // テストリスト
 // [x] 同seedで同じ冒険者が生まれる
@@ -306,8 +307,9 @@ describe('性別と外見', () => {
     expect(genders).toEqual(new Set(['male', 'female']));
   });
   it('ユニークの性別と外見は定義から写す', () => {
-    const def = UNIQUES.find((u) => u.id === 'u_alpha')!;
-    const a = uniqueAdventurer(def, 'u1');
+    const a = uniqueAdventurer(U_ALPHA, 'u1');
     expect([a.gender, a.appearance]).toEqual(['male', 'u_alpha']);
+    const t = uniqueAdventurer(UNIQUES.find((u) => u.id === 'tina')!, 't1');
+    expect([t.gender, t.appearance]).toEqual(['female', 'tina']);
   });
 });

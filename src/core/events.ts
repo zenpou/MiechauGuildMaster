@@ -1,6 +1,7 @@
 // 帰還時のイベント: 組み合わせ(親友)と、ユニーク冒険者の依頼チェーン(DESIGN 第6節)。
 import { salaryOf } from './adventurer';
 import { UNIQUE, UNIQUES, type UniqueChainStep, type UniqueDef } from './data';
+import { markGreeted } from './mail';
 import { addRelation, getRelation, pairKey } from './relations';
 import { LOYALTY_MAX, type Adventurer, type Expedition, type GameState } from './types';
 
@@ -32,6 +33,37 @@ export function uniqueAdventurer(def: UniqueDef, id: string): Adventurer {
   };
   if (a.salary <= 0) a.salary = salaryOf(a);
   return a;
+}
+
+/** 名簿へ直接入れる。候補一覧に同じユニークがいれば消す(古いセーブで候補に出ていた分) */
+function joinUnique(s: GameState, def: UniqueDef): Adventurer {
+  const a = uniqueAdventurer(def, `a${s.counters.nextId++}`);
+  a.history.hiredDay = s.day;
+  markGreeted(s, a);
+  s.adventurers.push(a);
+  s.candidates = s.candidates.filter((c) => c.adv.unique !== def.id);
+  s.flags[`unique:${def.id}`] = true;
+  s.flags[`unique:${def.id}:hired`] = s.day;
+  return a;
+}
+
+const inRoster = (s: GameState, id: string) => s.adventurers.some((a) => a.unique === id);
+
+/** 初日の名簿に入るユニークのうち、まだ名簿にいない者を入れる。入れた者を返す */
+export function joinInitialUniques(s: GameState): Adventurer[] {
+  return UNIQUES.filter((d) => 'initial' in d.join && d.join.initial && !inRoster(s, d.id)).map((d) => joinUnique(s, d));
+}
+
+/**
+ * 章 chapterId を読み終えたときに加入するユニークを名簿に入れ、お知らせを出す。
+ * 既読かどうかは見ない(story.ts を import すると循環するので、既読の判定は呼び出し側で済ませる)
+ */
+export function joinStoryUniques(s: GameState, chapterId: string): Adventurer[] {
+  const out = UNIQUES
+    .filter((d) => 'story' in d.join && d.join.story === chapterId && !inRoster(s, d.id))
+    .map((d) => joinUnique(s, d));
+  for (const a of out) s.notices.unshift({ day: s.day, text: `${a.name}がギルドに加入した。` });
+  return out;
 }
 
 /** 帰還の反映の後に呼ぶ。親友イベントとユニークの依頼チェーンを進める */

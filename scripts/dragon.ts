@@ -97,6 +97,7 @@ const { activeMax, activeQuests, deliver, recipeUnlocked, visibleQuests } = awai
 const { assessReadiness } = await import('../src/core/readiness');
 const { capacity, hire, hireFee } = await import('../src/core/recruit');
 const { serialize } = await import('../src/core/save');
+const { readDueStories } = await import('../src/core/story');
 const { canTrain, trainSkill } = await import('../src/core/training');
 const { PARTY_MAX } = await import('../src/core/types');
 const { travelDays } = await import('../src/core/world');
@@ -1137,6 +1138,8 @@ function runSeed(seed: number, log: boolean): Run {
       console.log(`| ${day} | ${s.gold} | ${s.adventurers.length} | ${pathName(front)} ${Math.floor(rateOf(st) * 100)}% | ${s.expeditions.length} | ${acts.join(' / ') || '-'} |`);
     }
     const rep = advanceDay(s);
+    // 物語を読まないので、出た章はその日に読んだことにする(章の読了で仲間が加入する)
+    readDueStories(s);
     tally(head, day);
     const p = periodOf(day);
     if (p) p.days++;
