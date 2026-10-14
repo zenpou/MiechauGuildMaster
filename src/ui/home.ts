@@ -1,18 +1,17 @@
 import { effectiveStats } from '../core/adventurer';
 import { facilityLevel } from '../core/base';
 import { canEquip, equip, unequip } from '../core/equipment';
-import { advanceDay, buyItem, dailyCost, newGame, sellGold, sellItem } from '../core/game';
+import { advanceDay, buyItem, newGame, sellGold, sellItem } from '../core/game';
 import { ITEM, JOB, JOBS, PERSONALITY, TRAINED_SKILL, TUNING, type TrainedSkillDef } from '../core/data';
 import { dismissHint, hintFor, hintsOff } from '../core/hints';
 import { canChangeJob, changeJob, promotionCost, promotionOptions } from '../core/jobs';
-import { unreadCount } from '../core/mail';
-import { REP_LEVELS, repLevel } from '../core/quests';
 import { capacity, dismiss } from '../core/recruit';
 import { canTrain, trainDays, trainableSkills, trainSkill } from '../core/training';
 import { LOYALTY_MILESTONES, STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type JobDef, type Result } from '../core/types';
 import { advById, commit, personaText, render, replaceState, sign, SLOTS, STAT_LABEL, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
 import { saveTransferRow } from './saveTransfer';
+import { artUrl } from './storyPlayer';
 
 const ELEMENT_NAME: Record<string, string> = { fire: '火', ice: '氷', thunder: '雷', earth: '土', dark: '闇' };
 const EFFECT_NAME: Record<string, string> = { gather: '採取量', carry: '積載' };
@@ -38,15 +37,19 @@ function equipText(def: ItemDef | undefined): string {
   return parts.join(' ');
 }
 
-/** 最初の数日の「次にやること」。赤字のヒントは状態で消えるので閉じるボタンを出さない */
+/** 最初の数日の「次にやること」。受付のティナが案内する体裁。赤字のヒントは状態で消えるので閉じるボタンを出さない */
 function hintBlock(): HTMLElement | null {
   const hint = hintFor(state);
   if (!hint) return null;
   return div('hint', { role: 'note' },
-    div('hint-text', hint.text),
-    div('row tight',
-      hint.id === 'debt' ? null : h('button', { class: 'small', onclick: () => { dismissHint(state, hint.id); commit(); } }, '閉じる'),
-      h('button', { class: 'link small', onclick: () => { hintsOff(state); commit(); } }, 'ヒントをすべて消す'),
+    h('img', { class: 'hint-face', src: artUrl('faces/tina/neutral.webp'), alt: '', width: 56, height: 56 }),
+    div('hint-body',
+      div('hint-name', '受付のティナ'),
+      div('hint-text', hint.text),
+      div('row tight',
+        hint.id === 'debt' ? null : h('button', { class: 'small', onclick: () => { dismissHint(state, hint.id); commit(); } }, '閉じる'),
+        h('button', { class: 'link small', onclick: () => { hintsOff(state); commit(); } }, 'ヒントをすべて消す'),
+      ),
     ),
   );
 }
@@ -54,19 +57,7 @@ function hintBlock(): HTMLElement | null {
 export function homeTab(): HTMLElement {
   const s = state;
   const potion = ITEM.potion;
-  const unread = unreadCount(s);
   return div('tab-body',
-    unread ? div('row tight inbox-note',
-      span('badge unread', `未読${unread}`),
-      h('button', { class: 'link', onclick: () => { ui.tab = 'inbox'; render(); } }, 'メールが届いています(受信箱へ)'),
-    ) : null,
-    div('summary',
-      span('big', `${s.day}日目`),
-      span(s.gold < 0 ? 'big neg' : 'big', `${s.gold}G`),
-      span('dim', `1日の支出 ${dailyCost(s)}G`),
-    ),
-    repBlock(),
-    h('button', { class: 'primary wide', onclick: nextDay }, '次の日へ'),
     hintBlock(),
     sceneBlock(),
     noticesBlock(),
@@ -126,16 +117,6 @@ function profileRow(a: Adventurer): HTMLElement {
         span('dim', personaText(a.persona)),
       ),
     ),
-  );
-}
-
-function repBlock(): HTMLElement {
-  const lv = repLevel(state.rep);
-  const next = REP_LEVELS[lv];
-  return div('summary small',
-    span(null, `評判 ${state.rep}`),
-    span('badge', `Lv${lv}/${REP_LEVELS.length}`),
-    span('dim', next === undefined ? '最高段階' : `次の段階まで ${next - state.rep}`),
   );
 }
 
@@ -323,7 +304,7 @@ function act(r: Result, msg: string) {
   toast(msg);
 }
 
-function nextDay() {
+export function nextDay() {
   const r = advanceDay(state);
   ui.lastReport = r;
   commit();

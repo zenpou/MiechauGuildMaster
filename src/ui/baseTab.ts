@@ -63,7 +63,6 @@ export function baseTab(): HTMLElement {
     }
   }
   return div('tab-body',
-    div('summary', span('big', `${s.day}日目`), span(s.gold < 0 ? 'big neg' : 'big', `${s.gold}G`)),
     h('h2', null, '区画図'),
     div('plots', { style: `grid-template-columns: repeat(${s.base.width}, 1fr)` }, ...cells),
     sel ? cellPanel(sel.x, sel.y) : div('dim small', 'マスを選ぶと、建てられる施設や施設の詳細が出ます。'),
