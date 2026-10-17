@@ -11,7 +11,9 @@
   overscroll-behavior: contain;
   background: rgba(5, 9, 10, 0.92);
 }
-.vn-overlay > .vn-player { max-width: 1100px; }
+/* 幅の上限は窓の高さから決める。舞台が背景の絵と同じ 3:2 になる幅まで広げ、縦に余裕のない窓では 1100px で止める。
+   固定の 1100px だけだと、広い画面で舞台が縦長になり背景の左右が切れる。350px は上下の枠(題・道具列・台詞・送り)の高さの和 */
+.vn-overlay > .vn-player { max-width: max(1100px, calc((100dvh - 350px) * 3 / 2)); }
 
 .vn-player {
   --vn-bg: var(--bg);
