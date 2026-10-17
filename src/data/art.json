@@ -1,5 +1,7 @@
 {
   "backgrounds": {
+    "bg_office_past": null,
+    "bg_home_morning": null,
     "bg_street_gate": "stills/prologue.webp",
     "bg_street_morning": "backgrounds/street-morning-v1.webp",
     "bg_guild_office": "backgrounds/guild-office-day-v1.webp",
