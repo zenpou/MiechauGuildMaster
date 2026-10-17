@@ -8,7 +8,7 @@ import {
   speakerCharacter, stillArt, TRANSITIONS,
 } from '../src/core/presentation';
 import type { CastMember, CharacterArt } from '../src/core/presentation';
-import { markStorySeen, STORY, storyDue, storySeen, storySeenDay, triggerMet } from '../src/core/story';
+import { castAway, markStorySeen, STORY, storyDue, storySeen, storySeenDay, triggerMet } from '../src/core/story';
 import type { StoryTrigger } from '../src/core/story';
 import type { GameState } from '../src/core/types';
 import { SOUND_PARTS } from '../src/ui/storyAudio';
@@ -453,6 +453,28 @@ describe('storyDue', () => {
     markStorySeen(s, 'prologue');
     expect(storyDue(s)).toEqual([]);
     s.day = 2;
+    expect(ids(storyDue(s))).toEqual(['ch1']);
+  });
+
+  it('章に出る人物が派遣中(away)のあいだ、その章は条件を満たしていても出ない。帰って idle に戻ると出る', () => {
+    const s = newGame(1);
+    markStorySeen(s, 'prologue');
+    s.day = 2;
+    const tina = s.adventurers.find((a) => a.unique === 'tina')!;
+    tina.status = 'away';
+    expect(storyDue(s)).toEqual([]);
+    expect(castAway(s, STORY.find((c) => c.id === 'ch1')!)).toEqual(['tina']);
+    tina.status = 'idle';
+    expect(ids(storyDue(s))).toEqual(['ch1']);
+  });
+
+  it('章に出ない人物の派遣や、訓練・施設の仕事は章を止めない', () => {
+    const s = newGame(1);
+    markStorySeen(s, 'prologue');
+    s.day = 2;
+    s.adventurers.push({ ...s.adventurers[0], id: 'x1', unique: undefined, status: 'away' });
+    expect(ids(storyDue(s))).toEqual(['ch1']);
+    s.adventurers[0].status = 'training';
     expect(ids(storyDue(s))).toEqual(['ch1']);
   });
 

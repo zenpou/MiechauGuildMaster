@@ -3,7 +3,7 @@
 import storyJson from '../data/story.json';
 import { joinStoryUniques } from './events';
 import { heldKeys } from './ledger';
-import type { PresentedLine } from './presentation';
+import { speakerCharacter, type PresentedLine } from './presentation';
 import type { GameState } from './types';
 
 /** 章を出す条件。1つのオブジェクトに1つのキー。組み合わせは all で書く */
@@ -52,9 +52,24 @@ export function storySeenDay(s: GameState, id: string): number | null {
   return typeof v === 'number' ? v : null;
 }
 
-/** 未読で条件を満たす章(台本の並び順) */
+/**
+ * 章に出る人物(話し手か立ち絵)のうち、名簿にいて派遣中の者。
+ * 派遣中の仲間が執務室の場面に出てくると矛盾するので、帰るまでその章は出さない(trigger には書かず、台本から導く)。
+ * 訓練・施設の仕事は拠点の中なので止めない
+ */
+export function castAway(s: GameState, c: StoryChapter): string[] {
+  const onStage = new Set<string>();
+  for (const l of c.lines) {
+    const speaker = speakerCharacter(l.speaker);
+    if (speaker) onStage.add(speaker);
+    for (const a of l.cast ?? []) onStage.add(a.character);
+  }
+  return s.adventurers.flatMap((a) => (a.unique && a.status === 'away' && onStage.has(a.unique) ? [a.unique] : []));
+}
+
+/** 未読で条件を満たし、出る人物が全員拠点にいる章(台本の並び順) */
 export function storyDue(s: GameState): StoryChapter[] {
-  return STORY.filter((c) => storySeenDay(s, c.id) === null && triggerMet(s, c.trigger));
+  return STORY.filter((c) => storySeenDay(s, c.id) === null && triggerMet(s, c.trigger) && castAway(s, c).length === 0);
 }
 
 /**
