@@ -1,0 +1,74 @@
+{
+  "tina": {
+    "greeting": { "subject": "よろしく", "body": "{name}よ。剣の手入れは欠かさないわ。甘い菓子があれば、もっと頑張れるからね。" },
+    "loyalty": { "subject": "話があるの", "body": "このギルドなら、あたしも安心して前に出られる。" },
+    "raise": { "subject": "日給の話", "body": "腕も上がったし、日給を{salary}Gから{desired}Gにしてほしいの。" },
+    "warning": { "subject": "ちゃんと考えて", "body": "このままの条件で続けるか、あたしも考えなきゃね。日給は{desired}Gで頼むわ。" },
+    "resign": { "subject": "じゃあね", "body": "世話になったわ。あたしは次の場所へ行く。" },
+    "rest": { "subject": "今日は休むわ", "body": "まだ戦えるけど、今日は休んだほうがよさそうね。一日もらうわ。" },
+    "complaint": { "subject": "隊の相談", "body": "{mate}とは息が合わないわ。編成を考え直してくれる？" },
+    "rumor": { "subject": "新しい場所の話", "body": "{dungeon}って場所があるらしいわ。腕試しに行きたいわね。" },
+    "quest": { "subject": "依頼が来たわ", "body": "新しい依頼よ。無理のない隊を組んでちょうだい。" },
+    "event": { "subject": "ちょっと話そう", "body": "{name}よ。あんたに相談したいことがあるの。" }
+  },
+  "sera": {
+    "greeting": { "subject": "よろしくお願いします", "body": "{name}です……。皆さんのお役に立てるように祈ります。{likes}が好きです。" },
+    "loyalty": { "subject": "ありがとうございます", "body": "ここにいると、セラも安心して祈れます……。" },
+    "raise": { "subject": "日給のお願い", "body": "あの……日給を{salary}Gから{desired}Gにしていただけると、助かります……。" },
+    "warning": { "subject": "ごめんなさい", "body": "このままでは続けられないかもしれません……。日給は{desired}Gを希望します。" },
+    "resign": { "subject": "さようなら", "body": "皆さんによろしく伝えてください……。今までありがとうございました。" },
+    "rest": { "subject": "休ませてください", "body": "疲れが残っていて……一日だけ、休ませてください……。" },
+    "complaint": { "subject": "相談です……", "body": "{mate}さんと一緒だと、少し怖くて……。隊を分けてもらえますか？" },
+    "rumor": { "subject": "場所の知らせ", "body": "{dungeon}という場所のお話を聞きました……。みんなで行けるといいですね。" },
+    "quest": { "subject": "依頼のお知らせ", "body": "新しい依頼が届いています……。無事に帰れるものを選びましょう。" },
+    "event": { "subject": "あの……", "body": "{name}です……。少し聞いていただきたいことがあります。" }
+  },
+  "viola": {
+    "greeting": { "subject": "期待してくれ", "body": "{name}だ。前に立つ仕事なら任せてくれ。斥候の本を読むのが好きだ。" },
+    "loyalty": { "subject": "認めよう", "body": "あなたの采配なら、私も安心して盾を任せられる。" },
+    "raise": { "subject": "日給の要求", "body": "私の働きなら、日給は{desired}Gが妥当だ。今の{salary}Gでは足りない。" },
+    "warning": { "subject": "今後について", "body": "この条件では続けにくい。日給を{desired}Gにするか、考えてほしい。" },
+    "resign": { "subject": "宿へ戻る", "body": "世話になった。私は宿へ戻ることにする。" },
+    "rest": { "subject": "休息を取る", "body": "万全でない私を隊に入れるな。今日は休ませてもらう。" },
+    "complaint": { "subject": "編成に異議あり", "body": "{mate}と組むと守りにくい。隊を分けてくれ。" },
+    "rumor": { "subject": "新たな景色", "body": "{dungeon}か。未踏なら、私が先頭で確かめたい。" },
+    "quest": { "subject": "依頼の知らせ", "body": "新しい依頼だ。前線を任せてもらおう。" },
+    "event": { "subject": "話がある", "body": "{name}だ。あなたに相談したいことがある。" }
+  },
+  "ruu": {
+    "greeting": { "subject": "よろしくじゃん", "body": "{name}だよ。屋根の上で昼寝するのが好き。温かいスープもね。" },
+    "loyalty": { "subject": "ちょっとだけ", "body": "ここなら、ボクも背中を預けていい気がするじゃん。" },
+    "raise": { "subject": "日給の話じゃん", "body": "ボクの働きなら、日給は{desired}Gでしょ。{salary}Gのままじゃ割に合わないじゃん。" },
+    "warning": { "subject": "考え中じゃん", "body": "他の道も考えちゃうよ。日給を{desired}Gにしてくれるなら、ここにいるけど。" },
+    "resign": { "subject": "じゃあね", "body": "世話になったじゃん。ボクは別の場所へ行くよ。" },
+    "rest": { "subject": "少し休むじゃん", "body": "足が重いじゃん。一日休ませてよ。" },
+    "complaint": { "subject": "隊を分けて", "body": "{mate}と一緒だと気配が合わないじゃん。別の隊にしてよ。" },
+    "rumor": { "subject": "噂を聞いたじゃん", "body": "{dungeon}に抜け道があるかも。ボクが先に見てこようか？" },
+    "quest": { "subject": "依頼だよ", "body": "新しい依頼じゃん。危ない道は避けて選ぼうよ。" },
+    "event": { "subject": "聞いてほしいじゃん", "body": "{name}だよ。マスターくんに話したいことがあるんだ。" }
+  },
+  "fine": {
+    "greeting": { "subject": "よろしくねぇ", "body": "{name}よぉ。薬草の下ごしらえが好きなの。のんびりやりましょうねぇ。" },
+    "loyalty": { "subject": "お姉さんから", "body": "このギルドは居心地がいいわぁ。カイくんも、ゆっくりしてねぇ。" },
+    "raise": { "subject": "日給の相談よぉ", "body": "お姉さんの働きなら、日給は{desired}Gにしてもらえるかしらぁ。今は{salary}Gなの。" },
+    "warning": { "subject": "少し考えるわぁ", "body": "このままでは続けにくいかしらぁ。日給を{desired}Gにしてくれたら嬉しいのよぉ。" },
+    "resign": { "subject": "またねぇ", "body": "今までありがとうねぇ。お姉さんは別の場所でのんびりするわぁ。" },
+    "rest": { "subject": "休ませてねぇ", "body": "少し疲れたみたい。今日はお姉さんを休ませてねぇ。" },
+    "complaint": { "subject": "隊の相談ねぇ", "body": "{mate}さんと一緒だと急かされるのぉ。隊を分けてもらえるかしらぁ。" },
+    "rumor": { "subject": "場所の噂よぉ", "body": "{dungeon}に素材があるそうよぉ。ゆっくり採りに行きたいわねぇ。" },
+    "quest": { "subject": "依頼が来たわぁ", "body": "新しい依頼よぉ。急がずに済むものを選びましょうねぇ。" },
+    "event": { "subject": "お話しましょう", "body": "{name}よぉ。カイくんに聞いてほしいことがあるの。" }
+  },
+  "aurelia": {
+    "greeting": { "subject": "我より", "body": "{name}だ。我はアウレリア。人の暮らしには不慣れだが、力は貸そう。" },
+    "loyalty": { "subject": "ひとこと", "body": "主の采配なら、我は炎を預けられる。" },
+    "raise": { "subject": "対価の話", "body": "我の働きには、日給{desired}Gが相応しい。今の{salary}Gでは足りぬ。" },
+    "warning": { "subject": "決めよ", "body": "この条件で我を留めるか。日給は{desired}Gを求める。" },
+    "resign": { "subject": "去る", "body": "世話になった。我は別の地へ戻る。" },
+    "rest": { "subject": "休む", "body": "炎を抑えるため、今日は休む。" },
+    "complaint": { "subject": "隊の話", "body": "{mate}とは歩調が合わぬ。隊を分けよ。" },
+    "rumor": { "subject": "新たな地", "body": "{dungeon}か。我が目で確かめよう。" },
+    "quest": { "subject": "依頼", "body": "新たな依頼だ。行く者を選べ。" },
+    "event": { "subject": "話がある", "body": "{name}だ。主に伝えることがある。" }
+  }
+}

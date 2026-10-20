@@ -6,11 +6,16 @@ import { rngFor } from '../src/core/rng';
 import type { GameState } from '../src/core/types';
 
 /**
- * newGame(初日はティナ1人、候補なし)に汎用の3人と候補2人を足し、物語を名簿に合わせる前の「4人で隊を組め、候補が2人いる」
- * 開始状態にする。候補の乱数は旧 newGame と同じタグなので、候補の中身も当時と同じ。日は1日目のまま(募集が来はじめる日は各テストで進める)
+ * newGame(初日はティナ・セラ2人、候補なし)からセラを外し、旧来の汎用3人を足して、物語を名簿に合わせる前の
+ * 「ティナと汎用3人で隊を組め、候補が2人いる」開始状態にする。候補の乱数は旧 newGame と同じタグなので、候補の中身も当時と同じ。
+ * 日は1日目のまま(募集が来はじめる日は各テストで進める)
  */
 export function fullGame(seed: number, playerName = ''): GameState {
-  const s = addStarterParty(newGame(seed, playerName), seed);
+  // 汎用4人を使う旧来のCore fixtureは、初期セラを外してから補充する。
+  // 新規開始そのものは newGame の二人を別テストで検証する。
+  const initial = newGame(seed, playerName);
+  initial.adventurers = initial.adventurers.filter((a) => a.unique !== 'sera');
+  const s = addStarterParty(initial, seed);
   const cr = rngFor(seed, 'recruit', 'init');
   for (let i = 0; i < 2; i++) spawnCandidate(s, cr);
   return s;

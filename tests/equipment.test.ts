@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { effectiveStats, generateAdventurer } from '../src/core/adventurer';
+import { carryCapacity, effectiveStats, equipEffect, equipResist, generateAdventurer } from '../src/core/adventurer';
 import { ITEM, ITEMS } from '../src/core/data';
-import { canEquip, equip, unequip } from '../src/core/equipment';
+import { canEquip, equip, previewEquipment, unequip } from '../src/core/equipment';
 import { runExploration } from '../src/core/explore';
 import { rngFor } from '../src/core/rng';
 import type { Adventurer, DungeonDef, GameState } from '../src/core/types';
@@ -59,6 +59,35 @@ describe('装備の定義', () => {
 });
 
 describe('equip / unequip', () => {
+  it('製作前の比較が実際の装備結果と一致し、耐性や採取効果の喪失も含む', () => {
+    const a = adv('preview', 'fighter');
+    a.fatigue = 65;
+    a.equipment!.accessory = 'fang_necklace';
+    const s = state([a], { moss_charm: 1 });
+    const original = structuredClone(s);
+    const preview = previewEquipment(a, 'accessory', 'moss_charm')!;
+    expect(s).toEqual(original);
+    expect(preview.before.gatherBonus).toBe(1);
+    expect(preview.after.gatherBonus).toBe(0);
+    expect(preview.after.resist.dark).toBe(0.3);
+    expect(equip(s, a.id, 'moss_charm').ok).toBe(true);
+    expect(preview.after).toEqual({
+      stats: effectiveStats(a), resist: equipResist(a),
+      gatherBonus: equipEffect(a, 'gather'), capacity: carryCapacity(a),
+    });
+  });
+
+  it('派遣中も帰還後の装備を比較できるが、実際の装備は禁止される', () => {
+    const a = adv('away-preview', 'priest');
+    a.status = 'away';
+    const before = structuredClone(a);
+    expect(previewEquipment(a, 'weapon', 'iron_sword')).not.toBeNull();
+    expect(canEquip(a, 'iron_sword').ok).toBe(false);
+    expect(previewEquipment(a, 'armor', 'iron_armor')).toBeNull();
+    expect(previewEquipment(a, 'accessory', 'iron_sword')).toBeNull();
+    expect(a).toEqual(before);
+  });
+
   it('装備で atk/def が増え、在庫が減る', () => {
     const a = adv('a', 'fighter');
     const s = state([a], { iron_sword: 1, leather_armor: 2 });

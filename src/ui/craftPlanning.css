@@ -1,0 +1,16 @@
+.craft-planning { margin-top: 8px; }
+.craft-plan { margin-top: 8px; padding: 12px; border-left: 2px solid var(--accent); background: #efc87809; overflow-wrap: anywhere; }
+.craft-plan h4 { margin: 12px 0 6px; color: var(--accent); }
+.craft-plan select { margin-top: 5px; }
+.craft-comparison { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; }
+.craft-comparison .map-face { flex: 0 0 40px; width: 40px; height: 40px; }
+.craft-comparison > div:last-child { min-width: 0; }
+.craft-comparison .small { margin-top: 4px; }
+.craft-material { border-top: 1px solid var(--line-soft); padding: 9px 0; }
+.craft-source { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin-top: 6px; }
+.craft-source button { white-space: normal; text-align: left; max-width: 100%; }
+@media (max-width: 640px) {
+  .craft-plan { padding: 9px; }
+  .craft-planning button { min-height: 44px; }
+  .craft-source { align-items: stretch; flex-direction: column; }
+}

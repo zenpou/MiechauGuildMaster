@@ -4,6 +4,7 @@
 import { canBless } from './blessing';
 import { facilityLevel } from './base';
 import { promotionCost, promotionOptions } from './jobs';
+import { getIntroExploration } from './introExploration';
 import type { GameState } from './types';
 
 export interface Hint { id: string; text: string }
@@ -17,7 +18,8 @@ const closedKey = (id: string) => `hint:${id}`;
 const promotable = (s: GameState) => s.adventurers.some((a) => a.status === 'idle'
   && promotionOptions(a).some((o) => a.level >= (o.requireLevel ?? 0)));
 
-interface Rule extends Hint {
+interface Rule extends Omit<Hint, 'text'> {
+  text: string | ((s: GameState) => string);
   /** 状態がこの条件を満たすあいだ出す */
   when: (s: GameState) => boolean;
   /** 閉じられない(状態で消える)ヒント */
@@ -32,11 +34,27 @@ const RULES: Rule[] = [
   },
   {
     id: 'first-dispatch', when: (s) => s.counters.dispatches === 0,
-    text: 'マスター代行、まずは「派遣」の窓口から、森の洞窟へ隊を出してみてください。一度送り出したら、こちらから手出しはできません。首尾は帰ってくる日の報告で分かります……それまで、わたしは祈るだけですので。',
+    text: (s) => {
+      const tina = s.adventurers.find((a) => a.unique === 'tina');
+      const sera = s.adventurers.find((a) => a.unique === 'sera');
+      const intro = tina && getIntroExploration(s, {
+        partyIds: sera ? [tina.id, sera.id] : [tina.id], leaderId: tina.id, action: 'explore',
+        target: { dungeon: 'forest_cave', floor: 'f1' }, policy: 'standard', days: 1, items: {},
+      });
+      return intro
+        ? `マスター代行、まずは「派遣」から${sera ? '剣士のティナさんと、回復役のセラさんを二人で' : 'ティナさんを'}森の洞窟へ。初回は安全を確かめた入口付近で薬草を採り、日帰りで戻る行程です。回復薬は不要です。「次の日へ」で探索を見守り、明日の朝の報告をお待ちください。`
+        : 'マスター代行、まずは「派遣」の窓口から隊を出してみてください。「見込みを見る」で戦力と消耗を確かめ、仲間と回復薬を整えて出発しましょう。';
+    },
   },
   {
     id: 'advance-day', when: (s) => s.expeditions.length > 0 && s.history.length === 0,
-    text: '隊が出ています。「次の日へ」で日を進めれば、帰還の日に報告が届きます。それまでは待つしかありません……気が気ではありませんが。',
+    text: '隊が出ています。「次の日へ」で日を進めると、現地での探索を見守れます。帰還したら「帰還報告」で成長と発見を確かめて、次の編成や行き先をご検討ください。',
+  },
+  {
+    id: 'second-party',
+    when: (s) => s.counters.dispatches === 1 && s.history.length > 0
+      && ['tina', 'sera'].every((id) => s.adventurers.some((a) => a.unique === id && a.status === 'idle' && a.injuryDays === 0)),
+    text: '次は「帰還報告」の「この隊を組み直す」から、ティナさんとセラさんの装備や隊長を見直してみてください。入口より奥には魔物や罠があります。回復役がいても無理は禁物です。「見込みを見る」で消耗を確かめ、回復薬も持たせましょう。',
   },
   {
     id: 'quests', when: (s) => s.history.length > 0 && !s.quests.some((q) => q.status !== 'posted'),
@@ -65,7 +83,7 @@ export function hintFor(s: GameState): Hint | null {
   if (s.flags[OFF]) return null;
   for (const r of RULES) {
     if (!r.sticky && s.flags[closedKey(r.id)]) continue;
-    if (r.when(s)) return { id: r.id, text: r.text };
+    if (r.when(s)) return { id: r.id, text: typeof r.text === 'function' ? r.text(s) : r.text };
   }
   return null;
 }

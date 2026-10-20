@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DUNGEON } from '../src/core/data';
 import { parseFloor } from '../src/core/dungeon';
+import { dispatch } from '../src/core/game';
 import { assessReadiness, gradeOf, uncertaintyOf } from '../src/core/readiness';
 import type { DispatchOrder, GameState } from '../src/core/types';
 import { fullGame } from './helpers';
@@ -65,5 +66,52 @@ describe('見込み', () => {
     expect(solo.powerRatio).toBeLessThan(full.powerRatio);
     const order4 = ['余裕', '適正', '厳しい', '危険'];
     expect(order4.indexOf(solo.grade)).toBeGreaterThanOrEqual(order4.indexOf(full.grade));
+  });
+
+  it('採取点が未知なら量を予告せず、素材の見込みは空振りとして示す', () => {
+    const s = fullGame(5);
+    const before = structuredClone(s);
+    const r = assessReadiness(s, order(s, {
+      action: 'gather', target: { dungeon: 'forest_cave', floor: 'f1', item: 'herb' },
+    }), 10);
+    expect(r.gather?.knownSites).toBe(0);
+    expect(r.gather?.avgAmount).toBe(0);
+    expect(r.gather?.emptyRate).toBe(1);
+    expect(r.avgSiteDays).toBe(1);
+    expect(s).toEqual(before);
+  });
+
+  it('既知の採集先の成果・早帰り・消耗を試算し、未来の確定結果を参照しない', () => {
+    const s = fullGame(5);
+    s.dungeons.forest_cave.floors.f1.visited = all;
+    const o = order(s, {
+      action: 'gather', days: 7, target: { dungeon: 'forest_cave', floor: 'f1', item: 'herb' },
+    });
+    const before = structuredClone(s);
+    const r = assessReadiness(s, o);
+    expect(r.gather?.knownSites).toBe(2);
+    expect(r.gather?.avgAmount).toBeGreaterThan(0);
+    expect(r.gather!.emptyRate).toBeGreaterThanOrEqual(0);
+    expect(r.gather!.emptyRate).toBeLessThan(1);
+    expect(r.avgSiteDays).toBeLessThan(7);
+    expect(r.avgFatigueGain).toBeGreaterThan(0);
+    expect(s).toEqual(before);
+    // 同じ編成の試算は、保存データにある未公開の確定結果に依存しない。
+    const future = dispatch(structuredClone(s), o);
+    if (!future.ok) throw new Error(future.reason);
+    future.expedition.result.materials.herb = 99999;
+    s.expeditions = [future.expedition];
+    expect(assessReadiness(s, o)).toEqual(r);
+  });
+
+  it('戦力だけを調べる0回の試算では、未計測の採集量や日数を0と表示しない', () => {
+    const s = fullGame(5);
+    const r = assessReadiness(s, order(s, {
+      action: 'gather', target: { dungeon: 'forest_cave', floor: 'f1', item: 'herb' },
+    }), 0);
+    expect(r.gather).toBeUndefined();
+    expect(r.avgSiteDays).toBeUndefined();
+    expect(r.avgFatigueGain).toBeUndefined();
+    expect(r.powerRatio).toBeGreaterThan(0);
   });
 });

@@ -22,6 +22,8 @@ export interface Unit {
 export interface CombatCtx {
   rng: Rng;
   say(kind: LogKind, text: string): void;
+  /** 観察表示用。結果計算とは独立した状態変化の通知で、乱数を消費しない。 */
+  observe?(observation: CombatObservation): void;
   /** 回復薬(アイテムID potion) */
   potions: { n: number; used: number };
   rel(a: string, b: string, delta: number, reason: string): void;
@@ -35,6 +37,15 @@ export interface CombatResult {
   kills: Record<string, number>;
   rounds: number;
   downed: string[];
+}
+
+export interface CombatObservation {
+  kind: 'attack' | 'heal' | 'item' | 'down' | 'flee';
+  actorId: string;
+  actorName: string;
+  targetId?: string;
+  targetName?: string;
+  amount?: number;
 }
 
 const ENEMY_SKILL = 'enemy';
@@ -115,9 +126,11 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
     u.hp = 0;
     if (u.side === 'ally') {
       downed.add(u.id);
+      ctx.observe?.({ kind: 'down', actorId: u.id, actorName: u.name, targetId: u.id, targetName: u.name, amount: 0 });
       say('combat', `${u.name}が倒れた!`);
     } else {
       kills[u.enemy!.id] = (kills[u.enemy!.id] ?? 0) + 1;
+      ctx.observe?.({ kind: 'down', actorId: u.id, actorName: u.name, targetId: u.id, targetName: u.name, amount: 0 });
       say('combat', `${u.name}を倒した。`);
     }
   };
@@ -142,6 +155,8 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
       const chaser = Math.max(...alive(enemies).map((u) => u.spd));
       const p = Math.max(0.35, Math.min(0.9, 0.7 + (fastest - chaser) * 0.03));
       if (rng.chance(p)) {
+        const actor = allies.find((a) => !a.down) ?? allies[0];
+        ctx.observe?.({ kind: 'flee', actorId: actor.id, actorName: actor.name });
         say('combat', '撤退を決断。殿をつとめながら、全員でその場を離脱した。');
         return { outcome: 'fled', kills, rounds: round, downed: [...downed] };
       }
@@ -158,18 +173,24 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
         ctx.potions.n--;
         ctx.potions.used++;
         const ratio = ITEM.potion.consumable!.params.ratio;
-        const amount = Math.round(weakest.maxHp * ratio);
+        const before = weakest.hp;
+        const requested = Math.round(weakest.maxHp * ratio);
+        const amount = Math.min(weakest.maxHp, weakest.hp + requested) - before;
         weakest.hp = Math.min(weakest.maxHp, weakest.hp + amount);
-        say('combat', weakest === u ? `${u.name}は回復薬を飲んだ(HP+${amount})。` : `${u.name}が${weakest.name}に回復薬を使った(HP+${amount})。`);
+        ctx.observe?.({ kind: 'item', actorId: u.id, actorName: u.name, targetId: weakest.id, targetName: weakest.name, amount });
+        say('combat', weakest === u ? `${u.name}は回復薬を飲んだ(HP+${requested})。` : `${u.name}が${weakest.name}に回復薬を使った(HP+${requested})。`);
         if (weakest !== u) ctx.rel(u.id, weakest.id, 2, `${u.name}が${weakest.name}を回復薬で助けた`);
         return;
       }
       const heal = ROLE_SKILL.heal;
       if (ready(u, heal.id) && weakest.hp / weakest.maxHp < heal.params.threshold && rng.chance(heal.params.chance)) {
         u.skillCd[heal.id] = heal.params.cd;
-        const amount = Math.round(weakest.maxHp * heal.params.ratio + u.mag * heal.params.magScale);
+        const before = weakest.hp;
+        const requested = Math.round(weakest.maxHp * heal.params.ratio + u.mag * heal.params.magScale);
+        const amount = Math.min(weakest.maxHp, weakest.hp + requested) - before;
         weakest.hp = Math.min(weakest.maxHp, weakest.hp + amount);
-        say('combat', `${u.name}の${heal.name}!${weakest === u ? '自分' : weakest.name}のHPが${amount}回復した。`);
+        ctx.observe?.({ kind: 'heal', actorId: u.id, actorName: u.name, targetId: weakest.id, targetName: weakest.name, amount });
+        say('combat', `${u.name}の${heal.name}!${weakest === u ? '自分' : weakest.name}のHPが${requested}回復した。`);
         if (weakest !== u) ctx.rel(u.id, weakest.id, 1, `${u.name}が${weakest.name}を癒した`);
         return;
       }
@@ -188,12 +209,16 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
       const strike = ready(u, 'power_strike') ? ROLE_SKILL.power_strike : null;
       if (strike) u.skillCd[strike.id] = strike.params.cd;
       if (!rng.chance(hitChance(u.spd, target.spd))) {
+        ctx.observe?.({ kind: 'attack', actorId: u.id, actorName: u.name, targetId: target.id, targetName: target.name, amount: 0 });
         if (strike) say('combat', `${u.name}の${strike.name}!しかし${target.name}にかわされた。`);
         else summary.push(`${u.name}→${target.name}(外れ)`);
         return;
       }
       const { dmg, crit } = damage(rng, u.atk, strike ? strike.params.mult : 1, target.def);
-      target.hp -= dmg;
+      const before = target.hp;
+      target.hp = Math.max(0, target.hp - dmg);
+      const amount = before - target.hp;
+      ctx.observe?.({ kind: 'attack', actorId: u.id, actorName: u.name, targetId: target.id, targetName: target.name, amount });
       if (strike) say('combat', `${u.name}の${strike.name}!${target.name}に${dmg}ダメージ${crit ? '(会心!)' : ''}。`);
       else if (crit) say('combat', `${u.name}の会心の一撃!${target.name}に${dmg}ダメージ。`);
       else summary.push(`${u.name}→${target.name}(-${dmg})`);
@@ -211,7 +236,10 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
           for (const t of mates) {
             // EnemyDef.skill の型に element が無いので、範囲スキルも敵本体の属性で打つ
             const dmg = elemental(damage(rng, u.atk, def.skill.mult, t.def).dmg, def.element, t);
-            t.hp -= dmg;
+            const before = t.hp;
+            t.hp = Math.max(0, t.hp - dmg);
+            const amount = before - t.hp;
+            ctx.observe?.({ kind: 'attack', actorId: u.id, actorName: u.name, targetId: t.id, targetName: t.name, amount });
             if (t.hp <= 0) ko(t);
           }
           return;
@@ -234,12 +262,16 @@ export function runCombat(allies: Unit[], enemies: Unit[], ctx: CombatCtx): Comb
         target = coverer;
       }
       if (!rng.chance(hitChance(u.spd, target.spd, PERSONALITY[target.personality!].id === 'timid' ? 0.08 : 0))) {
+        ctx.observe?.({ kind: 'attack', actorId: u.id, actorName: u.name, targetId: target.id, targetName: target.name, amount: 0 });
         summary.push(`${u.name}→${target.name}(回避)`);
         return;
       }
       const hit = elemental(damage(rng, u.atk, 1, target.def).dmg, def.element, target);
       const dmg = coverer && hasSkill(coverer, guard.id) ? Math.max(1, Math.round(hit * guard.params.damageTaken)) : hit;
-      target.hp -= dmg;
+      const before = target.hp;
+      target.hp = Math.max(0, target.hp - dmg);
+      const amount = before - target.hp;
+      ctx.observe?.({ kind: 'attack', actorId: u.id, actorName: u.name, targetId: target.id, targetName: target.name, amount });
       summary.push(`${u.name}→${target.name}(-${dmg})`);
       if (target.hp <= 0) ko(target);
     }

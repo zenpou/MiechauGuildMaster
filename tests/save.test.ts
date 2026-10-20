@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveStats } from '../src/core/adventurer';
-import { LOWER_JOBS } from '../src/core/data';
+import { LOWER_JOBS, UNIQUE } from '../src/core/data';
 import { equip, unequip } from '../src/core/equipment';
 import { advanceDay, dispatch, newGame } from '../src/core/game';
 import { changeJob } from '../src/core/jobs';
@@ -30,8 +30,10 @@ describe('古いセーブの読み込み(セーブ互換)', () => {
   it('冒険者の後から足した項目に既定値が入り、能力の計算も日送りも落ちない', () => {
     const s = migrate(oldSave())!;
     for (const a of s.adventurers) {
-      expect(a.skills).toEqual([]);
-      expect(a.persona).toEqual({ hobby: '', talent: '', likes: '', dislikes: '' });
+      // 旧fixtureに無かった初期セラは、移行時に定義どおり加入するため固有スキルを持つ。
+      const seraAddedByMigration = a.unique === 'sera';
+      expect(a.skills).toEqual(seraAddedByMigration ? ['sera_skill'] : []);
+      expect(a.persona).toEqual(seraAddedByMigration ? UNIQUE.sera.persona : { hobby: '', talent: '', likes: '', dislikes: '' });
       expect(a.equipment).toEqual({ weapon: null, armor: null, accessory: null });
       expect(a.assignment).toBeNull();
       expect(a.history.visits).toEqual({});
@@ -93,7 +95,7 @@ describe('物語の導入前から遊んでいたセーブ', () => {
     // 章は鎖なので、読む前は序章しか出ない。読み込みでは鎖をたどって過ぎた章を全部既読にする
     expect(storyDue(old).map((c) => c.id)).toEqual(['prologue']);
     const s = migrate(old)!;
-    expect(storyDue(s)).toEqual([]);
+    expect(storyDue(s).filter(c => !c.id.startsWith('loyalty:'))).toEqual([]);
     expect(storyFlags(s)).toEqual(['story:prologue', 'story:ch1', 'story:ch2']);
     // 読んでいない章に「読んだ日」を付けない。0 は「読んだ日は不明の既読」
     for (const k of storyFlags(s)) expect(s.flags[k], k).toBe(0);

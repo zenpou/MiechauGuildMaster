@@ -20,12 +20,25 @@ import type { GameState } from '../src/core/types';
 
 const fresh = () => newGame(1);
 const sent = (s: GameState) => { s.counters.dispatches = 1; return s; };
-const returned = (s: GameState) => { s.history.push({} as GameState['history'][number]); return sent(s); };
+// 後続のヒントを調べる状態。初回帰還直後の編成案内は確認済みとする。
+const returned = (s: GameState) => { s.history.push({} as GameState['history'][number]); s.flags['hint:second-party'] = true; return sent(s); };
 
 describe('hintFor', () => {
   it('何もしていない新規開始では、最初の派遣をすすめる', () => {
     expect(hintFor(fresh())?.id).toBe('first-dispatch');
     expect(hintFor(fresh())?.text).toContain('派遣');
+    expect(hintFor(fresh())?.text).toContain('ティナさん');
+    expect(hintFor(fresh())?.text).toContain('回復役のセラさん');
+  });
+
+  it('初回帰還後は既存の二人の準備を案内し、新規加入として説明しない', () => {
+    const s = returned(fresh());
+    delete s.flags['hint:second-party'];
+    const hint = hintFor(s);
+    expect(hint?.id).toBe('second-party');
+    expect(hint?.text).toContain('ティナさんとセラさん');
+    expect(hint?.text).toContain('回復薬');
+    expect(hint?.text).not.toContain('加わりました');
   });
 
   it('派遣中でまだ帰っていなければ、次の日へをすすめる', () => {

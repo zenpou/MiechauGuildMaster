@@ -2,14 +2,18 @@
 import { addExp, carryCapacity, powerOf } from './adventurer';
 import { canBless, tickBlessing, useBlessing } from './blessing';
 import { achievementExpMult, checkAchievements } from './achievements';
-import { bonus, build, completeConstructions, dailyProduction, facilityUpkeep, synergyValue } from './base';
+import { bonus, build, completeConstructions, dailyProduction, synergyValue } from './base';
 import { completeCrafts } from './craft';
 import { completeTraining } from './training';
 import { DUNGEON, EDGE, ITEM, NODE, POLICY, QUEST_TEMPLATES, TUNING, type ReturnOutcome } from './data';
 import { exploredRate, parseFloor } from './dungeon';
 import { onDragonDefeated } from './ending';
+import { storyPartyFor } from './dragonStory';
 import { onReturn, advanceUniqueChain, joinInitialUniques } from './events';
-import { floorTransit, returnDialogue, simulateExploration } from './explore';
+import { floorTransit, returnDialogue, runExploration } from './explore';
+import { getIntroExploration, introExplorationItem } from './introExploration';
+import { journeyUntil } from './journey';
+import { captureReturnState, finishReturnReport } from './returnReport';
 import {
   QUEST_TOWNS, REP_LEVELS, accept, createQuest, expireQuests, generateDailyQuests, progressFromReturn, questCargo,
   repLevel, seedUnlockQuests, type RoadInfo,
@@ -21,9 +25,10 @@ import { addInventory, heldKeys, ledger } from './ledger';
 import { applyResignations, checkMails, dispatchBlock, markTired, recordParty } from './mail';
 import { resolveScenes } from './scenes';
 import { emptyState } from './state';
+import { dailyExpenses, dayCashFlow } from './finances';
 import {
   LOYALTY_MAX, PARTIES_MAX, PARTY_MAX,
-  type ActionKind, type Adventurer, type DispatchOrder, type Expedition, type ExpeditionResult, type GameState,
+  type ActionKind, type Adventurer, type DispatchOrder, type Expedition, type ExpeditionResult, type GameState, type JourneyRecord,
   type ItemKind, type LogEntry, type Mail, type Result, type Scene, type WorldStep,
 } from './types';
 import { edgeBetween, planSteps, route, simulateTravel, type TravelResult } from './world';
@@ -140,7 +145,12 @@ function pickHomeTemplate(s: GameState, rng: Rng): string {
 }
 
 
-export const dailyCost = (s: GameState) => s.adventurers.reduce((t, a) => t + a.salary, 0) + UPKEEP_PER_DAY + facilityUpkeep(s);
+export const dailyCost = (s: GameState) => dailyExpenses(s).total;
+
+/** 日送りで待機者から減る疲労。表示側の休養見通しも同じ式を使う。 */
+export function dailyRestRecovery(s: GameState): number {
+  return -(T.restFatigue - bonus(s, 'fatigueRecover'));
+}
 
 export function newGame(seed: number, playerName = ''): GameState {
   const s = emptyState(seed, playerName);
@@ -161,15 +171,19 @@ export function newGame(seed: number, playerName = ''): GameState {
 export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition: Expedition } | { ok: false; reason: string } {
   if (!o || typeof o !== 'object' || !Array.isArray(o.partyIds) || !o.target || typeof o.target !== 'object') return fail('派遣内容が不正です');
   if (!ACTIONS.includes(o.action)) return fail('その行動はまだ選べません');
-  const trip = QUEST_ACTIONS.includes(o.action) ? questTrip(s, o) : dungeonTrip(s, o);
+  // 初回の安全行程だけ、UI が保持していた長い日数を現地1日に正規化する。
+  // 判定は読み取り専用なので、検証に失敗した派遣では何も消費しない。
+  const intro = getIntroExploration(s, o);
+  const dispatchOrder = intro ? { ...o, days: intro.days } : o;
+  const trip = QUEST_ACTIONS.includes(dispatchOrder.action) ? questTrip(s, dispatchOrder) : dungeonTrip(s, dispatchOrder);
   if (typeof trip === 'string') return fail(trip);
-  if (!has(POLICY, o.policy)) return fail('方針が不正です');
-  if (o.partyIds.length < 1 || o.partyIds.length > PARTY_MAX) return fail(`隊は1〜${PARTY_MAX}人で組んでください`);
-  if (new Set(o.partyIds).size !== o.partyIds.length) return fail('同じ冒険者が重複しています');
-  if (!o.partyIds.includes(o.leaderId)) return fail('隊長は隊員から選んでください');
+  if (!has(POLICY, dispatchOrder.policy)) return fail('方針が不正です');
+  if (dispatchOrder.partyIds.length < 1 || dispatchOrder.partyIds.length > PARTY_MAX) return fail(`隊は1〜${PARTY_MAX}人で組んでください`);
+  if (new Set(dispatchOrder.partyIds).size !== dispatchOrder.partyIds.length) return fail('同じ冒険者が重複しています');
+  if (!dispatchOrder.partyIds.includes(dispatchOrder.leaderId)) return fail('隊長は隊員から選んでください');
   if (s.expeditions.length >= PARTIES_MAX) return fail(`同時に出せる隊は${PARTIES_MAX}隊までです`);
   const members: Adventurer[] = [];
-  for (const id of o.partyIds) {
+  for (const id of dispatchOrder.partyIds) {
     const m = s.adventurers.find((a) => a.id === id);
     if (!m) return fail('存在しない冒険者が指定されています');
     if (m.status !== 'idle') return fail(`${m.name}は手が空いていません`);
@@ -178,8 +192,8 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   }
   const blocked = dispatchBlock(s, members);
   if (blocked) return fail(blocked);
-  if (o.blessed && !canBless(s)) return fail('アイリスの祝福はいま使えません');
-  const items = o.items ?? {};
+  if (dispatchOrder.blessed && !canBless(s)) return fail('アイリスの祝福はいま使えません');
+  const items = dispatchOrder.items ?? {};
   for (const [k, n] of Object.entries(items)) {
     if (!has(ITEM, k) || !isCount(n)) return fail('持ち物の指定が不正です');
     if ((s.inventory[k] ?? 0) < n) return fail(`${ITEM[k].name}の在庫が足りません`);
@@ -195,28 +209,33 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   const party = members.map((m) => structuredClone(m));
   const encounterMult = 1 - Math.min(ROAD_ENCOUNTER_OFF_MAX, bonus(s, 'roadEncounterOff'));
   // 祝福は疲労の増え方だけを変える。乱数の引き方は変えないので、掛けても道中・現地の出来事は同じ
-  const fatigueMult = o.blessed ? TUNING.blessing.fatigueRate : 1;
+  const fatigueMult = dispatchOrder.blessed ? TUNING.blessing.fatigueRate : 1;
   const outLeg = simulateTravel(rngFor(s.seed, 'road', n, 'out'), party, trip.out, 'outbound', k, encounterMult, fatigueMult);
   // 呼び戻しで現地を切り上げても使えるよう、現地の結果に関係なく帰路の遭遇も先に引いておく
   const backLeg = simulateTravel(rngFor(s.seed, 'road', n, 'back'), party, trip.back, 'outbound', k, encounterMult, fatigueMult);
   const outDays = pathDays(trip.out, k);
   let site: ExpeditionResult | null = null;
+  let siteJourney: JourneyRecord | undefined;
   if (trip.dungeonId && !outLeg.wiped) {
     for (const m of party) m.fatigue = clamp(m.fatigue + (outLeg.fatigue[m.id] ?? 0), 0, 100);
-    site = simulateExploration({
+    const simulated = runExploration({
       rng: rngFor(s.seed, 'exp', n),
       dungeon: DUNGEON[trip.dungeonId], floorId: trip.floorId,
-      members: party, leaderId: o.leaderId, policy: o.policy,
-      progress: s.dungeons[trip.dungeonId], days: o.days, items: { ...items }, relations: s.relations, startDay: s.day + outDays,
-      action: o.action, target: { item: o.target.item, enemy: o.target.enemy },
+      members: party, leaderId: dispatchOrder.leaderId, policy: dispatchOrder.policy,
+      progress: s.dungeons[trip.dungeonId], days: dispatchOrder.days, items: { ...items }, relations: s.relations, startDay: s.day + outDays,
+      action: dispatchOrder.action, target: { item: dispatchOrder.target.item, enemy: dispatchOrder.target.enemy },
       // 出発時の在庫で扉が決まる。2階以降は前の階を抜ける歩数を往復で払う
       keys: heldKeys(s), transit: floorTransit(DUNGEON[trip.dungeonId], trip.floorId, s.dungeons[trip.dungeonId], heldKeys(s)) ?? 0,
       hiddenBonus: bonus(s, 'hiddenFind'), fatigueMult,
+      ...(intro ? { intro: { route: intro.route, item: introExplorationItem } } : {}),
+      journey: { expeditionStartDay: s.day, outDays },
     });
+    site = simulated.result;
+    siteJourney = simulated.journey;
   }
   const result = combineLegs(outLeg, site, outLeg.wiped || site?.wiped ? null : backLeg, items, outDays);
   // 現地のひとことは現地の結果で決まるが、道中や復路の全滅で最終の結果は変わる。現地の無い護衛・運搬も含め、最終結果で作り直す
-  result.returnDialogue = returnDialogue(rngFor(s.seed, 'rdlg', n), members, finalOutcome(result, o.days, !!site));
+  result.returnDialogue = returnDialogue(rngFor(s.seed, 'rdlg', n), members, finalOutcome(result, dispatchOrder.days, !!site));
   // 採り尽くし・討伐完了で早帰りした隊は、予定日数ではなく実際の日数で戻る
   const stay = site ? Math.max(1, site.daysSpent) : 0;
   let steps = tripSteps(trip.out, trip.back, stay, s.day, k);
@@ -227,22 +246,23 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   }
   const expedition: ExpeditionEx = {
     id: `e${s.counters.nextId++}`,
-    order: structuredClone({ ...o, items, blessed: !!o.blessed, target: { ...o.target, route: reached } }),
+    order: structuredClone({ ...dispatchOrder, items, blessed: !!dispatchOrder.blessed, target: { ...dispatchOrder.target, route: reached } }),
     startDay: s.day, returnDay: steps[steps.length - 1].day,
-    steps, result, recalledDay: null, claimed: false,
+    steps, result, journey: siteJourney, recalledDay: null, claimed: false,
+    ...(trip.dungeonId === 'dragon_lair' ? { storyParty: storyPartyFor(members) } : {}),
     legs: { out: outLeg, back: backLeg, outNodes: trip.out, backNodes: trip.back, items: { ...items } },
   };
   s.counters.dispatches++;
-  if (o.blessed) useBlessing(s);
+  if (dispatchOrder.blessed) useBlessing(s);
   markTired(s, members);
-  recordParty(s, o.partyIds);
+  recordParty(s, dispatchOrder.partyIds);
   for (const m of members) m.status = 'away';
   for (const [k2, c] of Object.entries(items)) addInventory(s, k2, -c);
   s.expeditions.push(expedition);
   // 何もしなかった日(day_idle)の判定に使う
   s.flags.dispatchedDay = s.day;
   const avgLv = members.reduce((t, m) => t + m.level, 0) / members.length;
-  if (SAFE_WEAK_POLICIES.includes(o.policy) && avgLv <= SAFE_WEAK_LEVEL) addTag(s, 'dispatch_safe_weak');
+  if (SAFE_WEAK_POLICIES.includes(dispatchOrder.policy) && avgLv <= SAFE_WEAK_LEVEL) addTag(s, 'dispatch_safe_weak');
   return { ok: true, expedition };
 }
 
@@ -365,6 +385,7 @@ function combineLegs(
 
 /** 行動種別ごとの出発条件。問題なければ null */
 function checkAction(s: GameState, o: DispatchOrder, dungeonId: string, floorId: string): string | null {
+  if (dungeonId === 'dragon_lair' && s.flags['story:ch5'] !== 0 && !s.flags['story:ch5']) return '竜の寝床へ向かう前に、第五章で決戦の段取りを確認してください';
   const progress = s.dungeons[dungeonId];
   const name = DUNGEON[dungeonId].name;
   if (o.action === 'survey') return progress.confirmed ? `${name}は入口を確認済みです(踏査は噂だけのダンジョンへ)` : null;
@@ -397,6 +418,8 @@ export function recall(s: GameState, expeditionId: string): Result {
   const legs = e.legs;
   if (!legs || !now || now.phase === 'return') return fail('その隊はもう帰路についています');
   e.recalledDay = s.day;
+  // 既に日送りで見せた範囲だけを残し、帰路へ切り替えた後の未開示行程は再生させない。
+  e.journey = journeyUntil(e.journey, s.day - 1);
   // 往路で全滅した隊は全滅の日に引き返す表になっている。結果を明かさないよう、受け付けるだけにする
   if (legs.out.wiped) return ok();
   e.steps = turnBack(e.steps, s.day);
@@ -424,6 +447,7 @@ function outcomeLabel(e: Expedition): string {
 }
 
 function applyReturn(s: GameState, e: Expedition, notices: string[]) {
+  const returnBefore = captureReturnState(s, e);
   const r = e.result;
   const legs = (e as ExpeditionEx).legs;
   delete (e as ExpeditionEx).legs;
@@ -496,7 +520,7 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
   }
 
   // 竜の討伐は、どのダンジョンの帰還でも kills で見る(道中の戦闘で倒すことはないが、定義に依存しないため)
-  if ((r.kills.dragon ?? 0) > 0) onDragonDefeated(s, notices);
+  if ((r.kills.dragon ?? 0) > 0) onDragonDefeated(s, notices, e);
 
   // 帰りの道は、往路を最後まで行けたときだけ依頼の経路(to→拠点)を通る
   const fullOut = !!legs && reached.length === legs.outNodes.length;
@@ -519,6 +543,7 @@ function applyReturn(s: GameState, e: Expedition, notices: string[]) {
   }
   if (r.success && def && power < def.recommended * UNDERDOG_RATIO) addTag(s, 'return_underdog');
 
+  e.returnReport = finishReturnReport(s, e, returnBefore);
   e.claimed = true;
   s.history.unshift(e);
   if (s.history.length > HISTORY_MAX) s.history.length = HISTORY_MAX;
@@ -535,21 +560,20 @@ export function advanceDay(s: GameState): DayReport {
   const notices: string[] = [];
   const idle = s.flags.dispatchedDay !== s.day && s.flags.hiredDay !== s.day && s.expeditions.length === 0;
 
-  if (s.day <= T.supportDays) {
-    s.gold += T.supportGold;
-    ledger(s, '初期支援金', T.supportGold);
+  const flow = dayCashFlow(s);
+  if (flow.support > 0) {
+    s.gold += flow.support;
+    ledger(s, '初期支援金', flow.support);
   }
-  const wages = s.adventurers.reduce((t, a) => t + a.salary, 0);
-  s.gold -= wages + UPKEEP_PER_DAY;
-  ledger(s, '日給(全冒険者)', -wages);
-  ledger(s, 'ギルド維持費', -UPKEEP_PER_DAY);
-  const facilityCost = facilityUpkeep(s);
-  s.gold -= facilityCost;
-  ledger(s, '施設維持費', -facilityCost);
+  s.gold -= flow.wages;
+  ledger(s, '日給(全冒険者)', -flow.wages);
+  s.gold -= flow.guild;
+  ledger(s, 'ギルド維持費', -flow.guild);
+  s.gold -= flow.facilities;
+  ledger(s, '施設維持費', -flow.facilities);
   if (s.gold < 0) {
-    const interest = Math.ceil(-s.gold * T.debtInterest);
-    s.gold -= interest;
-    ledger(s, '借金の利息', -interest);
+    s.gold -= flow.interest;
+    ledger(s, '借金の利息', -flow.interest);
     s.debt = true;
     s.rep = Math.max(0, s.rep + T.debtRep);
     for (const a of s.adventurers) addLoyalty(a, T.debtLoyalty);
@@ -575,12 +599,12 @@ export function advanceDay(s: GameState): DayReport {
   tickBlessing(s, notices);
 
   const returnedIds = new Set(returned.flatMap((e) => e.order.partyIds));
-  const rest = T.restFatigue - bonus(s, 'fatigueRecover');
+  const rest = dailyRestRecovery(s);
   const idleExp = synergyValue(s, 'idleExp');
   for (const a of s.adventurers) {
     // 派遣中だけ回復しない。訓練中・勤務中は待機と同じに休める
     if (a.status === 'away' || returnedIds.has(a.id)) continue;
-    a.fatigue = Math.max(0, a.fatigue + rest);
+    a.fatigue = Math.max(0, a.fatigue - rest);
     if (a.injuryDays > 0) a.injuryDays--;
     if (idleExp && a.status === 'idle' && addExp(a, idleExp)) notices.push(`${a.name}がLv${a.level}に上がった。`);
   }

@@ -4,20 +4,28 @@ import { DUNGEON, DUNGEONS, ENEMY, ITEM, JOB, NODE, POLICIES, PERSONALITY, TUNIN
 import { needsSearch, parseFloor } from '../core/dungeon';
 import { floorTransit } from '../core/explore';
 import { dispatch, exploredRateOf, recall } from '../core/game';
+import { getIntroExploration } from '../core/introExploration';
 import { heldKeys } from '../core/ledger';
+import { journeyFrameAbsoluteDay } from '../core/journeyPlayback';
 import { activeQuests, questCargo } from '../core/quests';
 import { assessReadiness, type Readiness } from '../core/readiness';
 import { travelDays } from '../core/world';
 import { PARTY_MAX, PARTIES_MAX, type ActionKind, type DispatchOrder, type Expedition, type Quest } from '../core/types';
 import { ACTION_NAME, actionText, advById, commit, destText, nameOf, positionText, render, SLOTS, state, statusText, stepToday, toast, ui } from './app';
 import { div, h, span } from './dom';
+import { openJourney } from './journeyHost';
+import { mapFace } from './mapFace';
+import './returnReport.css';
+import { memberUnavailableReason } from '../core/expeditionPlan';
+import { partyPlanEditor, partyPlansBlock } from './partyPlans';
+import { financeOutlook } from './financeOutlook';
 
 const DAY_CHOICES = Array.from({ length: TUNING.game.daysMax }, (_, i) => i + 1);
 const ACTIONS: ActionKind[] = ['explore', 'gather', 'hunt', 'boss', 'survey'];
 const BOSS_KINDS = ['symbol', 'boss'];
 const FORECAST_RUNS = 40;
 
-const available = () => state.adventurers.filter((a) => a.status === 'idle' && a.injuryDays === 0);
+const available = () => state.adventurers.filter((a) => !memberUnavailableReason(state, a));
 const dungeonIds = () => DUNGEONS.map((d) => d.id).filter((id) => state.dungeons[id]);
 const uniq = <T>(xs: T[]) => [...new Set(xs)];
 const val = (ev: Event) => (ev.target as HTMLSelectElement).value;
@@ -77,6 +85,8 @@ function tidy() {
   if (c.reason[d.action]) d.action = ACTIONS.find((a) => !c.reason[a]) ?? 'explore';
   if (d.action === 'gather' && !c.items.includes(d.item)) d.item = c.items[0] ?? '';
   if (d.action !== 'hunt' || !c.full || !c.enemies.includes(d.enemy)) d.enemy = '';
+  const order = currentOrder();
+  if (order && getIntroExploration(state, order)) d.days = 1;
 }
 
 /** アイリスの祝福(第一章の読了で解禁)。残りが無い・発熱中は理由を出して選べない */
@@ -124,6 +134,8 @@ export function dispatchTab(): HTMLElement {
   const leader = d.leader ? advById(d.leader) : undefined;
   const order = currentOrder();
   const forecast = ui.forecast && ui.forecast.key === orderKey(order) ? ui.forecast.r : null;
+  const intro = order ? getIntroExploration(state, order) : null;
+  const trip = plannedTrip(quest);
   const blocker = quest?.type === 'escort' && quest.departDay !== state.day ? `この護衛は${quest.departDay}日目に出発します` : '';
 
   const memberRows = state.adventurers.map((a) => {
@@ -140,15 +152,16 @@ export function dispatchTab(): HTMLElement {
           return span(id ? 'on' : 'off', { title: id ? ITEM[id]?.name ?? id : `${sl.name}なし` }, sl.short);
         })),
         span('dim small', ` ${JOB[a.job].name} Lv${a.level} / ${PERSONALITY[a.personality].name} / 疲労${a.fatigue}`),
-        can ? null : span('small', ` (${statusText(a)})`),
+        can ? null : span('small', ` (${memberUnavailableReason(state, a) ?? statusText(a)})`),
       ),
-      checked ? h('label', { class: 'leader' },
-        h('input', { type: 'radio', name: 'leader', checked: d.leader === a.id ? true : undefined, onchange: () => { d.leader = a.id; render(); } }),
-        ' 隊長') : null,
     );
   });
 
   return div('tab-body',
+    partyPlansBlock(),
+    h('div', { id: 'dispatch-preparation' }),
+    ui.dispatchNotes.length ? div('dispatch-notes', { role: 'status' },
+      ...ui.dispatchNotes.map((text) => div('small', text))) : null,
     h('h2', null, '行き先'),
     h('select', { class: 'wide', onchange: (ev: Event) => pickDest(val(ev)) },
       h('optgroup', { label: 'ダンジョン' }, ...dungeonIds().map((id) => h('option', { value: id, selected: !quest && id === d.dungeon ? true : undefined },
@@ -158,14 +171,20 @@ export function dispatchTab(): HTMLElement {
     quest ? questBlock(quest) : dungeonBlock(c),
     h('h2', null, `隊員(${d.members.length}/${PARTY_MAX})`),
     h('ul', { class: 'plain members' }, ...memberRows),
-    leader ? div('small explore-desc', `地図の埋め方: ${PERSONALITY[leader.personality].exploreDesc}`) : null,
+    intro ? h('section', { class: 'dispatch-notes', 'aria-label': '初回の探索' },
+      h('h3', null, '初回は入口近くを確かめる日帰り探索'),
+      div('small', intro.description),
+      div('small', '薬草を1個採り、歩いた道を地図に残して戻ります。回復薬は不要です。'),
+      div('small dim', `${d.members.length === 2 ? 'ティナが前で道を確かめ、セラが回復役として支えます。' : ''}次の派遣からは通常の探索です。装備と回復薬を整えて奥へ進みましょう。`),
+    ) : null,
+    leader ? leaderChoices(!!intro) : null,
     div('form',
       h('label', null, '方針 ',
-        h('select', { onchange: (ev: Event) => { d.policy = val(ev); render(); } },
+        h('select', { disabled: !!intro, onchange: (ev: Event) => { d.policy = val(ev); render(); } },
           ...POLICIES.map((p) => h('option', { value: p.id, selected: p.id === d.policy ? true : undefined }, p.name))),
       ),
       quest ? null : h('label', null, '現地の日数 ',
-        h('select', { onchange: (ev: Event) => { d.days = Number(val(ev)); render(); } },
+        h('select', { disabled: !!intro, onchange: (ev: Event) => { d.days = Number(val(ev)); render(); } },
           ...DAY_CHOICES.map((n) => h('option', { value: n, selected: n === d.days ? true : undefined }, `${n}日`))),
       ),
       h('label', null, `回復薬(在庫${potionStock}) `,
@@ -174,8 +193,10 @@ export function dispatchTab(): HTMLElement {
       ),
       blessingRow(),
     ),
-    div('dim small', POLICIES.find((p) => p.id === d.policy)?.desc ?? ''),
+    partyPlanEditor(order),
+    div('dim small', intro ? '初回は決められた入口付近の行程を歩きます。' : POLICIES.find((p) => p.id === d.policy)?.desc ?? ''),
     div('trip', tripText(quest)),
+    trip ? financeOutlook(Math.max(1, trip.go + trip.stay + trip.back), true) : null,
     quest ? null : h('button', { class: 'wide', disabled: !order, onclick: showForecast }, '見込みを見る'),
     !quest && forecast ? forecastBlock(forecast) : null,
     blocker ? div('small neg', blocker) : null,
@@ -190,12 +211,15 @@ export function dispatchTab(): HTMLElement {
 function awayRow(e: Expedition): HTMLElement {
   const st = stepToday(e);
   const canRecall = e.recalledDay === null && st?.phase !== 'return';
+  const yesterday = state.day - 1;
+  const canObserve = !!e.journey?.frames.some((frame) => journeyFrameAbsoluteDay(e.journey!, frame) === yesterday);
   return h('li', null,
     `${e.order.partyIds.map(nameOf).join('・')}`,
     span('dim small', ` 隊長 ${nameOf(e.order.leaderId)} / ${destText(e)} / ${actionText(e.order)} / ${e.startDay}日目出発 → `),
     span(null, `${e.returnDay}日目に帰還予定`),
     div('small', `いま: ${positionText(st)}`, e.recalledDay !== null ? span('dim', `(${e.recalledDay}日目に呼び戻し)`) : '',
       canRecall ? h('button', { class: 'small danger', onclick: () => doRecall(e) }, '呼び戻す') : null),
+      canObserve ? h('button', { class: 'small', onclick: () => openJourney(e, yesterday) }, '道中を見る') : null,
   );
 }
 
@@ -253,22 +277,52 @@ function questBlock(q: Quest): HTMLElement {
 }
 
 /** 「往復N日+現地M日=帰還X日目」。早帰りで実際の帰還は早まることがある */
-function tripText(q: Quest | undefined): string {
+function plannedTrip(q: Quest | undefined): { go: number; stay: number; back: number } | null {
   const k = state.world;
   if (q) {
     const from = q.target.from ?? HOME;
     const to = q.target.to ?? HOME;
     const out = [travelDays(HOME, from, k), travelDays(from, to, k)];
     const back = travelDays(to, HOME, k);
-    if (out.some((x) => x === null) || back === null) return `${nodeName(to)}へ行く道が分かりません`;
+    if (out.some((x) => x === null) || back === null) return null;
     const go = (out[0] ?? 0) + (out[1] ?? 0);
-    return `往路${go}日+復路${back}日=${state.day + go + back}日目に帰還`;
+    return { go, stay: 0, back };
   }
   const node = DUNGEON[ui.d.dungeon]?.node;
   const one = node ? travelDays(HOME, node, k) : null;
-  if (one === null) return '行き先への道が分かりません';
-  const stay = ui.d.days;
-  return `往復${one * 2}日+現地${stay}日=${state.day + one * 2 + stay}日目に帰還(予定。早く切り上げることもある)`;
+  return one === null ? null : { go: one, stay: ui.d.days, back: one };
+}
+
+function tripText(q: Quest | undefined): string {
+  const trip = plannedTrip(q);
+  if (!trip) return '行き先への道が分かりません';
+  const { go, stay, back } = trip;
+  if (q) return `往路${go}日+復路${back}日=${state.day + Math.max(1, go + back)}日目に帰還`;
+  if (go + back === 0) return stay === 1 ? '日帰り。明日の朝に報告が届きます'
+    : `現地${stay}日=${state.day + stay}日目に帰還予定（往復に日はかかりません。早く切り上げることもあります）`;
+  return `往復${go + back}日+現地${stay}日=${state.day + go + back + stay}日目に帰還(予定。早く切り上げることもある)`;
+}
+
+function leaderChoices(intro = false): HTMLElement {
+  return h('fieldset', { class: 'leader-choices' },
+    h('legend', null, intro ? '今回の隊長' : '隊長で変わる歩き方'),
+    div('leader-options', ...ui.d.members.flatMap((id) => {
+      const m = advById(id);
+      if (!m) return [];
+      const personality = PERSONALITY[m.personality];
+      return [h('label', { class: `leader-choice${ui.d.leader === id ? ' selected' : ''}` },
+        h('input', {
+          type: 'radio', name: 'leader', 'aria-label': `${m.name}を隊長にする`,
+          checked: ui.d.leader === id ? true : undefined,
+          onchange: () => { ui.d.leader = id; ui.forecast = null; render(); },
+        }),
+        mapFace(m),
+        div(null, div(null, `${m.name} · ${personality.name}`),
+          div('small', intro ? '入口近くを確認し、薬草を採って戻ります。' : personality.exploreDesc),
+          intro ? null : div('small dim', personality.desc)),
+      )];
+    })),
+  );
 }
 
 function pickDest(v: string) {
@@ -295,6 +349,7 @@ function targetBlock(c: Choices): HTMLElement {
         h('select', { onchange: (ev: Event) => { d.item = val(ev); render(); } },
           ...c.items.map((id) => h('option', { value: id, selected: id === d.item ? true : undefined }, ITEM[id]?.name ?? id))))),
       div(known ? 'dim small' : 'small neg', `踏んだことのある採取点: ${known}か所${known ? '' : '(未踏には入らないので、初日に引き返す)'}`),
+      known ? div('small dim', '採取士は採る量と持てる荷物を増やします。同じ遠征では各採取点を1回ずつ調べ、回り終えると早めに帰ります。') : null,
     );
   }
   if (d.action === 'hunt') {
@@ -310,13 +365,32 @@ function targetBlock(c: Choices): HTMLElement {
 }
 
 function forecastBlock(r: Readiness): HTMLElement {
+  if (r.introductory) return div('detail forecast',
+    h('h3', null, '初回の行程'),
+    div('small', '入口付近の安全な道を往復します。戦闘や罠はなく、薬草1個と地図の記録を持ち帰ります。'),
+    div('small', '現地1日・翌朝帰還。次の派遣から通常の探索になります。'),
+  );
   const pct = (x: number) => `${Math.round(x * 100)}%`;
   const high = r.uncertainty === '高';
   return div('detail forecast',
-    div(null, span(`badge grade-${r.grade}`, r.grade), span('dim small', ` 戦力比 ${r.powerRatio.toFixed(2)}(${r.runs}回の試算)`)),
+    h('h3', null, '現地での見込み'),
+    r.gather ? h('section', { class: 'gather-forecast', 'aria-label': '採集の見込み' },
+      h('strong', null, `${ITEM[r.gather.item]?.name ?? r.gather.item}：平均 ${r.gather.avgAmount.toFixed(1)}個`),
+      div('small', `その素材を確保できない見込み ${pct(r.gather.emptyRate)} / 既知の採取点 ${r.gather.knownSites}か所`),
+      div('small dim', `採取が最も得意：${r.gather.bestGatherer.name}（採取${r.gather.bestGatherer.stat}） / 隊が持てる重さ ${r.gather.capacity}`),
+      r.gather.knownSites === 0 ? div('small neg', '先に探索して、この素材の採取点を見つけてください。') : null,
+      ui.d.policy === 'safe' || ui.d.policy === 'avoid'
+        ? div('small dim', '既知の巣や強敵の場所を迂回できる道を選びます。ほかに道がない場所や、道中の遭遇では戦闘になることがあります。')
+        : div('small dim', '既知の巣や強敵を迂回したいときは、安全第一か戦闘回避を選べます。'),
+    ) : null,
+    div(null, '戦力の目安 ', span(`badge grade-${r.grade}`, r.grade), span('dim small', ` 戦力比 ${r.powerRatio.toFixed(2)}(${r.runs}回の試算)`)),
     div('small', `全滅率 ${pct(r.wipeRate)} / 撤退率 ${pct(r.retreatRate)}`),
     div('small', `平均負傷日数 ${r.avgInjuryDays.toFixed(1)}日(1人あたり) / 想定戦闘 ${r.avgFights.toFixed(1)}回`),
+    r.avgSiteDays !== undefined ? div('small', `現地は平均 ${r.avgSiteDays.toFixed(1)}日 / 疲労の変化 ${r.avgFatigueGain! >= 0 ? '+' : ''}${r.avgFatigueGain!.toFixed(1)}（1人あたり）`) : null,
+    r.gather && r.avgSiteDays !== undefined && r.avgSiteDays < ui.d.days - 0.5
+      ? div('small', '指定した日数より早く切り上げる見込みです。採取点を回り終えた後は、日数を増やしても採り直しません。') : null,
     div(high ? 'small neg' : 'small', `不確かさ: ${r.uncertainty}`, high ? '(未踏が多く、見込みは当てにならない)' : ''),
+    div('small dim', '見つけた道だけでの試算です。往復の道中は含まず、実際の成果を保証するものではありません。'),
   );
 }
 
@@ -354,6 +428,11 @@ function depart() {
   d.potions = 0;
   d.blessed = false;
   ui.forecast = null;
+  ui.dispatchNotes = [];
+  ui.partyPlanEditId = '';
+  ui.partyPlanName = '';
+  ui.partyPlanEditorOpen = false;
+  ui.partyPlanRemoveId = null;
   commit();
   toast(`出発しました。${r.expedition.returnDay}日目に帰還します。`);
 }

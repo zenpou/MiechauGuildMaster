@@ -7,7 +7,7 @@ import { hire } from '../src/core/recruit';
 import { pairKey } from '../src/core/relations';
 import { rngFor } from '../src/core/rng';
 import { deserialize, serialize } from '../src/core/save';
-import type { DispatchOrder, GameState, Mail } from '../src/core/types';
+import type { DispatchOrder, GameState, Mail, MailKind } from '../src/core/types';
 import { fullGame } from './helpers';
 
 const M = TUNING.mail;
@@ -23,8 +23,11 @@ function order(ids: string[], o: Partial<DispatchOrder> = {}): DispatchOrder {
 
 function rich(seed = 1): GameState {
   const s = fullGame(seed);
-  // 退職の対象は汎用の者だけなので、先頭を汎用にする(ティナは末尾へ)
-  s.adventurers.push(s.adventurers.shift()!);
+  // 退職の対象は汎用の者だけなので、先頭を汎用にする(ユニークは末尾へ)
+  s.adventurers = [
+    ...s.adventurers.filter((a) => !a.unique),
+    ...s.adventurers.filter((a) => a.unique),
+  ];
   s.gold = 1_000_000;
   return s;
 }
@@ -65,6 +68,26 @@ describe('忠誠の節目', () => {
     for (const a of s.adventurers) a.loyalty = Math.max(a.loyalty, 50);
     const fresh = s.adventurers.filter((a) => !s.flags[`loyal:${a.id}:50`]);
     expect(ofKind(check(s), 'loyalty')).toHaveLength(Math.min(fresh.length, M.perDay));
+  });
+
+  it('ユニークの忠誠節目は人物別ストーリーに任せ、汎用メールを送らない', () => {
+    const s = newGame(1);
+    s.adventurers = s.adventurers.filter((a) => a.unique);
+    for (const a of s.adventurers) {
+      a.loyalty = 120;
+      s.flags[`loyal:${a.id}:50`] = true;
+    }
+    expect(ofKind(check(s), 'loyalty')).toHaveLength(0);
+  });
+
+  it('女性の自信家を含む全メール種別で男性一人称を出さない', () => {
+    const s = newGame(1);
+    const a = { ...s.adventurers[0], unique: undefined, gender: 'female' as const, personality: 'proud' };
+    const kinds: MailKind[] = ['greeting', 'loyalty', 'raise', 'warning', 'resign', 'rest', 'complaint', 'rumor', 'quest', 'event'];
+    for (const kind of kinds) expect(composeMail(kind, a).body, kind).not.toContain('俺');
+
+    const unique = { ...a, unique: 'viola' };
+    for (const kind of kinds) expect(composeMail(kind, unique).body, `viola/${kind}`).not.toContain('俺');
   });
 });
 
@@ -322,11 +345,12 @@ describe('受信箱', () => {
     const s = rich();
     // 節目50が残っている人は翌日に120を出すので、1人1通に揃える
     for (const a of s.adventurers) { a.loyalty = 120; s.flags[`loyal:${a.id}:50`] = true; }
+    const genericCount = s.adventurers.filter((a) => !a.unique).length;
     const notices: string[] = [];
     expect(check(s, notices)).toHaveLength(M.perDay);
     expect(notices.length).toBeGreaterThan(0);
     s.day++;
-    expect(ofKind(check(s), 'loyalty')).toHaveLength(s.adventurers.length - M.perDay);
+    expect(ofKind(check(s), 'loyalty')).toHaveLength(Math.max(0, genericCount - M.perDay));
   });
 
   it('同じ人からは1日1通まで', () => {

@@ -1,6 +1,6 @@
 import { achievementExpMult, achievementProgress, achievementStage } from '../core/achievements';
 import { ACHIEVEMENTS, TUNING, type AchievementDef } from '../core/data';
-import { STORY, storySeen, storySeenDay } from '../core/story';
+import { ALL_STORIES, storySeen, storySeenDay } from '../core/story';
 import { render, state } from './app';
 import { bar, div, h, span } from './dom';
 import { chapterThumb, rereadChapter } from './storyHost';
@@ -50,7 +50,7 @@ export function recordsTab(): HTMLElement {
 function storySection(): HTMLElement {
   const seen = storySeen(state);
   return div(null,
-    h('h2', null, `物語の章(${seen.length}/${STORY.length})`),
+    h('h2', null, `物語と仲間の話(${seen.length}/${ALL_STORIES.length})`),
     seen.length
       ? h('ul', { class: 'plain story-chapters' }, ...seen.map((c) => h('li', null,
         chapterThumb(c),

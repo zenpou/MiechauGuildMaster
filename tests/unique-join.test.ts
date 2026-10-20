@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { generateAdventurer } from '../src/core/adventurer';
 import { TUNING, UNIQUE, type UniqueDef } from '../src/core/data';
-import { newGame } from '../src/core/game';
+import { dispatch, newGame } from '../src/core/game';
 import { applyResignations, checkMails } from '../src/core/mail';
 import { arriveCandidates } from '../src/core/recruit';
 import { rngFor } from '../src/core/rng';
@@ -29,15 +29,17 @@ beforeEach(() => { unregister = FIXTURES.map(registerUnique); });
 afterEach(() => { for (const u of unregister) u(); });
 
 describe('初日の名簿', () => {
-  it('初日の名簿は initial のユニーク(ティナ)1人だけ', () => {
+  it('初日の名簿は initial のユニーク(ティナ・セラ)2人だけ', () => {
     const s = newGame(1);
-    expect(s.adventurers).toHaveLength(1);
-    const [t] = s.adventurers;
-    expect(t.unique).toBe('tina');
-    expect(t.appearance).toBe('tina');
-    expect(t.history.hiredDay).toBe(1);
+    expect(s.adventurers).toHaveLength(2);
+    expect(s.adventurers.map((a) => a.unique)).toEqual(['tina', 'sera']);
+    const [t, sera] = s.adventurers;
+    expect(t).toMatchObject({ unique: 'tina', appearance: 'tina', history: { hiredDay: 1 } });
+    expect(sera).toMatchObject({ unique: 'sera', appearance: 'sera', history: { hiredDay: 1 } });
     expect(s.flags['unique:tina']).toBe(true);
     expect(s.flags['unique:tina:hired']).toBe(1);
+    expect(s.flags['unique:sera']).toBe(true);
+    expect(s.flags['unique:sera:hired']).toBe(1);
   });
 
   it('初日の名簿の者には挨拶メールを出し直さない', () => {
@@ -133,7 +135,48 @@ describe('古いセーブの読み込み', () => {
   it('initial のユニークが名簿にいなければ足し、二度読んでも増えない', () => {
     const once = roundTrip(oldSave());
     expect(countUnique(once, 'tina')).toBe(1);
+    expect(countUnique(once, 'sera')).toBe(1);
     expect(countUnique(roundTrip(once), 'tina')).toBe(1);
+    expect(countUnique(roundTrip(once), 'sera')).toBe(1);
+  });
+
+  it('旧ティナだけのセーブを第一章既読で読み直しても、セラを重複加入させない', () => {
+    const s = newGame(2);
+    s.adventurers = s.adventurers.filter((a) => a.unique === 'tina');
+    delete s.flags['unique:sera'];
+    delete s.flags['unique:sera:hired'];
+    s.flags['story:ch1'] = 2;
+    const once = roundTrip(s);
+    const twice = roundTrip(once);
+    expect(countUnique(once, 'tina')).toBe(1);
+    expect(countUnique(once, 'sera')).toBe(1);
+    expect(countUnique(twice, 'tina')).toBe(1);
+    expect(countUnique(twice, 'sera')).toBe(1);
+  });
+
+  it('既存セラのID・装備・成長・派遣中状態・遠征履歴を保持する', () => {
+    const s = newGame(3);
+    const sera = s.adventurers.find((a) => a.unique === 'sera')!;
+    sera.id = 'legacy-sera';
+    sera.level = 4;
+    sera.exp = 37;
+    sera.equipment.weapon = 'bone_dagger';
+    const sent = dispatch(s, {
+      partyIds: [sera.id], leaderId: sera.id, action: 'explore',
+      target: { dungeon: 'forest_cave', floor: 'f1' }, policy: 'standard', days: 1, items: {},
+    });
+    expect(sent.ok).toBe(true);
+    const before = structuredClone(s.adventurers.find((a) => a.unique === 'sera')!);
+    const beforeExpeditions = structuredClone(s.expeditions);
+    const loaded = roundTrip(s);
+    const restored = loaded.adventurers.find((a) => a.unique === 'sera')!;
+    expect(restored).toMatchObject({
+      id: before.id, level: before.level, exp: before.exp, status: 'away',
+      equipment: before.equipment, history: before.history,
+    });
+    expect(loaded.expeditions).toEqual(beforeExpeditions);
+    expect(loaded.expeditions.every((e) => e.order.partyIds.includes('legacy-sera'))).toBe(true);
+    expect(countUnique(loaded, 'sera')).toBe(1);
   });
 
   it('既読の章(読んだ日不明の 0 を含む)のユニークを補い、二度読んでも増えない', () => {

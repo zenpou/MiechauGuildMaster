@@ -1,0 +1,26 @@
+.return-reports { margin-bottom: 20px; }
+.return-card { border: 1px solid var(--line); background: #0c191de6; padding: 14px; margin: 8px 0; border-radius: var(--radius); overflow-wrap: anywhere; }
+.return-card h3 { margin: 0 0 8px; }
+.return-card h4 { margin: 12px 0 5px; color: var(--accent); }
+.return-metrics { display: flex; flex-wrap: wrap; gap: 6px 20px; padding: 8px 0; border-bottom: 1px solid var(--line-soft); }
+.return-discoveries { padding: 8px 0; line-height: 1.6; }
+.return-members { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 6px; }
+.return-member { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 6px; background: #ffffff06; }
+.return-member .map-face { width: 38px; height: 38px; flex: 0 0 38px; }
+.return-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.return-actions button { min-height: 44px; white-space: normal; text-align: left; }
+.return-quote { border-left: 2px solid var(--accent); padding-left: 8px; margin: 8px 0; }
+.dispatch-notes { border-left: 3px solid var(--accent); background: #efc87812; padding: 10px; margin: 0 0 12px; line-height: 1.6; }
+.leader-choices { min-width: 0; padding: 8px; border: 1px solid var(--line-soft); margin: 12px 0; }
+.leader-choices legend { color: var(--accent); }
+.leader-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; }
+.leader-choice { display: flex; align-items: center; gap: 8px; padding: 8px; min-width: 0; border: 1px solid transparent; cursor: pointer; background: #ffffff05; }
+.leader-choice.selected { border-color: var(--accent); background: #efc87815; }
+.leader-choice .map-face { width: 42px; height: 42px; flex: 0 0 42px; }
+.leader-choice > div:last-child { min-width: 0; }
+.leader-choice:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .leader-options, .return-members { grid-template-columns: minmax(0, 1fr); }
+  .return-card { padding: 10px; }
+  .return-actions button { flex: 1 1 150px; }
+}

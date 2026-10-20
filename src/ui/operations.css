@@ -1,0 +1,33 @@
+.operations { margin: 16px 0; padding: 12px; border: 1px solid var(--line-soft); border-radius: var(--radius); background: #09151bb3; }
+.operations h2 { margin-top: 0; }
+.operations-summary { display: flex; gap: 6px 18px; flex-wrap: wrap; margin-bottom: 10px; }
+.operation-teams, .operation-members { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; margin: 8px 0 12px; }
+.operation-team, .operation-member { padding: 10px; background: #ffffff06; border: 1px solid var(--line-soft); border-radius: 4px; overflow-wrap: anywhere; }
+.operation-title { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; min-width: 0; }
+.operation-title > div:last-child { min-width: 0; }
+.operation-title .map-face { width: 36px; height: 36px; flex: 0 0 36px; }
+.operations summary { cursor: pointer; padding: 8px 0; }
+.operations button { min-height: 36px; }
+.party-plans { margin-bottom: 16px; border: 1px solid var(--line-soft); padding: 12px; border-radius: var(--radius); background: #09151bb3; }
+.party-plans h2 { margin-top: 0; }
+.party-plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; }
+.party-plan { min-width: 0; border: 1px solid var(--line-soft); padding: 10px; background: #ffffff05; overflow-wrap: anywhere; }
+.party-plan h3 { margin: 0 0 5px; }
+.party-plan-members { display: flex; flex-wrap: wrap; gap: 5px 12px; margin: 8px 0; }
+.party-plan-person { display: flex; align-items: center; gap: 4px; }
+.party-plan-person .map-face { width: 28px; height: 28px; flex: 0 0 28px; }
+.party-plan .row { flex-wrap: wrap; margin-top: 8px; }
+.party-plan button { min-height: 40px; }
+.party-plan-editor { margin: 12px 0; padding: 10px; background: #efc8780d; border-left: 2px solid var(--accent); }
+.party-plan-editor summary { cursor: pointer; }
+.party-plan-editor .form { margin-top: 10px; }
+.party-plan-editor input { max-width: 100%; min-width: 0; }
+.gather-forecast { padding: 10px; margin: 8px 0; border-left: 2px solid var(--accent); background: #efc8780d; }
+.gather-forecast > div { margin-top: 5px; }
+#dispatch-preparation { scroll-margin-top: 75px; }
+@media (max-width: 640px) {
+  .operation-teams, .operation-members, .party-plan-grid { grid-template-columns: minmax(0, 1fr); }
+  .operations, .party-plans { padding: 9px; }
+  .operations button, .party-plan button, .party-plan-editor button { min-height: 44px; }
+  #dispatch-preparation { scroll-margin-top: 140px; }
+}

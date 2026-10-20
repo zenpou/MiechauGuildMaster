@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>冒険者の専用顔アイコン</title>
+<style>
+  body{background:#10191b;color:#eee1c5;font:15px system-ui;margin:24px}
+  main{max-width:960px;margin:auto}h1{font-size:24px}
+  #faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+  article{background:#1c2b2c;border:1px solid #59604b;padding:15px;border-radius:5px}
+  .icons{display:flex;align-items:end;gap:10px}.map-face.large{width:80px;height:80px}.map-face.small{width:32px;height:32px}
+  p{margin:8px 0 0;color:#ccc}
+</style>
+<main><h1>冒険者の専用顔アイコン</h1><p>頭全体を描いた透過素材。80pxと32pxの表示比較。</p><div id="faces"></div></main>
+<script type="module">
+  import { MAP_FACES } from '/src/ui/mapFaceData.ts';
+  import { mapFace } from '/src/ui/mapFace.ts';
+  import { PERSONALITIES, UNIQUES } from '/src/core/data.ts';
+  for(const id of Object.keys(MAP_FACES)){
+    const u=UNIQUES.find(u=>u.appearance===id), parts=id.split('_');
+    const name=u?.name ?? `${PERSONALITIES.find(p=>p.id===parts[1])?.name}・${parts[2]==='male'?'男性':'女性'}`;
+    const a={appearance:id,name,personality:parts[1]??'brave',gender:parts[2]??'female'};
+    const card=document.createElement('article'), icons=document.createElement('div'),label=document.createElement('p');
+    icons.className='icons';icons.append(mapFace(a,'large'),mapFace(a,'small'));label.textContent=name;
+    card.append(icons,label);document.querySelector('#faces').append(card);
+  }
+</script>
+</html>

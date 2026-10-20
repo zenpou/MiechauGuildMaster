@@ -5,6 +5,16 @@
 
 ## 0. 決定事項(2026-10-14)
 
+### 2026-10-21 アウレリアの地図用顔を追加
+
+終章後に実際の冒険者となるため、`public/art/map-faces/aurelia-v1.png` を追加した。1254×1254・RGBA PNG。内蔵画像生成ツールを使用し、アウレリアの既存立ち絵を人物参照、ティナの地図アイコンを画風参照とした。通常の42×42表示をPC・スマートフォン幅の派遣画面で確認済み。証跡は `artifacts/previews/story-fixes/aurelia-map-*.png`。
+
+生成プロンプト:
+
+> Create exactly one square transparent PNG game map head icon of Aurelia, matching the existing icon style. Reference image 1 is Aurelia's character identity: young adult ancient dragon in human form, charcoal-black hair with vivid burnt-orange inner streaks and tips, gold amber eyes, calm expression, no horns or wings. Reference image 2 is the required chibi floating-head icon rendering style only (do NOT copy red hair, bandage or her identity). Draw only Aurelia's complete head and stylized hair silhouette, no body, neck, shoulders, badge, background or text. Near frontal three-quarter view, quiet confident neutral expression, large expressive amber eyes, clean bold anime outlines and cel shading, subtle warm cream keyline like reference 2. Simplify her long hair into a compact head silhouette with orange tips that stays legible at 48x48 pixels. Entire hair silhouette inside canvas with 5% transparent padding; head occupies about90% of square. True transparent alpha background.
+
+### 当初の共通仕様
+
 | 項目 | 決定 |
 |---|---|
 | 立ち絵の寸法 | **全身 512×1024、背景透過**(現行エンジンのまま)。頭を上端近くに置く。エンジンは上端基準で胸から上を見せる(倍率は `cast.json` の `display` / `poseDisplay` で人物・ポーズ別に上書きでき、竜の姿はこれで枠に収める)。台詞枠の顔は別ファイル `public/art/faces/<id>/<pose>.webp`(256×256)。2026-10-14 組み込み済み |
@@ -41,7 +51,7 @@
 
 既存の `tavern`(酒場)は新しい台本では使わない。
 
-## 3. 立ち絵(最新仕様 74 枚、生成済み)
+## 3. 立ち絵(主要人物・竜・汎用の計76枚、生成済み。母の追加1枚は末尾参照)
 
 ### 3-1. 共通仕様
 
@@ -51,13 +61,13 @@
 - 表情の標準は RULES 3-3「共通5種(通常・喜び・怒り・驚き・照れ)+固有1種」。下表の全量を発注する。
 - 台詞枠の顔は顔専用の画像(`faces/<id>/<pose>.webp`、256×256)を別に納める。立ち絵の表情も顔で分かる大きさにする。
 
-### 3-2. 主要人物(10人、61 枚。ガルドのコートなし2枚を含む)
+### 3-2. 主要人物(10人、63枚。ガルド・アイリスのコートなし各2枚を含む)
 
 | 人物 | id | 表情(ファイル名) | 固有表情の描き方 | 参照画像・注意 |
 |---|---|---|---|---|
 | カイ | `kai` | neutral / happy / angry / surprised / shy / **sleep** | sleep: 目を閉じ口が半開き。立ったまま寝ている | 顔・髪は `kai.png` を継承。衣装は新しい村人風（生成りの紐付きチュニック、革ベルトと腰袋、布ズボン、柔らかい革靴）。新衣装の基準は `artifacts/source-art/characters/kai/neutral.png`。neutral は気だるげな半目 |
 | ティナ | `tina` | neutral / happy / angry / surprised / shy / **sulky** | sulky: 頬を膨らませ横目で拗ねる | `tina.png`。頬の絆創膏を忘れない |
-| アイリス | `iris` | neutral / happy / angry / surprised / shy / **dizzy** | dizzy: 目を細め、頬が赤く、額に手を当てふらつく | **`iris-coat.png`(コート版)**。作中は常に父のコートを肩に羽織っている。angry は極めて稀なので控えめに |
+| アイリス | `iris` | neutral / happy / angry / surprised / shy / **dizzy** / coatless_neutral / coatless_happy | dizzy: 目を細め、頬が赤く、額に手を当てふらつく。coatless_happy: 父にコートを返した後の笑顔 | **`iris-coat.png`(コート版)**。終章で父に返すまでは父のコートを肩に羽織る。返却後は**本を持たないコートなし版**(`coatless_neutral` / `coatless_happy`)を使用し、終章No.31・35は `coatless_happy`。angry は極めて稀なので控えめに |
 | ノエル | `noel` | neutral / happy / angry / surprised / shy / **worried** | worried: 眉を下げて心配そう。surprised は眼鏡が跳ねてずれる | `noel.png`。帳簿を抱えている |
 | セラ | `sera` | neutral / happy / angry / surprised / shy / **teary** | teary: 大粒の涙、小刻みに震える。angry はほぼ出ないので弱く | `sera.png` |
 | ヴィオラ(鎧) | `viola` | neutral / happy / angry / surprised / shy / **flustered** | flustered: クール気取りの顔が崩れ、素の慌てた顔が出る | `viola.png` の顔・髪で、**衣装は重い金属鎧(プレートメイル)+身の丈ほどの大盾**。兜は無し(髪を見せる) |
@@ -97,11 +107,11 @@
 | 種類 | 枚数 |
 |---|---|
 | 背景 | 4 |
-| 立ち絵・主要人物 | 61（ヴィオラ2衣装、ガルドのコートあり・なしを含む） |
+| 立ち絵・主要人物 | 63（ヴィオラ2衣装、ガルド・アイリスのコートあり・なしを含む） |
 | 立ち絵・竜の姿 | 1 |
 | 立ち絵・汎用冒険者 | 12（男女×6性格×各1枚、neutralのみ採用） |
 | 一枚絵 | 2 |
-| **最新仕様の合計** | **80（現行素材。旧汎用素材と未使用のhappyは別途保存）** |
+| **本表の合計** | **82（序章冒頭の追加3件は末尾参照。現行全体は85。旧汎用素材と未使用のhappyは別途保存）** |
 
 ## 6. 納品の形
 
@@ -112,6 +122,10 @@
 ## 追加素材（2026-10-14）
 
 ガルドのコートなし版を2枚追加: `gald/coatless_neutral`（通常）、`gald/coatless_happy`（豪快な笑い）。既存の `neutral` / `happy` はコートありのまま保持する。512×1024、透過PNG・WebP。初回の明細78枚に追加して素材総数80枚。今回の範囲は素材作成までで、ゲームへの衣装切り替え登録は別工程。
+
+## アイリスのコート返却後の差分（2026-10-21 登録確認）
+
+`iris/coatless_neutral`（通常）と `iris/coatless_happy`（喜び）は、本もコートも持たない衣装差分。`cast.json` の `iris.poses` と `art.json` の `characters.iris` に登録済みで、立ち絵・顔アイコンとも配布ファイルが存在する。終章No.30で父にコートを返し、No.31・35で `coatless_happy` を使う。従来のコートあり差分は返却前に使うため保持する。追加2枚を上表に含め、序章冒頭の追加3件を含む現行全体は85枚。
 
 ## 竜と仲間思いの冒険者の修正（2026-10-14）
 

@@ -1,0 +1,12 @@
+.finance-outlook { margin: 12px 0; padding: 12px; border-left: 2px solid var(--accent); background: #efc8780b; overflow-wrap: anywhere; }
+.finance-outlook h3 { margin: 0 0 10px; }
+.finance-summary { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-bottom: 10px; }
+.finance-summary > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.finance-summary strong { font-size: 1.1rem; }
+.finance-outlook > .small { margin-top: 5px; }
+.finance-outlook summary { cursor: pointer; padding: 10px 0; min-height: 44px; box-sizing: border-box; }
+.finance-return { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 4px 0; }
+@media (max-width: 640px) {
+  .finance-outlook { padding: 10px; }
+  .finance-summary { gap: 10px 18px; }
+}

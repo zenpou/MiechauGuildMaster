@@ -1,6 +1,7 @@
 // メール(第6節の表): 発火条件の判定、文面の差し込み、返信の効果、自己退職。判定は advanceDay の忠誠+1の後に1日1回。
 import { salaryOf } from './adventurer';
 import { DUNGEON, DUNGEONS, MAIL_TEXT, TUNING } from './data';
+import uniqueMailTextJson from '../data/unique-mail-text.json';
 import { exploredRate, parseFloor } from './dungeon';
 import { getRelation, pairKey } from './relations';
 import type { Rng } from './rng';
@@ -20,6 +21,10 @@ const GREETING_DAYS = 7;
 const PRIORITY: MailKind[] = ['warning', 'raise', 'rest', 'complaint', 'loyalty', 'greeting', 'rumor'];
 /** 差出人が冒険者でないときの口調 */
 const DEFAULT_VOICE = 'cautious';
+
+type MailText = { subject: string; body: string };
+type UniqueMailText = Record<string, Partial<Record<MailKind, MailText>>>;
+const UNIQUE_MAIL_TEXT = uniqueMailTextJson as unknown as UniqueMailText;
 
 const ok = (): Result => ({ ok: true });
 const fail = (reason: string): Result => ({ ok: false, reason });
@@ -45,12 +50,22 @@ function addLoyalty(a: Adventurer, delta: number) {
 /** 文面の差し込み。kind × 性格の定型に {name} などを入れる */
 export function composeMail(kind: MailKind, a: Adventurer | null, vars: Vars = {}): Pick<Mail, 'subject' | 'body' | 'choices'> {
   const table = MAIL_TEXT.text[kind] ?? {};
-  const t = table[a?.personality ?? DEFAULT_VOICE] ?? table[DEFAULT_VOICE] ?? { subject: kind, body: '' };
+  const uniqueText = a?.unique ? UNIQUE_MAIL_TEXT[a.unique]?.[kind] : undefined;
+  const t = uniqueText ?? table[a?.personality ?? DEFAULT_VOICE] ?? table[DEFAULT_VOICE] ?? { subject: kind, body: '' };
   const all: Vars = a
     ? { name: a.name, salary: a.salary, desired: desiredSalary(a), hobby: a.persona.hobby, likes: a.persona.likes, ...vars }
     : vars;
   const fill = (text: string) => text.replace(/\{(\w+)\}/g, (raw, k: string) => (k in all ? String(all[k]) : raw));
-  return { subject: fill(t.subject), body: fill(t.body), choices: (MAIL_TEXT.choices[kind] ?? []).map((c) => ({ ...c })) };
+  const subject = fill(t.subject);
+  const body = fill(t.body);
+  // 自信家の汎用文面には男性一人称がある。女性の汎用冒険者にも同じ表を使うため、
+  // 固有文面が無い古いセーブの女性にも「俺」が残らないようにする。
+  const female = a?.gender === 'female';
+  return {
+    subject: female ? subject.replace(/俺/g, '私') : subject,
+    body: female ? body.replace(/俺/g, '私') : body,
+    choices: (MAIL_TEXT.choices[kind] ?? []).map((c) => ({ ...c })),
+  };
 }
 
 function send(s: GameState, kind: MailKind, a: Adventurer | null, vars: Vars, payload: Record<string, string | number>): Mail {
@@ -143,6 +158,9 @@ function complaintOf(s: GameState, a: Adventurer): Pending | null {
 }
 
 function loyaltyOf(s: GameState, a: Adventurer): Pending | null {
+  // ユニークの節目はメールではなく人物別の紙芝居で描く。旧セーブでも
+  // story:<id> の既読が無ければ、専用イベントが後から出せるようにする。
+  if (a.unique) return null;
   // 挨拶より先に節目が届かないように
   if (!s.flags['greeted:' + a.id] && s.day <= a.history.hiredDay + GREETING_DAYS) return null;
   for (const m of LOYALTY_MILESTONES) {

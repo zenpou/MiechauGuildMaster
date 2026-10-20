@@ -1,0 +1,336 @@
+[
+  {
+    "id": "loyalty:tina:50",
+    "title": "ティナ · 棒切れの思い出",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "tina", "value": 50 } },
+        { "joinedDays": { "unique": "tina", "days": 1 } },
+        { "flag": "story:prologue" },
+        { "recovered": "tina" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ティナ", "text": "ねえカイ、昔のこと、ちょっとだけ話していい？", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ティナ", "text": "あの棒切れを振り回した日、あんたが「剣ならすごい」って言ったの、覚えてる。", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "覚えてる。……怒って衛兵を倒した日だろ", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "sulky", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ティナ", "text": "笑うな！ でも、あれがあたしの始まりだった。だから今も、あんたを放っておけないのよ。", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "angry", "position": "left", "motion": "hit", "motionAt": "笑うな" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:tina:120",
+    "title": "ティナ · 癒しの夢",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "tina", "value": 120 } },
+        { "flag": "story:loyalty:tina:50" },
+        { "recovered": "tina" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ティナ", "text": "ねえ、セラって昔からアイリスを治そうとしてたのよね", "background": "bg_guild_office_night", "cast": [{ "character": "tina", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "ああ。ティナも同じだったな", "background": "bg_guild_office_night", "cast": [{ "character": "tina", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ティナ", "text": "あたしは剣に逃げたんだ。治せない自分を見たくなくて……", "background": "bg_guild_office_night", "cast": [{ "character": "tina", "pose": "sulky", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "逃げたんじゃなくて、守れるものを見つけただけだろ", "background": "bg_guild_office_night", "cast": [{ "character": "tina", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ティナ", "text": "……そういう言い方、ずるい。あたしは剣で、今度こそみんなを守る。", "background": "bg_guild_office_night", "cast": [{ "character": "tina", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:tina:255",
+    "title": "ティナ · 守るための剣",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "tina", "value": 255 } },
+        { "flag": "story:loyalty:tina:120" },
+        { "recovered": "tina" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ティナ", "text": "あんたが決めてくれたから、あたしは剣で守れるんだよ……！", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "適性通りだっただけだろ", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ティナ", "text": "それでも、あんたが言ってくれなきゃ、あたしは立ち上がれなかった", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "……そうか。じゃあ、これからも頼む", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ティナ", "text": "急に素直になるな！ その顔、蹴るわよ！", "background": "bg_guild_office", "cast": [{ "character": "tina", "pose": "angry", "position": "left", "motion": "spin-out", "motionAt": "蹴る" }, { "character": "kai", "pose": "surprised", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:sera:50",
+    "title": "セラ · あの日の祈り",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "sera", "value": 50 } },
+        { "joinedDays": { "unique": "sera", "days": 1 } },
+        { "flag": "story:ch1" },
+        { "recovered": "sera" }
+      ]
+    },
+    "lines": [
+      { "speaker": "セラ", "text": "カイさま……あの日のことを、また思い出していました", "background": "bg_guild_office", "cast": [{ "character": "sera", "pose": "teary", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "アイリスに祈り方を教えた日か", "background": "bg_guild_office", "cast": [{ "character": "sera", "pose": "teary", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "セラ", "text": "はい。セラには治せないと思っていたのに、アイリスちゃんの魔力が光になって……", "background": "bg_guild_office", "cast": [{ "character": "sera", "pose": "teary", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "俺は、使わせたほうが楽だと言っただけだ", "background": "bg_guild_office", "cast": [{ "character": "sera", "pose": "teary", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "セラ", "text": "その言葉が、セラには救いでした……", "background": "bg_guild_office", "cast": [{ "character": "sera", "pose": "teary", "position": "left", "motion": "tremble", "motionAt": "救い" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:sera:120",
+    "title": "セラ · 今日は休んでください",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "sera", "value": 120 } },
+        { "flag": "story:loyalty:sera:50" },
+        { "recovered": "sera" }
+      ]
+    },
+    "lines": [
+      { "speaker": "カイ", "text": "セラ、今日は俺の肩を癒してくれるか", "background": "bg_guild_office_night", "cast": [{ "character": "kai", "pose": "neutral", "position": "left" }, { "character": "sera", "pose": "surprised", "position": "right" }] },
+      { "speaker": "セラ", "text": "……ごめんなさい。今日は、セラもお休みをいただけませんか", "background": "bg_guild_office_night", "cast": [{ "character": "kai", "pose": "surprised", "position": "left" }, { "character": "sera", "pose": "teary", "position": "right" }] },
+      { "speaker": "カイ", "text": "え、今日は休むのか", "background": "bg_guild_office_night", "cast": [{ "character": "kai", "pose": "surprised", "position": "left" }, { "character": "sera", "pose": "teary", "position": "right" }] },
+      { "speaker": "セラ", "text": "セラは、治せなかった悔しさを忘れられなくて。でも、続ける自信もなくて……", "background": "bg_guild_office_night", "cast": [{ "character": "kai", "pose": "neutral", "position": "left" }, { "character": "sera", "pose": "teary", "position": "right" }] },
+      { "speaker": "カイ", "text": "休むのも仕事だろ。戻ったら頼む", "background": "bg_guild_office_night", "cast": [{ "character": "kai", "pose": "neutral", "position": "left" }, { "character": "sera", "pose": "happy", "position": "right" }] },
+      { "speaker": "セラ", "text": "はい……ありがとうございます、カイさま", "background": "bg_guild_office_night", "cast": [{ "character": "kai", "pose": "neutral", "position": "left" }, { "character": "sera", "pose": "happy", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:sera:255",
+    "title": "セラ · そばで癒させてください",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "sera", "value": 255 } },
+        { "flag": "story:loyalty:sera:120" },
+        { "recovered": "sera" }
+      ]
+    },
+    "lines": [
+      { "speaker": "セラ", "text": "カイさま……ずっと、そばで癒させてください", "background": "bg_guild_office_night", "cast": [{ "character": "sera", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] },
+      { "speaker": "カイ", "text": "……すー……", "background": "bg_guild_office_night", "cast": [{ "character": "sera", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] },
+      { "speaker": "セラ", "text": "……おやすみなさい。聞こえていなくても、セラは安心しました", "background": "bg_guild_office_night", "cast": [{ "character": "sera", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] },
+      { "speaker": "セラ", "text": "明日も、そばにいますね", "background": "bg_guild_office_night", "cast": [{ "character": "sera", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:viola:50",
+    "title": "ヴィオラ · 先頭の景色",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "viola", "value": 50 } },
+        { "joinedDays": { "unique": "viola", "days": 1 } },
+        { "flag": "story:ch2" },
+        { "recovered": "viola" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ヴィオラ", "text": "先頭で盾を構えると、誰より先に未踏の景色を見られるんだ", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "斥候の夢、少しは叶ったか", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ヴィオラ", "text": "ふっ、問題ない。……私が最初に見た景色を、忘れることはないわ", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "なら、その盾で次も頼む", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ヴィオラ", "text": "……あなた、いや。相棒にそう言われると、先へ進める気がするわ", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:viola:120",
+    "title": "ヴィオラ · 宿の夜",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "viola", "value": 120 } },
+        { "flag": "story:loyalty:viola:50" },
+        { "recovered": "viola" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ヴィオラ", "text": "両親が、今夜は実家の宿で祝おうって。あなたも来るだろう？", "background": "bg_guild_hall", "cast": [{ "character": "viola", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "宿の飯が出るなら、行く", "background": "bg_guild_hall", "cast": [{ "character": "viola", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ヴィオラ", "text": "父さんも母さんも、私が帰るのを喜んでた。昔泊まっていた斥候の話も聞かせてくれた", "background": "bg_guild_hall", "cast": [{ "character": "viola", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "まだ斥候に憧れてるのか", "background": "bg_guild_hall", "cast": [{ "character": "viola", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ヴィオラ", "text": "ああ。あの人が見た景色を、今度は私が先に見る", "background": "bg_guild_hall", "cast": [{ "character": "viola", "pose": "scout_happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "盾の前は、よく見えるだろ", "background": "bg_guild_hall", "cast": [{ "character": "viola", "pose": "scout_happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:viola:255",
+    "title": "ヴィオラ · 転んでも怖くない",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "viola", "value": 255 } },
+        { "flag": "story:loyalty:viola:120" },
+        { "recovered": "viola" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ヴィオラ", "text": "あなたの前なら、転んでも怖くない", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "だろうな。ずっと頑丈だし", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "flustered", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ヴィオラ", "text": "そこは気持ちの話だ！ ……でも、あなたがそう言うなら、進める", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "flustered", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "うん。先頭、頼んだ", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ヴィオラ", "text": "相棒となら、どこまでも行く", "background": "bg_guild_office", "cast": [{ "character": "viola", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:ruu:50",
+    "title": "ルゥ · 食卓のスープ",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "ruu", "value": 50 } },
+        { "joinedDays": { "unique": "ruu", "days": 1 } },
+        { "flag": "story:ch3" },
+        { "recovered": "ruu" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ルゥ", "text": "……このスープ、あの日と同じ匂いじゃん", "background": "bg_guild_hall", "cast": [{ "character": "ruu", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "冷めるぞ。食べれば", "background": "bg_guild_hall", "cast": [{ "character": "ruu", "pose": "bluff", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ルゥ", "text": "ボクさ、昔は人の財布を盗ってた。生きるためでも、悪いことだった", "background": "bg_guild_hall", "cast": [{ "character": "ruu", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "そうか", "background": "bg_guild_hall", "cast": [{ "character": "ruu", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ルゥ", "text": "怒らないの？ 許してくれるとか、言わないの？", "background": "bg_guild_hall", "cast": [{ "character": "ruu", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "これからの話だろ。今は食べろ", "background": "bg_guild_hall", "cast": [{ "character": "ruu", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ルゥ", "text": "……マスターくんって、そういうところずるいじゃん", "background": "bg_guild_hall", "cast": [{ "character": "ruu", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:ruu:120",
+    "title": "ルゥ · 帰る部屋",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "ruu", "value": 120 } },
+        { "flag": "story:loyalty:ruu:50" },
+        { "recovered": "ruu" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ルゥ", "text": "この部屋、ボクの部屋って本当？", "background": "bg_guild_office", "cast": [{ "character": "ruu", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "空いてたからな。鍵はなくすなよ", "background": "bg_guild_office", "cast": [{ "character": "ruu", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ルゥ", "text": "仮の寝床じゃない。誰かに追い出される場所でもない", "background": "bg_guild_office", "cast": [{ "character": "ruu", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "嫌なら戻してもいいけど", "background": "bg_guild_office", "cast": [{ "character": "ruu", "pose": "bluff", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ルゥ", "text": "嫌なわけないじゃん。……帰る場所、できたみたいだ", "background": "bg_guild_office", "cast": [{ "character": "ruu", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:ruu:255",
+    "title": "ルゥ · そばにいていい？",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "ruu", "value": 255 } },
+        { "flag": "story:loyalty:ruu:120" },
+        { "recovered": "ruu" }
+      ]
+    },
+    "lines": [
+      { "speaker": "ルゥ", "text": "ねえ、ボク、役に立たなくても、そばにいていい？", "background": "bg_guild_office_night", "cast": [{ "character": "ruu", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "いてくれていい。……俺が楽だし", "background": "bg_guild_office_night", "cast": [{ "character": "ruu", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ルゥ", "text": "……それ、ずるいじゃん。そんな顔で言われたら、からかえない", "background": "bg_guild_office_night", "cast": [{ "character": "ruu", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "そうか", "background": "bg_guild_office_night", "cast": [{ "character": "ruu", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "ルゥ", "text": "カイ……。ううん、なんでもない！", "background": "bg_guild_office_night", "cast": [{ "character": "ruu", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:fine:50",
+    "title": "フィーネ · 急がない採取",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "fine", "value": 50 } },
+        { "joinedDays": { "unique": "fine", "days": 1 } },
+        { "flag": "story:ch4" },
+        { "recovered": "fine" }
+      ]
+    },
+    "lines": [
+      { "speaker": "フィーネ", "text": "この前の採取、ゆっくり選ばせてもらえて助かったわぁ。カイくんが待ってくれたものぉ", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "急いで戻っても、また仕事が増えるしな", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "フィーネ", "text": "みんなはお姉さんを急かすけど、カイくんは待ってくれるのねぇ", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "待つくらいなら、寝てる", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] },
+      { "speaker": "フィーネ", "text": "ふふ、それが嬉しいのよぉ", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:fine:120",
+    "title": "フィーネ · 山の星",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "fine", "value": 120 } },
+        { "flag": "story:loyalty:fine:50" },
+        { "recovered": "fine" }
+      ]
+    },
+    "lines": [
+      { "speaker": "フィーネ", "text": "採取隊が戻ったわぁ。山の夜は、星がきれいだったそうよぉ", "background": "bg_guild_office_night", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "そうか。外で寝るのは面倒そうだな", "background": "bg_guild_office_night", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "フィーネ", "text": "カイくんが一緒なら、野営も楽しいと思うのにねぇ", "background": "bg_guild_office_night", "cast": [{ "character": "fine", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "俺はギルドで寝てる", "background": "bg_guild_office_night", "cast": [{ "character": "fine", "pose": "sparkle", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] },
+      { "speaker": "フィーネ", "text": "あらぁ、残念ねぇ。次はここで星を眺めましょうかぁ", "background": "bg_guild_office_night", "cast": [{ "character": "fine", "pose": "sparkle", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] },
+      { "speaker": "カイ", "text": "……分かった", "background": "bg_guild_office_night", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "sleep", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:fine:255",
+    "title": "フィーネ · のんびりしていても",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "fine", "value": 255 } },
+        { "flag": "story:loyalty:fine:120" },
+        { "recovered": "fine" }
+      ]
+    },
+    "lines": [
+      { "speaker": "フィーネ", "text": "カイくん、ずっとここでのんびりしていてもいいのよぉ", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "……それは、だめになるやつだ", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "surprised", "position": "right" }] },
+      { "speaker": "フィーネ", "text": "じゃあ、お姉さんがだめにしてあげようかしらぁ", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "surprised", "position": "right" }] },
+      { "speaker": "カイ", "text": "いや、定時で帰る", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "フィーネ", "text": "ふふ。帰る場所があるって、いいことよぉ", "background": "bg_guild_office", "cast": [{ "character": "fine", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:aurelia:50",
+    "title": "アウレリア · 力加減",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "aurelia", "value": 50 } },
+        { "joinedDays": { "unique": "aurelia", "days": 1 } },
+        { "flag": "story:epilogue" },
+        { "recovered": "aurelia" }
+      ]
+    },
+    "lines": [
+      { "speaker": "アウレリア", "text": "……また壊れた", "background": "bg_guild_office", "cast": [{ "character": "aurelia", "pose": "neutral", "position": "left" }], "sfx": "door", "sfxAt": "壊れた" },
+      { "speaker": "カイ", "text": "ドアノブを握り潰すな。力を抜け", "background": "bg_guild_office", "cast": [{ "character": "aurelia", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "アウレリア", "text": "我は壊すつもりはない。卵も、そっと持てる", "background": "bg_guild_office", "cast": [{ "character": "aurelia", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "じゃあ、この卵を持ってみろ", "background": "bg_guild_office", "cast": [{ "character": "aurelia", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "アウレリア", "text": "……割れぬ。できた", "background": "bg_guild_office", "cast": [{ "character": "aurelia", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "よかったな", "background": "bg_guild_office", "cast": [{ "character": "aurelia", "pose": "happy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:aurelia:120",
+    "title": "アウレリア · 街の祭り",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "aurelia", "value": 120 } },
+        { "flag": "story:loyalty:aurelia:50" },
+        { "recovered": "aurelia" }
+      ]
+    },
+    "lines": [
+      { "speaker": "アウレリア", "text": "人が多い。何故、皆同じ場所へ向かう", "background": "bg_street_morning", "cast": [{ "character": "aurelia", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "祭りらしい。屋台で何か食べるか", "background": "bg_street_morning", "cast": [{ "character": "aurelia", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "アウレリア", "text": "……動けぬ。音も匂いも多すぎる", "background": "bg_street_morning", "cast": [{ "character": "aurelia", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "帰ってもいいぞ", "background": "bg_street_morning", "cast": [{ "character": "aurelia", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "アウレリア", "text": "いや、主の隣なら、ここにいる", "background": "bg_street_morning", "cast": [{ "character": "aurelia", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  },
+  {
+    "id": "loyalty:aurelia:255",
+    "title": "アウレリア · 預ける名",
+    "trigger": {
+      "all": [
+        { "loyalty": { "unique": "aurelia", "value": 255 } },
+        { "flag": "story:loyalty:aurelia:120" },
+        { "recovered": "aurelia" }
+      ]
+    },
+    "lines": [
+      { "speaker": "アウレリア", "text": "我の名を、お前に預ける", "background": "bg_guild_office_night", "cast": [{ "character": "aurelia", "pose": "neutral", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "……名前、長いな。『アウ』でいいか", "background": "bg_guild_office_night", "cast": [{ "character": "aurelia", "pose": "surprised", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "アウレリア", "text": "……カイ。今、我をそう呼んだか", "background": "bg_guild_office_night", "cast": [{ "character": "aurelia", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "カイ", "text": "呼びやすいだろ", "background": "bg_guild_office_night", "cast": [{ "character": "aurelia", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] },
+      { "speaker": "アウレリア", "text": "我の名を縮めるのは、お前だけだ。……否、カイだけだ", "background": "bg_guild_office_night", "cast": [{ "character": "aurelia", "pose": "shy", "position": "left" }, { "character": "kai", "pose": "neutral", "position": "right" }] }
+    ]
+  }
+]

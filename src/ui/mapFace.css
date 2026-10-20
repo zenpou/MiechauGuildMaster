@@ -1,0 +1,6 @@
+.map-face {
+  display: inline-block; position: relative; overflow: hidden;
+  width: 48px; height: 48px; flex: 0 0 auto; vertical-align: middle;
+}
+.map-face > img { position: absolute; max-width: none; object-fit: fill; pointer-events: none; }
+.map-face-fallback { display: grid; place-items: center; color: var(--accent); background: var(--panel-strong); border-radius: 6px; }

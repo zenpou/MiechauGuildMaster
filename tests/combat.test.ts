@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionOrder, enemyTarget, makeAllyUnit, makeEnemies, runCombat, type CombatCtx, type Unit } from '../src/core/combat';
+import { actionOrder, enemyTarget, makeAllyUnit, makeEnemies, runCombat, type CombatCtx, type CombatObservation, type Unit } from '../src/core/combat';
 import { ENEMIES, ENEMY, ROLE_SKILL, ROLE_SKILLS } from '../src/core/data';
 import { rngFor } from '../src/core/rng';
 import { ROLE_IDS, type Adventurer, type RoleId, type Stats } from '../src/core/types';
@@ -81,6 +81,25 @@ describe('runCombat', () => {
       return { r, log: c.log, hp: allies.map((u) => u.hp) };
     };
     expect(run()).toEqual(run());
+  });
+  it('観測には行動種別・名前とクランプ後の実量を渡す', () => {
+    const attackActions: CombatObservation[] = [];
+    const attacker = ally(['attacker'], { id: 'a', name: '攻撃役', atk: 2000, spd: 99 });
+    const enemy = foe({ id: 'e', name: '小鬼', hp: 1, maxHp: 1, def: 0, spd: 1 });
+    runCombat([attacker], [enemy], ctx(1, { observe: (action) => attackActions.push(action) }));
+    const attack = attackActions.find((action) => action.kind === 'attack' && action.targetId === 'e');
+    expect(attack).toMatchObject({ actorId: 'a', actorName: '攻撃役', targetId: 'e', targetName: '小鬼', amount: 1 });
+    expect(enemy.hp).toBe(0);
+    expect(attackActions.find((action) => action.kind === 'down' && action.targetId === 'e')).toMatchObject({ targetName: '小鬼' });
+
+    const healActions: CombatObservation[] = [];
+    const healer = ally(['healer'], { id: 'h', name: '癒し手', mag: 500, spd: 99 });
+    const hurt = ally(['attacker'], { id: 'w', name: '負傷者', hp: 1, maxHp: 100, spd: 1 });
+    runCombat([healer, hurt], [foe({ hp: 99999, maxHp: 99999, atk: 1, spd: 1 })], ctx(1, { observe: (action) => healActions.push(action) }));
+    const heal = healActions.find((action) => action.kind === 'heal');
+    expect(heal).toMatchObject({ actorId: 'h', actorName: '癒し手', targetId: 'w', targetName: '負傷者' });
+    expect(heal!.amount).toBe(99);
+    expect(hurt.hp).toBeLessThanOrEqual(hurt.maxHp);
   });
   it('味方が圧倒的に強ければ勝つ', () => {
     const allies = [ally(['attacker'], { atk: 200, spd: 50, hp: 500, maxHp: 500 })];

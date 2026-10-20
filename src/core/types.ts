@@ -2,6 +2,8 @@
 // 設計の正本は docs/DESIGN.md。数値はここに書かず src/data/*.json に置く。
 // GameState に項目を足すときは save.ts の既定値も書く(セーブ互換)。
 
+import type { CombatObservation } from './combat';
+
 // ---- 能力(8) ----
 export type StatKey = 'hp' | 'atk' | 'def' | 'mag' | 'spd' | 'dex' | 'scout' | 'gather';
 export type Stats = Record<StatKey, number>;
@@ -35,7 +37,7 @@ export type Result = { ok: true } | { ok: false; reason: string };
 export interface JobDef {
   id: string; name: string; desc: string;
   /** lower=下級(役割1つ) / upper=上級(隣り合う2役) */
-  tier: 'lower' | 'upper';
+  tier: 'lower' | 'upper' | 'special';
   roles: RoleId[];
   /** 上級のみ: 入口となる下級職(2つ) */
   from?: string[];
@@ -279,6 +281,13 @@ export interface DispatchOrder {
   blessed?: boolean;
 }
 
+/** 次回の派遣に再利用する通常ダンジョン編成。出発時の状態は含めない。 */
+export interface PartyPlan {
+  id: string;
+  name: string;
+  order: DispatchOrder;
+}
+
 export type LogKind = 'narration' | 'combat' | 'talk' | 'event' | 'relation' | 'result' | 'map';
 export interface LogEntry { day: number; kind: LogKind; text: string }
 export interface RelationDelta { a: string; b: string; delta: number; reason: string }
@@ -313,6 +322,117 @@ export interface ExpeditionResult {
   returnDialogue: ReturnDialogue[];
 }
 
+/** 帰還時に、今回の成果が育成・次の派遣判断へつながるよう保存する差分報告。 */
+export interface ReturnMemberReport {
+  id: string;
+  name: string;
+  unique?: string;
+  appearance: string;
+  personality: string;
+  gender: Gender;
+  levelBefore: number;
+  levelAfter: number;
+  fatigueBefore: number;
+  fatigueAfter: number;
+  /** 帰還反映直後の負傷残日数。日送りの待機回復はまだ含めない。 */
+  injuryDays: number;
+}
+
+export interface ReturnGatherReport {
+  cell: number;
+  item: string;
+}
+
+export interface ReturnFloorReport {
+  dungeon: string;
+  floor: string;
+  /** exploredRate と同じ 0〜1 の値。 */
+  rateBefore: number;
+  rateAfter: number;
+  /** 帰還処理で初めて既知になった踏査マスの数。 */
+  newCells: number;
+  newlyDiscoveredGather: ReturnGatherReport[];
+}
+
+export interface ReturnFloorUnlock {
+  dungeon: string;
+  floor: string;
+}
+
+export interface ExpeditionReturnReport {
+  version: 1;
+  members: ReturnMemberReport[];
+  floors: ReturnFloorReport[];
+  unlockedFloors: ReturnFloorUnlock[];
+  confirmedDungeons: string[];
+  newKeys: string[];
+}
+
+/** 自動探索の再生用フレーム。文章ログとは別に、実際の位置と状態変化を保存する。 */
+export type JourneyFrameKind =
+  | 'start' | 'move' | 'event' | 'hidden' | 'gather' | 'treasure' | 'trap' | 'stairs'
+  | 'encounter' | 'combat_action' | 'rest' | 'retreat' | 'camp' | 'end';
+
+export interface JourneyMember {
+  id: string;
+  name: string;
+  unique?: string;
+  personality: string;
+  gender: Gender;
+  appearance: string;
+  maxHp: number;
+}
+
+export interface JourneyFrame {
+  /** 遠征開始からの相対日。往路の日数(outDays)を含む。 */
+  day: number;
+  /** 同じマスを再訪しても順番を復元できる単調な番号。 */
+  seq: number;
+  phase: 'dungeon';
+  cell: number | null;
+  kind: JourneyFrameKind;
+  /** ダンジョン内の往路探索か、入口へ向かう帰路か。 */
+  movement?: 'explore' | 'return';
+  text?: string;
+  logKind?: LogKind;
+  actorId?: string;
+  targetId?: string;
+  /** 戦闘フレームはログ文を解析せず、確定した行動種別と名前を保持する。 */
+  combatKind?: CombatObservation['kind'];
+  /** 戦闘を開始した敵の定義ID。同じ日に同じマスで戦った別の敵と区別する。 */
+  battleEnemy?: string;
+  actorName?: string;
+  targetName?: string;
+  amount?: number;
+  /** 直前フレームから変化した味方HP。start フレームだけ全員分を持つ。 */
+  hp?: Record<string, number>;
+  hpDelta?: Record<string, number>;
+  /** このフレームで新たに地図へ加わったマス。 */
+  visitedDelta?: number[];
+  /** このフレームで発見した隠し通路。発見前の値は保存しない。 */
+  hiddenFoundDelta?: number[];
+}
+
+export interface JourneyRecord {
+  version: 1;
+  dungeon: string;
+  floor: string;
+  /** ゲーム上の遠征開始日(絶対日)。 */
+  startDay: number;
+  /** ダンジョン到着までの往路日数。フレーム day に加算済み。 */
+  outDays: number;
+  leaderId: string;
+  members: JourneyMember[];
+  /** 出発時点の知識。再生時の地図の土台にする。 */
+  initialVisited: number[];
+  initialHiddenFound: number[];
+  /** 出発時の鍵。現在の所持品で過去の扉表示を変えない。 */
+  initialKeys?: string[];
+  frames: JourneyFrame[];
+  end?: 'done' | 'mapFull' | 'retreat' | 'wipe';
+  finalCell?: number;
+}
+
 /** ワールド上の位置。出発時に全行程を確定するので、日付→位置の表 */
 export interface WorldStep { day: number; node: string | null; edge: string | null; phase: 'outbound' | 'stay' | 'return' }
 
@@ -322,6 +442,12 @@ export interface Expedition {
   startDay: number; returnDay: number;
   steps: WorldStep[];
   result: ExpeditionResult;
+  /** 任意。旧セーブには無く、護衛・運搬など現地探索のない遠征にも無い。 */
+  journey?: JourneyRecord;
+  /** 出発時の隊。竜戦の回想を後日の装備・改名に左右させない。 */
+  storyParty?: StoryPartyMember[];
+  /** 任意。帰還時にだけ作る、当時の実状態から採った成果報告。 */
+  returnReport?: ExpeditionReturnReport;
   /** 呼び戻し(帰還方向への切替)を出した日 */
   recalledDay: number | null;
   claimed: boolean;
@@ -394,6 +520,23 @@ export interface Scene { id: string; day: number; lines: string[]; thought: stri
 export interface LedgerEntry { day: number; label: string; amount: number }
 export interface Notice { day: number; text: string }
 
+export interface StoryPartyMember {
+  id: string; name: string; unique?: string; appearance: string; personality: string;
+  /** 旧記録から分からない装備は推測しない。 */
+  fireResist: number | null;
+}
+
+/** 初めて竜に勝った遠征の控え。通常履歴の件数制限から独立して保存する。 */
+export interface DragonVictory {
+  version: 1;
+  expeditionId: string; returnDay: number; leaderId: string;
+  members: StoryPartyMember[];
+  blessed: boolean | null;
+  injuredIds: string[];
+  wiped: boolean;
+  combat: JourneyFrame[];
+}
+
 export interface GameState {
   version: number;
   playerName: string;
@@ -409,6 +552,7 @@ export interface GameState {
   quests: Quest[];
   expeditions: Expedition[];
   history: Expedition[];
+  partyPlans: PartyPlan[];
   mails: Mail[];
   achievements: string[];
   scenes: Scene[];
@@ -420,6 +564,7 @@ export interface GameState {
   repMilestones: number[];
   debt: boolean;
   dragonDefeated: boolean;
+  dragonVictory: DragonVictory | null;
   /** アイリスの祝福(第一章の読了で解禁)。溜まった魔力と発熱の状態 */
   blessing: BlessingState;
   flags: Record<string, number | boolean>;
@@ -436,7 +581,7 @@ export interface BlessingState {
 }
 
 // ---- 定数(数値調整はここではなく data/ で行う。構造上の上限だけ置く) ----
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export const PARTY_MAX = 4;
 export const PARTIES_MAX = 4;
 export const LOYALTY_MAX = 255;

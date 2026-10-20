@@ -206,6 +206,8 @@ export interface UniqueDef {
   base: Stats; apt: Aptitude; growth: number;
   /** 0 なら雇う時に salaryOf で決める */
   salary: number;
+  /** 初回加入時のみ。既存名簿の療養・成長は書き換えない。 */
+  joinInjuryDays?: number;
   persona: Persona;
   skill: TrainedSkillDef;
   join: UniqueJoin;

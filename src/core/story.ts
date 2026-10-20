@@ -1,7 +1,9 @@
 // 物語の章。どの章をいつ出すかは台本(story.json)の trigger に書き、ここは GameState と照らすだけ。
-// 読んだ章は flags['story:<id>'] に読んだ日を残す。GameState に項目を足すとセーブの版を上げることになる
+// 本編・人物別会話とも、flags['story:<id>'] に読んだ日を残す。
 import storyJson from '../data/story.json';
 import { joinStoryUniques } from './events';
+import { dragonBattleLines } from './dragonStory';
+import { LOYALTY_STORIES } from './loyaltyStory';
 import { heldKeys } from './ledger';
 import { speakerCharacter, type PresentedLine } from './presentation';
 import type { GameState } from './types';
@@ -15,6 +17,9 @@ export type StoryTrigger =
   | { dragonDefeated: boolean }
   | { endingSeen: boolean }
   | { questsDone: number }
+  | { loyalty: { unique: string; value: number } }
+  | { joinedDays: { unique: string; days: number } }
+  | { recovered: string }
   | { all: StoryTrigger[] };
 
 export interface StoryChapter {
@@ -29,6 +34,7 @@ export interface StoryChapter {
 }
 
 export const STORY = storyJson as unknown as StoryChapter[];
+export const ALL_STORIES = [...STORY, ...LOYALTY_STORIES];
 
 const SEEN_PREFIX = 'story:';
 
@@ -42,6 +48,9 @@ export function triggerMet(s: GameState, t: StoryTrigger): boolean {
   if ('dragonDefeated' in t) return s.dragonDefeated === t.dragonDefeated;
   if ('endingSeen' in t) return Boolean(s.flags['ending:seen']) === t.endingSeen;
   if ('questsDone' in t) return s.quests.filter((q) => q.status === 'done').length >= t.questsDone;
+  if ('loyalty' in t) return s.adventurers.some(a => a.unique === t.loyalty.unique && a.loyalty >= t.loyalty.value);
+  if ('joinedDays' in t) return s.adventurers.some(a => a.unique === t.joinedDays.unique && s.day - a.history.hiredDay >= t.joinedDays.days);
+  if ('recovered' in t) return s.adventurers.some(a => a.unique === t.recovered && a.injuryDays === 0);
   // 書き間違えた条件で章が勝手に開くより、出ないほうが気づける(台本の語彙は tests/story.test.ts で検査する)
   return false;
 }
@@ -69,7 +78,15 @@ export function castAway(s: GameState, c: StoryChapter): string[] {
 
 /** 未読で条件を満たし、出る人物が全員拠点にいる章(台本の並び順) */
 export function storyDue(s: GameState): StoryChapter[] {
-  return STORY.filter((c) => storySeenDay(s, c.id) === null && triggerMet(s, c.trigger) && castAway(s, c).length === 0);
+  const due = (chapters: StoryChapter[]) => chapters.filter(c => storySeenDay(s, c.id) === null && triggerMet(s, c.trigger));
+  // 本編が開いているときは先に読む。登場人物の帰還待ちの間も脇話を割り込ませない。
+  const main = due(STORY);
+  return (main.length ? main : due(LOYALTY_STORIES)).filter(c => castAway(s, c).length === 0);
+}
+
+/** 表示と読み返しで共通。戦闘は保存された実戦の記録から組み立てる。 */
+export function presentChapter(s: GameState, chapter: StoryChapter): StoryChapter {
+  return chapter.id === 'epilogue' ? { ...chapter, lines: [...dragonBattleLines(s.dragonVictory), ...chapter.lines] } : chapter;
 }
 
 /**
@@ -77,7 +94,7 @@ export function storyDue(s: GameState): StoryChapter[] {
  * day に 0 を渡すと「読んだ日は不明の既読」(物語の導入前から遊んでいたセーブの、過ぎた章)
  */
 export function markStorySeen(s: GameState, id: string, day: number = s.day): void {
-  if (storySeenDay(s, id) !== null || !STORY.some((c) => c.id === id)) return;
+  if (storySeenDay(s, id) !== null || !ALL_STORIES.some((c) => c.id === id)) return;
   s.flags[SEEN_PREFIX + id] = day;
   joinStoryUniques(s, id);
 }
@@ -94,5 +111,5 @@ export function readDueStories(s: GameState, day: number = s.day): void {
 
 /** 読み終えた章(台本の並び順)。読み返し用 */
 export function storySeen(s: GameState): StoryChapter[] {
-  return STORY.filter((c) => storySeenDay(s, c.id) !== null);
+  return ALL_STORIES.filter((c) => storySeenDay(s, c.id) !== null);
 }

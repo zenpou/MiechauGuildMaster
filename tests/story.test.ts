@@ -8,10 +8,13 @@ import {
   speakerCharacter, stillArt, TRANSITIONS,
 } from '../src/core/presentation';
 import type { CastMember, CharacterArt } from '../src/core/presentation';
-import { castAway, markStorySeen, STORY, storyDue, storySeen, storySeenDay, triggerMet } from '../src/core/story';
+import { castAway, markStorySeen, STORY, storyDue as allStoryDue, storySeen, storySeenDay, triggerMet } from '../src/core/story';
 import type { StoryTrigger } from '../src/core/story';
 import type { GameState } from '../src/core/types';
 import { SOUND_PARTS } from '../src/ui/storyAudio';
+
+// このファイルの進行テストは本編7章を対象とする。人物別会話は storyIntegration で検証。
+const storyDue = (s: GameState) => allStoryDue(s).filter(c => STORY.includes(c));
 
 function triggerProblems(t: unknown, where: string): string[] {
   if (typeof t !== 'object' || t === null || Array.isArray(t)) return [`${where}: trigger がオブジェクトでない`];
@@ -456,15 +459,15 @@ describe('storyDue', () => {
     expect(ids(storyDue(s))).toEqual(['ch1']);
   });
 
-  it('章に出る人物が派遣中(away)のあいだ、その章は条件を満たしていても出ない。帰って idle に戻ると出る', () => {
+  it.each(['tina', 'sera'])('初期仲間%sが派遣中は第一章を待ち、帰ってから出す', (unique) => {
     const s = newGame(1);
     markStorySeen(s, 'prologue');
     s.day = 2;
-    const tina = s.adventurers.find((a) => a.unique === 'tina')!;
-    tina.status = 'away';
+    const member = s.adventurers.find((a) => a.unique === unique)!;
+    member.status = 'away';
     expect(storyDue(s)).toEqual([]);
-    expect(castAway(s, STORY.find((c) => c.id === 'ch1')!)).toEqual(['tina']);
-    tina.status = 'idle';
+    expect(castAway(s, STORY.find((c) => c.id === 'ch1')!)).toEqual([unique]);
+    member.status = 'idle';
     expect(ids(storyDue(s))).toEqual(['ch1']);
   });
 

@@ -1,9 +1,20 @@
 // 装備の付け外し(DESIGN 第5節)。装備は在庫のスタックで、個体差はない。
 import { ITEM, JOB } from './data';
+import { carryCapacity, effectiveStats, equipEffect, equipResist } from './adventurer';
 import type { Adventurer, EquipSlot, Equipment, GameState, Result } from './types';
 
 
 const EQUIP_KINDS = ['weapon', 'armor', 'accessory'];
+
+/** 現在の疲労のまま付け替えたときの比較。在庫・待機状態は変えず、帰還後の製作計画にも使う。 */
+export function previewEquipment(a: Adventurer, slot: EquipSlot, itemId: string | null) {
+  if (itemId !== null && (ITEM[itemId]?.equip?.slot !== slot || !canEquip({ ...a, status: 'idle' }, itemId).ok)) return null;
+  const after = { ...a, equipment: { ...(a.equipment ?? { weapon: null, armor: null, accessory: null }), [slot]: itemId } };
+  const values = (m: Adventurer) => ({
+    stats: effectiveStats(m), resist: equipResist(m), gatherBonus: equipEffect(m, 'gather'), capacity: carryCapacity(m),
+  });
+  return { before: values(a), after: values(after) };
+}
 
 /** 旧セーブには equipment が無いので、無ければ空の枠を作る */
 function slotsOf(a: Adventurer): Equipment {

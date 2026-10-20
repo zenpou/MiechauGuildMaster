@@ -1,6 +1,6 @@
 // 物語の章を画面に重ねる。どの章を出すかは core/story.ts、演じるのは storyPlayer.ts
 import { stillArt } from '../core/presentation';
-import { markStorySeen, STORY, storyDue, type StoryChapter } from '../core/story';
+import { ALL_STORIES, markStorySeen, presentChapter, storyDue, type StoryChapter } from '../core/story';
 import { render, state } from './app';
 import { div, h } from './dom';
 import { artUrl, createStoryPlayer } from './storyPlayer';
@@ -12,7 +12,7 @@ function open(chapter: StoryChapter, onClose: () => void): HTMLElement {
   const player = createStoryPlayer({
     id: chapter.id,
     title: chapter.title,
-    lines: chapter.lines,
+    lines: presentChapter(state, chapter).lines,
     onClose: () => {
       active = null;
       onClose();
@@ -38,7 +38,7 @@ export function storyOverlay(onDone: () => void): HTMLElement | null {
 
 /** 読み終えた章をもう一度出す。既読の記録(読んだ日)は動かさない */
 export function rereadChapter(id: string, onDone: () => void): void {
-  const chapter = STORY.find((c) => c.id === id);
+  const chapter = ALL_STORIES.find((c) => c.id === id);
   if (!chapter || active) return;
   open(chapter, onDone);
   render();

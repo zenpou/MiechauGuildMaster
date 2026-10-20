@@ -139,7 +139,6 @@ describe('セーブ互換(版2 → 版3)', () => {
     const s = migrate(old)!;
     expect(s.blessing).toEqual({ charges: 0, feverUntil: null, fullSince: null });
     expect(s.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(3);
   });
 
   it('すでにある値は上書きしない', () => {

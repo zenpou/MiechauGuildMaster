@@ -1,6 +1,6 @@
 // 帰還時のイベント: 組み合わせ(親友)と、ユニーク冒険者の依頼チェーン(DESIGN 第6節)。
 import { salaryOf } from './adventurer';
-import { UNIQUE, UNIQUES, type UniqueChainStep, type UniqueDef } from './data';
+import { ITEM, UNIQUE, UNIQUES, type UniqueChainStep, type UniqueDef } from './data';
 import { markGreeted } from './mail';
 import { addRelation, getRelation, pairKey } from './relations';
 import { LOYALTY_MAX, type Adventurer, type Expedition, type GameState } from './types';
@@ -23,7 +23,7 @@ export function uniqueAdventurer(def: UniqueDef, id: string): Adventurer {
     id, name: def.name, age: def.age, level: 1, exp: 0, job: def.job,
     base: { ...def.base }, apt: { ...def.apt }, growth: def.growth,
     personality: def.personality, gender: def.gender, appearance: def.appearance, traits: [],
-    fatigue: 0, injuryDays: 0, salary: def.salary, loyalty: 50, status: 'idle',
+    fatigue: 0, injuryDays: def.joinInjuryDays ?? 0, salary: def.salary, loyalty: 50, status: 'idle',
     assignment: null,
     equipment: { weapon: null, armor: null, accessory: null },
     skills: [def.skill.id],
@@ -62,7 +62,7 @@ export function joinStoryUniques(s: GameState, chapterId: string): Adventurer[] 
   const out = UNIQUES
     .filter((d) => 'story' in d.join && d.join.story === chapterId && !inRoster(s, d.id))
     .map((d) => joinUnique(s, d));
-  for (const a of out) s.notices.unshift({ day: s.day, text: `${a.name}がギルドに加入した。` });
+  for (const a of out) s.notices.unshift({ day: s.day, text: `${a.name}がギルドに加入した。${a.injuryDays > 0 ? `まず${a.injuryDays}日、怪我の療養をする。` : ''}` });
   return out;
 }
 
@@ -98,6 +98,7 @@ export function advanceUniqueChain(s: GameState, notices: string[]) {
     if (take <= 0) continue;
     s.inventory[step.item!] -= take;
     s.flags[key] = have + take;
+    notices.push(`${u.name}の頼みに、在庫から${ITEM[step.item!]?.name ?? step.item}を${take}個渡した（${have + take}/${step.n}）。`);
     if (have + take >= step.n) finishStep(s, def, u, notices);
   }
 }

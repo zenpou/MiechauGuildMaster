@@ -19,5 +19,6 @@
   {"id":"treasure_hunter","name":"トレジャーハンター","desc":"地図を埋め、採って運ぶ野外の専門家。ギャザラー+スカウト。","tier":"upper","roles":["gatherer","scout"],"from":["gatherer","scout"],"requireLevel":10,"attackStat":"atk",
    "statMult":{"hp":0.95,"atk":0.95,"def":0.85,"mag":0.7,"spd":1.2,"dex":1.25,"scout":1.25,"gather":1.25},"armor":["light","medium"]},
   {"id":"assassin","name":"アサシン","desc":"先に見つけて先に仕留める。スカウト+アタッカー。","tier":"upper","roles":["scout","attacker"],"from":["scout","fighter"],"requireLevel":10,"attackStat":"atk",
-   "statMult":{"hp":0.95,"atk":1.2,"def":0.85,"mag":0.65,"spd":1.25,"dex":1.15,"scout":1.2,"gather":0.9},"armor":["light"]}
+   "statMult":{"hp":0.95,"atk":1.2,"def":0.85,"mag":0.65,"spd":1.25,"dex":1.15,"scout":1.2,"gather":0.9},"armor":["light"]},
+  {"id":"ancient_dragon","name":"古竜","desc":"アウレリア固有。人の姿で力を抑え、前衛で攻めと守りを担う。転職不可。","tier":"special","roles":["attacker","tank"],"attackStat":"atk","statMult":{"hp":1.25,"atk":1.2,"def":1.2,"mag":1,"spd":0.95,"dex":1,"scout":0.9,"gather":0.85},"armor":["medium","heavy"]}
 ]

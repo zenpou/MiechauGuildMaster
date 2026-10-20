@@ -11,6 +11,7 @@ import { div, h, span } from './dom';
 import { homeTab, nextDay } from './home';
 import { icon } from './icons';
 import { inboxTab } from './inboxTab';
+import { journeyOverlay } from './journeyHost';
 import { logTab } from './logTab';
 import { mapTab } from './mapTab';
 import { initPwa } from './pwa';
@@ -51,7 +52,7 @@ function render() {
   const app = document.getElementById('app')!;
   const tab = TABS.find((t) => t.id === ui.tab) ?? TABS[0];
   const unread = unreadCount(state);
-  const pages = endingPending(state) ? endingPages() : [];
+  const pages = endingPending(state) ? endingPages(state) : [];
   const body = [
     hud(unread),
     h('nav', { class: 'tabs', 'aria-label': 'コマンド' }, ...TABS.map((t) =>
@@ -65,21 +66,27 @@ function render() {
       tab.view(),
     ),
   ].filter((x): x is HTMLElement => !!x);
+  // 道中の観察は、日送り直後のエンディング・物語より先に見せる。
+  const journey = journeyOverlay(render);
   // 物語の章はエンディングの後に重ねる。竜の後の章は、エンディングを読み終えてから開く
-  const story = pages.length ? null : storyOverlay(commit);
-  const modal = pages.length > 0 || story !== null;
+  const story = journey || pages.length ? null : storyOverlay(commit);
+  const modal = journey !== null || pages.length > 0 || story !== null;
   // モーダルの間は後ろの画面を操作・読み上げの対象から外す
   if (modal) for (const el of body) el.inert = true;
   // 下のバー(インストール・更新)にも、モーダルの後ろからキーボードで届かないようにする
   const bar = document.getElementById('pwa');
   if (bar) bar.inert = modal;
   // 描き直しでプレイヤーを付け直すとフォーカスが外れる。音量などを触っている途中なら、そこへ戻す
-  const focused = story?.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
+  const focused = journey?.contains(document.activeElement)
+    ? document.activeElement as HTMLElement
+    : story?.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
   app.replaceChildren(...body,
-    ...(pages.length ? [endingModal(pages)] : []),
+    ...(journey ? [journey] : []),
+    ...(pages.length && !journey ? [endingModal(pages)] : []),
     ...(story ? [story] : []),
     ...(ui.toast ? [div(`toast ${ui.toast.err ? 'err' : ''}`, ui.toast.text)] : []));
-  if (pages.length) app.querySelector<HTMLButtonElement>('.modal button')?.focus();
+  if (journey) (focused ?? journey.querySelector<HTMLElement>('button:not([disabled])'))?.focus({ preventScroll: true });
+  else if (pages.length) app.querySelector<HTMLButtonElement>('.modal button')?.focus();
   else if (story) (focused ?? story.querySelector<HTMLElement>('[data-story-next]'))?.focus({ preventScroll: true });
 }
 

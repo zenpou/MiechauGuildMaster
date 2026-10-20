@@ -40,12 +40,13 @@ function sent(s: GameState, o: Partial<DispatchOrder> = {}): Expedition {
 const wages = (s: GameState) => s.adventurers.reduce((t, a) => t + a.salary, 0);
 
 describe('newGame', () => {
-  it('名簿はティナ1人・初期資金・回復薬2・森の洞窟の進捗0', () => {
+  it('名簿はティナとセラの2人・初期資金・回復薬2・森の洞窟の進捗0', () => {
     const s = newGame(7);
     expect(s.gold).toBe(G0);
-    expect(s.adventurers).toHaveLength(1);
+    expect(s.adventurers).toHaveLength(2);
     expect(s.adventurers[0]).toMatchObject({ unique: 'tina', appearance: 'tina', job: 'fighter', status: 'idle' });
-    expect(s.adventurers[0].history.hiredDay).toBe(1);
+    expect(s.adventurers[1]).toMatchObject({ unique: 'sera', appearance: 'sera', job: 'priest', status: 'idle' });
+    expect(s.adventurers.every((a) => a.history.hiredDay === 1)).toBe(true);
     expect(s.inventory.potion).toBe(2);
     expect(s.dungeons.forest_cave).toEqual({ confirmed: true, floors: { f1: { visited: [], hiddenFound: [] } }, bossDefeated: 0, fullCleared: false });
     expect(s.world.visitedNodes).toEqual(['base', 'forest_cave']);

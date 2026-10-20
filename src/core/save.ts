@@ -4,7 +4,12 @@ import { genericAppearance } from './adventurer';
 import { DUNGEONS, UNIQUE } from './data';
 import { hashSeed, Rng } from './rng';
 import { joinInitialUniques, joinStoryUniques } from './events';
-import { readDueStories, storySeen } from './story';
+import { markStorySeen, STORY, storySeen, storySeenDay, triggerMet } from './story';
+import { captureDragonVictory, isDragonVictory, isStoryParty } from './dragonStory';
+import { isJourneyRecord } from './journey';
+import { packJourney, unpackJourney } from './journeyStorage';
+import { isReturnReport } from './returnReport';
+import { normalizePartyPlans } from './partyPlans';
 import { SAVE_VERSION, type Adventurer, type GameState } from './types';
 
 export interface KeyValueStore {
@@ -37,6 +42,20 @@ function fillLooks(a: Adventurer, seed: number) {
   if (!a.appearance) a.appearance = def?.appearance ?? a.unique ?? genericAppearance(a.personality, a.gender);
 }
 
+/** 観察記録は任意の後付けデータ。壊れた/未完成の記録は捨て、結果本体を読み込めるようにする。 */
+function fillJourney(e: GameState['expeditions'][number]) {
+  if (e.journey === undefined) return;
+  const record = unpackJourney(e.journey);
+  if (record) e.journey = record;
+  else delete e.journey;
+}
+
+/** 帰還報告は後付けの任意データ。壊れていれば遠征結果本体を残して削除する。 */
+function fillReturnReport(e: GameState['expeditions'][number]) {
+  if (e.returnReport === undefined) return;
+  if (!isReturnReport(e.returnReport)) delete e.returnReport;
+}
+
 export function migrate(raw: unknown): GameState | null {
   if (!raw || typeof raw !== 'object') return null;
   const s = raw as Partial<GameState>;
@@ -48,10 +67,15 @@ export function migrate(raw: unknown): GameState | null {
   merged.world = { ...base.world, ...(s.world ?? {}) };
   merged.counters = { ...base.counters, ...(s.counters ?? {}) };
   merged.blessing = { ...base.blessing, ...(s.blessing ?? {}) };
+  // 編成は後付け任意データ。壊れた編成だけ捨て、名簿や本体のセーブは保持する。
+  merged.partyPlans = normalizePartyPlans((s as Partial<GameState>).partyPlans);
   for (const e of [...merged.expeditions, ...merged.history]) {
     e.result.maxDepth ??= 0;
     e.result.daysSpent ??= e.returnDay - e.startDay;
     e.result.returnDialogue ??= [];
+    fillJourney(e);
+    fillReturnReport(e);
+    if (e.storyParty !== undefined && !isStoryParty(e.storyParty)) delete e.storyParty;
   }
   for (const a of [...merged.adventurers, ...merged.candidates.map((c) => c.adv)]) {
     fillAdventurer(a);
@@ -63,17 +87,22 @@ export function migrate(raw: unknown): GameState | null {
   // 物語の導入前から遊んでいたセーブ(章の旗が1つも無く、1日目を過ぎている)は、過ぎた章を開いた直後に
   // 連続で出さず、既読にする。出す・出さないを章ごとに選ばせないのは、台本があとから増えても同じ扱いで済ませるため
   if (merged.day > 1 && !Object.keys(merged.flags).some((k) => k.startsWith('story:'))) {
-    readDueStories(merged, 0);
+    // 新しく追加した人物別の会話まで既読にしない。本編だけ従来どおり補完する。
+    for (const c of STORY) if (storySeenDay(merged, c.id) === null && triggerMet(merged, c.trigger)) markStorySeen(merged, c.id, 0);
   }
   // 名簿を物語に合わせる前のセーブ(汎用4人で始めた)にも、初日の仲間と既読の章で加入する者を入れる。汎用の者はそのまま残す
   for (const a of joinInitialUniques(merged)) merged.notices.unshift({ day: merged.day, text: `${a.name}がギルドに加入した。` });
   for (const c of storySeen(merged)) joinStoryUniques(merged, c.id);
+  if (!isDragonVictory(merged.dragonVictory)) {
+    const firstWin = merged.history.find(e => e.returnDay === merged.flags.clearDay && (e.result.kills.dragon ?? 0) > 0);
+    merged.dragonVictory = merged.dragonDefeated && firstWin ? captureDragonVictory(merged, firstWin) : null;
+  }
   merged.version = SAVE_VERSION;
   return merged;
 }
 
 export function serialize(state: GameState): string {
-  return JSON.stringify(state);
+  return JSON.stringify(state, (key, value) => key === 'journey' && isJourneyRecord(value) ? packJourney(value) : value);
 }
 
 export function deserialize(text: string): GameState | null {

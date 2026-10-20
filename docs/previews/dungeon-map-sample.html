@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>冒険の地図 · 見た目サンプル</title>
+<style>
+  :root { color-scheme:dark; --bg:#10191b; --panel-strong:#1c2b2c; --line:#8e7650; --line-soft:#454a3c; --accent:#efc878; --text:#f7f0df; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 system-ui,"Yu Gothic",sans-serif}
+  main{max-width:900px;margin:16px auto;padding:20px;background:#142022;border:1px solid #59604b}
+  header{display:flex;gap:24px;justify-content:space-between;align-items:center;margin-bottom:16px}
+  h1{font:26px/1.3 "Yu Mincho",serif;margin:3px 0;color:#f5d79b} h2{font:21px/1.4 "Yu Mincho",serif;margin:0;color:var(--terrain-accent)}
+  .eyebrow{color:#aaa98d;font-size:12px;letter-spacing:.12em} .dim{color:#b8c2b5}
+  button,select{font:inherit;color:var(--text);background:#1c2b2c;border:1px solid #555d4b;padding:9px 14px;cursor:pointer;border-radius:3px}
+  button:hover,button:focus-visible{border-color:#efc878} button[aria-pressed=true]{background:#434c38;border-color:#c0ba8b}
+  button:disabled{opacity:.5;cursor:default}.primary{background:#dfbd77;color:#191c14;border-color:#ebd398}
+  nav{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 22px} .layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(210px,1fr);gap:28px;align-items:start}
+  .map-wrap{padding:8px;background:var(--terrain-ground);border:1px solid #68705d}
+  .terrain-map{border:0!important;position:relative}.terrain-tiles{display:contents}.terrain-mark{font-size:clamp(10px,1.8vw,15px)!important}
+  .leader{position:absolute;z-index:3;width:var(--face-size);height:var(--face-size);transform:translate(-50%,-68%);pointer-events:none;transition:left var(--step,.4s) linear,top var(--step,.4s) linear}
+  .leader:before{content:"";position:absolute;width:64%;height:19%;left:18%;bottom:6%;border-radius:50%;background:#09110dcc;filter:blur(1px)}
+  .leader img{position:relative;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1px 1px #000a)}
+  .leader.walking img{animation:bob .45s ease-in-out infinite alternate}
+  .leader em{position:absolute;top:96%;left:50%;transform:translateX(-50%);font:10px system-ui;background:#0d181be8;color:#fff2ca;padding:0 5px;white-space:nowrap;border-radius:3px}
+  @keyframes bob{to{transform:translateY(-2px) rotate(2deg)}}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px}
+  label{display:inline-flex;gap:6px;align-items:center}.caption{margin:12px 0;color:#bdc9b8;font-size:12px}
+  aside{padding:6px 0}.face-show{display:flex;align-items:center;gap:15px;margin:22px 0}
+  .face-show img{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 3px 3px #0008)}
+  .detail{padding:15px 0;border-top:1px solid #414c40}.detail b{color:#e4d5ae;font-weight:500}
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:9px 0}.swatches .terrain-cell{border:1px solid #5b6651}
+  .status{min-height:3em;margin-top:10px;color:#f4dfac}.sizes{display:flex;gap:6px;align-items:center;margin-top:10px}.sizes button{font-size:12px;padding:5px 10px}
+  @media(max-width:640px){main{margin:0;border:0;padding:16px}.layout{grid-template-columns:1fr;gap:14px}header{align-items:start;gap:14px}h1{font-size:22px}nav{margin-bottom:16px}nav button{padding:8px 10px;min-height:44px}.face-show{margin:8px 0}.swatches{max-width:280px}.leader em{font-size:9px}}
+  @media(prefers-reduced-motion:reduce){.leader{transition:none!important}.leader.walking img{animation:none}}
+</style>
+<main>
+  <header><div><div class="eyebrow">冒険の地図 / 見た目サンプル</div><h1>洞窟を歩くティナ</h1></div><span class="dim">専用の顔アイコン</span></header>
+  <nav aria-label="場所"></nav>
+  <div class="layout">
+    <section>
+      <div class="map-wrap"><div class="terrain-map" role="img" aria-label="洞窟の地図"></div></div>
+      <div class="controls">
+        <button class="primary" id="play">歩かせる</button><button id="restart">入口へ戻す</button>
+        <label><input type="checkbox" id="fog">探索した場所だけ表示</label>
+      </div>
+      <div class="status" aria-live="polite"></div>
+      <div class="caption">入＝入口　採＝採集　宝＝宝箱　巣＝敵の巣　主＝強敵　罠＝罠</div>
+    </section>
+    <aside>
+      <h2 id="place"></h2><div class="dim" id="mood"></div>
+      <div class="face-show"><img src="/art/map-faces/tina-v1.png" alt="ティナの独立した顔アイコン"><div><b>ティナ</b><div class="dim">隊を率いる冒険者</div></div></div>
+      <div class="detail"><b>マップ上の大きさ</b><div class="sizes" role="group" aria-label="顔の大きさ"><button data-size="1.05">小さめ</button><button data-size="1.35" aria-pressed="true">標準</button><button data-size="1.65">大きめ</button></div></div>
+      <div class="detail"><b>この場所のマップチップ</b><div class="swatches"></div><div class="dim">床の濃淡と岩肌で、道と壁を区別。</div></div>
+      <div class="detail dim">画面の見た目を確認するサンプルです。ゲームのセーブや進行は変わりません。</div>
+    </aside>
+  </div>
+</main>
+<script type="module">
+  import { DUNGEONS } from '/src/core/data.ts';
+  import { parseFloor, visibleFrom } from '/src/core/dungeon.ts';
+  import { runExploration } from '/src/core/explore.ts';
+  import { newGame } from '/src/core/game.ts';
+  import { rngFor } from '/src/core/rng.ts';
+  import { dungeonTheme, terrainCell, terrainStyle } from '/src/ui/dungeonArt.ts';
+  const $=s=>document.querySelector(s);
+  let dungeon=DUNGEONS[0], grid, frames=[], index=0, playing=false, timer, size=1.35;
+  const leader=document.createElement('div');leader.className='leader';
+  leader.innerHTML='<img src="/art/map-faces/tina-v1.png" alt=""><em>ティナ</em>';
+  const tiles=document.createElement('div');tiles.className='terrain-tiles';
+  $('.terrain-map').append(tiles,leader);
+  for(const d of DUNGEONS){
+    const b=document.createElement('button');b.textContent=d.name;b.dataset.place=d.id;
+    b.onclick=()=>{dungeon=d;setup();};$('nav').append(b);
+  }
+  function setup(){
+    stop();index=0;grid=parseFloor(dungeon.floors[0]);
+    // 見た目確認専用の隊。ユーザーのセーブを読まず、経路は本体と同じ探索処理から得る。
+    const member=structuredClone(newGame(1).adventurers[0]);
+    member.base={...member.base,hp:400,atk:90,def:60,scout:22};member.fatigue=0;
+    const r=runExploration({rng:rngFor(2,'map-sample',dungeon.id),dungeon,floorId:dungeon.floors[0].id,
+      members:[member],leaderId:member.id,policy:'standard',progress:{confirmed:true,floors:{},bossDefeated:0,fullCleared:false},
+      days:1,items:{potion:2},relations:{},startDay:1,action:'explore',keys:[],journey:{expeditionStartDay:1,outDays:0}});
+    frames=(r.journey?.frames??[]).filter(f=>f.kind==='start'||f.kind==='move'||f.text||f.hiddenFoundDelta?.length);
+    if(!frames.length)frames=[{cell:grid.entrance,text:'入口に到着。'}];
+    const theme=dungeonTheme(dungeon.id);
+    $('main').style.setProperty('--terrain-accent',theme.color);$('main').style.setProperty('--terrain-ground',theme.ground);
+    $('#place').textContent=dungeon.name;$('#mood').textContent=theme.mood;
+    for(const b of document.querySelectorAll('nav button'))b.setAttribute('aria-pressed',String(b.dataset.place===dungeon.id));
+    $('.swatches').replaceChildren(...[0,2,7,9].map((n,i)=>{
+      const el=document.createElement('div');el.className='terrain-cell';el.style.cssText=terrainStyle(theme,i>=2,n);return el;
+    }));
+    draw(true);
+  }
+  function draw(jump=false){
+    const f=frames[index],theme=dungeonTheme(dungeon.id),fog=$('#fog').checked;
+    const visited=new Set(frames.slice(0,index+1).filter(x=>x.cell!==null).map(x=>x.cell));
+    const hidden=new Set(frames.slice(0,index+1).flatMap(x=>x.hiddenFoundDelta??[]));
+    const seen=new Set(visited);for(const c of visited)for(const n of visibleFrom(grid,c))seen.add(n);
+    const board=$('.terrain-map');board.style.gridTemplateColumns=`repeat(${grid.width},1fr)`;
+    tiles.replaceChildren(...grid.cells.map((c,i)=>terrainCell(theme,c,i,{known:!fog||seen.has(i),visited:!fog||visited.has(i),hidden:hidden.has(i)})));
+    const c=f.cell??grid.entrance;
+    leader.style.setProperty('--step',jump?'0s':'.4s');
+    leader.style.setProperty('--face-size',`${size/grid.width*100}%`);
+    leader.style.left=`${(c%grid.width+.5)/grid.width*100}%`;
+    leader.style.top=`${(Math.floor(c/grid.width)+.5)/grid.height*100}%`;
+    leader.classList.toggle('walking',playing&&f.kind==='move');
+    board.setAttribute('aria-label',`${dungeon.name}。ティナは横${c%grid.width+1}、縦${Math.floor(c/grid.width)+1}マス目`);
+    $('.status').textContent=f.text??(f.movement==='return'?'入口へ引き返している。':'ティナが先頭に立って、道を進んでいる。');
+    $('#play').textContent=playing?'一時停止':index===frames.length-1?'もう一度歩く':'歩かせる';
+  }
+  function stop(){clearTimeout(timer);playing=false;}
+  function step(){timer=setTimeout(()=>{if(index<frames.length-1)index++;else stop();draw();if(playing)step();},frames[index].kind==='move'?430:1100);}
+  $('#play').onclick=()=>{if(playing)stop();else{if(index===frames.length-1)index=0;playing=true;step();}draw(true);};
+  $('#restart').onclick=()=>{stop();index=0;draw(true);};
+  $('#fog').onchange=()=>draw(true);
+  for(const b of document.querySelectorAll('[data-size]'))b.onclick=()=>{
+    size=Number(b.dataset.size);
+    for(const v of document.querySelectorAll('[data-size]'))v.setAttribute('aria-pressed',String(v===b));
+    draw(true);
+  };
+  setup();
+</script>
+</html>

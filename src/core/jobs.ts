@@ -32,6 +32,7 @@ export function canChangeJob(s: GameState, advId: string, jobId: string): Result
   const cur = JOB[a.job];
   const to = JOB[jobId];
   if (a.job === jobId) return fail(`${a.name}はすでに${to.name}です`);
+  if (cur.tier === 'special' || to.tier === 'special') return fail('固有の職へ、または固有の職からは転職できません');
   if (a.status !== 'idle') return fail(`${a.name}は待機中ではありません`);
   if (cur.tier === 'upper') {
     if (to.tier === 'upper') return fail('上級職から別の上級職へは転職できません');

@@ -23,7 +23,7 @@
     "growth": 1.2, "salary": 0,
     "persona": {"hobby": "祈り", "talent": "聞き上手", "likes": "アイリスの笑顔", "dislikes": "大きな声"},
     "skill": {"id": "sera_skill", "name": "癒しの祈り", "desc": "固有。教会で毎日練習した回復の祈り。魔力+3。", "mods": {"mag": 3}},
-    "join": {"story": "ch1"},
+    "join": {"initial": true},
     "chain": [
       {"kind": "deliver", "item": "herb", "n": 5, "text": "アイリスちゃんの体に良い薬草を5つ届けてほしい"},
       {"kind": "visit", "dungeon": "forest_cave", "n": 3, "text": "怖いけれど、森の洞窟へ3回ついていきたい"},
@@ -55,7 +55,7 @@
     "growth": 1.2, "salary": 0,
     "persona": {"hobby": "屋根の上で昼寝", "talent": "結び目", "likes": "温かいスープ", "dislikes": "鉄の罠"},
     "skill": {"id": "ruu_skill", "name": "抜け道の勘", "desc": "固有。路上で身についた、隠れた道を嗅ぎ分ける勘。偵察+3。", "mods": {"scout": 3}},
-    "join": {"story": "ch3"},
+    "join": {"story": "ch3"}, "joinInjuryDays": 2,
     "chain": [
       {"kind": "visit", "dungeon": "ruined_tower", "n": 3, "text": "借りを返す。廃れた塔へ3回ついていく"},
       {"kind": "deliver", "item": "old_coin", "n": 3, "text": "盗まずに拾った古銭を3枚、ボクに預けてほしい"},
@@ -78,5 +78,52 @@
       {"kind": "visit", "dungeon": "forest_cave", "n": 3, "text": "森の洞窟へ3回、のんびり採取に連れて行ってほしいのよぉ"}
     ],
     "chainLoyalty": 30
+  },
+  {
+    "id": "aurelia",
+    "name": "アウレリア",
+    "job": "ancient_dragon",
+    "personality": "cautious",
+    "age": 322,
+    "gender": "female",
+    "appearance": "aurelia",
+    "base": {
+      "hp": 140,
+      "atk": 30,
+      "def": 24,
+      "mag": 22,
+      "spd": 12,
+      "dex": 10,
+      "scout": 8,
+      "gather": 6
+    },
+    "apt": {
+      "attacker": 95,
+      "tank": 85,
+      "healer": 40,
+      "scout": 20,
+      "gatherer": 10
+    },
+    "growth": 1.1,
+    "salary": 0,
+    "persona": {
+      "hobby": "街の見物",
+      "talent": "長い記憶",
+      "likes": "静かな昼寝",
+      "dislikes": "住処を荒らされること"
+    },
+    "skill": {
+      "id": "aurelia_skill",
+      "name": "古竜の誇り",
+      "desc": "固有。人の姿で力を抑え、仲間を守る。守備+3。",
+      "mods": {
+        "def": 3
+      }
+    },
+    "join": {
+      "story": "epilogue"
+    },
+    "chain": [],
+    "chainLoyalty": 0
   }
 ]

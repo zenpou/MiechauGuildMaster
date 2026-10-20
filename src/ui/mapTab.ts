@@ -3,17 +3,10 @@ import { parseFloor, visibleFrom } from '../core/dungeon';
 import { exploredRateOf } from '../core/game';
 import { heldKeys } from '../core/ledger';
 import { dungeonRate } from '../core/quests';
-import type { CellDef, CellKind } from '../core/types';
+import type { CellDef } from '../core/types';
 import { actionText, advById, nameOf, render, state, ui } from './app';
 import { div, h, span } from './dom';
-
-const MARK: Partial<Record<CellKind, string>> = {
-  entrance: '入', gather: '採', nest: '巣', symbol: '主', boss: '主', treasure: '宝', trap: '罠', hidden: '隠',
-  door: '扉', stairs_down: '下', stairs_up: '上',
-};
-
-/** 鍵の入った宝箱は、ふつうの宝箱と分けて見せる(扉の先へ進む手がかりなので) */
-const markOf = (c: CellDef) => (c.kind === 'treasure' && c.item ? '鍵' : MARK[c.kind] ?? '');
+import { dungeonTheme, terrainCell } from './dungeonArt';
 
 // 四捨五入だと 99.5% が「100%」に見えて踏破の表示と食い違うので切り捨てる(実績の判定と同じ)
 const pct = (x: number) => Math.floor(x * 100 + 1e-9);
@@ -36,6 +29,7 @@ export function mapTab(): HTMLElement {
   const floorId = ui.mapFloor;
   const floor = dungeon.floors.find((f) => f.id === floorId)!;
   const grid = parseFloor(floor);
+  const theme = dungeonTheme(dungeonId);
   const prog = state.dungeons[dungeonId]?.floors[floorId] ?? { visited: [], hiddenFound: [] };
   const visited = new Set(prog.visited);
   const hiddenFound = new Set(prog.hiddenFound);
@@ -47,14 +41,13 @@ export function mapTab(): HTMLElement {
   const recent = new Set(last?.result.mapDeltas.filter((m) => m.floor === floorId).flatMap((m) => m.cells) ?? []);
 
   const cells = grid.cells.map((c, i) => {
-    if (!known.has(i)) return div('cell unknown');
-    // 未発見の隠し通路は、見えていても壁と同じ見た目にする(見つけるまで分からない)
-    const looksWall = c.kind === 'wall' || (c.kind === 'hidden' && !hiddenFound.has(i));
-    if (looksWall) return div('cell wall');
-    const door = c.kind !== 'door' ? '' : c.key && keys.has(c.key) ? 'door open' : 'door';
-    const cls = ['cell', 'floor', visited.has(i) ? 'stepped' : 'seen', recent.has(i) ? 'recent' : '', door].join(' ');
-    const title = cellTitle(c);
-    return div(cls, title ? { title } : null, markOf(c));
+    const el = terrainCell(theme, c, i, {
+      known: known.has(i), visited: visited.has(i), hidden: hiddenFound.has(i),
+      recent: recent.has(i), keys: [...keys],
+    });
+    const title = known.has(i) ? cellTitle(c) : null;
+    if (title) el.title = title;
+    return el;
   });
 
   const floorRates = dungeon.floors.map((f) => ({ f, rate: exploredRateOf(state, dungeonId, f.id) }));
@@ -68,12 +61,13 @@ export function mapTab(): HTMLElement {
     multi ? div('dungeon-pick floor-pick', ...floorRates.map(({ f, rate: r }) =>
       h('button', { class: f.id === floorId ? 'on' : '', onclick: () => { ui.mapFloor = f.id; render(); } }, `${f.name} ${pct(r)}%`))) : null,
     h('h2', null, `${dungeon.name} ${floor.name}`),
+    div('dungeon-atmosphere', { style: `--terrain-accent:${theme.color}` }, theme.mood),
     div('summary',
       span('big', `探索率 ${rate}%`),
       multi ? span(null, `全体 ${pct(dungeonRate(state, dungeonId))}%`) : null,
       cleared ? span('big pos', '踏破') : null,
       span('dim', `踏んだマス ${visited.size}`)),
-    div('map', { style: `grid-template-columns: repeat(${grid.width}, 1fr)` }, ...cells),
+    div('map terrain-map', { style: `grid-template-columns: repeat(${grid.width}, 1fr)`, role: 'img', 'aria-label': `${dungeon.name} ${floor.name}の地図。探索率${rate}%` }, ...cells),
     div('legend small',
       legendItem('unknown', '未知'),
       legendItem('seen', '見えた'),

@@ -1,0 +1,24 @@
+.terrain-map {
+  display: grid; gap: 0; width: 100%; background: #080e12;
+  border: 1px solid var(--line-soft); position: relative;
+}
+.terrain-cell { aspect-ratio: 1; position: relative; min-width: 0; background-repeat: no-repeat; }
+.terrain-cell.terrain-unknown { background: #080e12; box-shadow: inset 0 0 0 1px #ffffff02; }
+.terrain-seen { filter: brightness(.53) saturate(.65); }
+.terrain-wall { filter: brightness(.7); }
+.terrain-visited { filter: none; }
+.terrain-floor.terrain-recent::after {
+  content: ''; position: absolute; inset: 0; background: #f8d58316; border: 1px solid #f8d58332; pointer-events: none;
+}
+.terrain-mark {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: clamp(10px, 2.6vw, 14px); font-weight: bold; color: #fff6d9;
+  text-shadow: 0 1px 2px #000, 1px 0 2px #000, -1px 0 2px #000;
+}
+.terrain-treasure { color: #ffe18b; }
+.terrain-gather { color: #c4f5ad; }
+.terrain-nest, .terrain-symbol, .terrain-boss, .terrain-trap { color: #ffb3a4; }
+.terrain-door { background: #422b28a6; }
+.terrain-open { background: #326e584d; }
+.dungeon-atmosphere { color: var(--terrain-accent, var(--dim)); margin-bottom: 10px; font-size: .85rem; }
+.map.terrain-map { max-width: 560px; }

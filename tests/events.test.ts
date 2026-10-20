@@ -102,6 +102,7 @@ describe('ユニーク冒険者', () => {
     expect(s.inventory.herb).toBe(0);
     expect(s.flags['u_alpha:herb']).toBe(3);
     expect(s.flags['u_alpha:step'] ?? 0).toBe(0);
+    expect(notices).toContain(`${u.name}の頼みに、在庫から薬草を3個渡した（3/5）。`);
     s.inventory.herb = 4;
     advanceUniqueChain(s, notices);
     expect(s.inventory.herb).toBe(2);
@@ -138,6 +139,7 @@ describe('ユニーク冒険者', () => {
 
   it('ユニークが名簿にいなければ薬草を引かない', () => {
     const s = newGame(4);
+    s.adventurers = s.adventurers.filter((a) => !a.unique);
     s.inventory.herb = 9;
     advanceUniqueChain(s, []);
     expect(s.inventory.herb).toBe(9);

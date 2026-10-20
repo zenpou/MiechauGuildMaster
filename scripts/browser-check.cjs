@@ -20,7 +20,7 @@ const TABS = [
   ['home', '拠点'], ['inbox', '受信箱'], ['quests', '依頼'], ['dispatch', '派遣'], ['world', 'ワールド'],
   ['recruit', '募集'], ['base', '施設'], ['map', '地図'], ['log', 'ログ'], ['records', '記録'],
 ];
-/** 隊の上限(PARTY_MAX)。派遣の通しは名簿にいる人数(初日はティナ1人)とこの数の小さい方で出す */
+/** 隊の上限(PARTY_MAX)。派遣の通しは名簿にいる人数(初日はティナとセラの2人)とこの数の小さい方で出す */
 const PARTY = 4;
 /** sim:dragon の bot が seed 1 で進めた途中のセーブ。clear は竜を倒した日で止まる */
 const FIXTURE_DAYS = { day60: 60, day100: 100, clear: 200 };
@@ -272,6 +272,11 @@ async function nextDay(t) {
   const before = (await t.save()).day;
   await t.page.getByRole('button', { name: '次の日へ', exact: true }).click();
   await t.page.waitForFunction(([key, day]) => JSON.parse(localStorage.getItem(key)).day > day, [SAVE_KEY, before]);
+  const observation = t.page.getByRole('dialog', { name: '冒険の道中', exact: true });
+  if (await observation.count()) {
+    await observation.getByRole('button', { name: '観察を終える', exact: true }).click();
+    await observation.waitFor({ state: 'detached' });
+  }
   await skipStories(t, `${before + 1}日目`);
 }
 
@@ -361,11 +366,14 @@ async function dispatchRoundTrip(t) {
     await explore.click();
     await page.getByRole('radio', { name: '探索', exact: true, checked: true }).waitFor();
   }
-  const members = Math.min(PARTY, await page.getByRole('checkbox', { checked: false, disabled: false }).count());
+  // 初回の二人は選択済み。祝福などのチェック欄を隊員として数えない。
+  const memberList = page.locator('ul.members');
+  const selected = await memberList.getByRole('checkbox', { checked: true }).count();
+  const members = Math.min(PARTY, selected + await memberList.getByRole('checkbox', { checked: false, disabled: false }).count());
   if (!t.check(members >= 1, '派遣に出せる隊員が1人もいない')) return;
-  for (let n = 1; n <= members; n++) {
-    await page.getByRole('checkbox', { checked: false, disabled: false }).first().click();
-    await page.getByRole('checkbox', { checked: true }).nth(n - 1).waitFor();
+  for (let n = selected + 1; n <= members; n++) {
+    await memberList.getByRole('checkbox', { checked: false, disabled: false }).first().click();
+    await memberList.getByRole('checkbox', { checked: true }).nth(n - 1).waitFor();
   }
   t.note(`${members}人で出す`);
   await t.shot('dispatch-form');

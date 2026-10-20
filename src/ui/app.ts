@@ -1,9 +1,11 @@
 // 画面の共有状態。保存は操作ごとに core/save.ts へ。
 import { DUNGEON, ENEMY, FACILITY, ITEM, NODE } from '../core/data';
 import { newGame, type DayReport } from '../core/game';
+import { getIntroExploration } from '../core/introExploration';
 import type { Readiness } from '../core/readiness';
 import { load, save } from '../core/save';
 import type { ActionKind, Adventurer, DispatchOrder, EquipSlot, Expedition, GameState, Persona, StatKey, WorldStep } from '../core/types';
+import { resetJourney } from './journeyHost';
 
 export type Tab = 'home' | 'inbox' | 'quests' | 'dispatch' | 'world' | 'recruit' | 'base' | 'map' | 'log' | 'records';
 
@@ -16,9 +18,16 @@ export const ui = {
   selMail: null as string | null,
   /** 施設タブで選んだマス */
   selCell: null as null | { x: number; y: number },
+  craftRecipe: '',
+  craftMember: '',
   /** 名簿で装備パネルを開いている冒険者 */
   selAdv: null as string | null,
   d: newDispatchForm(),
+  dispatchNotes: [] as string[],
+  partyPlanEditId: '',
+  partyPlanName: '',
+  partyPlanEditorOpen: false,
+  partyPlanRemoveId: null as string | null,
   /** 見込みと、それを出した時の条件。条件が変わったら表示しない */
   forecast: null as null | { key: string; r: Readiness },
   mapDungeon: 'forest_cave',
@@ -37,11 +46,14 @@ export function setRender(fn: () => void) { renderFn = fn; }
 export function render() { renderFn(); }
 
 export function commit() {
+  // 装備・勤務・施設などを変えた後に、変更前の見込みを残さない。
+  ui.forecast = null;
   ui.saveWarning = save(localStorage, state) ? '' : '保存できませんでした。ブラウザの空き容量・保存設定を確認してください。';
   render();
 }
 
 export function replaceState(s: GameState) {
+  resetJourney();
   state = s;
   ui.selLog = null;
   ui.selMail = null;
@@ -49,8 +61,15 @@ export function replaceState(s: GameState) {
   ui.selAdv = null;
   ui.lastReport = null;
   ui.d = newDispatchForm();
+  ui.dispatchNotes = [];
+  ui.partyPlanEditId = '';
+  ui.partyPlanName = '';
+  ui.partyPlanEditorOpen = false;
+  ui.partyPlanRemoveId = null;
   ui.forecast = null;
   ui.mapDungeon = 'forest_cave';
+  ui.craftRecipe = '';
+  ui.craftMember = '';
   ui.mapFloor = 'f1';
   ui.selNode = null;
   ui.endingPage = 0;
@@ -58,8 +77,14 @@ export function replaceState(s: GameState) {
 }
 
 function newDispatchForm() {
+  const starters = ['tina', 'sera'].map((unique) => state.adventurers.find((a) => a.unique === unique));
+  const members = starters.flatMap((a) => a && a.status === 'idle' && a.injuryDays === 0 ? [a.id] : []);
+  const initial = members.length === 2 && getIntroExploration(state, {
+    partyIds: members, leaderId: members[0], action: 'explore',
+    target: { dungeon: 'forest_cave', floor: 'f1' }, policy: 'standard', days: 1, items: {},
+  });
   return {
-    members: [] as string[], leader: null as string | null, policy: 'standard', days: 3, potions: 0, blessed: false,
+    members: initial ? members : [] as string[], leader: initial ? members[0] : null as string | null, policy: 'standard', days: 1, potions: 0, blessed: false,
     /** 護衛・運搬の依頼に出すときの依頼ID。空ならダンジョンへ */
     dungeon: 'forest_cave', floor: 'f1', questId: '', action: 'explore' as ActionKind, item: '', enemy: '',
   };

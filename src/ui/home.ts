@@ -8,16 +8,18 @@ import { dismissHint, hintFor, hintsOff } from '../core/hints';
 import { canChangeJob, changeJob, promotionCost, promotionOptions } from '../core/jobs';
 import { capacity, dismiss } from '../core/recruit';
 import { canTrain, trainDays, trainableSkills, trainSkill } from '../core/training';
-import { LOYALTY_MILESTONES, STAT_KEYS, type Adventurer, type EquipSlot, type ItemDef, type JobDef, type Result } from '../core/types';
+import { LOYALTY_MILESTONES, STAT_KEYS, type Adventurer, type JobDef, type Result } from '../core/types';
 import { advById, commit, personaText, render, replaceState, sign, SLOTS, STAT_LABEL, state, statusText, toast, ui } from './app';
 import { div, h, span } from './dom';
+import { queueJourneyObservation } from './journeyHost';
 import { saveTransferRow } from './saveTransfer';
 import { artUrl } from './storyPlayer';
+import { returnReportsBlock } from './returnReport';
+import { operationsBlock } from './operations';
+import { equipText, equipmentChangeText as statDiff } from './equipmentText';
 
-const ELEMENT_NAME: Record<string, string> = { fire: '火', ice: '氷', thunder: '雷', earth: '土', dark: '闇' };
-const EFFECT_NAME: Record<string, string> = { gather: '採取量', carry: '積載' };
 const ARMOR_NAME: Record<string, string> = { light: '軽装', medium: '中装', heavy: '重装' };
-const TIER_NAME: Record<JobDef['tier'], string> = { lower: '下級', upper: '上級' };
+const TIER_NAME: Record<JobDef['tier'], string> = { lower: '下級', upper: '上級', special: '固有' };
 const slotsOf = (a: Adventurer) => a.equipment ?? { weapon: null, armor: null, accessory: null };
 const skillsOf = (a: Adventurer) => a.skills ?? [];
 const ROSTER_HEAD = ['名前', '職', '武器', '防具', '装飾', '性格', 'Lv', '疲労', '負傷', '忠誠', '日給', '状態', ''];
@@ -26,16 +28,6 @@ const ROSTER_HEAD = ['名前', '職', '武器', '防具', '装飾', '性格', 'L
 function skillText(def: TrainedSkillDef | undefined): string {
   if (!def) return '';
   return Object.entries(def.mods).map(([k, v]) => `${STAT_LABEL[k as keyof typeof STAT_LABEL] ?? k}${sign(v as number)}`).join(' ');
-}
-
-/** 「攻撃+3 闇耐性30%」のような装備の効果文 */
-function equipText(def: ItemDef | undefined): string {
-  const e = def?.equip;
-  if (!e) return '';
-  const parts = Object.entries(e.mods).map(([k, v]) => `${STAT_LABEL[k as keyof typeof STAT_LABEL] ?? k}${sign(v as number)}`);
-  for (const [k, v] of Object.entries(e.resist ?? {})) parts.push(`${ELEMENT_NAME[k] ?? k}耐性${Math.round((v as number) * 100)}%`);
-  for (const [k, v] of Object.entries(e.effects ?? {})) parts.push(`${EFFECT_NAME[k] ?? k}${sign(v)}`);
-  return parts.join(' ');
 }
 
 /** 最初の数日の「次にやること」。受付のノエルが案内する体裁(心配性なので顔は worried)。赤字のヒントは状態で消えるので閉じるボタンを出さない */
@@ -59,10 +51,12 @@ export function homeTab(): HTMLElement {
   const s = state;
   const potion = ITEM.potion;
   return div('tab-body',
+    returnReportsBlock(),
+    operationsBlock(),
+    noticesBlock(),
     hintBlock(),
     blessingBlock(),
     sceneBlock(),
-    noticesBlock(),
     h('h2', null, `名簿(${s.adventurers.length}/${capacity(s)}人)`),
     div('dim small', `名前を押すと装備の付け替えと訓練ができます。解雇は待機中の者だけ(費用なし)。★はユニーク。忠誠が節目(${LOYALTY_MILESTONES.join('/')})に届くとメールが来ます。`),
     div('scroll',
@@ -198,14 +192,6 @@ function pickAdv(id: string) {
   render();
 }
 
-/** 付け替えた場合の実効能力。変わる能力だけ「前→後」で返す */
-function statDiff(a: Adventurer, slot: EquipSlot, itemId: string | null): string {
-  const before = effectiveStats(a);
-  const after = effectiveStats({ ...a, equipment: { ...slotsOf(a), [slot]: itemId } });
-  const out = STAT_KEYS.filter((k) => before[k] !== after[k]).map((k) => `${STAT_LABEL[k]} ${before[k]}→${after[k]}`);
-  return out.length ? out.join(' / ') : '能力の変化なし';
-}
-
 function equipPanel(): HTMLElement | null {
   const a = ui.selAdv ? advById(ui.selAdv) : undefined;
   if (!a) return null;
@@ -215,6 +201,7 @@ function equipPanel(): HTMLElement | null {
   return div('detail equip',
     div('row tight', span('big', a.name), span('dim small', `${JOB[a.job].name} Lv${a.level} 着られる防具: ${JOB[a.job].armor.map((c) => ARMOR_NAME[c] ?? c).join('・')}`),
       h('button', { class: 'small', onclick: () => pickAdv(a.id) }, '閉じる')),
+    div('small', `現在の疲労 ${a.fatigue}${a.injuryDays ? ` / 負傷はあと${a.injuryDays}日` : ''}。待機して日を進めると回復します。`),
     div('small stats', ...STAT_KEYS.map((k) => span(null, `${STAT_LABEL[k]}${st[k]}`))),
     idle ? null : div('small neg', `${statusText(a)}のため付け替えできません(待機中のみ)`),
     ...SLOTS.map((sl) => {
@@ -244,6 +231,7 @@ function equipPanel(): HTMLElement | null {
 function jobTargets(a: Adventurer): JobDef[] {
   const cur = JOB[a.job];
   if (cur?.tier === 'upper') return (cur.from ?? []).map((id) => JOB[id]).filter((j): j is JobDef => !!j);
+  if (cur?.tier === 'special') return [];
   return [...JOBS.filter((j) => j.tier === 'lower' && j.id !== a.job), ...promotionOptions(a)];
 }
 
@@ -260,8 +248,8 @@ function jobBlock(a: Adventurer): HTMLElement {
   return div('slot jobs',
     h('h3', null, '転職'),
     div('small', `今の職: ${cur.name}(${TIER_NAME[cur.tier]})`, span('dim', ` ${cur.desc}`)),
-    div('dim small', `下級どうしは無料。上級への昇格は条件を満たすと${cost}G。上級からは入口の下級へ無料で戻れます(別の上級へは移れません)。転職は待機中のみ。Lvは変わりません。`),
-    div('small neg', '着けられなくなる防具は在庫に戻ります。'),
+    div('dim small', cur.tier === 'special' ? 'この仲間だけの固有職です。転職はできません。' : `下級どうしは無料。上級への昇格は条件を満たすと${cost}G。上級からは入口の下級へ無料で戻れます(別の上級へは移れません)。転職は待機中のみ。Lvは変わりません。`),
+    cur.tier === 'special' ? null : div('small neg', '着けられなくなる防具は在庫に戻ります。'),
     common ? div('small neg', common) : null,
     checks.length ? h('ul', { class: 'plain' }, ...checks.map(({ j, c }) => h('li', { class: c.ok ? '' : 'dim' },
       div('row tight',
@@ -324,9 +312,12 @@ function act(r: Result, msg: string) {
 export function nextDay() {
   const r = advanceDay(state);
   ui.lastReport = r;
+  if (r.returned.length) ui.tab = 'home';
+  // 日送り後の「昨日」は、現地の確定フレームだけを観察する。報酬・乱数・保存状態は advanceDay が済ませている。
+  queueJourneyObservation([...r.returned, ...state.expeditions], state.day - 1);
   commit();
   const msgs: string[] = [];
-  if (r.returned.length) msgs.push(`${r.returned.length}隊が帰還しました。ログで報告を読めます。`);
+  if (r.returned.length) msgs.push(`${r.returned.length}隊が帰還しました。拠点に帰還報告が届いています。`);
   else if (r.scene) msgs.push('街で噂が立っています。');
   if (r.mails.length) msgs.push(`メールが届きました(${r.mails.length}通)`);
   if (msgs.length) toast(msgs.join(' '));

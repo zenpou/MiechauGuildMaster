@@ -6,9 +6,12 @@ import {
 import { canCraft, craftDays, craftGold, startCraft } from '../core/craft';
 import { FACILITIES, FACILITY, ITEM, ITEMS, RECIPE, RECIPES } from '../core/data';
 import { buildFacility } from '../core/game';
+import { recipeUnlocked } from '../core/quests';
 import type { FacilityDef, FacilityLevelCost, PlacedFacility, Result } from '../core/types';
 import { commit, render, STAT_LABEL, state, toast, ui } from './app';
 import { div, h, span } from './dom';
+import { craftPlanning } from './craftPlanning';
+import { equipText } from './equipmentText';
 
 const itemName = (id: string) => ITEM[id]?.name ?? id;
 const placedAt = (x: number, y: number) => state.base.facilities.find((f) => f.x === x && f.y === y);
@@ -105,7 +108,7 @@ function buildPanel(x: number, y: number): HTMLElement {
       h('ul', { class: 'plain' }, ...g.list.map((d) => {
         const r = canBuild(state, d.id, x, y);
         const produce = produceText(d.effects[0]);
-        return h('li', null,
+        return h('li', { id: `build-${d.id}` },
           div('row tight', span(null, d.name), costView(d.costs[0]),
             h('button', { class: 'small', disabled: !r.ok, onclick: () => doBuild(d.id, x, y) }, '建てる')),
           produce ? div('small pos', produce) : null,
@@ -195,14 +198,16 @@ function recipeBlock(facilityId: string): HTMLElement {
     job ? div('small', `製作中: ${RECIPE[job.recipeId]?.name}(${job.doneDay}日目に完成)`) : null,
     h('ul', { class: 'plain' }, ...RECIPES.filter((r) => r.facility === facilityId).map((r) => {
       const c = canCraft(state, r.id);
-      return h('li', null,
+      return h('li', { id: `recipe-${r.id}` },
         div('row tight',
           span(null, `${r.name}${r.output.n > 1 ? `×${r.output.n}` : ''}`),
           span('small', span(state.gold >= craftGold(state, r.id) ? '' : 'neg', `${craftGold(state, r.id)}G`), ` ${craftDays(state, r.id)}日`),
           h('button', { class: 'small', disabled: !c.ok, onclick: () => doCraft(r.id) }, '作る')),
         div('small', ...r.inputs.map((i) => span(stock(i.item) >= i.n ? 'pos' : 'neg', `${itemName(i.item)}×${i.n}(${stock(i.item)}) `))),
         div('dim small', ITEM[r.output.item]?.desc ?? ''),
+        ITEM[r.output.item]?.equip ? div('small', equipText(ITEM[r.output.item])) : null,
         c.ok ? null : div('small dim', c.reason),
+        recipeUnlocked(state, r.id) ? craftPlanning(r) : null,
       );
     })),
   );

@@ -4,9 +4,10 @@ import { carryCapacity, effectiveStats, equipEffect, traitNum } from './adventur
 import { hasSkill, makeAllyUnit, makeEnemies, runCombat, type Unit } from './combat';
 import { ENEMY, ITEM, PERSONALITY, POLICY, RETURN_LINES, ROLE_SKILL, TRAIT, TUNING, type ReturnOutcome } from './data';
 import { exploredRate, frontier, isPassable, neighbors, parseFloor, searchSpots, shortestPath, visibleFrom, xy, type Grid, type PassKnowledge } from './dungeon';
+import { createJourneyRecorder, type JourneyRecorder } from './journey';
 import type { Rng } from './rng';
 import type {
-  ActionKind, Adventurer, CellKind, DungeonDef, DungeonProgress, ExpeditionResult, LogKind, ReturnDialogue, StatKey,
+  ActionKind, Adventurer, CellKind, DungeonDef, DungeonProgress, ExpeditionResult, JourneyFrameKind, JourneyRecord, LogKind, ReturnDialogue, StatKey,
 } from './types';
 
 // sim で調整する値は src/data/tuning.json
@@ -39,6 +40,10 @@ export interface ExploreInput {
   keys?: string[];
   /** 隠し通路の発見率への加算。省略時 0 */
   hiddenBonus?: number;
+  /** 初回導入用。指定された安全ルートを往復し、対象の薬草を1個だけ確実に採る。 */
+  intro?: { route: number[]; item: string };
+  /** 派遣時だけ指定する観察記録。未指定なら従来どおり記録を作らない。 */
+  journey?: { expeditionStartDay: number; outDays: number };
 }
 
 /** 1歩の記録。cost は既踏1・未踏2 */
@@ -133,7 +138,7 @@ export function simulateExploration(inp: ExploreInput): ExpeditionResult {
   return runExploration(inp).result;
 }
 
-export function runExploration(inp: ExploreInput): { result: ExpeditionResult; trace: ExploreTrace } {
+export function runExploration(inp: ExploreInput): { result: ExpeditionResult; trace: ExploreTrace; journey?: JourneyRecord } {
   const { rng, dungeon, members } = inp;
   const floorDef = dungeon.floors.find((f) => f.id === inp.floorId);
   if (!floorDef) throw new Error(`${dungeon.id}: フロア ${inp.floorId} が無い`);
@@ -143,7 +148,10 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   const ex = PERSONALITY[leader.personality].explore;
   // 寄り道と臆病の回避は探索系だけ。採集・討伐・ボスでは指示を優先する
   const exploring = inp.action === 'explore' || inp.action === 'survey';
-  const avoid = exploring && ex.detour === 'avoid';
+  // 採集の「安全第一」「戦闘回避」は方針の avoid 値だけで既知の巣を避ける。
+  // 経路選択に新しい乱数は使わず、探索系の性格による既存の回避はそのまま残す。
+  const avoidGather = inp.action === 'gather' && policy.avoid >= 0.25;
+  const avoid = (exploring && ex.detour === 'avoid') || avoidGather;
   const knownOnly = inp.knownOnly === true;
   const targetItem = inp.target?.item;
   const targetEnemy = inp.target?.enemy;
@@ -182,6 +190,17 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   const trapCare = members.reduce((s, m) => s + PERSONALITY[m.personality].trapCare, 0);
 
   let day = 1;
+  let pos = entrance;
+  const hpSnapshot = () => Object.fromEntries(units.map((u) => [u.id, Math.max(0, u.hp)]));
+  const journey: JourneyRecorder | null = inp.journey
+    ? createJourneyRecorder({
+      dungeon: dungeon.id, floor: inp.floorId, startDay: inp.journey.expeditionStartDay,
+      outDays: inp.journey.outDays, leaderId: inp.leaderId, members,
+      initialVisited: [...visited], initialHiddenFound: [...hiddenFound],
+      initialKeys: [...know.keys],
+    }, Object.fromEntries(units.map((u) => [u.id, u.maxHp])))
+    : null;
+  const journeyDay = () => day + (inp.journey?.outDays ?? 0);
   const result: ExpeditionResult = {
     success: false, retreated: false, wiped: false, log: [],
     mapDeltas: [], maxDepth: 0, daysSpent: 0, materials: {}, items: {}, gold: 0,
@@ -189,12 +208,16 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     kills: {}, itemsUsed: {}, repGain: 0, rescueCost: 0, lostMaterials: {},
     questProgress: {}, returnDialogue: [],
   };
-  const say = (kind: LogKind, text: string) => { result.log.push({ day, kind, text }); };
+  const say = (kind: LogKind, text: string) => {
+    result.log.push({ day, kind, text });
+    if (journey) journey.log(journeyDay(), pos, kind, text, hpSnapshot());
+  };
   const trace: ExploreTrace = { days: [], events: [], end: 'done', finalCell: entrance, maxDepth: 0, forcedReturn: false };
   for (const m of members) result.fatigue[m.id] = 0;
   const downedEver = new Set<string>();
   const consumed = new Set<number>();
   const edgesDone = new Set<number>();
+  let introCollected = false;
 
   const addFatigue = (n: number) => {
     for (const m of members) result.fatigue[m.id] += Math.round(n * traitNum(m, 'fatigueRate', 1) * (inp.fatigueMult ?? 1));
@@ -261,7 +284,6 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   };
 
   // ---- 1日の状態 ----
-  let pos = entrance;
   let left = 0;
   let future = 0;
   let rests = 0;
@@ -296,17 +318,23 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     }
     seg = { from: pos, steps: 0, fresh: 0, hes: 0, home: seg.home };
   };
-  const event = (cell: number, kind: ExploreEvent['kind']) => {
+  const event = (cell: number, kind: ExploreEvent['kind'], hiddenFoundDelta: number[] = []) => {
     flush();
     trace.events.push({ day, cell, kind });
+    const journeyKind: JourneyFrameKind = ['nest', 'symbol', 'boss', 'floor'].includes(kind)
+      ? 'event'
+      : kind as JourneyFrameKind;
+    if (journey) journey.event(journeyDay(), cell, journeyKind, hpSnapshot(), { hiddenFoundDelta });
   };
 
   let retreating = false;
   let mapFull = false;
   let wiped = false;
+  let safeGatherDetourLogged = false;
   const startRetreat = (text: string) => {
     if (retreating) return;
     retreating = true;
+    if (journey) journey.event(journeyDay(), pos, 'retreat', hpSnapshot());
     say('narration', text);
   };
 
@@ -318,6 +346,9 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     const foes = makeEnemies(def, count);
     const r = runCombat(units, foes, {
       rng, say, potions, rel: bumpRel, canFlee: true, fleeBelow: retreatThreshold() * T.fleeRatio,
+      observe: (action) => {
+        if (journey) journey.combat(journeyDay(), pos, action, hpSnapshot()).battleEnemy = enemyId;
+      },
     });
     for (const [k, v] of Object.entries(r.kills)) result.kills[k] = (result.kills[k] ?? 0) + v;
     for (const id of r.downed) downedEver.add(id);
@@ -379,6 +410,14 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       case 'gather': {
         event(i, 'gather');
         const item = cell.item!;
+        if (inp.intro?.item === item) {
+          const kept = addMaterial(item, 1);
+          if (kept > 0) {
+            introCollected = true;
+            say('event', `${best('gather').name}が入口近くで${ITEM[item].name}を1個採った。`);
+          }
+          return;
+        }
         const g = best('gather');
         if (!rng.chance(clamp(T.gatherBase + stats[g.id].gather / T.gatherScale + luck * 0.1, 0.1, 0.95))) {
           say('event', `${g.name}が${ITEM[item].name}を探したが、使えるものは見つからなかった。`);
@@ -429,6 +468,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         fight(i, cell.enemy!, 1, cell.kind);
         return;
       case 'floor':
+        if (inp.intro) return;
         if (rng.chance(dungeon.encounterRate ?? T.defaultEncounter) && dungeon.enemies.length) {
           const e = rng.weighted(dungeon.enemies, (x) => x.weight);
           fight(i, e.id, rng.int(e.group[0], e.group[1]), 'encounter');
@@ -449,7 +489,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   };
   /** 隣の隠し通路は、通りがかった時に1日1度だけ発見を試みる */
   const tryHidden = (i: number) => {
-    if (knownOnly) return;
+    if (knownOnly || inp.intro) return;
     for (const n of visibleFrom(grid, i)) {
       if (kindOf(n) !== 'hidden' || hiddenFound.includes(n) || tried.has(n)) continue;
       tried.add(n);
@@ -460,12 +500,12 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
         hiddenFound.push(h);
         newHidden.push(h);
       }
-      event(n, 'hidden');
+      event(n, 'hidden', hiddenRun(n));
       say('event', `${s.name}が壁の継ぎ目に気づいた。隠し通路だ!`);
     }
   };
 
-  const move = (next: number, cost: number) => {
+  const move = (next: number, cost: number, returning = false) => {
     const fresh = !visited.has(next);
     pos = next;
     edgesDone.add(next);
@@ -478,6 +518,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     today.used += cost;
     today.moves.push({ cell: next, cost });
     trace.maxDepth = Math.max(trace.maxDepth, depths[next]);
+    if (journey) journey.move(journeyDay(), next, hpSnapshot(), fresh ? [next] : [], returning ? 'return' : 'explore');
     seg.steps++;
     if (fresh) seg.fresh++;
   };
@@ -503,6 +544,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
       const healer = units.some((u) => !u.down && hasSkill(u, 'heal'));
       const r = T.restHeal + (healer ? ROLE_SKILL.heal.params.ratio : 0);
       healAll(r);
+      if (journey) journey.event(journeyDay(), pos, 'rest', hpSnapshot());
       flush();
       say('narration', `${leader.name}の判断で小休止を取った(HP+${Math.round(r * 100)}%)。`);
     }
@@ -586,12 +628,16 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     const dAll = bfs(pos, (i) => visited.has(i));
     const dSafe = avoid ? bfs(pos, (i) => visited.has(i) && !isDanger(i)) : dAll;
     const dEnt = bfs(entrance, (i) => visited.has(i));
+    // 目標への往路だけでなく、入口から目標までの帰路予約も同じ安全経路で測る。
+    // 安全な経路が無いときは従来の既知経路へ戻し、既存の採取・探索を止めない。
+    const dEntSafe = avoidGather ? bfs(entrance, (i) => visited.has(i) && !isDanger(i)) : dEnt;
     const scored: { cell: number; dist: number; depth: number; detour: number }[] = [];
     let far = false;
     for (const cell of [...cands.keys()].sort((a, b) => a - b)) {
       let dist = costVia(dSafe, cell, T.costUnknown);
       if (dist < 0) dist = costVia(dAll, cell, T.costUnknown);
-      const depth = costVia(dEnt, cell, 1);
+      let depth = costVia(dEntSafe, cell, 1);
+      if (depth < 0) depth = costVia(dEnt, cell, 1);
       if (dist < 0 || depth < 0) continue;
       // 往復できない目標を選ぶと帰路の制約に当たって足踏みするだけなので、最初から外す
       if (dist + depth + owed + transit > left + future) {
@@ -614,12 +660,15 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   };
 
   // ---- 本編 ----
-  say('narration', `${dungeon.name}・${floorDef.name}に入った。隊長は${leader.name}、方針は「${policy.name}」。`);
-  if (!visited.has(entrance)) {
+  const entranceFresh = !visited.has(entrance);
+  if (entranceFresh) {
     visited.add(entrance);
     newCells.push(entrance);
   }
   look(entrance);
+  if (journey) journey.frame({ day: journeyDay(), cell: entrance, kind: 'start', hp: hpSnapshot(), visitedDelta: entranceFresh ? [entrance] : [] });
+  say('narration', `${dungeon.name}・${floorDef.name}に入った。隊長は${leader.name}、方針は「${policy.name}」。`);
+  if (inp.intro) say('narration', '入口近くの薬草を採り帰路を確認する初回の行程。');
 
   const budget = Math.max(1, Math.round(T.baseSteps * ex.speed));
   const days = Math.max(1, inp.days);
@@ -644,6 +693,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     let ri = 0;
 
     while (end === null) {
+      if (inp.intro && introCollected && homeReason === null) homeReason = 'safety';
       const homeward = leaving || retreating || mapFull || homeReason !== null;
       if (homeward) {
         if (!seg.home) {
@@ -676,13 +726,28 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
           break;
         }
         if (left < T.costKnown) break;
-        move(pathTo(pos, entrance)![1], T.costKnown);
+        move(pathTo(pos, entrance)![1], T.costKnown, true);
         afterMove();
         if (wiped) end = 'wipe';
         continue;
       }
 
       if (target < 0 || pos === target) {
+        if (inp.intro) {
+          if (introCollected) {
+            homeReason = 'safety';
+            continue;
+          }
+          const introTarget = inp.intro.route[inp.intro.route.length - 1];
+          const at = inp.intro.route.indexOf(pos);
+          if (at < 0 || at >= inp.intro.route.length - 1 || introTarget === undefined) {
+            homeReason = 'safety';
+            continue;
+          }
+          target = introTarget;
+          route = inp.intro.route;
+          ri = at;
+        } else {
         const t = chooseTarget();
         if (t === 'far') {
           // 入口で何も出来ない日は、待っても届くようにならない。予定日数を使い切らずに戻す
@@ -706,12 +771,23 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
           mapFull = true;
           continue;
         }
+        if (avoidGather && !safeGatherDetourLogged && r.every((i) => !isDanger(i))) {
+          const known = new Set(visited);
+          known.add(t);
+          const ordinary = shortestPath(grid, pos, t, known, know);
+          if (ordinary?.some((i) => isDanger(i))) {
+            flush();
+            say('narration', '既知の巣や強敵を避け、採取点へ迂回する。');
+            safeGatherDetourLogged = true;
+          }
+        }
         target = t;
         route = r;
         ri = 0;
         if (searching) {
           flush();
           say('narration', '行き止まりの壁が気になり、調べ直しに戻った。');
+        }
         }
       }
       if (owed > 0) {
@@ -758,6 +834,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     if (end === null) {
       healAll(T.campHeal);
       for (const m of members) result.fatigue[m.id] += T.campFatigue;
+      if (journey) journey.event(journeyDay(), pos, 'camp', hpSnapshot());
       say('narration', 'その場で野営した。');
     }
   }
@@ -777,6 +854,8 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
     say('result', '入口まで引き返し、探索を切り上げた。');
   } else if (end === 'mapFull') {
     say('result', '行ける場所を歩き尽くし、入口から帰還した。');
+  } else if (inp.intro) {
+    say('result', '入口周辺の確認を終えて帰還した。');
   } else {
     say('result', '予定の日数を終え、入口から帰還した。');
   }
@@ -832,5 +911,6 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   if ('potion' in result.items || potions.n > 0) result.items.potion = potions.n;
   if (potions.used > 0) result.itemsUsed.potion = potions.used;
   for (const k of foundKeys) result.items[k] = 1;
-  return { result, trace };
+  if (journey) journey.finish(journeyDay(), pos, end, hpSnapshot());
+  return { result, trace, ...(journey ? { journey: journey.record } : {}) };
 }

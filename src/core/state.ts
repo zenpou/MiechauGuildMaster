@@ -32,6 +32,7 @@ export function emptyState(seed: number, playerName = ''): GameState {
     quests: [],
     expeditions: [],
     history: [],
+    partyPlans: [],
     mails: [],
     achievements: [],
     scenes: [],
@@ -43,6 +44,7 @@ export function emptyState(seed: number, playerName = ''): GameState {
     repMilestones: [],
     debt: false,
     dragonDefeated: false,
+    dragonVictory: null,
     blessing: { charges: 0, feverUntil: null, fullSince: null },
     flags: {},
   };
