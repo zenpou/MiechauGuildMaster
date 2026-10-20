@@ -707,8 +707,8 @@ describe('art.json の絵のファイル', () => {
     expect(bad).toEqual([]);
   });
 
-  it('絵の無い話し手は「母」と「全員」だけ', () => {
+  it('絵の無い話し手は「全員」だけ(母はシルエットの顔がある)', () => {
     const silent = CAST.filter((c) => c.poses.every((pose) => ART.characters[c.id]?.[pose] === null)).map((c) => c.id);
-    expect(silent).toEqual(['mother', 'everyone']);
+    expect(silent).toEqual(['everyone']);
   });
 });

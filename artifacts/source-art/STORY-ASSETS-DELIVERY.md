@@ -123,3 +123,39 @@ python artifacts/source-art/verify-story-assets.py --require-complete
 最終結果: `--require-complete` は終了コード0、素材82/82、顔76/76、既存160ファイルのSHA256一致。全顔PNGが設定範囲からの切り出しと一致し、全顔WebPがPNGのRGBA画素と一致。PNG/WebP計316ファイル（立ち絵・背景・一枚絵164＋顔152）。
 
 一覧はChromeで全314画像の読み込み、全228顔表示の48/58/76px実寸、1280px幅・375px幅で横はみ出しなしを確認した。[ブラウザー検証結果](faces/gallery-browser-check.json)、[アイリス](../story-assets-review/faces/gallery-iris.png)、[竜](../story-assets-review/faces/gallery-dragon.png)、[スマートフォン幅](../story-assets-review/faces/gallery-mobile-tina.png)。白・暗色・透過背景の切り替えも確認。複製した一時ワークスペースでは、顔PNG欠落・寸法違い・アルファなし・範囲外座標・未知ポーズ上書き・前回SHA256不一致の6ケースすべてを終了コード1で検出した。[失敗条件の検証結果](faces/negative-verification-checks.json)。
+
+## 序章冒頭の背景2枚・母のシルエット（2026-10-17）
+
+序章 No.1〜3 の前世オフィス、No.4〜9 の実家、No.5・7・9 の母の顔に使う3件を追加した。素材は85枚（背景6・一枚絵2・立ち絵77）、派生の顔は77枚、PNG/WebPは計324ファイル。ゲームへの登録と実ゲームの台詞枠表示は別セッションの担当。
+
+| ID | 元PNG | 配布WebP | 寸法 |
+|---|---|---|---|
+| bg_office_past | [PNG](backgrounds/bg_office_past.png) | [WebP](../../public/art/backgrounds/bg_office_past.webp) | 1536×1024 |
+| bg_home_morning | [PNG](backgrounds/bg_home_morning.png) | [WebP](../../public/art/backgrounds/bg_home_morning.webp) | 1536×1024 |
+| mother / neutral 立ち絵 | [PNG](characters/mother/neutral.png) | [WebP](../../public/art/characters/mother/neutral.webp) | 512×1024・透過 |
+| mother / neutral 顔 | [PNG](faces/mother/neutral.png) | [WebP](../../public/art/faces/mother/neutral.webp) | 256×256・透過 |
+
+### 生成と判断
+
+内蔵 `image_gen` を使用。背景の線・材質感は `backgrounds/guild-office-day-v1.png`、人物の輪郭とセル影は `characters/tina/design-approved-v1.png`、暮らしの水準は `characters/kai/neutral.png` を目視参照した。[実行プロンプト全文・全6呼び出しの引数と生成元](prologue-opening-work/generation-calls.json)、[採用素材の生成台帳](story-batch-prologue-opening.json)を保存。初回生成3回と部分修正3回で、採用する原画は3枚。顔は別生成していない。
+
+- オフィスは無人、灰青の低彩度にし、書類・青白いモニター・缶・胃薬を中央の机に集めた。初回の時計は時刻が合わなかったため、針だけ約00:10へ修正。数字や文字は読み取れない表現にした。
+- 実家はギルドの豪華さを引き継がず、素朴な梁・板床・調理道具・薬草と朝の光にした。初回は寝床が脚付きベッドになったため、木枠と脚を除去し、藁布団・毛布・上着を床に直接置く構図へ修正。開いた玄関は中央やや右に置いた。
+- 母は顔の造作を描かない濃い墨色の影。真っ黒一色だと輪郭を見失うため、衣服は暗い階調のセル影とし、外縁に控えめな明るい線を残した。初回の上げた拳は下ろし、両手を腰へ変更。三角巾・後ろで束ねた髪・エプロン・まくった袖・3つの湯気で怒りを示す。
+- 母の顔は表情の拡大よりも三角巾・湯気・頭と肩の輪郭を優先。`face-regions.json` に `mother: {x:76, y:12, size:352}` を追加し、完成立ち絵から正方形で切り出した。48pxでも影の輪郭と湯気が見える範囲を採用した。
+
+背景PNGは生成結果の1536×1024を保存し、WebPは品質85・method=6。母の生成結果887×1774をLANCZOSで512×1024へ縮小。顔は範囲を切り出してLANCZOSで256×256へ変換。立ち絵・顔のWebPはlossless=True、method=6、exact=Trueでアルファを保持。再作成は新しい8ファイルだけを対象にする:
+
+```powershell
+python artifacts/source-art/prologue-opening/prepare.py
+python artifacts/source-art/verify-story-assets.py --require-complete
+python artifacts/source-art/prologue-opening/review.py
+```
+
+### 検証と保存範囲
+
+`--require-complete` は終了コード0、素材85/85・顔77/77。寸法・形式・透過・顔の切り出し画素一致・顔WebPのRGBA一致、生成台帳85件の対応、一覧の641リンクと322画像参照の存在を確認した。背景375×480の中央トリミング、母の48/58/76px表示、白／暗色／実家／門前の背景上での輪郭を[確認シート](prologue-opening/visual-review.jpg)で目視確認した。
+
+[前回納品記録](prologue-opening/previous-delivery-verification.json)の既存316画像すべてが前回SHA256と一致することを検証器の必須条件に追加。[作業前ハッシュ](prologue-opening/before-sha256.json)と[保存範囲の検証](prologue-opening/preservation-check.json)でも、既存画像462ファイルの不変を確認した。本作業による既存ファイルの更新は、依頼された一覧・顔範囲・検証器・納品記録と、検証器が再生成する最終結果JSONのみ。最終監査中に本作業外の`src/core/story.ts`と`src/data/story.json`の変更を検出したため、`src/`全体の前後一致は主張しない。これらや並行更新された文書・テストの差分は保持し、本作業では編集していない。
+
+今回の一覧のブラウザー表示はローカル接続制限で確認できなかったため、リンクの存在検査と配布WebPから作った確認シートで検証した。ゲーム組み込み・実ゲーム再生は未実施。`src/`、`src/data/*.json` は変更していない。

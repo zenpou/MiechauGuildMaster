@@ -20,5 +20,6 @@
   "adv_proud_male": { "x": 147, "y": 24, "size": 173 },
   "adv_proud_female": { "x": 153, "y": 26, "size": 176 },
   "adv_timid_male": { "x": 148, "y": 52, "size": 179 },
-  "adv_timid_female": { "x": 132, "y": 54, "size": 176 }
+  "adv_timid_female": { "x": 132, "y": 54, "size": 176 },
+  "mother": { "x": 76, "y": 12, "size": 352 }
 }

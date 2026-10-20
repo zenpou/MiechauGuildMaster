@@ -1,0 +1,7194 @@
+{
+  "expected": 82,
+  "complete": 82,
+  "remaining": 0,
+  "scope": "asset delivery only; game integration and live playback not included",
+  "assets": [
+    {
+      "category": "backgrounds",
+      "id": "bg_guild_office_sunset",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/backgrounds/bg_guild_office_sunset.png",
+          "format": "PNG",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 2331102,
+          "sha256": "27a23005455e65a48a5eb6efe08511889c8a0b747d191e2f99c12d0c61ab5e41"
+        },
+        "webp": {
+          "path": "public/art/backgrounds/bg_guild_office_sunset.webp",
+          "format": "WEBP",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 227996,
+          "sha256": "e456babea8bde9a89270fc957627664d7b4a8f0dbc210df410d2ae08821b42ca"
+        }
+      }
+    },
+    {
+      "category": "backgrounds",
+      "id": "bg_dungeon_mine",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/backgrounds/bg_dungeon_mine.png",
+          "format": "PNG",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 2803743,
+          "sha256": "53ac64fc21f555c6e050ba33d9ad804ca2d494ca70be2702bb5f4a1019ed86ca"
+        },
+        "webp": {
+          "path": "public/art/backgrounds/bg_dungeon_mine.webp",
+          "format": "WEBP",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 325074,
+          "sha256": "a7d36237733a72799165c6423edef00263b84b853640f73398c3c23bab78e702"
+        }
+      }
+    },
+    {
+      "category": "backgrounds",
+      "id": "bg_dungeon_crystal",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/backgrounds/bg_dungeon_crystal.png",
+          "format": "PNG",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 3135825,
+          "sha256": "ee787a66f5f521aebe21e31c77bc179253af0342417895d1a5ad44c7cdd31d76"
+        },
+        "webp": {
+          "path": "public/art/backgrounds/bg_dungeon_crystal.webp",
+          "format": "WEBP",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 433492,
+          "sha256": "e332bb33f3bc44da21dde4944d5b64e7712a9fb26085558833b3d750c9ef2405"
+        }
+      }
+    },
+    {
+      "category": "backgrounds",
+      "id": "bg_dungeon_dragon",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/backgrounds/bg_dungeon_dragon.png",
+          "format": "PNG",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 2860535,
+          "sha256": "017e311d73f5ee29cf5f8dbe5b249564f70d0163d062b4593e7994928bdc27e4"
+        },
+        "webp": {
+          "path": "public/art/backgrounds/bg_dungeon_dragon.webp",
+          "format": "WEBP",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 348938,
+          "sha256": "0e8991c9891f31dafc574ffa91c31edb33d93667ac63f086d0f6624cb12b7781"
+        }
+      }
+    },
+    {
+      "category": "stills",
+      "id": "prologue",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/stills/prologue.png",
+          "format": "PNG",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 2712802,
+          "sha256": "291a1b420d4d170798004c315ad93a8493733a6905fdbd8b5f24796dfd521e04"
+        },
+        "webp": {
+          "path": "public/art/stills/prologue.webp",
+          "format": "WEBP",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 559770,
+          "sha256": "2bff3c8b176c00dddc168b2fb3407c136a48f9507fcb3642793090a269535e1b"
+        }
+      }
+    },
+    {
+      "category": "stills",
+      "id": "dragon",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/stills/dragon.png",
+          "format": "PNG",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 3029416,
+          "sha256": "758ce0455a5c0f62472f23f63736f4da94efbb8fc97412700bd98d30f9faf36d"
+        },
+        "webp": {
+          "path": "public/art/stills/dragon.webp",
+          "format": "WEBP",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 418246,
+          "sha256": "04d04f0b7eb21683129b8b372de8b16db8957a71f7d89636239c482bdfb71759"
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "kai/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/kai/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 421958,
+          "sha256": "36d5a4f7440fd89ec5b3ca5b120c75c92dc45cfdb7dc2608087e9d6afd5a4a88",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            464,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/kai/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 108564,
+          "sha256": "3c0a60b2d233784017b8cfc556443d7a9ad4dd91c0bdd9b640ddaeb171e93bc0",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            464,
+            1019
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "kai/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/kai/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 411119,
+          "sha256": "34c76c2254410c4ef62be5bb398cc67f5594d8e7dc234a3fe4e07ad5119b0172",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            464,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/kai/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 105600,
+          "sha256": "916530e2353902d584b3679f510d03085ebf874bd1ae042ce73c7d30360b2be4",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            464,
+            1019
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "kai/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/kai/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 416438,
+          "sha256": "5ffc2b3f01e96ae9a4875d3dbe81593b4a3bfd0fa0763f495d2d26dde893c2c2",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            465,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/kai/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 106208,
+          "sha256": "2413007b798b4baa00a6d92aa762668517398a77ad30d5d0c91b56a0d0a05dfb",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            465,
+            1019
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "kai/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/kai/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 414701,
+          "sha256": "2e93da52f2bd66ba0e7a4189146645c2e5ba8a37b302dcfa2d0b0d48e194d22c",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            464,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/kai/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 106084,
+          "sha256": "8061c4fd74378982be64ec88e6dcc795844eadc4d41ddf3e68543349e25423cd",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            464,
+            1019
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "kai/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/kai/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 409235,
+          "sha256": "bb31061639f77fefca37ade945ccd5233fa458d01a8a873f7a3f2c1fa79bdd82",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            465,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/kai/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 103816,
+          "sha256": "5a4f98c26f0d7e9c262235f9a96fb6d81879f8dd3f931d9702b0b6e5c17f0eb1",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            465,
+            1019
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "kai/sleep",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/kai/sleep.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 409440,
+          "sha256": "645080c355c4c63417cf8b3647cad57bce7a3dfdbc6cc0ee3e58aa068af616de",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            465,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/kai/sleep.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 103234,
+          "sha256": "57bafb2ed9065268668b8f8e12ab9a72a674b80b21e8b5b5ac5d2399a35b61ae",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            5,
+            465,
+            1019
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "tina/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/tina/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 540067,
+          "sha256": "23444f851893d353e7f098b4f072b19561e707f2ccd3127b0bcbd2ce00586e00",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            72,
+            4,
+            493,
+            1011
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/tina/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 328082,
+          "sha256": "81d8b0c770d3b48a506f6a32969195be818090c28c1a0348f993a5c307358f6d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            72,
+            4,
+            493,
+            1011
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "tina/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/tina/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 549248,
+          "sha256": "36d9f779b0a565f2c0d43f61f9d5e2651b6cb444bf3eee1fedbedbd500202423",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            3,
+            494,
+            1012
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/tina/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 334498,
+          "sha256": "af79ce42a880ddfe924abae7c793a40cbbc423dec532eb320c666d4ae601e08d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            3,
+            494,
+            1012
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "tina/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/tina/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 548211,
+          "sha256": "7f3395170692987bc3bb29f790513be6d1b3eb80b970aded37f9639fc0874c7f",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            4,
+            494,
+            1012
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/tina/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 332252,
+          "sha256": "28f199a0c54d2f5ae08d267d42555c84f063fe73dbbb365ceea2be83ea30ba10",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            4,
+            494,
+            1012
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "tina/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/tina/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 544488,
+          "sha256": "c689466f1ff726c5ffa3b13cc27c01edf39ead16fa39493f2876e74ac7e4aaff",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            3,
+            494,
+            1012
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/tina/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 329730,
+          "sha256": "5b9dcef570cfa77ba6f99e293827b8ca85dd36d054447febb97ce092bc6a8658",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            3,
+            494,
+            1012
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "tina/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/tina/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 545499,
+          "sha256": "9877d0421829e1acbf6304b42df35f860bf42962fa2b5551cdbe0fde1d3b3a03",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            4,
+            494,
+            1012
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/tina/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 333244,
+          "sha256": "4829415c726fe481a34323533e435e317434f702d327e6c0e8bdad208b7815ab",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            4,
+            494,
+            1012
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "tina/sulky",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/tina/sulky.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 544413,
+          "sha256": "ed69374d1c160ee77efb60ff1f94219dbcab73e62ff48d8971fd58487cda100b",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            3,
+            494,
+            1012
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/tina/sulky.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 332432,
+          "sha256": "a04670f15d6c97843975857bd1d7bcedd267f574e944eab921b30e78cefa0efa",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            71,
+            3,
+            494,
+            1012
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "iris/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/iris/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 589955,
+          "sha256": "63ff9effae8b884009ccc61e362ac0328d1cb2621458f444e846e1f234dd764b",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            16,
+            494,
+            1012
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/iris/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 341662,
+          "sha256": "6d6c2953811c5216af9c26f544785562523ef13597143399c1cda7130dec2e0d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            16,
+            494,
+            1012
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "iris/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/iris/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 594592,
+          "sha256": "3237a43a8a1c5f716b470b3067fcdfbbb82ca342344056d831b7fa419fdd933a",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            16,
+            495,
+            1013
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/iris/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 342920,
+          "sha256": "b61342ca0223d9d58d1170a78821c7a9129f9503ac3f76566e9b451ab7c2c9dc",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            16,
+            495,
+            1013
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "iris/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/iris/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 587817,
+          "sha256": "36202137320301d593d5a1f8c0cea5f185ee4864365f5b839159db26909e7bdf",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            17,
+            494,
+            1012
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/iris/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 341178,
+          "sha256": "b39731b4e3225fd31b1a7d2c46d9874940322565629a26cf32d77bdf41e4c703",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            17,
+            494,
+            1012
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "iris/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/iris/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 595236,
+          "sha256": "3646091e988c1a87f6dc38429bef5a6554b442897f82082b53df894c250ef4f9",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            16,
+            495,
+            1013
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/iris/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 345326,
+          "sha256": "1caaeb6efb31f53a3c6fade4429bf70a03cf723f4a918f83106e897c0e966521",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            16,
+            495,
+            1013
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "iris/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/iris/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 592019,
+          "sha256": "4e40e1e83f6187e7cd3e0b7451e122667f7fcfc0c721db77b05029ba48a5d68b",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            16,
+            494,
+            1013
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/iris/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 336166,
+          "sha256": "2cbb4d1ff3474d8b3ee78cf0c79ffa9607a1149cc998279603e430ccb90cf6d6",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            16,
+            494,
+            1013
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "iris/dizzy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/iris/dizzy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 589159,
+          "sha256": "8d329c9fa3fea6a8192ae6d4a5e175ee9a1818cf0f2491b9aa04b742f2e24617",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            11,
+            15,
+            504,
+            982
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/iris/dizzy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 344162,
+          "sha256": "0611e1ab57de1df01c0cf4944fbfb5007bdf58d4af37a13116d26e5bf6fdc355",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            11,
+            15,
+            504,
+            982
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "iris/coatless_neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/iris/coatless_neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 494683,
+          "sha256": "f52123f3fb1012859b8f0f59e18727856160328d5d6adce70c412b1f0433d74d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            43,
+            18,
+            486,
+            994
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/iris/coatless_neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 324878,
+          "sha256": "0850742c1a3c85442ea77ebbcb5a49ae6ed5c787dfa4d96e19b635863705ce06",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            43,
+            18,
+            486,
+            994
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "iris/coatless_happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/iris/coatless_happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 496327,
+          "sha256": "db3f5153b1933d57a975a61a59b524c684af44367e9841641459c2174aba59fb",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            43,
+            12,
+            488,
+            995
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/iris/coatless_happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 324152,
+          "sha256": "b59077f59ba1ce02774c595e3b2bce3d2a73c8297c7ecc3d93f3cf64bc51c828",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            43,
+            12,
+            488,
+            995
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "noel/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/noel/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 452865,
+          "sha256": "cae5cb4e19993c4744cc301252ff648d6de154d6c27b23a6f9030c988bfb8c6e",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            62,
+            14,
+            477,
+            1008
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/noel/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 252968,
+          "sha256": "f0904f0c5ff934a58d2f0de55329f1b2ecd06b44edc6e6b090ad9a871fb3e7fc",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            62,
+            14,
+            477,
+            1008
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "noel/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/noel/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 463364,
+          "sha256": "3cea0d6e1953db5ae706fcdcdfeae3702cb82f7de30672622416ee522bcf3b4f",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            60,
+            14,
+            478,
+            1009
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/noel/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 262024,
+          "sha256": "9a4a898ac6dca69af2769b3d58cd6eb77186fe15735d0949832e4b6812e6340b",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            60,
+            14,
+            478,
+            1009
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "noel/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/noel/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 465275,
+          "sha256": "9343e4f0b9e1f8b5a7ce9c5f83fcdd17e46fc1d053ed5dfa738e74fa7ca83746",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            60,
+            13,
+            479,
+            1009
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/noel/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 261672,
+          "sha256": "5ddc06c01a9c9506c7e9c7ffc9c6cc54d0679f8a824402de929d2e6b46149841",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            60,
+            13,
+            479,
+            1009
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "noel/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/noel/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 461882,
+          "sha256": "17e5eb8c62d947c99a3bfef470ac82ebd81b40d84cb7c84cf02ca5747147081e",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            61,
+            12,
+            477,
+            1009
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/noel/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 260968,
+          "sha256": "631fa915c08a11a67b6bb3af1903a2b30be0c5088778a2e291f58af9afd67746",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            61,
+            12,
+            477,
+            1009
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "noel/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/noel/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 460795,
+          "sha256": "d0051c1619de9bf240e9121931b7f4366f5dee988eb0162270fd40df9db9f3ac",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            61,
+            15,
+            478,
+            1009
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/noel/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 259276,
+          "sha256": "b07f325cd6f22207b6c174286b6e77180a8b047220d04d28e8398a3cac21a8f1",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            61,
+            15,
+            478,
+            1009
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "noel/worried",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/noel/worried.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 458665,
+          "sha256": "272cdf57c5b08f03adde91026c94077957f543d53c248226419d8b9121b3d5ce",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            63,
+            14,
+            476,
+            1008
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/noel/worried.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 260722,
+          "sha256": "3db9fb933a5c5991c6a823ef122f957d125a62ea67e821a93d793265f1abdd67",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            63,
+            14,
+            476,
+            1008
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "sera/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/sera/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 514369,
+          "sha256": "602f8542b42fe170f724519c21225a86d7cc0d10c705464f75ac81ef2aac4210",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1016
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/sera/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 301178,
+          "sha256": "d02c345a1c3853fde037c21e0d396e84e5ad02f6927c721b989a28618fe227b0",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1016
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "sera/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/sera/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 514628,
+          "sha256": "a57cb93fa7a4eee200b7e426b1c91c96067dd890f358cd6d89d144fe71fd2f65",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1017
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/sera/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 300328,
+          "sha256": "c28948ac643ac3651a63c5d5292a1cc823a0e141a1111c12744667dc4ce5a6aa",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1017
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "sera/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/sera/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 514617,
+          "sha256": "e4405ceb0cda1cce5b408a192b59fdf191c4027cd6dfe74e016b1a7bee06a1fa",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1016
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/sera/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 304162,
+          "sha256": "2845e21fc2f2b49f694044e103169f833b963a20b91dcfb9262008fa83b3b84d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1016
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "sera/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/sera/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 519595,
+          "sha256": "ffda9b97d05806fb772f4546e37ae8b085659e2328f0c7962536bda0eb27ad57",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1017
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/sera/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 307958,
+          "sha256": "043425a46f945d44e5d84660d2bff7df278d51bd5001072648110ad06db2825c",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1017
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "sera/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/sera/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 513634,
+          "sha256": "6dad258da7de5e114af7f0fdc7275c54f57c470efee5f6104f87384b3272fa9d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1017
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/sera/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 302778,
+          "sha256": "0563ea6759aa167c74109ae13e9d477b65e69a48de35a1e5bd449f7280719056",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            22,
+            8,
+            503,
+            1017
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "sera/teary",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/sera/teary.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 513890,
+          "sha256": "07db82dcc6ef1065d0538b4ec7eca2b059250d002d4197753b3f9fe1193447ea",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            23,
+            8,
+            503,
+            1016
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/sera/teary.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 302898,
+          "sha256": "8e44048ef573632e922e070dd85cbda56771ff17de0c21d5ee4de3bc7968cce5",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            23,
+            8,
+            503,
+            1016
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 653636,
+          "sha256": "580e251281e52e350e387c09e3a20e3c741810cff8a65bdb41aaeeaa541b780f",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            17,
+            5,
+            512,
+            1007
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 437554,
+          "sha256": "7a9370cbb476d5cc4cc95259b74010666546ef4b6438f64ef67911b079948c7b",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            17,
+            5,
+            512,
+            1007
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 638170,
+          "sha256": "a1d7b9690d448912d6e273d1747bf1dff712ae3381926b0d224219e131a1ef56",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            16,
+            5,
+            512,
+            997
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 428170,
+          "sha256": "ed71572d23f7a3fd9d8a4c41b8f30b69742b82f3c9945c374fecbcd4c8ecf46a",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            16,
+            5,
+            512,
+            997
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 632378,
+          "sha256": "eae4311d17685008ad7f075d95b3da0eee1bce427824df4399ff0192ed99bd91",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            17,
+            6,
+            512,
+            1011
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 423942,
+          "sha256": "a40d824e501f685798093910700915dd213414d342791fb363fe60f33c5d2b25",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            17,
+            6,
+            512,
+            1011
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 633301,
+          "sha256": "c3db996367876865290c4d0aaea088514da74c51c3f67e535b9acae1597c04e2",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            18,
+            4,
+            512,
+            1002
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 423752,
+          "sha256": "524c830f0686dab7c77f7db3ec6434125760d81430be448b379fed3cb855ecca",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            18,
+            4,
+            512,
+            1002
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 632065,
+          "sha256": "03d8b34a7878d02f65d6af2eb92bc490cfa3bae699006e83f227d0f1f7527d0e",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            14,
+            4,
+            512,
+            1001
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 425550,
+          "sha256": "8b050e95d885571fc4f9e12a4a6c9139b7e9ebd8a6cd9e56c44e7b2715636fce",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            14,
+            4,
+            512,
+            1001
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/flustered",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/flustered.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 628750,
+          "sha256": "b2c77a2b4241469b91a88933c4220235b804f4c553a7c82fca251dba18972d91",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            7,
+            5,
+            512,
+            989
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/flustered.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 422330,
+          "sha256": "40cffc4cfdfd44dc5ddac939c642572432251c5f13823777680981683333fff6",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            7,
+            5,
+            512,
+            989
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/scout_neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/scout_neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 480626,
+          "sha256": "39bfd225113ec320061bbb7e6ebe5fbc23442a63d6d65376399e965adceee2e9",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            63,
+            7,
+            489,
+            1017
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/scout_neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 283468,
+          "sha256": "8632c8d8647d8bd71c1b45e08b3c5beabcb33bc45840c1454ec743abff03c6b1",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            63,
+            7,
+            489,
+            1017
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/scout_happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/scout_happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 482575,
+          "sha256": "ce656069e4615c57b1070904d98408a855d95feb2b72aab8abd152dc3d5e7354",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            64,
+            7,
+            490,
+            1017
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/scout_happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 288928,
+          "sha256": "bf6da2f5d08728a45e8cd7f12fa9a530342ff43e002eeb3df471444ef183bc94",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            64,
+            7,
+            490,
+            1017
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/scout_angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/scout_angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 478149,
+          "sha256": "f8d853dfda2c271608f2694483fabf561ab3f582fdeb5696f8b5a45a41ea2489",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            64,
+            7,
+            489,
+            1017
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/scout_angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 285752,
+          "sha256": "d82db61a51648c9f4c46a415022fde89fc449b8e763d044aaf7617698258a76a",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            64,
+            7,
+            489,
+            1017
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "viola/scout_flustered",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/viola/scout_flustered.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 484463,
+          "sha256": "c63df6e24cc8e7fbf30050729b71733ef84d90aac456b4dc2def5539102dff93",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            63,
+            6,
+            490,
+            1018
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/viola/scout_flustered.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 287962,
+          "sha256": "900c32e72019e73553fb147f6b18205eca1340c020c725924a5159dfff364700",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            63,
+            6,
+            490,
+            1018
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "ruu/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/ruu/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 459047,
+          "sha256": "543c65d1812f8fae0544878d5ac3a220dc95806035da156a134b6fcc4776ba49",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            53,
+            8,
+            483,
+            1016
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/ruu/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 306354,
+          "sha256": "f62dd9c71bdd3988771f66442352674aa16851e41673c24d3e497653725c9357",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            53,
+            8,
+            483,
+            1016
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "ruu/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/ruu/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 437676,
+          "sha256": "2b7ab20c0934dbbe57ce6f3b4c27864394074f9e80bdf1f73ff57ed422f5d107",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            60,
+            8,
+            491,
+            984
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/ruu/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 293490,
+          "sha256": "1beaafac1fd658bb14ba3b1ea1305afff0527a949c277a9972ef0dc34e547898",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            60,
+            8,
+            491,
+            984
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "ruu/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/ruu/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 434954,
+          "sha256": "8d0bdfb852c242340d9bf30447dada9b572d8d44996eed5d8c6789053dc1c477",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            50,
+            8,
+            490,
+            995
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/ruu/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 291970,
+          "sha256": "b5ca9bd36a41690668ee8cd2a796a03481539863578ab378e44460a354547bfd",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            50,
+            8,
+            490,
+            995
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "ruu/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/ruu/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 429574,
+          "sha256": "d27b7a7b1c5d25337e7c9acd70ed2c7fed6260152d09e763213c96c76734ce77",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            56,
+            9,
+            483,
+            984
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/ruu/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 289216,
+          "sha256": "30e7950034e02516285809a22043878af314d409e9846e5861a19babf074021a",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            56,
+            9,
+            483,
+            984
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "ruu/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/ruu/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 431223,
+          "sha256": "24f9f268faf1a4c00409597a926c450723e32b2d28e8205dffb378138894a4c7",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            58,
+            7,
+            485,
+            990
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/ruu/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 290020,
+          "sha256": "240d50e0baad9415e81e4ccd82863a66bc797f8b4c40b20ef34d61aea454c85a",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            58,
+            7,
+            485,
+            990
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "ruu/bluff",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/ruu/bluff.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 428424,
+          "sha256": "a986ec1651a5aecd6e6da38c068672d11c616122932137af12c53e5c9832b678",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            62,
+            8,
+            484,
+            980
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/ruu/bluff.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 287806,
+          "sha256": "f81fd2bfa4e4294e52dd00674f92d874cef0125b866db49166ddef375f3c74fc",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            62,
+            8,
+            484,
+            980
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "fine/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/fine/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 588328,
+          "sha256": "0d351e70a769711589d30cbad4dbeb22fc3f050a744607702bb9330327b6ba7c",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            36,
+            9,
+            497,
+            1012
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/fine/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 402264,
+          "sha256": "8fb5d25d1dd4cf2f9b9702bfa1f28e99aad33833ce9d0fc6b5ea2258a7288c1c",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            36,
+            9,
+            497,
+            1012
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "fine/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/fine/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 555977,
+          "sha256": "1499e9ea1940a7f4dad9716afcbcb066e6e37c1a65b3f6d6e32ffb8aef49e456",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            36,
+            8,
+            492,
+            989
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/fine/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 378406,
+          "sha256": "7f84599b75cb6237d516e38a43ef1f9f5233bb58cd21b6032cf5076536d0e3d0",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            36,
+            8,
+            492,
+            989
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "fine/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/fine/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 550865,
+          "sha256": "083ca4226402170f6c9be40fd59a4bc7367196dcf59223cd29a545994a850850",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            37,
+            7,
+            493,
+            986
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/fine/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 374784,
+          "sha256": "fb67f87910ff7bad32162330b435c077c5031eb99debc44624328f75d23a99f1",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            37,
+            7,
+            493,
+            986
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "fine/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/fine/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 572148,
+          "sha256": "874d45262f77c10bcae5ad00d586d687e21e93320195d222e54a7929280dc9bb",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            35,
+            8,
+            498,
+            998
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/fine/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 389442,
+          "sha256": "d331bc4a9366ee036df3b816dd7e77f0fbf7b389dc7bfca196402029e52f5c58",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            35,
+            8,
+            498,
+            998
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "fine/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/fine/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 550437,
+          "sha256": "46676b24ab48ad57746e121b535a588720d749017cdf6bd78cdb3881097c7fd5",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            40,
+            8,
+            493,
+            984
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/fine/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 376458,
+          "sha256": "d75da1eb8d6a6c6ca2b4a3ee73bc8e9bb80385f00f633d92faca4023feade4e6",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            40,
+            8,
+            493,
+            984
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "fine/sparkle",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/fine/sparkle.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 590090,
+          "sha256": "1a2eb1c829e443a3daa42d8cb3cfbb39dcc4dac3ed72ec4b645bcfcf856e4df3",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            35,
+            8,
+            500,
+            1008
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/fine/sparkle.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 404300,
+          "sha256": "8af12df896b161febaa585030fb8f8f9c3ebca52539a16b233bc9e7d993e8b3e",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            35,
+            8,
+            500,
+            1008
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "aurelia/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/aurelia/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 488448,
+          "sha256": "d0c76ae426a741ba79a66c9771d1600dc9d1f9b656450bb3467c6c21dd87504d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            30,
+            11,
+            501,
+            1016
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/aurelia/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 342844,
+          "sha256": "392800a0b69009c8248a440be8a5c0d36eefafc44b9538165aa1cef4d5b2ed96",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            30,
+            11,
+            501,
+            1016
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "aurelia/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/aurelia/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 468561,
+          "sha256": "03dc1e1c160cb37992ecafe08a46f0318ef7275925b1dbd7612cdc789e4ab424",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            35,
+            10,
+            499,
+            997
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/aurelia/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 328532,
+          "sha256": "72da0ed53750b46b5801cd9c6b214fbe12b78dd64116622d119f8ad2dd23496b",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            35,
+            10,
+            499,
+            997
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "aurelia/angry",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/aurelia/angry.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 470169,
+          "sha256": "43f7178a1468fe3299cdfc0111ff36357718e2f55ed64a3a4f8eaa229bf76868",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            30,
+            9,
+            501,
+            997
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/aurelia/angry.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 332936,
+          "sha256": "2a5e2e8fe67f5b9ad8e74f3a2b3201bc53c065c2c0e754223b6f7568597ac10f",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            30,
+            9,
+            501,
+            997
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "aurelia/surprised",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/aurelia/surprised.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 476675,
+          "sha256": "0cdd98f94ec50a04e9896f2acf70a699db4e1028a4baf1d3b6e3d7bf0ed1f325",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            39,
+            8,
+            507,
+            1000
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/aurelia/surprised.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 335738,
+          "sha256": "c5e7d2f6d895064a7a0383b8749824fbff2a5520777735d0a112f4cdfc398ae9",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            39,
+            8,
+            507,
+            1000
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "aurelia/shy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/aurelia/shy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 454245,
+          "sha256": "68feab1beb0806f0479f8eb6498aa04527351373ba555b10b813bfd453698d63",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            41,
+            9,
+            492,
+            987
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/aurelia/shy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 319960,
+          "sha256": "58a1375764503dc1c677c9524d07724538f1d03227e7cef9a43c73bdb4473414",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            41,
+            9,
+            492,
+            987
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "aurelia/dragon",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/aurelia/dragon.png",
+          "format": "PNG",
+          "size": [
+            1024,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 1282044,
+          "sha256": "73f3dbc37400068502d4dbb3dd6fad69cc402b1dd084e68f2c4c316f844d4b8a",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            12,
+            49,
+            1014,
+            995
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/aurelia/dragon.webp",
+          "format": "WEBP",
+          "size": [
+            1024,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 348762,
+          "sha256": "a277e72cdd935b30a611137944e7172d02beae729a9d7fed3a9819932d7dc3d3",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            12,
+            49,
+            1014,
+            995
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "gald/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/gald/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 558521,
+          "sha256": "820f5866df41cbc4157ce4834f71ed65ebbb514a8e3273bd885a238373c03c7d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            5,
+            9,
+            511,
+            1014
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/gald/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 327720,
+          "sha256": "9f7e75ea34ea319d9e1ee747e57919090f4ca676b6bca60b8d2ac802d9099a4b",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            5,
+            9,
+            511,
+            1014
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "gald/happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/gald/happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 562052,
+          "sha256": "6b73673a0596272c63b315ada5e8f01992694b17123d4ec164a3e37c2335c1b6",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            5,
+            8,
+            511,
+            1014
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/gald/happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 334220,
+          "sha256": "8d42a1d217a0b0db6ae599ac1f218ccd2c0dd15b1fc88009738753e081d46e62",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            5,
+            8,
+            511,
+            1014
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "gald/coatless_neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/gald/coatless_neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 430680,
+          "sha256": "d404099821ac07b07ec9f1d5a5bbf85c5dab8e2c403bf9cec52b452a2d0acaf5",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            16,
+            9,
+            504,
+            1015
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/gald/coatless_neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 101432,
+          "sha256": "2cd4b0f9dee9e9a92d1afc3d6f00352b92b2bdd59e36cfa147104fb636aac3b9",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            16,
+            9,
+            504,
+            1015
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "gald/coatless_happy",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/gald/coatless_happy.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 441581,
+          "sha256": "1cacb824d48dfafd2fe2e90fcd99441ddb278ac4e763d51f25a6845a9b11c5dd",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            15,
+            8,
+            504,
+            1015
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/gald/coatless_happy.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 95730,
+          "sha256": "4f63951078201a4e9afb5196ac5672b69202e4351256bc199f833fbb3b089790",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            15,
+            8,
+            504,
+            1015
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_brave_male/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_brave_male/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 439441,
+          "sha256": "6605c03e5c45dd28dc9e81fe11778648a54d2e6bca7436d1d805ff9e7ba78b15",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            72,
+            5,
+            481,
+            1022
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_brave_male/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 300936,
+          "sha256": "9da6bd09ecae6b0cff269185956213b475a811997fcf56f85b505c5db723297d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            72,
+            5,
+            481,
+            1022
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_brave_female/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_brave_female/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 435617,
+          "sha256": "a1f966b59289e68a4fe78786165195c8e671d3e6f41cfa9b9ee052927943f0d2",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            79,
+            7,
+            468,
+            1018
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_brave_female/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 286022,
+          "sha256": "691b2c83ecbeb3df4de4ade3ed3aa8f50d6b1af7f60e439a7716517d9b497071",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            79,
+            7,
+            468,
+            1018
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_cautious_male/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_cautious_male/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 405304,
+          "sha256": "9d1a72b88e37e6129efb110107a987c9767596f926334883e278fa1c7bca9cce",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            94,
+            19,
+            466,
+            1017
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_cautious_male/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 274812,
+          "sha256": "f97e6104310934705850718623d3281c42c8e1a6503b287a36c6dc426767541d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            94,
+            19,
+            466,
+            1017
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_cautious_female/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_cautious_female/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 412550,
+          "sha256": "c4841a3df2972c47e779641a63faacb6605d5c4b55c671bc5563a3f38cdb7d9f",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            87,
+            10,
+            448,
+            1017
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_cautious_female/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 261758,
+          "sha256": "ff696080197b990eddc38f47a00e85c5327b454d3a9e22d566f01bb8b501c4c1",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            87,
+            10,
+            448,
+            1017
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_greedy_male/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_greedy_male/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 439871,
+          "sha256": "748907efef1341733dbd1edb51aa4872213beb4d4251a3fc750e8d7534e91d3e",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            68,
+            21,
+            493,
+            1016
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_greedy_male/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 98818,
+          "sha256": "91c98cf43ce51951c1f95d4d0a4a9d12e0ec22b2ce2116f39660569781d3f911",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            68,
+            21,
+            493,
+            1016
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_greedy_female/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_greedy_female/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 448247,
+          "sha256": "9a756290896bbc2a3233a2abc66f4b8ef612961a1fb6523af50da035cf807d8f",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            89,
+            5,
+            465,
+            1020
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_greedy_female/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 116336,
+          "sha256": "f8e6ac24dd645a35e3a5eb486b7e1ff4dc52dff1776a854e3070da0a863746a9",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            89,
+            5,
+            465,
+            1020
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_caring_male/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_caring_male/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 471618,
+          "sha256": "a950552e74709a1d35b6663ae1f29e92eb0ed5055b12de23a50c567c8a0d1e90",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            45,
+            2,
+            479,
+            1024
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_caring_male/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 309666,
+          "sha256": "32124a5b73ec0661abd167ae3d5d0f56b750a56770840862708e3deaf2828422",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            45,
+            2,
+            479,
+            1024
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_caring_female/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_caring_female/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 420986,
+          "sha256": "5147434fedcbf33ead21579d571c754839144b1ea91b42100a4807273e744bef",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            67,
+            3,
+            472,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_caring_female/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 271706,
+          "sha256": "c756b8e9822a861097f4191279dbcf77b62649ecdd5c36b8aef27c7579e4de57",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            67,
+            3,
+            472,
+            1019
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_proud_male/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_proud_male/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 423721,
+          "sha256": "ca391fb3050d01a3a2e1c3a9ed4e9742dbd2442dba709de2e21a2aaf941dfb27",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            57,
+            5,
+            480,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_proud_male/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 288316,
+          "sha256": "6e15f1ca0e25dda2402dce5de1718a485b9ec37a27e713ad0532c2e14e903d75",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            57,
+            5,
+            480,
+            1019
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_proud_female/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_proud_female/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 414490,
+          "sha256": "1e40da370e3f7c54259ec465e272fdbc72fd7dd3369caecc05abfff7f7f78b1d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            58,
+            4,
+            490,
+            1018
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_proud_female/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 270802,
+          "sha256": "d773be8a9fea5289988fe781764f7383770159aa75607502b94959a5437ffb1a",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            58,
+            4,
+            490,
+            1018
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_timid_male/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_timid_male/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 381816,
+          "sha256": "e496b0775c156ba9717384d4be77ca27c5e1cdcdcb6c8ab3bb4c133a31ed83e3",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            99,
+            9,
+            437,
+            1015
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_timid_male/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 249452,
+          "sha256": "ac7556ac4a863e7299974eba8d0a9d4f366a51a33d0782fe64b272763323caf1",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            99,
+            9,
+            437,
+            1015
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
+      "id": "adv_timid_female/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/adv_timid_female/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 407643,
+          "sha256": "25915db526282915081be00f797cdd2aa64a328e0386a12422f728dfffa14e4d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            7,
+            435,
+            1019
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/adv_timid_female/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 256372,
+          "sha256": "7d5bed4f548b648359ad9c9c6be7c3098e447e47e71c989254a5b1d539f2596b",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            97,
+            7,
+            435,
+            1019
+          ]
+        }
+      }
+    }
+  ],
+  "faces": {
+    "expected": 76,
+    "complete": 76,
+    "remaining": 0,
+    "files": {
+      "source_expected": 76,
+      "source_found": 76,
+      "webp_expected": 76,
+      "webp_found": 76
+    },
+    "collection_issues": [],
+    "regions": {
+      "path": "artifacts/source-art/faces/face-regions.json",
+      "persons_expected": 22,
+      "persons_found": 22,
+      "issues": []
+    },
+    "assets": [
+      {
+        "category": "faces",
+        "id": "kai/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/kai/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 104229,
+            "sha256": "862a8636ce12f370813e56de1623ce24c6d3901dc26d1b2b482b085b093d1718",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/kai/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 69572,
+            "sha256": "df78bc8e321f25b218032c295b075bd6701eaf5b5029ba22ee6357243b5880e7",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 140,
+          "y": 60,
+          "size": 185
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "kai/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/kai/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 103692,
+            "sha256": "14ba838555f033fe161637d2488d9d5d2528beae8b2feede72c284e4545cc58d",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/kai/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 68332,
+            "sha256": "b3540f43031978b53c4fd11d6f5d0e2a7150812e1ea5c2ab057b3acb2c8bea40",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 140,
+          "y": 60,
+          "size": 185
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "kai/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/kai/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 103101,
+            "sha256": "e0b705f95b15680392d169d1fc526aebc0d4278be30d2ab83efd394f5e2fb84d",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/kai/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 68070,
+            "sha256": "86f984e34bd43c7cbfb11d714322ede27ec935bf68f73122fcbe6f7a6a22d377",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 140,
+          "y": 60,
+          "size": 185
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "kai/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/kai/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 104370,
+            "sha256": "3d9fedbe8d3796ae6c026a00d7e25e6a495c73653838c085a9c55efe181e678f",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/kai/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 68800,
+            "sha256": "3eb9354c4dd4573c2d6973517adaae3ce120feb434c9b1b130b16bae2051aff8",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 140,
+          "y": 60,
+          "size": 185
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "kai/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/kai/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 103218,
+            "sha256": "2e4c7b3ce8b868cfe22d9341ce6b03c0cf3999597a753f9e45026ca6364f9044",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/kai/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 68254,
+            "sha256": "3dce264b2ddb6f39974f71866ba538470f092a339f3e6ece15f6f6d5b51d35ba",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 140,
+          "y": 60,
+          "size": 185
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "kai/sleep",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/kai/sleep.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 102115,
+            "sha256": "75757d9b9a3d6c3cd3a90e34a1e81187335ff59d951f2bd87028fc0feed3203a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/kai/sleep.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 67884,
+            "sha256": "09a119584bc89f09667a7eb256816435ae0fc3a2154354c4e2534f13efb17152",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 140,
+          "y": 60,
+          "size": 185
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "tina/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/tina/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 124746,
+            "sha256": "87c0162b47dbdeeb24ab97cf6f1241fbf969bd09dd23fefca326df2dc1a4926d",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/tina/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 86492,
+            "sha256": "62fa4c1d60831ef6cffd10dba316fda12e421951481d578031e900e1897f8861",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 144,
+          "y": 92,
+          "size": 174
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "tina/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/tina/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 126958,
+            "sha256": "0aae60adbae306cb8074084c2e0f648e6abb8f345fc09ce0e96a02b3fdb77ca8",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/tina/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 88814,
+            "sha256": "655d295da71949ec17599ec7425f1634a028c0509f99f742c0a0a2722681d9a7",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 144,
+          "y": 92,
+          "size": 174
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "tina/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/tina/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 124056,
+            "sha256": "dd3eb88d3670a810d5f6ed14b9235ebf58fd97521e81773b440d28ce7b759f50",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/tina/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 84628,
+            "sha256": "5d14e911af16928ba88a14cbb31076c45d721ace1a8d1df0fba9b272165864fa",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 144,
+          "y": 92,
+          "size": 174
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "tina/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/tina/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 124731,
+            "sha256": "e0bfb3ad62d86ab5d0b89ca3e7b79f83775dae4ed67799e03ebe217e8faf0d59",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/tina/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 84614,
+            "sha256": "cd91a0b405a8ee3a8da81c6d283bd9666b25430c2cffeaec9cc0351399945185",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 144,
+          "y": 92,
+          "size": 174
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "tina/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/tina/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 124651,
+            "sha256": "06a7b36cf45200bd06982c087cdbb69a5bff53b0853e4ae5b1c4785da13a5ab6",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/tina/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 87548,
+            "sha256": "492bf7e226a865cdccfa31a14ad60792b6b50c98c2bec555fc2cf09a43dd6ce9",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 144,
+          "y": 92,
+          "size": 174
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "tina/sulky",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/tina/sulky.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 122229,
+            "sha256": "149bbcfbe38846e2e2f9188a322e35291377ad1bfed1127c6264d6599720d86b",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/tina/sulky.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 84074,
+            "sha256": "12b007708fa508a42e0bb0e137082e317e4536c1f75e3cd46a94c02ef60f2c9c",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 144,
+          "y": 92,
+          "size": 174
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "iris/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/iris/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 133572,
+            "sha256": "c4768cefa09c34bc73ddd76c707d4dea4eb65530fb65d3fd15a6426e24ed6057",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/iris/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 87294,
+            "sha256": "3f282968dfc9960c54ed6405db7783a5cdaef9e5cbbaafa7782b80d9eb219487",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 42,
+          "size": 184
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "iris/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/iris/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 131788,
+            "sha256": "c7055e71cd0b0643aca74a2c5bae231f04903ab18275e0d45966aa444dbca894",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/iris/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 86366,
+            "sha256": "2ae3c97eed80963e0d28b5978c8d22be1260a219e6bf228e91f2536fb15e946a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 42,
+          "size": 184
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "iris/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/iris/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 130590,
+            "sha256": "3568ce7b5446a67fd7e05a61cefb09991ac0ecee3dd058790c570b3af34f90ce",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/iris/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 85192,
+            "sha256": "67c6ad91a0fd4627fc67a6809e863a522b3e17e90d9374cfef40bf2c09d0a79c",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 42,
+          "size": 184
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "iris/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/iris/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 133373,
+            "sha256": "d0caaa87e0d2969dc7f7a468adf27268d4994396f23ec05f5d9385083de78554",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/iris/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 87062,
+            "sha256": "b0a734bd3b52edd9a0cb41769f98fb0c58d0c21203ebeccbcac5e2fbfdd7589f",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 42,
+          "size": 184
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "iris/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/iris/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 131885,
+            "sha256": "92a21f5dde4e974afd076545fbf2365905b31ff95797dd18f95bf01fb613b691",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/iris/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 86188,
+            "sha256": "33f269ff7fcb7f9fcb0b83a71c26a89c0f583d492ed55d504d4ae8cabaca333c",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 42,
+          "size": 184
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "iris/dizzy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/iris/dizzy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 127245,
+            "sha256": "2b80e9660474c04de0085f32a4f41ef14d2856199acaabb1d810f77b1affd853",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/iris/dizzy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 82682,
+            "sha256": "efbbe59f296d55ad62bb71373535420c4b12c07f9dfcbb67348b12441fd756f7",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 42,
+          "size": 184
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "iris/coatless_neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/iris/coatless_neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 132648,
+            "sha256": "d97319b5f79dade7a120c6ddd20dcef71c7d848cf8f4ef0c6c7d0170cc98c64e",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/iris/coatless_neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 87122,
+            "sha256": "013691ee6f1092b1f120633d5be497abc42ff68bd9f066e830da521a4d25714c",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 42,
+          "size": 184
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "iris/coatless_happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/iris/coatless_happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 132517,
+            "sha256": "4affffb8dc7a50b2aa66253cb91d2987d6e60478b4b8e039b1e76cb21b86c862",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/iris/coatless_happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 87570,
+            "sha256": "54be137fe78b13220590dbb887dfbe2538b48617b4aca0416cb82bce5c583bca",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 42,
+          "size": 184
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "noel/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/noel/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 113832,
+            "sha256": "8b52c64f541a9edab3b386cb83be9494f2ca5276d5111486b98fdcfef9232ad0",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/noel/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 75316,
+            "sha256": "47a90822382980f3b83a66f75e7cedf049aad4b6d7853a73b43c945e9c937f18",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 141,
+          "y": 47,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "noel/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/noel/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 116618,
+            "sha256": "6dbb4dd01a7f17502b933eb90e7e2a78238d9ad86f649d9e6f84187d6a840648",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/noel/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 77230,
+            "sha256": "c0969a0e7520ec9603fde0e4b0f6936e66b102e538ef65e484e4c35d866bc9ba",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 141,
+          "y": 47,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "noel/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/noel/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 114261,
+            "sha256": "070ff868259c9277d0208384b0ac60ba7b5a61082fababa3f73d7abac3ed610f",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/noel/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 75634,
+            "sha256": "1a420e4da66885a580af5879e6563464e89c590d3d0786806fb4ed28439b19af",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 141,
+          "y": 47,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "noel/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/noel/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 117591,
+            "sha256": "e842c2abb3f305f4aceb6a54050463dc8fcba5fa94b425d2da1d3c2281e74b27",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/noel/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 79066,
+            "sha256": "fcb8918ca7d792e656ea8e64ff4e1af5bd7b5ba4e3ee113844eda749d2e4c4b6",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 141,
+          "y": 47,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "noel/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/noel/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 113613,
+            "sha256": "c2598139564949252f56dd97ace0fdc6bed2fd983e80a8892b72fe9f928a188d",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/noel/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 74740,
+            "sha256": "3997c722d4b7ffac376462fd8459a6e197b6b19ce22fd26dc9d2d90ededdd469",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 141,
+          "y": 47,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "noel/worried",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/noel/worried.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 114836,
+            "sha256": "06ca0e51972a73b6fe88182933d12d532813ca11bc674cbf06663fadd5399171",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/noel/worried.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 76194,
+            "sha256": "559b977f05e91e9d53d178eb135f5264e009836efc8b2e429b88e0550431f971",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 141,
+          "y": 47,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "sera/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/sera/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 131937,
+            "sha256": "b96de64f7daca236142fb26c8bf009793568d84330b7838190acd95fa4b419d0",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/sera/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 89678,
+            "sha256": "caa887d48d4480094593c927bf257fb0706f2302d2aa573cce545ca84b1b54c1",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 149,
+          "y": 62,
+          "size": 186
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "sera/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/sera/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 132819,
+            "sha256": "e10e15d8ab10fe512fa0c7688f062b35fca33782f27e1af98ba15fef7054c710",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/sera/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 89708,
+            "sha256": "7fd06c850d71ce135d12914fa623675cb7aa056159a9aca3f8981ebbf47c8476",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 149,
+          "y": 62,
+          "size": 186
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "sera/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/sera/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 130283,
+            "sha256": "5a4e59b5d23fd7bcc06f435c73541de6ab912a2cce7b29d56ed5b1dceeb5b31d",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/sera/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 87762,
+            "sha256": "265d4475101c66a054ce644be30ecdd6c8b07c093b184d2a442135fe17a353ca",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 149,
+          "y": 62,
+          "size": 186
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "sera/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/sera/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 131730,
+            "sha256": "a6506a581b9c979d42cf7b228817f801a166d0c3c3a184c11d73bce858fd10f0",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/sera/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 88994,
+            "sha256": "e0f84e81d3dd3da558f79fd5db10042afbd1314f68c46a593493c5f3f33755f2",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 149,
+          "y": 62,
+          "size": 186
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "sera/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/sera/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 131528,
+            "sha256": "db6f9148f847f0cf708c29f6ea3e792ded41596227604aa45c5400d91b727116",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/sera/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 88880,
+            "sha256": "9e02d2aa8b32eddbc16dbace14d95a5d2a8571c7489d85ef99174538b4f4ea7b",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 149,
+          "y": 62,
+          "size": 186
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "sera/teary",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/sera/teary.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 132380,
+            "sha256": "0feef75fa90f7a2802f0ee8852b7e7c52a45b85f9b4a70350fcf6327f0b4e8d3",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/sera/teary.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 90176,
+            "sha256": "e405b5dcedd16353d66b9e35915b4eb72c1edb7bd027fba62851761774ec1897",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 149,
+          "y": 62,
+          "size": 186
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 116315,
+            "sha256": "133d4482decdc6780e12b9771cf16452f368e85833b813ce6d6bb230af7d96fe",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 78218,
+            "sha256": "3fefb3360ee4692ab913051c799a249984e5ae8e223bdcc2582ea9929b3d281c",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 113370,
+            "sha256": "1257eab680bae28d251a458412d33a0f4ac4d407cb39edc76b64b36c5f1260c9",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 75580,
+            "sha256": "d8b48909c2ac80c82ee62724995ea842d537f13cd8fac20fd134bc2f5b76ca7a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 111098,
+            "sha256": "b7184fa8412c6350fe356a19c31c572359e65bc492183d41f32ed6bb5117044c",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 74062,
+            "sha256": "4b5c5bbbe5821cb7b8f9a6205b1a1fc0ed9d38c7a0f6eb9db205cbc12c630a89",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 113447,
+            "sha256": "6803217d2485b9c524595e1a50e77a018a9032d249672e9ae24601d13a5c5070",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 76116,
+            "sha256": "cd9cbd1ea8968abe0e508c6a76b7567314654162998791cdb1099f43a9fbd2de",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 113582,
+            "sha256": "7db1f7716a06c074bb1e4302b546453e33765046484a535f302b3875f97f9992",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 76380,
+            "sha256": "44466cf8640075d98ae277fffd8dc3c59e7a141249347d6e05636a9a030904af",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/flustered",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/flustered.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 119091,
+            "sha256": "8e94801d52fb64d005619141597abf1755f01ffdadb775f677dff4cbc6d9cc0a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/flustered.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 80088,
+            "sha256": "f0a80b88106de1ee68ef9151a440c5a8488a9ae6c7b548f8bb4e06249c2655ac",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/scout_neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/scout_neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 109106,
+            "sha256": "a0fabcbd6881f9429fb9220d78b8772797a2edcdc5435b8565e591c7ef644808",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/scout_neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 72560,
+            "sha256": "d4e2c3d6d14acd269c5d489e57ceb978b0a5f368440756cf244edf8c94e0d1f1",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/scout_happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/scout_happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 108832,
+            "sha256": "8ffad043cfd4f9c76882a49706a5bed322da94d6d692be48822976cbf9c7c292",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/scout_happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 73140,
+            "sha256": "5fbad5798ecf1c7dbd22d4dbf5e2143d218390b06604c46f731493f3ee57b78e",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/scout_angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/scout_angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 104986,
+            "sha256": "aea591b7c71f1531b0b730cc63a6cb05c756982454bd5238574fabbf31ffcda8",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/scout_angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 70930,
+            "sha256": "4cc65848867737c65197496d10551a8fb43364d2824dbcabf6254d493ba47fd8",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "viola/scout_flustered",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/viola/scout_flustered.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 110893,
+            "sha256": "d971a770be2e262aa7e6b1d0d4fba54fa2f712eaa499b01ca169cc86e9f52da1",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/viola/scout_flustered.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 74336,
+            "sha256": "7a7df73ed084cfed177123806d1e307fff09f7a36a15ee1c095bfd3ff170a3f8",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 134,
+          "y": 47,
+          "size": 165
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "ruu/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/ruu/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 118952,
+            "sha256": "8a93d91d8ec4d15d4dccfdf3b65829ede2ea0a0d60b70a9b16c27239a4ade887",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/ruu/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 80704,
+            "sha256": "2976817ec771a8e23c030227ad42444202c69cf9b8d454e608c1518e83e797ea",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 151,
+          "y": 56,
+          "size": 188
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "ruu/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/ruu/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 119281,
+            "sha256": "0790ad88644ab4bab2b3dd8014f67d1a6bbfdcd355cc40091f7f6d6bd0051b54",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/ruu/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 79190,
+            "sha256": "bff050a1e24a8f2fd87cec47af7724ed6311d160602acb646bfe7e68bd464271",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 151,
+          "y": 56,
+          "size": 188
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "ruu/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/ruu/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 116285,
+            "sha256": "92b665ac78c60582f5b6f8a7859bfebc2da82ae01419b16b1783a54d53252204",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/ruu/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 76948,
+            "sha256": "a68097463a1b6b4d878070bbd0813833844ac83511fdbe852a4bafcd2a2daf37",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 151,
+          "y": 56,
+          "size": 188
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "ruu/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/ruu/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 117819,
+            "sha256": "479e11dcccf1c065fe397d0eabed34642581bea13926ab3136a5d93c38328acc",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/ruu/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 78472,
+            "sha256": "5cfa1851dc2af002c47211d07c6abe15edc0cac68032092f1070bb0c97c2e35c",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 151,
+          "y": 56,
+          "size": 188
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "ruu/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/ruu/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 118265,
+            "sha256": "d6e7ac70323bcd3445c1927d8ccc164064daf0af9042113b0e2791c26d126c1d",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/ruu/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 78376,
+            "sha256": "2f588285dadb77310b197d97776418c8764a275d155b3da7e11d3a4f16d57612",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 151,
+          "y": 56,
+          "size": 188
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "ruu/bluff",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/ruu/bluff.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 116233,
+            "sha256": "3ac1e646ee84856761f4c8295e5e5838bf8ca95e9a8ab5d96ce70e0a7d19ef25",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/ruu/bluff.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 79048,
+            "sha256": "637d98ae194f8bfac2d655e514206020642e69068a6e29ab3f9592f5e870b2d9",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 151,
+          "y": 56,
+          "size": 188
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "fine/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/fine/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 129164,
+            "sha256": "6ca0f017e656a4ce1998b9b38268ddd20c75713e72cbaf23be72bbb3e255a4fa",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/fine/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 85270,
+            "sha256": "6ab732f3b00b8ea33108242cf19fa2420cd5b1b14ecbe6b883fb25cee9af09b8",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 128,
+          "y": 38,
+          "size": 176
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "fine/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/fine/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 124575,
+            "sha256": "5031b8cfc717ad2ed7d9c0a8c302320f0effc226758794df5baf45afc1a23571",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/fine/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 81768,
+            "sha256": "6f78f979d91e69374f3b2284357c511b51c37dfd03c16aeeeee0373dd1a2379a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 128,
+          "y": 38,
+          "size": 176
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "fine/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/fine/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 123558,
+            "sha256": "b388f38aee525cdca19b6233275b6e7c40770343477dd143531951190c5a4bf1",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/fine/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 79680,
+            "sha256": "a7758f3adf5198415a72fcfcd251e3c182989dcb0f4ee9f078dcd23c310c9c50",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 128,
+          "y": 38,
+          "size": 176
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "fine/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/fine/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 125839,
+            "sha256": "cd82aab7a055b30a94352da21c53530325e2469f43d31c5ea0eb929eb11a869f",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/fine/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 83284,
+            "sha256": "ae2d6e440c41a4a2716ca90ec501e519c57c4d1c9cb7416d0a0b1678836bd765",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 128,
+          "y": 38,
+          "size": 176
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "fine/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/fine/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 127373,
+            "sha256": "f73cbc85852f4a19a134713e14be91868a9160fb28e0dfa9ae272af5077dea1a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/fine/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 84666,
+            "sha256": "f8eca9fa9b77b180bea81d3726a11e60dc1cf1a4da658705c0a35e754f254d7a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 128,
+          "y": 38,
+          "size": 176
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "fine/sparkle",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/fine/sparkle.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 128707,
+            "sha256": "bda978ae6f531a6480ae6340195dd3c80554362d289ca2d60f114fb454d33cb9",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/fine/sparkle.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 85370,
+            "sha256": "9f7180c2ee186f333d2bea9a78fdfbf726877156760d52e80e825e44bb1c6a85",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 128,
+          "y": 38,
+          "size": 176
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "aurelia/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/aurelia/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 121088,
+            "sha256": "5a87ce6eec42d50a60ec08c7b17dec932b9f8b62fbc4b0305fd22d49f22f5357",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/aurelia/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 81448,
+            "sha256": "fef1a7e921c443e5a13d4a4f6bdf98653e81ecfad0376a03b127e74688fc43a9",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 142,
+          "y": 57,
+          "size": 173
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "aurelia/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/aurelia/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 116096,
+            "sha256": "ae602401bf69a9c8760428c2f0097d7bdf986be4acf4315dcccf4c6f0a0dbba4",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/aurelia/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 78320,
+            "sha256": "d741be2ba16c64d5e5cbc8c0fc6923b1016303236466158618262699b74d1a24",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 142,
+          "y": 57,
+          "size": 173
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "aurelia/angry",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/aurelia/angry.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 116013,
+            "sha256": "088e60ae0358ce893ac0df5ea0349db0c4ec858e709bdbe8fd0eb91fe3ad6bf1",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/aurelia/angry.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 78618,
+            "sha256": "f94188b1931ab26b36308764cfc2667a6898253fc6294247d7f6e16b99af93cf",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 142,
+          "y": 57,
+          "size": 173
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "aurelia/surprised",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/aurelia/surprised.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 119949,
+            "sha256": "a8cc4e7e7015650be059e12bcde5810da961f67c4fdfb01d10213937ef3b09b8",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/aurelia/surprised.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 81404,
+            "sha256": "7dc8ab9bdc2d7afd78de7d5cf4bf4923a5530fd7d844ffcf31b99a90e2acc3fa",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 142,
+          "y": 57,
+          "size": 173
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "aurelia/shy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/aurelia/shy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 117225,
+            "sha256": "1c6e18e5d3193d32ac25e60a81cb56d05ee011056c8155151dbcbbe090a9e843",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/aurelia/shy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 78946,
+            "sha256": "0faa2829a4cc73e9282adf7aac32d6ec9cc4f677ef438c039b87219f59af73b6",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 142,
+          "y": 57,
+          "size": 173
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "aurelia/dragon",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/aurelia/dragon.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 108337,
+            "sha256": "529261be4c796e181cb1dab6b6d2e0dacf2d4356637b13e5c6064d2fbdadc2a7",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/aurelia/dragon.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 75158,
+            "sha256": "49a78b28e3a81e2db3410ec5f86938d88e31782c0b08a1703e7d271fd1554c7d",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 12,
+          "y": 142,
+          "size": 212
+        },
+        "region_source": "poses"
+      },
+      {
+        "category": "faces",
+        "id": "gald/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/gald/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 101552,
+            "sha256": "0e0dd1d080ee3df75a66ef815043310a21edd4332d187efa7b903e5d52d54194",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/gald/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 67656,
+            "sha256": "a149c4763cad1dc13fb7e3b8830fcc06431a49e47bde069e28a17c391e91655c",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 22,
+          "size": 178
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "gald/happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/gald/happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 104947,
+            "sha256": "45aa6cf1f96dc0688f841db059e964856061f95fb85856426493ee48041a63be",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/gald/happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 69980,
+            "sha256": "3bd2ed378661160aa2c2156888db39648b928a988cec63dfacad6da73783477f",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 22,
+          "size": 178
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "gald/coatless_neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/gald/coatless_neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 93752,
+            "sha256": "a5b1f9fdae2df1333c6e32391dfc7b62537fc4014434d3e951d1a38019e934de",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/gald/coatless_neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 64822,
+            "sha256": "7c406fdcf31d2cffbd1ae35faf7f75e894946ecd875bae1b09f195d84ebd8912",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 22,
+          "size": 178
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "gald/coatless_happy",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/gald/coatless_happy.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 97431,
+            "sha256": "b29b517bd166b42f556baea509767f3eb3132e1e1df77fee699713fa91992b60",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/gald/coatless_happy.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 66402,
+            "sha256": "aa3e554e047e6e9566bd23a5101bf23652f6c2f1a012849b0c1c16ad6197f7c3",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 22,
+          "size": 178
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_brave_male/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_brave_male/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 102019,
+            "sha256": "cebfb2d4c68adfcb8365d261d7f780662b569d84889e2f99071edb3ad0a278f3",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_brave_male/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 69732,
+            "sha256": "5fc9955c63cd5738c9ec396a71e449adc8dc130ad86cdf63a11b631eb9cb8a7f",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 149,
+          "y": 21,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_brave_female/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_brave_female/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 102148,
+            "sha256": "618afa706cb31305f4c702c9a0b39348f22d99c20c4725bce53771b373c6d6ba",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_brave_female/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 69286,
+            "sha256": "9b27fe158e9b2a318c945da6222ec72628ec7d9e9efe0c023dc38ca2aa607324",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 145,
+          "y": 37,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_cautious_male/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_cautious_male/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 104956,
+            "sha256": "e541c589e3c1a1274f7fc512b45ea9d01620cc5439a53458ef8384490467d9cf",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_cautious_male/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 71572,
+            "sha256": "38290a04acd068383922ecb47001ef50f849de056c92cd246559256719365543",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 144,
+          "y": 36,
+          "size": 175
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_cautious_female/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_cautious_female/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 117373,
+            "sha256": "f98488dfcd45caa02953d6880962cd1d0f377403ef9041a86547e3e1155f68ad",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_cautious_female/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 76240,
+            "sha256": "23ab926ce99b89ec85c87b875db7d53e02acc3f5afdf51366920398efbca4580",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 157,
+          "y": 54,
+          "size": 172
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_greedy_male/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_greedy_male/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 106787,
+            "sha256": "d6b558887ebad83da617b96732539ce18fda9638ba6b90d2ece7c16ffe5324e7",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_greedy_male/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 69186,
+            "sha256": "6cba73a6fb2d4660f7914304e275f7d7fc062839c5f6c91929b81375bef6e95b",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 69,
+          "size": 168
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_greedy_female/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_greedy_female/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 130026,
+            "sha256": "7873c0c84df88738be9bd418c41474eed995f6296f5895444bae4316fb76b394",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_greedy_female/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 85430,
+            "sha256": "e1d3319783c9e1cbd2e687e71cd52ff53c797351b09bcde3d6e7061e6a50917b",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 133,
+          "y": 78,
+          "size": 182
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_caring_male/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_caring_male/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 110805,
+            "sha256": "f77fbe25021d3d70f2bbab9cf9c07a316b84eecf165ee6c2ec5783f21693a94f",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_caring_male/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 70794,
+            "sha256": "fad717591dc1d493f70478311b8e8b11f8534d36169cedfa0d9d4d506a006f98",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 146,
+          "y": 47,
+          "size": 174
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_caring_female/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_caring_female/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 106425,
+            "sha256": "265d59462ce64f05ab0997fe015163bbbca694d62beaa03e09500c8b8f3f6322",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_caring_female/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 70970,
+            "sha256": "baa515f6ba03d48e625c6d581cae5aaae98a7a5ddd443533c169d935039eaf3d",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 143,
+          "y": 44,
+          "size": 176
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_proud_male/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_proud_male/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 114695,
+            "sha256": "c52f9cac7d5b7e58c45cfea0b8e84fdce58204c2795e9e837e13013571055e4a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_proud_male/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 75068,
+            "sha256": "a92c34ef12b134d509acf336e6030b41fc8f4417e7421360bc84fa0e547f6a04",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 147,
+          "y": 24,
+          "size": 173
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_proud_female/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_proud_female/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 113627,
+            "sha256": "2c91dcd4376d9e1b7636ab22fb6d6cec81564a7926b7331c5ac97ddc18b9c0ca",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_proud_female/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 75802,
+            "sha256": "092b0dfd1456bf3272a8a1ed9e9d0fb1911168d11a6ec03bd91f79acdc078baa",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 153,
+          "y": 26,
+          "size": 176
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_timid_male/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_timid_male/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 101485,
+            "sha256": "1779225d63f6199a1f13d4739b52119ce1937576f08014fe9baa6098b8b20ea8",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_timid_male/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 66054,
+            "sha256": "b523b33f0f2451c5da449ab5bfb556833e596fc534f5bb89c270bc41c565ae18",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 148,
+          "y": 52,
+          "size": 179
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "adv_timid_female/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/adv_timid_female/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 108423,
+            "sha256": "19b68bebea1afb386fdbad651d76d78373a2082d4b3bfd08725d63d77ef8ba2a",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/adv_timid_female/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 71672,
+            "sha256": "2a54b336e742bb15c2e53610c2d09b80ec8d0e75839daade8ccbce4b6023e3fb",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 132,
+          "y": 54,
+          "size": 176
+        },
+        "region_source": "base"
+      }
+    ]
+  }
+}

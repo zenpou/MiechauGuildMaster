@@ -21,14 +21,16 @@ CHARACTERS = {
     'fine': ['neutral', 'happy', 'angry', 'surprised', 'shy', 'sparkle'],
     'aurelia': ['neutral', 'happy', 'angry', 'surprised', 'shy', 'dragon'],
     'gald': ['neutral', 'happy', 'coatless_neutral', 'coatless_happy'],
+    'mother': ['neutral'],
     **{f'adv_{name}_{gender}': ['neutral'] for name in
        ['brave', 'cautious', 'greedy', 'caring', 'proud', 'timid'] for gender in ['male', 'female']},
 }
 expected = [('backgrounds', name) for name in [
-    'bg_guild_office_sunset', 'bg_dungeon_mine', 'bg_dungeon_crystal', 'bg_dungeon_dragon']]
+    'bg_guild_office_sunset', 'bg_dungeon_mine', 'bg_dungeon_crystal', 'bg_dungeon_dragon',
+    'bg_office_past', 'bg_home_morning']]
 expected += [('stills', name) for name in ['prologue', 'dragon']]
 expected += [('characters', f'{name}/{pose}') for name, poses in CHARACTERS.items() for pose in poses]
-assert len(expected) == 82
+assert len(expected) == 85
 records = []
 for category, name in expected:
     record = {'category': category, 'id': name, 'issues': [], 'files': {}}
@@ -72,7 +74,7 @@ for r in records:
         seen[digest] = r['id']
 
 face_expected = [name for category, name in expected if category == 'characters']
-assert len(face_expected) == 76
+assert len(face_expected) == 77
 face_expected_set = set(face_expected)
 face_persons = set(CHARACTERS)
 face_source_root = OUT / 'faces'
@@ -278,8 +280,8 @@ for r in records:
 page = '''<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>物語素材一覧</title><style>
 *{box-sizing:border-box}body{margin:0;background:#151923;color:#e8edf3;font:14px/1.6 system-ui,sans-serif}header{padding:28px;position:sticky;top:0;background:#151923ee;z-index:2;backdrop-filter:blur(10px)}h1{margin:0;font-size:26px}p{margin:6px 0}a{color:#9ed9ff}input,button{padding:8px 12px;border-radius:6px;border:1px solid #657083;background:#242d3d;color:white;margin:8px 5px 0 0}main{padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:20px}article{padding:12px;background:#232b39;border-radius:10px;overflow:hidden}article b{display:block;margin-top:10px;overflow-wrap:anywhere}.art{background:repeating-conic-gradient(#d8dbe1 0% 25%,#f6f7fa 0% 50%) 0 0/20px 20px;border-radius:6px;position:relative;overflow:hidden}.art>a{display:block}.art img{display:block;width:100%;height:auto}.characters .art>a>img{height:420px;object-fit:contain}.face-strip{position:absolute;right:6px;bottom:6px;display:flex;align-items:flex-end;gap:3px;padding:3px;background:#dce2e7dd;border:2px solid #647488;border-radius:5px}.face-strip a{display:block;line-height:0;color:#172030;text-align:center}.face-strip span{display:block;font-size:10px;line-height:16px}.dark .face-strip a{color:#fff}.face-strip img{width:auto;height:auto;object-fit:cover}.face-links{font-size:12px;margin-top:4px}.missing{height:220px;display:grid;place-items:center;color:#59616c}details{background:#232b39;color:#e8edf3}summary{padding:5px;cursor:pointer;font-size:12px}.dark .art,.dark .face-strip{background:#343b48}.light .art,.light .face-strip{background:#fff}[hidden]{display:none}
-</style><header><h1>物語素材一覧</h1><p>__COUNT__ / 82 素材 · 汎用冒険者は男女×6性格の各1枚（旧素材・笑顔差分は予備として保存）</p><p>生成・素材納品の確認用。ゲーム組み込み・実機表示は別工程。人物立ち絵右下は顔専用WebPを48/58/76pxで表示。</p><input id="filter" placeholder="人物名・背景IDで絞り込み" aria-label="素材フィルター"><button onclick="document.body.className=''">透過背景</button><button onclick="document.body.className='dark'">暗い背景</button><button onclick="document.body.className='light'">白い背景</button> <a href="story-assets-verification.json">検証結果</a></header><main>__CARDS__</main><script>document.querySelector('#filter').addEventListener('input',e=>document.querySelectorAll('article').forEach(a=>a.hidden=!a.dataset.id.includes(e.target.value.trim().toLowerCase())))</script></html>'''
-(OUT / 'story-assets-review.html').write_text(page.replace('__COUNT__', str(complete)).replace('__CARDS__', ''.join(cards)), encoding='utf-8')
+</style><header><h1>物語素材一覧</h1><p>__COUNT__ / __TOTAL__ 素材 · 汎用冒険者は男女×6性格の各1枚（旧素材・笑顔差分は予備として保存）</p><p>生成・素材納品の確認用。ゲーム組み込み・実機表示は別工程。人物立ち絵右下は顔専用WebPを48/58/76pxで表示。</p><input id="filter" placeholder="人物名・背景IDで絞り込み" aria-label="素材フィルター"><button onclick="document.body.className=''">透過背景</button><button onclick="document.body.className='dark'">暗い背景</button><button onclick="document.body.className='light'">白い背景</button> <a href="story-assets-verification.json">検証結果</a></header><main>__CARDS__</main><script>document.querySelector('#filter').addEventListener('input',e=>document.querySelectorAll('article').forEach(a=>a.hidden=!a.dataset.id.includes(e.target.value.trim().toLowerCase())))</script></html>'''
+(OUT / 'story-assets-review.html').write_text(page.replace('__COUNT__', str(complete)).replace('__TOTAL__', str(len(expected))).replace('__CARDS__', ''.join(cards)), encoding='utf-8')
 print(json.dumps({'expected':len(expected),'complete':complete,'remaining':len(expected)-complete}, ensure_ascii=False))
 if '--require-complete' in sys.argv and complete != len(expected):
     sys.exit(1)
@@ -326,6 +328,18 @@ if '--require-complete' in sys.argv:
             assert hashlib.sha256(path.read_bytes()).hexdigest() == file['sha256'], f'Existing file changed: {file["path"]}'
             face_baseline_count += 1
     assert face_baseline_count == 160, 'Previous delivery baseline must contain 160 files'
+    # The prologue adds files only: all 316 previously delivered images must stay exact.
+    prologue_baseline = json.loads((OUT / 'prologue-opening/previous-delivery-verification.json').read_text(encoding='utf-8'))
+    prologue_baseline_count = 0
+    assert len(prologue_baseline['assets']) == 82
+    assert len(prologue_baseline['faces']['assets']) == 76
+    for asset in prologue_baseline['assets'] + prologue_baseline['faces']['assets']:
+        for file in asset['files'].values():
+            path = ROOT / file['path']
+            assert path.exists(), f'Prologue baseline file missing: {file["path"]}'
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == file['sha256'], f'Existing file changed: {file["path"]}'
+            prologue_baseline_count += 1
+    assert prologue_baseline_count == 316
     final = {
         'assets': len(expected), 'files': len(expected) * 2,
         'faces': len(face_expected), 'face_files': len(face_expected) * 2,
@@ -334,9 +348,10 @@ if '--require-complete' in sys.argv:
         'valid_gallery_image_sources': len(links.sources),
         'source_bytes': sum(r['files']['source']['bytes'] for r in records),
         'webp_bytes': sum(r['files']['webp']['bytes'] for r in records),
-        'latest_revision': 'Face crops for every active pose; Iris coatless variants added',
+        'latest_revision': 'Prologue office, home morning, and mother silhouette with face crop added',
         'scope': 'Asset files and face crops delivered; game integration and live playback not included',
         'faces_baseline_files_unchanged': face_baseline_count,
+        'prologue_baseline_files_unchanged': prologue_baseline_count,
     }
     baseline = OUT / 'revisions/generic-gender-expansion/previous-verification.json'
     if baseline.exists():

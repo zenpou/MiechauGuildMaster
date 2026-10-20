@@ -1,7 +1,7 @@
 {
   "backgrounds": {
-    "bg_office_past": null,
-    "bg_home_morning": null,
+    "bg_office_past": "backgrounds/bg_office_past.webp",
+    "bg_home_morning": "backgrounds/bg_home_morning.webp",
     "bg_street_gate": "stills/prologue.webp",
     "bg_street_morning": "backgrounds/street-morning-v1.webp",
     "bg_guild_office": "backgrounds/guild-office-day-v1.webp",
@@ -98,7 +98,7 @@
       "coatless_neutral": {"image": "characters/gald/coatless_neutral.webp", "face": "faces/gald/coatless_neutral.webp"}
     },
     "mother": {
-      "neutral": null
+      "neutral": {"image": "characters/mother/neutral.webp", "face": "faces/mother/neutral.webp"}
     },
     "everyone": {
       "neutral": null

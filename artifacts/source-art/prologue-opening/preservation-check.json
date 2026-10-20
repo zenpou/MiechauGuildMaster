@@ -1,0 +1,20 @@
+{
+  "baseline_files": 630,
+  "unchanged_files": 622,
+  "unchanged_image_files": 462,
+  "unchanged_src_files": 79,
+  "changed_allowed_metadata": [
+    "artifacts/source-art/STORY-ASSETS-DELIVERY.md",
+    "artifacts/source-art/faces/face-regions.json",
+    "artifacts/source-art/story-assets-final-check.json",
+    "artifacts/source-art/story-assets-review.html",
+    "artifacts/source-art/story-assets-verification.json",
+    "artifacts/source-art/verify-story-assets.py"
+  ],
+  "outside_delivery_src_changes_observed": [
+    "src/core/story.ts",
+    "src/data/story.json"
+  ],
+  "unexpected_asset_changes": [],
+  "runtime_checked": false
+}

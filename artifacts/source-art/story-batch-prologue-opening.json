@@ -1,0 +1,58 @@
+{
+  "tool": "built-in image_gen",
+  "assets": [
+    {
+      "category": "backgrounds",
+      "id": "bg_office_past",
+      "source": "artifacts/source-art/backgrounds/bg_office_past.png",
+      "distribution": "public/art/backgrounds/bg_office_past.webp",
+      "sourceOutput": "artifacts/source-art/prologue-opening-work/bg_office_past-final.png",
+      "status": "generated",
+      "prompt": "Use case: illustration-story\nAsset type: game background, 1536x1024 landscape\nPrimary request: A modern Japanese office cubicle island late at night, completely empty of people. One foreground desk is cluttered with a tall stack of papers, a glowing computer monitor casting cold blue-white light, an empty energy drink can, an unbranded stomach-medicine box, and a slightly crooked keyboard. One chair is empty or tipped over. Through the window, night city office lights glow. A wall clock shows just after midnight, but all writing and clock numerals are softly blurred and unreadable. Fluorescent ceiling lights are partly switched off.\nStyle/medium: hand-painted anime game background, matching the supplied guild-office-day-v1 reference: warm textured brushwork, clean dark ink-like contours, painterly wood and fabric surfaces, polished visual-novel background illustration.\nComposition/framing: wide 3:2 background, central desk and key props concentrated near the middle for a narrow 375px smartphone crop; keep far left and far right low-detail. No characters. Do not put logos, company names, or legible text anywhere.\nLighting/mood: quiet, exhausted, memory-like midnight atmosphere; noticeably desaturated gray-blue overall, with the monitor as the main cool accent and only dim practical light.\nColor palette: muted gray-blue, charcoal, dusty brown, desaturated beige; reduced saturation compared with the bright fantasy guild-office reference.\nConstraints: exactly one empty office scene, no people, no readable words or numbers, no real-world logos, no watermark, no UI frame. Generate a full 1536x1024 image.",
+      "editPrompt": "Use case: precise-object-edit\nAsset type: game background, final 1536x1024 landscape\nInput image: the supplied candidate is the edit target; preserve its entire scene, painterly anime game style, composition, lighting, colors, desk props, and empty office exactly.\nPrimary request: change only the wall clock hands so it reads just after midnight: short hand near 12 and long hand near 2 (about 00:10). Keep the clock face softly blurred with no readable numerals.\nConstraints: preserve all other pixels and elements as closely as possible, including the central desk, paper stack, blue-white monitor, energy drink can, medicine box, crooked keyboard, empty chair, windows and city lights. No people, no logos, no legible text, no watermark. Keep 1536x1024 output.",
+      "generationSourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a1488a-2c40-7000-9e35-6dbc606d3cfa\\exec-064a6a31-9563-42e9-93c4-ae53ea816f68.png",
+      "referencesInspected": [
+        "artifacts/source-art/backgrounds/guild-office-day-v1.png",
+        "artifacts/source-art/characters/tina/design-approved-v1.png",
+        "artifacts/source-art/characters/kai/neutral.png"
+      ]
+    },
+    {
+      "category": "backgrounds",
+      "id": "bg_home_morning",
+      "source": "artifacts/source-art/backgrounds/bg_home_morning.png",
+      "distribution": "public/art/backgrounds/bg_home_morning.webp",
+      "sourceOutput": "artifacts/source-art/prologue-opening-work/bg_home_morning-final.png",
+      "status": "generated",
+      "prompt": "Use case: illustration-story\nAsset type: game background, 1536x1024 landscape\nPrimary request: A modest, tidy rural village home interior in the morning, with no people. Simple wooden or packed-earth floor, heavy wooden beams, plain plaster, and a warm lived-in farming household at the same humble level as a young man wearing a natural linen tunic. A rumpled straw bedroll with blanket and a discarded outer jacket lies in the foreground as the place where he napped. In the back wall, a wooden entrance door is centered slightly to the right and partly open, with a shaft of bright morning light entering from outside; this is the exit he will be kicked through. Shelves hold simple farming tools and cooking pots, and dried herbs hang overhead.\nStyle/medium: hand-painted anime visual-novel game background matching the supplied guild-office-day-v1 reference: fine dark contour lines, controlled painterly cel-like shading, warm textured wood and plaster surfaces, polished story-game illustration.\nComposition/framing: wide 3:2 background, all important elements grouped toward the center for a narrow 375px smartphone crop; keep the door clearly readable at center-right, with open floor space on the right foreground for a character standing later. No characters.\nLighting/mood: clear diagonal golden morning sunlight through the partly open door and a small window, cozy but slightly cramped domestic atmosphere.\nColor palette: warm oat linen, honey wood, muted clay, soft green herbs, pale gold sunbeams.\nConstraints: exactly one empty rustic home interior, no people, no readable text or logos, no watermark, no UI frame. Generate a full 1536x1024 image.",
+      "editPrompt": "Use case: precise-object-edit\nAsset type: game background, final 1536x1024 landscape\nInput image: the supplied candidate is the edit target; preserve its entire rustic morning home, painterly anime game style, composition, lighting, colors, door placement, shelves, tools, pots, herbs, and empty room.\nPrimary request: change only the sleeping place in the left foreground. Remove the wooden bed frame, legs, raised headboard, and any furniture structure under it. Replace it with a simple straw futon and blanket laid directly on the wooden floor, with a discarded outer jacket beside/on it. The floor bedding should run from the left foreground toward the center as a flat floor bed.\nConstraints: preserve the central-right partly open entrance door and morning sunbeam exactly, keep the scene empty of people, no readable text, no logos, no watermark, no UI frame. Keep 1536x1024 output.",
+      "generationSourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a1488a-2c40-7000-9e35-6dbc606d3cfa\\exec-67a06815-7d6f-4edd-aff0-5816b7d48ee8.png",
+      "referencesInspected": [
+        "artifacts/source-art/backgrounds/guild-office-day-v1.png",
+        "artifacts/source-art/characters/tina/design-approved-v1.png",
+        "artifacts/source-art/characters/kai/neutral.png"
+      ]
+    },
+    {
+      "id": "mother",
+      "pose": "neutral",
+      "source": "artifacts/source-art/characters/mother/neutral.png",
+      "distribution": "public/art/characters/mother/neutral.webp",
+      "sourceOutput": "artifacts/source-art/prologue-opening-work/mother-neutral-final.png",
+      "faceSource": "artifacts/source-art/faces/mother/neutral.png",
+      "faceDistribution": "public/art/faces/mother/neutral.webp",
+      "status": "generated",
+      "prompt": "Use case: illustration-story\nAsset type: transparent game character sprite, 512x1024 portrait\nPrimary request: Full-body silhouette of an angry village mother, shown alone from head to boots, on a genuinely transparent background. She is short and broad/stocky. Her face has no facial features at all: only a near-black charcoal ink silhouette with a very subtle lighter rim highlight so the outline remains readable indoors. Hair is tied back under a triangular headscarf, she wears a simple apron over a homespun dress, and her sleeves are rolled up; one hand rests firmly on her hip and the other arm is bent in a scolding pose. Add two or three small angular steam puffs or sparks around her head to communicate anger.\nInput image role: style reference is the supplied Tina design-approved-v1 character: crisp anime contour lines, clean cel-like shading, expressive readable silhouette, polished visual-novel sprite.\nStyle/medium: anime game character sprite with the same clean linework and restrained cel shading as Tina; use only charcoal-black and dark ink-gray silhouette values plus a thin warm-gray edge highlight, no skin or face color.\nComposition/framing: full body centered, head close to the top edge with a small transparent margin, feet fully visible near the bottom, no crop, upright neutral/scolding stance suitable for a 512x1024 visual-novel sprite. Keep the silhouette compact and clearly readable when reduced to 48px.\nLighting/mood: stern, comic anger conveyed only by posture, headscarf, apron, rolled sleeves, and steam/sparks.\nConstraints: transparent background with alpha; no scenery, no floor shadow, no text, no logo, no watermark, no facial eyes/nose/mouth/details, no extra people or props. Generate a full 512x1024 portrait image.",
+      "editPrompt": "Use case: precise-object-edit\nAsset type: transparent game character sprite, final 512x1024 portrait\nInput image: the supplied candidate is the edit target; preserve the silhouette design, near-black ink shading, thin warm-gray rim highlights, triangular headscarf, tied-back hair, apron, short stocky proportions, boots, steam puffs, transparent background, and head/feet placement.\nPrimary request: change only the pose of the raised arm on the viewer's left. Lower that arm so the hand rests on her hip, matching the other hand already on her hip. Both arms must be bent with both hands on the waist/hips in a stern scolding stance.\nConstraints: preserve the featureless face, headscarf, apron, rolled sleeves, steam/sparks, exact sprite framing, transparent alpha, no scenery, no text, no logos, no watermark. Keep 512x1024 output.",
+      "generationSourceOutput": "C:\\Users\\takas\\.codex\\generated_images\\01a1488a-2c40-7000-9e35-6dbc606d3cfa\\exec-78ceb44e-1265-44bd-ac9b-a2ccdb000ace.png",
+      "referencesInspected": [
+        "artifacts/source-art/backgrounds/guild-office-day-v1.png",
+        "artifacts/source-art/characters/tina/design-approved-v1.png",
+        "artifacts/source-art/characters/kai/neutral.png"
+      ]
+    }
+  ],
+  "prompts": "artifacts/source-art/prologue-opening-work/generation-calls.json",
+  "processing": "Backgrounds: original 1536x1024 PNG and WebP quality=85 method=6. Mother: RGBA 887x1774 resized with LANCZOS to 512x1024; lossless WebP method=6 exact=True. Face: region x=76 y=12 size=352, LANCZOS to 256x256, lossless WebP method=6 exact=True.",
+  "scope": "Asset delivery only. No src changes or game registration."
+}

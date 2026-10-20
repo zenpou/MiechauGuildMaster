@@ -1,6 +1,6 @@
 {
-  "expected": 82,
-  "complete": 82,
+  "expected": 85,
+  "complete": 85,
   "remaining": 0,
   "scope": "asset delivery only; game integration and live playback not included",
   "assets": [
@@ -117,6 +117,64 @@
           "mode": "RGB",
           "bytes": 348938,
           "sha256": "0e8991c9891f31dafc574ffa91c31edb33d93667ac63f086d0f6624cb12b7781"
+        }
+      }
+    },
+    {
+      "category": "backgrounds",
+      "id": "bg_office_past",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/backgrounds/bg_office_past.png",
+          "format": "PNG",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 1942892,
+          "sha256": "37e40a6160fd99da1485d708ce94905a033ebce8de100b8103195afb027bfefe"
+        },
+        "webp": {
+          "path": "public/art/backgrounds/bg_office_past.webp",
+          "format": "WEBP",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 120924,
+          "sha256": "7c0f04f3a81bf41d04cc3ed35c677e33da86842e23c5d6fb5e1b1a486be89827"
+        }
+      }
+    },
+    {
+      "category": "backgrounds",
+      "id": "bg_home_morning",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/backgrounds/bg_home_morning.png",
+          "format": "PNG",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 2696789,
+          "sha256": "b3abe5a0cb403c46fbed1865aebb678e8ab5b1963aa63e937d616a9feed041d9"
+        },
+        "webp": {
+          "path": "public/art/backgrounds/bg_home_morning.webp",
+          "format": "WEBP",
+          "size": [
+            1536,
+            1024
+          ],
+          "mode": "RGB",
+          "bytes": 280566,
+          "sha256": "3426d2486447fe56a7db69cac65592464da548738ac36ccad6195935be8cf269"
         }
       }
     },
@@ -3316,6 +3374,55 @@
     },
     {
       "category": "characters",
+      "id": "mother/neutral",
+      "issues": [],
+      "files": {
+        "source": {
+          "path": "artifacts/source-art/characters/mother/neutral.png",
+          "format": "PNG",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 425744,
+          "sha256": "ff3e3ac362d4e2376dc695d4a3d3e26ddf7e7418f5195d2e9f074adda4bb1c1e",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            17,
+            30,
+            494,
+            998
+          ]
+        },
+        "webp": {
+          "path": "public/art/characters/mother/neutral.webp",
+          "format": "WEBP",
+          "size": [
+            512,
+            1024
+          ],
+          "mode": "RGBA",
+          "bytes": 271078,
+          "sha256": "121c2c32d9c388fe2e6826a0ca8fc86598de2856b70a0094bf57ab10b2b31b1d",
+          "alpha_extrema": [
+            0,
+            255
+          ],
+          "content_bbox": [
+            17,
+            30,
+            494,
+            998
+          ]
+        }
+      }
+    },
+    {
+      "category": "characters",
       "id": "adv_brave_male/neutral",
       "issues": [],
       "files": {
@@ -3904,20 +4011,20 @@
     }
   ],
   "faces": {
-    "expected": 76,
-    "complete": 76,
+    "expected": 77,
+    "complete": 77,
     "remaining": 0,
     "files": {
-      "source_expected": 76,
-      "source_found": 76,
-      "webp_expected": 76,
-      "webp_found": 76
+      "source_expected": 77,
+      "source_found": 77,
+      "webp_expected": 77,
+      "webp_found": 77
     },
     "collection_issues": [],
     "regions": {
       "path": "artifacts/source-art/faces/face-regions.json",
-      "persons_expected": 22,
-      "persons_found": 22,
+      "persons_expected": 23,
+      "persons_found": 23,
       "issues": []
     },
     "assets": [
@@ -6670,6 +6777,49 @@
           "x": 146,
           "y": 22,
           "size": 178
+        },
+        "region_source": "base"
+      },
+      {
+        "category": "faces",
+        "id": "mother/neutral",
+        "issues": [],
+        "files": {
+          "source": {
+            "path": "artifacts/source-art/faces/mother/neutral.png",
+            "format": "PNG",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 82597,
+            "sha256": "d95adab14217b9d4ce15c702c15f415dd524cd7a7ed01f1cbaa4dfd458688750",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          },
+          "webp": {
+            "path": "public/art/faces/mother/neutral.webp",
+            "format": "WEBP",
+            "size": [
+              256,
+              256
+            ],
+            "mode": "RGBA",
+            "bytes": 53516,
+            "sha256": "b9af07df58533e340e44733ae0cab5f4fdd3d586a29816d3bc84cd4d416472d5",
+            "alpha_extrema": [
+              0,
+              255
+            ]
+          }
+        },
+        "region": {
+          "x": 76,
+          "y": 12,
+          "size": 352
         },
         "region_source": "base"
       },
