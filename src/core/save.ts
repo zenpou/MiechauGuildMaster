@@ -47,6 +47,7 @@ export function migrate(raw: unknown): GameState | null {
   merged.base = { ...base.base, ...(s.base ?? {}) };
   merged.world = { ...base.world, ...(s.world ?? {}) };
   merged.counters = { ...base.counters, ...(s.counters ?? {}) };
+  merged.blessing = { ...base.blessing, ...(s.blessing ?? {}) };
   for (const e of [...merged.expeditions, ...merged.history]) {
     e.result.maxDepth ??= 0;
     e.result.daysSpent ??= e.returnDay - e.startDay;

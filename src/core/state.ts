@@ -43,6 +43,7 @@ export function emptyState(seed: number, playerName = ''): GameState {
     repMilestones: [],
     debt: false,
     dragonDefeated: false,
+    blessing: { charges: 0, feverUntil: null, fullSince: null },
     flags: {},
   };
 }

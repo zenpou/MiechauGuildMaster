@@ -148,8 +148,8 @@ describe('性別と外見(版1 → 版2)', () => {
 
   it('版1のセーブを読むと、名簿と応募者の全員に性別と外見が入り、版が2になる', () => {
     const s = migrate(v1Save())!;
-    expect(SAVE_VERSION).toBe(2);
-    expect(s.version).toBe(2);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(2);
+    expect(s.version).toBe(SAVE_VERSION);
     expect(s.candidates.length).toBeGreaterThan(0);
     for (const a of everyone(s).filter((x) => !x.unique)) {
       expect(['male', 'female']).toContain(a.gender);

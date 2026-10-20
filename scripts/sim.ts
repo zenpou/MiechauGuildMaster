@@ -11,6 +11,7 @@ import { parseFloor } from '../src/core/dungeon';
 import { cellDepths } from '../src/core/explore';
 import { advanceDay, dispatch, exploredRateOf, newGame, sellItem } from '../src/core/game';
 import { addInventory } from '../src/core/ledger';
+import { canBless } from '../src/core/blessing';
 import { readDueStories } from '../src/core/story';
 import { addStarterParty } from './roster';
 import { PARTY_MAX, type ActionKind, type Adventurer, type DispatchOrder, type Expedition } from '../src/core/types';
@@ -101,6 +102,7 @@ function run(seed: number, leaderPersonality?: string): RunResult {
         action, target,
         policy: POLICY_ID, days: DAYS,
         items: (s.inventory.potion ?? 0) >= 1 ? { potion: 1 } : {},
+        blessed: canBless(s),
       };
       const r = dispatch(s, order);
       if (r.ok) pending.set(r.expedition.id, ++count);
@@ -260,7 +262,7 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
     const party = s.adventurers.filter(readyRested).slice(0, PARTY_MAX);
     if (party.length >= MIN_PARTY) {
       const items: Record<string, number> = (s.inventory.potion ?? 0) >= 1 ? { potion: 1 } : {};
-      const common = { partyIds: party.map((a) => a.id), leaderId: party[0].id, policy: POLICY_ID, days: DAYS, items };
+      const common = { partyIds: party.map((a) => a.id), leaderId: party[0].id, policy: POLICY_ID, days: DAYS, items, blessed: canBless(s) };
       let order: DispatchOrder;
       if (toMine) {
         order = { ...common, action: s.dungeons[MINE].confirmed ? 'explore' : 'survey', target: { dungeon: MINE, floor: FLOOR_ID } };

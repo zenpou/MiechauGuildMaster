@@ -11,6 +11,7 @@ import { acceptQuest, advanceDay, buildFacility, dispatch, exploredRateOf, newGa
 import { dispatchBlock, markRead, replyMail } from '../src/core/mail';
 import { activeQuests, deliver, visibleQuests } from '../src/core/quests';
 import { capacity, hire, hireFee } from '../src/core/recruit';
+import { canBless } from '../src/core/blessing';
 import { readDueStories } from '../src/core/story';
 import { addStarterParty } from './roster';
 import {
@@ -242,7 +243,7 @@ function runStyle(style: Style, seed: number): Run {
     const items: Record<string, number> = (s.inventory.potion ?? 0) >= 1 ? { potion: 1 } : {};
     const r = dispatch(s, {
       partyIds: party.map((a) => a.id), leaderId: party[0].id,
-      action: t.action, target: t.target, policy: POLICY_ID, days: DAYS, items,
+      action: t.action, target: t.target, policy: POLICY_ID, days: DAYS, items, blessed: canBless(s),
     });
     if (r.ok && t.questId) working.set(r.expedition.id, t.questId);
     return r.ok;

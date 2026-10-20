@@ -59,7 +59,7 @@ export function replaceState(s: GameState) {
 
 function newDispatchForm() {
   return {
-    members: [] as string[], leader: null as string | null, policy: 'standard', days: 3, potions: 0,
+    members: [] as string[], leader: null as string | null, policy: 'standard', days: 3, potions: 0, blessed: false,
     /** 護衛・運搬の依頼に出すときの依頼ID。空ならダンジョンへ */
     dungeon: 'forest_cave', floor: 'f1', questId: '', action: 'explore' as ActionKind, item: '', enemy: '',
   };

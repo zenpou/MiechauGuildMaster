@@ -78,6 +78,7 @@
   "craft": {
     "workerStatMin": 12
   },
+  "blessing": {"max": 3, "feverAfterDays": 3, "feverDays": 2, "fatigueRate": 0.5},
   "readiness": {
     "runs": 40,
     "gradeEdges": [

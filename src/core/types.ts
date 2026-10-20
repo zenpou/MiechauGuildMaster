@@ -275,6 +275,8 @@ export interface DispatchOrder {
   days: number;
   /** 持ち物 */
   items: Record<string, number>;
+  /** アイリスの祝福を掛けて出す(残りが要る) */
+  blessed?: boolean;
 }
 
 export type LogKind = 'narration' | 'combat' | 'talk' | 'event' | 'relation' | 'result' | 'map';
@@ -418,11 +420,23 @@ export interface GameState {
   repMilestones: number[];
   debt: boolean;
   dragonDefeated: boolean;
+  /** アイリスの祝福(第一章の読了で解禁)。溜まった魔力と発熱の状態 */
+  blessing: BlessingState;
   flags: Record<string, number | boolean>;
 }
 
+/** アイリスの魔力。隊が出ない日が続くと溜まり、溜まりすぎると発熱する(core/blessing.ts) */
+export interface BlessingState {
+  /** 掛けられる回数(出発する隊1つに1回) */
+  charges: number;
+  /** 発熱中なら、熱が引く日 */
+  feverUntil: number | null;
+  /** 上限に達した日(発熱までの日数を数える) */
+  fullSince: number | null;
+}
+
 // ---- 定数(数値調整はここではなく data/ で行う。構造上の上限だけ置く) ----
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 export const PARTY_MAX = 4;
 export const PARTIES_MAX = 4;
 export const LOYALTY_MAX = 255;

@@ -25,6 +25,8 @@ export interface ExploreInput {
   days: number;
   /** 持ち物(potion など) */
   items: Record<string, number>;
+  /** 疲労の増え方の倍率(祝福で下がる) */
+  fatigueMult?: number;
   relations: Record<string, number>;
   startDay: number;
   action: ActionKind;
@@ -195,7 +197,7 @@ export function runExploration(inp: ExploreInput): { result: ExpeditionResult; t
   const edgesDone = new Set<number>();
 
   const addFatigue = (n: number) => {
-    for (const m of members) result.fatigue[m.id] += Math.round(n * traitNum(m, 'fatigueRate', 1));
+    for (const m of members) result.fatigue[m.id] += Math.round(n * traitNum(m, 'fatigueRate', 1) * (inp.fatigueMult ?? 1));
   };
   const avgFatigue = () => members.reduce((s, m) => s + m.fatigue + result.fatigue[m.id], 0) / members.length;
   const retreatThreshold = () =>

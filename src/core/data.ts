@@ -97,6 +97,16 @@ export interface Tuning {
     /** 依頼報酬の係数。納品=売値合計×、討伐=敵exp×、護衛・運搬=1日あたり */
     deliverPriceMul: number; huntExpMul: number; escortGoldPerDay: number; transportGoldPerDay: number;
   };
+  blessing: {
+    /** 溜められる回数 */
+    max: number;
+    /** 上限のまま何日で発熱するか */
+    feverAfterDays: number;
+    /** 発熱が続く日数(その間は使えない) */
+    feverDays: number;
+    /** 掛けた隊の疲労の増え方(1 = そのまま) */
+    fatigueRate: number;
+  };
   readiness: {
     runs: number;
     /** 余裕 / 適正 / 厳しい の境(戦力比) */

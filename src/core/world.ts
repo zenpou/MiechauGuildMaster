@@ -145,7 +145,7 @@ export interface TravelResult {
  */
 export function simulateTravel(
   rng: Rng, members: Adventurer[], nodes: string[], direction: 'outbound' | 'return', knowledge: EdgeKnowledge,
-  encounterMult = 1,
+  encounterMult = 1, fatigueMult = 1,
 ): TravelResult {
   const path = direction === 'outbound' ? nodes : [...nodes].reverse();
   const edges = edgesOf(path, knowledge);
@@ -163,7 +163,7 @@ export function simulateTravel(
   const downed = new Set<string>();
   for (const m of members) result.fatigue[m.id] = 0;
   const addFatigue = (n: number) => {
-    for (const m of members) result.fatigue[m.id] += Math.round(n * traitNum(m, 'fatigueRate', 1));
+    for (const m of members) result.fatigue[m.id] += Math.round(n * traitNum(m, 'fatigueRate', 1) * fatigueMult);
   };
 
   for (let i = 0; i < edges.length && !result.wiped; i++) {

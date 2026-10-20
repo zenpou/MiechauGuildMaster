@@ -98,6 +98,7 @@ const { assessReadiness } = await import('../src/core/readiness');
 const { capacity, hire, hireFee } = await import('../src/core/recruit');
 const { serialize } = await import('../src/core/save');
 const { readDueStories } = await import('../src/core/story');
+const { canBless } = await import('../src/core/blessing');
 const { canTrain, trainSkill } = await import('../src/core/training');
 const { PARTY_MAX } = await import('../src/core/types');
 const { travelDays } = await import('../src/core/world');
@@ -926,7 +927,7 @@ function runSeed(seed: number, log: boolean): Run {
     if (pot) items.potion = pot;
     const hi = Math.min(PARTY_POTIONS, have('hi_potion'));
     if (role !== 'third' && p.target.dungeon && hi) items.hi_potion = hi;
-    return { partyIds: party.map((a) => a.id), leaderId: leaderOf(party, p.action).id, action: p.action, target: p.target, policy, days: p.days, items };
+    return { partyIds: party.map((a) => a.id), leaderId: leaderOf(party, p.action).id, action: p.action, target: p.target, policy, days: p.days, items, blessed: canBless(s) };
   };
   // grade は戦力比だけで決まり、予測の試行の結果(撤退率・全滅率)を見ない。坑道で予測「撤退100%」のまま
   // 「厳しい」止まりで20回続けて撤退した seed があったので、先端だけは試行して予測も見る。ほかは試行0回(速さのため)

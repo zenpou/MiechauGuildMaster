@@ -68,7 +68,7 @@ export function assessReadiness(s: GameState, o: DispatchOrder, runs = T.runs): 
       progress, days: o.days, items: { ...(o.items ?? {}) }, relations: s.relations, startDay: s.day,
       action: o.action, target: { item: o.target.item, enemy: o.target.enemy }, knownOnly: true,
       keys: heldKeys(s), transit: floorTransit(dungeon, floorId, progress, heldKeys(s)) ?? 0,
-      hiddenBonus: bonus(s, 'hiddenFind'),
+      hiddenBonus: bonus(s, 'hiddenFind'), fatigueMult: o.blessed ? TUNING.blessing.fatigueRate : 1,
     });
     if (result.wiped) wipes++;
     if (result.retreated) retreats++;

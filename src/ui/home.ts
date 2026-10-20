@@ -1,5 +1,6 @@
 import { effectiveStats } from '../core/adventurer';
 import { facilityLevel } from '../core/base';
+import { blessingStatus } from '../core/blessing';
 import { canEquip, equip, unequip } from '../core/equipment';
 import { advanceDay, buyItem, newGame, sellGold, sellItem } from '../core/game';
 import { ITEM, JOB, JOBS, PERSONALITY, TRAINED_SKILL, TUNING, type TrainedSkillDef } from '../core/data';
@@ -59,6 +60,7 @@ export function homeTab(): HTMLElement {
   const potion = ITEM.potion;
   return div('tab-body',
     hintBlock(),
+    blessingBlock(),
     sceneBlock(),
     noticesBlock(),
     h('h2', null, `名簿(${s.adventurers.length}/${capacity(s)}人)`),
@@ -117,6 +119,21 @@ function profileRow(a: Adventurer): HTMLElement {
         span('dim', personaText(a.persona)),
       ),
     ),
+  );
+}
+
+/** アイリスの祝福の残り。隊が出ない日が続くと溜まりすぎて発熱するので、いつ溢れるかまで見せる */
+function blessingBlock(): HTMLElement | null {
+  const b = blessingStatus(state);
+  if (!b.unlocked) return null;
+  const gauge = '●'.repeat(b.charges) + '○'.repeat(Math.max(0, b.max - b.charges));
+  const note = b.fever ? `発熱中。あと${b.daysLeft}日は祝福が使えない`
+    : b.charges >= b.max ? `魔力が溜まりきっている。あと${b.daysLeft}日で熱を出す。隊を出す朝に「派遣」で祝福を`
+      : '1日に1つ溜まる。出発する隊に掛けると疲れにくくなる';
+  return div('detail blessing',
+    div('small dim', 'アイリスの祝福'),
+    div(null, `${gauge} 残り${b.charges}/${b.max}`),
+    div('small dim', note),
   );
 }
 

@@ -1,6 +1,7 @@
 // 最初の数日のヒント: いまの状態から「次にやること」を1つだけ出す。閉じたものは二度と出ない。
 // 文面は受付のノエルの台詞(口調は docs/story/characters/noel.md)。操作の名前(「派遣」など)は鉤括弧で残し、押す先が分かるようにする
 // 状態は flags に持つので、GameState に項目は足さない。
+import { canBless } from './blessing';
 import { facilityLevel } from './base';
 import { promotionCost, promotionOptions } from './jobs';
 import type { GameState } from './types';
@@ -40,6 +41,10 @@ const RULES: Rule[] = [
   {
     id: 'quests', when: (s) => s.history.length > 0 && !s.quests.some((q) => q.status !== 'posted'),
     text: '「依頼」の掲示には報酬と評判がかかっています。納期に遅れると評判が下がりますので、日数を見て受けてください。無理なものは断ってよいと、マスター代行ご自身がおっしゃっていましたよね?',
+  },
+  {
+    id: 'blessing', when: (s) => canBless(s) && !s.history.some((e) => e.order.blessed) && !s.expeditions.some((e) => e.order.blessed),
+    text: 'お嬢様の『祝福』が使えるようになりました。「派遣」の窓口で出発する隊に掛けると、皆さん疲れにくくなります。お嬢様の魔力は日ごとに溜まり、溜まりきったまま日が経つと熱を出されますので、どうか毎日……いえ、隊を出す朝には必ず!',
   },
   {
     id: 'promote', when: (s) => promotable(s) && facilityLevel(s, 'training') >= 1 && s.gold >= promotionCost(s),

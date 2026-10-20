@@ -1,3 +1,4 @@
+import { blessingStatus, canBless } from '../core/blessing';
 import { carryCapacity } from '../core/adventurer';
 import { DUNGEON, DUNGEONS, ENEMY, ITEM, JOB, NODE, POLICIES, PERSONALITY, TUNING } from '../core/data';
 import { needsSearch, parseFloor } from '../core/dungeon';
@@ -65,6 +66,7 @@ function tidy() {
   d.members = d.members.filter((id) => ok.has(id));
   if (!d.leader || !d.members.includes(d.leader)) d.leader = d.members[0] ?? null;
   d.potions = Math.min(d.potions, state.inventory.potion ?? 0);
+  if (d.blessed && !canBless(state)) d.blessed = false;
   if (!state.dungeons[d.dungeon]) d.dungeon = dungeonIds()[0];
   const floors = floorChoices(d.dungeon);
   if (!floors.some((f) => f.id === d.floor && f.transit !== null)) d.floor = floors[0]?.id ?? 'f1';
@@ -77,6 +79,19 @@ function tidy() {
   if (d.action !== 'hunt' || !c.full || !c.enemies.includes(d.enemy)) d.enemy = '';
 }
 
+/** アイリスの祝福(第一章の読了で解禁)。残りが無い・発熱中は理由を出して選べない */
+function blessingRow(): HTMLElement | null {
+  const b = blessingStatus(state);
+  if (!b.unlocked) return null;
+  const d = ui.d;
+  const can = canBless(state);
+  const why = b.fever ? `発熱中(あと${b.daysLeft}日)` : b.charges === 0 ? '残りなし(1日1つ溜まる)' : '';
+  return h('label', { class: can ? '' : 'dim', title: `隊の疲労の増え方が${Math.round(TUNING.blessing.fatigueRate * 100)}%になる。出発する隊1つに1回` },
+    h('input', { type: 'checkbox', checked: d.blessed ? true : undefined, disabled: !can, onchange: (ev: Event) => { d.blessed = (ev.target as HTMLInputElement).checked; render(); } }),
+    ` アイリスの祝福(残り${b.charges}/${b.max})${why ? ` ${why}` : ''}`,
+  );
+}
+
 function currentOrder(): DispatchOrder | null {
   const d = ui.d;
   if (!d.leader || !d.members.length) return null;
@@ -84,7 +99,7 @@ function currentOrder(): DispatchOrder | null {
   if (q) {
     return {
       partyIds: [...d.members], leaderId: d.leader, action: q.type as ActionKind, target: { questId: q.id },
-      policy: d.policy, days: 1, items: d.potions > 0 ? { potion: d.potions } : {},
+      policy: d.policy, days: 1, items: d.potions > 0 ? { potion: d.potions } : {}, blessed: d.blessed,
     };
   }
   const target: DispatchOrder['target'] = { dungeon: d.dungeon, floor: d.floor };
@@ -92,7 +107,7 @@ function currentOrder(): DispatchOrder | null {
   if (d.action === 'hunt' && d.enemy) target.enemy = d.enemy;
   return {
     partyIds: [...d.members], leaderId: d.leader, action: d.action, target,
-    policy: d.policy, days: d.days, items: d.potions > 0 ? { potion: d.potions } : {},
+    policy: d.policy, days: d.days, items: d.potions > 0 ? { potion: d.potions } : {}, blessed: d.blessed,
   };
 }
 
@@ -157,6 +172,7 @@ export function dispatchTab(): HTMLElement {
         h('select', { onchange: (ev: Event) => { d.potions = Number(val(ev)); render(); } },
           ...Array.from({ length: potionStock + 1 }, (_, n) => h('option', { value: n, selected: n === d.potions ? true : undefined }, `${n}個`))),
       ),
+      blessingRow(),
     ),
     div('dim small', POLICIES.find((p) => p.id === d.policy)?.desc ?? ''),
     div('trip', tripText(quest)),
@@ -336,6 +352,7 @@ function depart() {
   d.members = [];
   d.leader = null;
   d.potions = 0;
+  d.blessed = false;
   ui.forecast = null;
   commit();
   toast(`出発しました。${r.expedition.returnDay}日目に帰還します。`);

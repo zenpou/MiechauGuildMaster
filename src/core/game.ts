@@ -1,5 +1,6 @@
 // ゲーム状態の進行。派遣は出発時に 往路・現地・復路 を全部確定し、帰還日に applyReturn で開示する。
 import { addExp, carryCapacity, powerOf } from './adventurer';
+import { canBless, tickBlessing, useBlessing } from './blessing';
 import { achievementExpMult, checkAchievements } from './achievements';
 import { bonus, build, completeConstructions, dailyProduction, facilityUpkeep, synergyValue } from './base';
 import { completeCrafts } from './craft';
@@ -177,6 +178,7 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   }
   const blocked = dispatchBlock(s, members);
   if (blocked) return fail(blocked);
+  if (o.blessed && !canBless(s)) return fail('アイリスの祝福はいま使えません');
   const items = o.items ?? {};
   for (const [k, n] of Object.entries(items)) {
     if (!has(ITEM, k) || !isCount(n)) return fail('持ち物の指定が不正です');
@@ -192,9 +194,11 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   // 帰還日まで隊員の状態は変わらないが、シミュレーション中の書き換えから在籍データを守るため複製を渡す
   const party = members.map((m) => structuredClone(m));
   const encounterMult = 1 - Math.min(ROAD_ENCOUNTER_OFF_MAX, bonus(s, 'roadEncounterOff'));
-  const outLeg = simulateTravel(rngFor(s.seed, 'road', n, 'out'), party, trip.out, 'outbound', k, encounterMult);
+  // 祝福は疲労の増え方だけを変える。乱数の引き方は変えないので、掛けても道中・現地の出来事は同じ
+  const fatigueMult = o.blessed ? TUNING.blessing.fatigueRate : 1;
+  const outLeg = simulateTravel(rngFor(s.seed, 'road', n, 'out'), party, trip.out, 'outbound', k, encounterMult, fatigueMult);
   // 呼び戻しで現地を切り上げても使えるよう、現地の結果に関係なく帰路の遭遇も先に引いておく
-  const backLeg = simulateTravel(rngFor(s.seed, 'road', n, 'back'), party, trip.back, 'outbound', k, encounterMult);
+  const backLeg = simulateTravel(rngFor(s.seed, 'road', n, 'back'), party, trip.back, 'outbound', k, encounterMult, fatigueMult);
   const outDays = pathDays(trip.out, k);
   let site: ExpeditionResult | null = null;
   if (trip.dungeonId && !outLeg.wiped) {
@@ -207,7 +211,7 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
       action: o.action, target: { item: o.target.item, enemy: o.target.enemy },
       // 出発時の在庫で扉が決まる。2階以降は前の階を抜ける歩数を往復で払う
       keys: heldKeys(s), transit: floorTransit(DUNGEON[trip.dungeonId], trip.floorId, s.dungeons[trip.dungeonId], heldKeys(s)) ?? 0,
-      hiddenBonus: bonus(s, 'hiddenFind'),
+      hiddenBonus: bonus(s, 'hiddenFind'), fatigueMult,
     });
   }
   const result = combineLegs(outLeg, site, outLeg.wiped || site?.wiped ? null : backLeg, items, outDays);
@@ -223,12 +227,13 @@ export function dispatch(s: GameState, o: DispatchOrder): { ok: true; expedition
   }
   const expedition: ExpeditionEx = {
     id: `e${s.counters.nextId++}`,
-    order: structuredClone({ ...o, items, target: { ...o.target, route: reached } }),
+    order: structuredClone({ ...o, items, blessed: !!o.blessed, target: { ...o.target, route: reached } }),
     startDay: s.day, returnDay: steps[steps.length - 1].day,
     steps, result, recalledDay: null, claimed: false,
     legs: { out: outLeg, back: backLeg, outNodes: trip.out, backNodes: trip.back, items: { ...items } },
   };
   s.counters.dispatches++;
+  if (o.blessed) useBlessing(s);
   markTired(s, members);
   recordParty(s, o.partyIds);
   for (const m of members) m.status = 'away';
@@ -567,6 +572,7 @@ export function advanceDay(s: GameState): DayReport {
   dailyProduction(s, notices);
   completeTraining(s, notices);
   advanceUniqueChain(s, notices);
+  tickBlessing(s, notices);
 
   const returnedIds = new Set(returned.flatMap((e) => e.order.partyIds));
   const rest = T.restFatigue - bonus(s, 'fatigueRecover');
