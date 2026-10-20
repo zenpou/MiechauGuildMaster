@@ -58,7 +58,7 @@ export function homeTab(): HTMLElement {
     blessingBlock(),
     sceneBlock(),
     h('h2', null, `名簿(${s.adventurers.length}/${capacity(s)}人)`),
-    div('dim small', `名前を押すと装備の付け替えと訓練ができます。解雇は待機中の者だけ(費用なし)。★はユニーク。忠誠が節目(${LOYALTY_MILESTONES.join('/')})に届くとメールが来ます。`),
+    div('dim small', `名前を押すと装備の付け替えと訓練ができます。解雇できるのは待機中の汎用冒険者です(費用なし)。★はユニーク。忠誠が節目(${LOYALTY_MILESTONES.join('/')})に届くと、ユニークは仲間の会話、汎用冒険者はメールが開きます。`),
     div('scroll',
       h('table', { class: 'roster' },
         h('thead', null, h('tr', null, ...ROSTER_HEAD.map((t) => h('th', null, t)))),
