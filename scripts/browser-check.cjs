@@ -1,6 +1,6 @@
 'use strict';
 // ビルドした画面(dist)を、インストール済みの Chrome で通して確かめる。npm run build の後に npm run test:browser で回す。
-// 引数にシナリオ名(new tabs dispatch day60 day100 clear transfer pwa)を並べると、それだけを回す。
+// 引数にシナリオ名(new tabs dispatch story-pacing day60 day100 clear transfer pwa)を並べると、それだけを回す。
 // 結果は artifacts/browser-check.json、画面は artifacts/screens/phase7-*.png。失敗が1つでもあれば終了コード1。
 const fs = require('node:fs');
 const http = require('node:http');
@@ -47,6 +47,7 @@ const SCENARIOS = [
   { id: 'new', title: '新規開始', run: newGame },
   { id: 'tabs', title: '全タブ巡回', run: newGameTabs },
   { id: 'dispatch', title: '派遣の通し', run: dispatchRoundTrip },
+  { id: 'story-pacing', title: '初回帰還と個別会話の日送り', run: storyPacing },
   { id: 'day60', title: '途中のセーブ(60日)', fixture: 'day60', run: (t) => midGame(t, 'day60') },
   { id: 'day100', title: '途中のセーブ(100日)', fixture: 'day100', run: (t) => midGame(t, 'day100') },
   { id: 'clear', title: '竜を倒したセーブ', fixture: 'clear', run: dragonCleared },
@@ -268,7 +269,7 @@ async function skipStories(t, where, shot) {
   throw new Error(`${where}: 物語を20回スキップしても終わらない`);
 }
 
-async function nextDay(t) {
+async function nextDay(t, shot) {
   const before = (await t.save()).day;
   await t.page.getByRole('button', { name: '次の日へ', exact: true }).click();
   await t.page.waitForFunction(([key, day]) => JSON.parse(localStorage.getItem(key)).day > day, [SAVE_KEY, before]);
@@ -277,7 +278,7 @@ async function nextDay(t) {
     await observation.getByRole('button', { name: '観察を終える', exact: true }).click();
     await observation.waitFor({ state: 'detached' });
   }
-  await skipStories(t, `${before + 1}日目`);
+  return skipStories(t, `${before + 1}日目`, shot);
 }
 
 /**
@@ -402,6 +403,41 @@ async function dispatchRoundTrip(t) {
     `再読込でセーブが変わった: ${JSON.stringify(again)}`);
   t.check(await page.getByText(`${back.day}日目`, { exact: true }).first().isVisible(), `再読込の後、拠点に「${back.day}日目」と出ない`);
   t.flush('再読込');
+}
+
+async function storyPacing(t) {
+  await dispatchRoundTrip(t);
+  const { page } = t;
+  const storyFlags = () => page.evaluate(key => Object.entries(JSON.parse(localStorage.getItem(key)).flags)
+    .filter(([id]) => id.startsWith('story:')).sort(([a], [b]) => a.localeCompare(b)), SAVE_KEY);
+  const initial = await storyFlags();
+  t.check(JSON.stringify(initial) === JSON.stringify([['story:ch1', 2], ['story:prologue', 1]]),
+    `初回帰還後は第一章だけのはず: ${JSON.stringify(initial)}`);
+  for (let day = 3; day <= 9; day++) {
+    const count = await nextDay(t, day >= 8 ? `story-pacing-day${day}` : undefined);
+    const expected = day < 8 ? 0 : 1;
+    t.check(count === expected, `${day}日目の会話は${expected}話のはずが${count}話`);
+    const flags = await storyFlags();
+    const side = flags.filter(([id]) => id.startsWith('story:loyalty:'));
+    const want = day < 8 ? [] : day === 8 ? [['story:loyalty:tina:50', 8]]
+      : [['story:loyalty:sera:50', 9], ['story:loyalty:tina:50', 8]];
+    t.check(JSON.stringify(side) === JSON.stringify(want), `${day}日目の個別会話が想定と違う: ${JSON.stringify(side)}`);
+    await page.reload();
+    await waitApp(page);
+    t.check(await page.locator('.vn-player').count() === 0, `${day}日目の再読込で追加の会話が出た`);
+    if (day === 8) {
+      // 記録からの読み返しでも、同日のセラの会話を連続発生させない。
+      await openTab(page, '記録');
+      await page.locator('.story-chapters li').filter({ hasText: 'ティナ' })
+        .getByRole('button', { name: '読み返す' }).click();
+      t.check(await skipStories(t, '8日目の読み返し') === 1, '読み返しに別の会話が続いた');
+      t.check(JSON.stringify(await storyFlags()) === JSON.stringify(flags), '読み返しで既読日が変わった');
+    }
+  }
+  await openTab(page, '拠点');
+  await t.shot('story-pacing-day9-home');
+  t.note('2日目は第一章のみ、3〜7日目は個別会話なし、8日目ティナ・9日目セラ。再読込・読み返しでも1日1話を維持');
+  t.flush('個別会話の日送り');
 }
 
 async function midGame(t, name) {

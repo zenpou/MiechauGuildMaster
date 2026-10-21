@@ -91,6 +91,8 @@ async function run(viewport) {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
 
   // 忠誠255の会話を、実際の保存→再読込→全行進行→読み返しで確かめる。
+  // 本編読了日の個別会話は保留されるので、終章を読んだ翌日の状態で確認する。
+  saved.day += 1;
   const tina = saved.adventurers.find(a => a.unique === 'tina');
   tina.loyalty = 255;
   tina.injuryDays = 0;

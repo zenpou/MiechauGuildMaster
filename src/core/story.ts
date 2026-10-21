@@ -76,12 +76,29 @@ export function castAway(s: GameState, c: StoryChapter): string[] {
   return s.adventurers.flatMap((a) => (a.unique && a.status === 'away' && onStage.has(a.unique) ? [a.unique] : []));
 }
 
+/** 本編を今日新しく読んだら、人物別会話は次の日まで待つ(0は日付不明なので数えない)。 */
+function mainStoryReadToday(s: GameState): boolean {
+  return s.day > 0 && STORY.some((chapter) => storySeenDay(s, chapter.id) === s.day);
+}
+
+/** 人物別会話を同じ日に二つ開かない。日付0の旧既読は枠を消費しない。 */
+function loyaltyStoryReadToday(s: GameState): boolean {
+  return s.day > 0 && LOYALTY_STORIES.some((chapter) => storySeenDay(s, chapter.id) === s.day);
+}
+
 /** 未読で条件を満たし、出る人物が全員拠点にいる章(台本の並び順) */
 export function storyDue(s: GameState): StoryChapter[] {
   const due = (chapters: StoryChapter[]) => chapters.filter(c => storySeenDay(s, c.id) === null && triggerMet(s, c.trigger));
   // 本編が開いているときは先に読む。登場人物の帰還待ちの間も脇話を割り込ませない。
   const main = due(STORY);
-  return (main.length ? main : due(LOYALTY_STORIES)).filter(c => castAway(s, c).length === 0);
+  if (main.length) return main.filter(c => castAway(s, c).length === 0);
+  // 本編を読み終えた直後に、そのまま人物別会話まで連続表示しない。
+  if (mainStoryReadToday(s)) return [];
+  if (loyaltyStoryReadToday(s)) return [];
+  const loyalty = due(LOYALTY_STORIES)
+    .filter(c => castAway(s, c).length === 0);
+  // 台本の順序をそのまま使い、同日に複数の人物別会話を開かない。
+  return loyalty.slice(0, 1);
 }
 
 /** 表示と読み返しで共通。戦闘は保存された実戦の記録から組み立てる。 */
@@ -100,11 +117,16 @@ export function markStorySeen(s: GameState, id: string, day: number = s.day): vo
 }
 
 /**
- * 出ている章を全部読んだことにする。物語を読まない bot・計測用。
- * 章は前章の読了を条件にした鎖なので、1つ既読にすると次が出る。出なくなるまで繰り返す
+ * 出ている本編を順に読み、人物別会話はその日の上限を守る。物語を読まない bot・計測用。
+ * 本編は前章の読了を条件にした鎖なので、1つ既読にすると次が出る。出なくなるまで繰り返す
  */
 export function readDueStories(s: GameState, day: number = s.day): void {
   for (let due = storyDue(s); due.length > 0; due = storyDue(s)) {
+    if (LOYALTY_STORIES.includes(due[0])) {
+      // day=0 は過去移行用の日付不明値でも、同じ呼出しで全人物別会話を既読にしない。
+      markStorySeen(s, due[0].id, day);
+      return;
+    }
     for (const c of due) markStorySeen(s, c.id, day);
   }
 }

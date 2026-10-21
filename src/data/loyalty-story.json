@@ -5,7 +5,7 @@
     "trigger": {
       "all": [
         { "loyalty": { "unique": "tina", "value": 50 } },
-        { "joinedDays": { "unique": "tina", "days": 1 } },
+        { "joinedDays": { "unique": "tina", "days": 7 } },
         { "flag": "story:prologue" },
         { "recovered": "tina" }
       ]
@@ -59,7 +59,7 @@
     "trigger": {
       "all": [
         { "loyalty": { "unique": "sera", "value": 50 } },
-        { "joinedDays": { "unique": "sera", "days": 1 } },
+        { "joinedDays": { "unique": "sera", "days": 7 } },
         { "flag": "story:ch1" },
         { "recovered": "sera" }
       ]
@@ -114,7 +114,7 @@
     "trigger": {
       "all": [
         { "loyalty": { "unique": "viola", "value": 50 } },
-        { "joinedDays": { "unique": "viola", "days": 1 } },
+        { "joinedDays": { "unique": "viola", "days": 7 } },
         { "flag": "story:ch2" },
         { "recovered": "viola" }
       ]
@@ -170,7 +170,7 @@
     "trigger": {
       "all": [
         { "loyalty": { "unique": "ruu", "value": 50 } },
-        { "joinedDays": { "unique": "ruu", "days": 1 } },
+        { "joinedDays": { "unique": "ruu", "days": 7 } },
         { "flag": "story:ch3" },
         { "recovered": "ruu" }
       ]
@@ -227,7 +227,7 @@
     "trigger": {
       "all": [
         { "loyalty": { "unique": "fine", "value": 50 } },
-        { "joinedDays": { "unique": "fine", "days": 1 } },
+        { "joinedDays": { "unique": "fine", "days": 7 } },
         { "flag": "story:ch4" },
         { "recovered": "fine" }
       ]
@@ -283,7 +283,7 @@
     "trigger": {
       "all": [
         { "loyalty": { "unique": "aurelia", "value": 50 } },
-        { "joinedDays": { "unique": "aurelia", "days": 1 } },
+        { "joinedDays": { "unique": "aurelia", "days": 7 } },
         { "flag": "story:epilogue" },
         { "recovered": "aurelia" }
       ]

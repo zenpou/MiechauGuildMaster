@@ -6,7 +6,7 @@ import { endingPages, onDragonDefeated } from '../src/core/ending';
 import { advanceDay, dispatch, newGame } from '../src/core/game';
 import { canChangeJob } from '../src/core/jobs';
 import { deserialize, migrate, serialize } from '../src/core/save';
-import { markStorySeen, presentChapter, STORY, storyDue, storySeenDay } from '../src/core/story';
+import { markStorySeen, presentChapter, readDueStories, STORY, storyDue, storySeenDay } from '../src/core/story';
 import type { DispatchOrder, GameState, JourneyFrame } from '../src/core/types';
 
 const text = (s: GameState) => presentChapter(s, STORY.find(c => c.id === 'epilogue')!).lines.map(l => l.text).join('\n');
@@ -213,7 +213,110 @@ describe('初勝利の回想とセーブ互換', () => {
 });
 
 describe('人物別会話の進行', () => {
-  it('旧メール50の印と関係なく、加入翌日・導入読了後に会話を開き、読み返しでは再発生しない', () => {
+  it('初回派遣の帰還後2日目は本編を優先し、個別会話を開かない', () => {
+    const s = newGame(818);
+    markStorySeen(s, 'prologue');
+    const sent = dispatch(s, order(s));
+    expect(sent.ok).toBe(true);
+    if (!sent.ok) return;
+    expect(sent.expedition.returnDay).toBe(2);
+    advanceDay(s);
+    expect(s.day).toBe(2);
+    expect(storyDue(s).map(c => c.id)).toEqual(['ch1']);
+  });
+
+  it('加入7日経過までは出ず、8日目と9日目に初回話を1つずつ出す', () => {
+    const s = newGame(819);
+    markStorySeen(s, 'prologue');
+    markStorySeen(s, 'ch1');
+    s.adventurers.forEach((a) => { a.loyalty = 50; a.injuryDays = 0; a.status = 'idle'; });
+    s.day = 7;
+    expect(storyDue(s)).toEqual([]);
+    s.day = 8;
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:tina:50']);
+    markStorySeen(s, 'loyalty:tina:50');
+    expect(storyDue(s)).toEqual([]);
+    s.day = 9;
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:sera:50']);
+  });
+
+  it('個別話の解禁後も本編の帰還待ち・読了日は保留し、botや読み返しでも日送りを守る', () => {
+    const s = newGame(824);
+    markStorySeen(s, 'prologue');
+    s.day = 8;
+    const sera = s.adventurers.find(a => a.unique === 'sera')!;
+    sera.status = 'away';
+    expect(storyDue(s)).toEqual([]);
+    sera.status = 'idle';
+    expect(storyDue(s).map(c => c.id)).toEqual(['ch1']);
+    readDueStories(s);
+    expect(storySeenDay(s, 'ch1')).toBe(8);
+    expect(storySeenDay(s, 'loyalty:tina:50')).toBeNull();
+    expect(storyDue(deserialize(serialize(s))!)).toEqual([]);
+    s.day = 9;
+    readDueStories(s);
+    readDueStories(s);
+    expect(storySeenDay(s, 'loyalty:tina:50')).toBe(9);
+    expect(storySeenDay(s, 'loyalty:sera:50')).toBeNull();
+    s.day = 10;
+    markStorySeen(s, 'ch1');
+    expect(storySeenDay(s, 'ch1')).toBe(8);
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:sera:50']);
+  });
+
+  it('忠誠255でも台本順の個別話を1日1話に制限する', () => {
+    const s = newGame(820);
+    markStorySeen(s, 'prologue');
+    markStorySeen(s, 'ch1');
+    s.adventurers.forEach((a) => { a.loyalty = 255; a.injuryDays = 0; a.status = 'idle'; });
+    s.day = 8;
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:tina:50']);
+    markStorySeen(s, 'loyalty:tina:50');
+    expect(storyDue(s)).toEqual([]);
+    s.day = 9;
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:tina:120']);
+  });
+
+  it('保存して読み直しても当日の個別話枠を保持する', () => {
+    const s = newGame(821);
+    markStorySeen(s, 'prologue');
+    markStorySeen(s, 'ch1');
+    s.day = 8;
+    markStorySeen(s, 'loyalty:tina:50');
+    const loaded = deserialize(serialize(s))!;
+    expect(storyDue(loaded)).toEqual([]);
+    loaded.day = 9;
+    expect(storyDue(loaded).map(c => c.id)).toEqual(['loyalty:sera:50']);
+  });
+
+  it('派遣中・負傷中の人物別話を保留し、在宅の候補を出す', () => {
+    const s = newGame(822);
+    markStorySeen(s, 'prologue');
+    markStorySeen(s, 'ch1');
+    const tina = s.adventurers.find(a => a.unique === 'tina')!;
+    s.day = 8;
+    tina.status = 'away';
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:sera:50']);
+    tina.status = 'idle';
+    tina.injuryDays = 1;
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:sera:50']);
+  });
+
+  it('旧セーブの日付不明既読0は当日枠を消費せず、readDueStoriesも個別話を連続解放しない', () => {
+    const s = newGame(823);
+    markStorySeen(s, 'prologue');
+    markStorySeen(s, 'ch1');
+    s.day = 8;
+    s.flags['story:loyalty:tina:50'] = 0;
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:sera:50']);
+
+    delete s.flags['story:loyalty:tina:50'];
+    readDueStories(s, 0);
+    expect(storySeenDay(s, 'loyalty:tina:50')).toBe(0);
+    expect(storySeenDay(s, 'loyalty:sera:50')).toBeNull();
+  });
+
+  it('旧メール50の印と関係なく、加入7日経過・導入読了後に会話を開き、読み返しでは再発生しない', () => {
     const s = newGame(816);
     const tina = s.adventurers[0];
     markStorySeen(s, 'prologue');
@@ -222,6 +325,8 @@ describe('人物別会話の進行', () => {
     s.day = 2;
     expect(storyDue(s).map(c => c.id)).toEqual(['ch1']);
     markStorySeen(s, 'ch1');
+    expect(storyDue(s).some(c => c.id === 'loyalty:tina:50')).toBe(false);
+    s.day = 8;
     expect(storyDue(s).some(c => c.id === 'loyalty:tina:50')).toBe(true);
     tina.status = 'away';
     expect(storyDue(s).some(c => c.id === 'loyalty:tina:50')).toBe(false);
@@ -232,14 +337,16 @@ describe('人物別会話の進行', () => {
     tina.loyalty = 255;
     expect(storyDue(s).some(c => c.id === 'loyalty:tina:120')).toBe(false);
     markStorySeen(s, 'loyalty:tina:50');
+    s.day = 9;
     expect(storyDue(s).some(c => c.id === 'loyalty:tina:120')).toBe(true);
     markStorySeen(s, 'loyalty:tina:120');
+    s.day = 10;
     expect(storyDue(s).some(c => c.id === 'loyalty:tina:255')).toBe(true);
     markStorySeen(s, 'loyalty:tina:255');
     const loyalty = tina.loyalty;
-    s.day = 3;
+    s.day = 11;
     markStorySeen(s, 'loyalty:tina:50');
-    expect(storySeenDay(s, 'loyalty:tina:50')).toBe(2);
+    expect(storySeenDay(s, 'loyalty:tina:50')).toBe(8);
     expect(tina.loyalty).toBe(loyalty);
     expect(storyDue(deserialize(serialize(s))!).some(c => c.id.startsWith('loyalty:tina:'))).toBe(false);
   });

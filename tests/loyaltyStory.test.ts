@@ -44,14 +44,14 @@ describe('人物別忠誠ストーリー', () => {
     expect(sera50.lines.map((line) => line.text).join('\n')).toContain('あの日');
   });
 
-  it('50は導入章・加入翌日・回復済み、120/255は直前章の読了を待つ', () => {
+  it('50は導入章・加入7日経過・回復済み、120/255は直前章の読了を待つ', () => {
     for (const unique of uniques) {
       const first = LOYALTY_STORIES.find((s) => s.id === `loyalty:${unique}:50`)!;
       const later = [120, 255].map((threshold) => LOYALTY_STORIES.find((s) => s.id === `loyalty:${unique}:${threshold}`)!);
       const all = (first.trigger as { all: unknown[] }).all as Record<string, unknown>[];
       expect(all).toEqual(expect.arrayContaining([
         { loyalty: { unique, value: 50 } },
-        { joinedDays: { unique, days: 1 } },
+        { joinedDays: { unique, days: 7 } },
         { recovered: unique },
       ]));
       expect(all.some((x) => typeof x.flag === 'string' && x.flag.startsWith('story:'))).toBe(true);
