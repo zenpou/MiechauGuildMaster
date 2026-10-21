@@ -10,6 +10,7 @@ import { parseFloor } from '../src/core/dungeon';
 import {
   acceptQuest, advanceDay, buildFacility, buyItem, dispatch, exploredRateOf, newGame, recall, sellGold, sellItem,
 } from '../src/core/game';
+import { acceptUniqueRequest, deliverUniqueRequest } from '../src/core/events';
 import { availableRecipes, canCraft } from '../src/core/craft';
 import { createQuest, deliver } from '../src/core/quests';
 import { hire } from '../src/core/recruit';
@@ -574,6 +575,48 @@ function mineReady(seed: number): GameState {
 }
 
 describe('移動込みの派遣', () => {
+  it('同日受注の境界は実際の派遣IDで判定する', () => {
+    const setup = () => {
+      const s = mineReady(73);
+      // 旧セーブからティナの訪問段階まで進んでいる状態。会話は未読でも旧進行は表示される。
+      s.flags['story:loyalty:tina:50'] = false;
+      s.flags['tina:step'] = 1;
+      s.flags['tina:old_mine'] = 0;
+      return s;
+    };
+    const mineOrder = (s: GameState): DispatchOrder => {
+      const tina = s.adventurers.find((a) => a.unique === 'tina')!;
+      return order(s, {
+        partyIds: s.adventurers.map((a) => a.id), leaderId: tina.id,
+        target: { dungeon: 'old_mine', floor: 'f1' }, policy: 'safe', days: 2, items: {},
+      });
+    };
+
+    const dispatchedFirst = setup();
+    const beforeAccept = dispatch(dispatchedFirst, mineOrder(dispatchedFirst));
+    expect(beforeAccept.ok).toBe(true);
+    if (!beforeAccept.ok) return;
+    const preAcceptedExpedition = beforeAccept.expedition;
+    expect(preAcceptedExpedition.id).toMatch(/^e\d+$/);
+    expect(preAcceptedExpedition.result.mapDeltas.some((d) => d.dungeon === 'old_mine')).toBe(true);
+    expect(acceptUniqueRequest(dispatchedFirst, 'tina', 1).ok).toBe(true);
+    while (dispatchedFirst.day < preAcceptedExpedition.returnDay) advanceDay(dispatchedFirst);
+    expect(dispatchedFirst.flags['tina:old_mine'] ?? 0).toBe(0);
+    expect(dispatchedFirst.flags['tina:step']).toBe(1);
+
+    const acceptedFirst = setup();
+    expect(acceptUniqueRequest(acceptedFirst, 'tina', 1).ok).toBe(true);
+    const afterAccept = dispatch(acceptedFirst, mineOrder(acceptedFirst));
+    expect(afterAccept.ok).toBe(true);
+    if (!afterAccept.ok) return;
+    const postAcceptedExpedition = afterAccept.expedition;
+    expect(postAcceptedExpedition.id).toBe(preAcceptedExpedition.id);
+    expect(postAcceptedExpedition.result.mapDeltas.some((d) => d.dungeon === 'old_mine')).toBe(true);
+    while (acceptedFirst.day < postAcceptedExpedition.returnDay) advanceDay(acceptedFirst);
+    expect(acceptedFirst.flags['tina:old_mine']).toBe(1);
+    expect(acceptedFirst.flags['tina:step']).toBe(1);
+  });
+
   it('returnDay = 出発日 + 往路 + 現地 + 復路、steps は planSteps と同じ', () => {
     const s = mineReady(21);
     const e = sent(s, { target: { dungeon: 'old_mine', floor: 'f1' }, days: 2 });
@@ -885,10 +928,15 @@ describe('訓練・親友・ユニークの日送りへの組み込み', () => {
     expect(s.flags[`friends:${pairKey(a.id, b.id)}`]).toBe(true);
   });
 
-  it('ユニークの最初の頼み(ティナの牙の納品)は、在庫があれば日送りで進む', () => {
+  it('ユニークの最初の頼み(ティナの牙の納品)は、受注後の明示納品で進む', () => {
     const s = fullGame(33);
+    s.flags['story:loyalty:tina:50'] = 0;
     s.inventory.fang = 5;
     advanceDay(s);
+    expect(s.flags['tina:step']).toBeUndefined();
+    expect(s.inventory.fang ?? 0).toBe(5);
+    expect(acceptUniqueRequest(s, 'tina', 0).ok).toBe(true);
+    expect(deliverUniqueRequest(s, 'tina', 0).ok).toBe(true);
     expect(s.flags['tina:step']).toBe(1);
     expect(s.inventory.fang ?? 0).toBe(0);
   });

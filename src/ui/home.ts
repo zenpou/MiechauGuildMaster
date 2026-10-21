@@ -58,7 +58,7 @@ export function homeTab(): HTMLElement {
     blessingBlock(),
     sceneBlock(),
     h('h2', null, `名簿(${s.adventurers.length}/${capacity(s)}人)`),
-    div('dim small', `名前を押すと装備の付け替えと訓練ができます。解雇できるのは待機中の汎用冒険者です(費用なし)。★はユニーク。忠誠が節目(${LOYALTY_MILESTONES.join('/')})に届くと、ユニークは仲間の会話、汎用冒険者はメールが開きます。仲間の会話は加入から7日経過後、1日1人・1話まで。本編があった日は翌日以降に持ち越します。`),
+    div('dim small', `名前を押すと装備の付け替えと訓練ができます。解雇できるのは待機中の汎用冒険者です(費用なし)。★はユニーク。忠誠が節目(${LOYALTY_MILESTONES.join('/')})に届くと、ユニークは仲間の会話、汎用冒険者はメールが開きます。仲間の会話は加入から7日経過後。本編も含め新しい物語は1日1話まで。仲間の頼みは会話の後に「依頼」で受けられます。`),
     div('scroll',
       h('table', { class: 'roster' },
         h('thead', null, h('tr', null, ...ROSTER_HEAD.map((t) => h('th', null, t)))),

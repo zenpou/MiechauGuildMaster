@@ -34,6 +34,7 @@ function triggerProblems(t: unknown, where: string): string[] {
       return typeof v === 'string' && ITEM[v]?.kind === 'key' ? [] : [`${where}: 鍵でないアイテム ${String(v)}`];
     case 'dragonDefeated':
     case 'endingSeen':
+    case 'hasReturned':
       return typeof v === 'boolean' ? [] : [`${where}: ${key} が真偽値でない`];
     case 'all':
       return Array.isArray(v) && v.length > 0
@@ -434,6 +435,7 @@ describe('storyDue', () => {
   function everythingMet(): GameState {
     const s = newGame(1);
     s.day = 2;
+    s.adventurers[0].history.expeditions = 1;
     confirmDungeon(s, 'old_mine');
     s.inventory.ruin_key = 1;
     finishQuests(s, 10);
@@ -447,15 +449,19 @@ describe('storyDue', () => {
     for (const id of ['prologue', 'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'epilogue']) {
       expect(ids(storyDue(s))).toEqual([id]);
       markStorySeen(s, id);
+      expect(storyDue(s)).toEqual([]);
+      s.day++;
     }
     expect(storyDue(s)).toEqual([]);
   });
 
-  it('第一章は序章読了の翌日(2日目)から', () => {
+  it('第一章は序章読了後、最短2日目の帰還を待つ', () => {
     const s = newGame(1);
     markStorySeen(s, 'prologue');
     expect(storyDue(s)).toEqual([]);
     s.day = 2;
+    expect(storyDue(s)).toEqual([]);
+    s.adventurers[0].history.expeditions = 1;
     expect(ids(storyDue(s))).toEqual(['ch1']);
   });
 
@@ -463,6 +469,7 @@ describe('storyDue', () => {
     const s = newGame(1);
     markStorySeen(s, 'prologue');
     s.day = 2;
+    s.adventurers[0].history.expeditions = 1;
     const member = s.adventurers.find((a) => a.unique === unique)!;
     member.status = 'away';
     expect(storyDue(s)).toEqual([]);
@@ -475,6 +482,7 @@ describe('storyDue', () => {
     const s = newGame(1);
     markStorySeen(s, 'prologue');
     s.day = 2;
+    s.adventurers[0].history.expeditions = 1;
     s.adventurers.push({ ...s.adventurers[0], id: 'x1', unique: undefined, status: 'away' });
     expect(ids(storyDue(s))).toEqual(['ch1']);
     s.adventurers[0].status = 'training';
@@ -483,18 +491,20 @@ describe('storyDue', () => {
 
   it('第四章は第三章読了と依頼10件、第五章は竜の紋章、終章は第五章読了と竜の討伐', () => {
     const s = everythingMet();
-    for (const id of ['prologue', 'ch1', 'ch2', 'ch3']) markStorySeen(s, id);
+    for (const id of ['prologue', 'ch1', 'ch2', 'ch3']) markStorySeen(s, id, 0);
     s.quests = s.quests.filter((q) => !q.id.startsWith('test-done-'));
     finishQuests(s, 9);
     expect(storyDue(s)).toEqual([]);
     finishQuests(s, 1);
     expect(ids(storyDue(s))).toEqual(['ch4']);
     markStorySeen(s, 'ch4');
+    s.day++;
     s.inventory.dragon_crest = 0;
     expect(storyDue(s)).toEqual([]);
     s.inventory.dragon_crest = 1;
     expect(ids(storyDue(s))).toEqual(['ch5']);
     markStorySeen(s, 'ch5');
+    s.day++;
     s.dragonDefeated = false;
     expect(storyDue(s)).toEqual([]);
     s.dragonDefeated = true;
@@ -633,7 +643,7 @@ describe('台本(docs/story/scripts)との照合', () => {
     expect(ids(STORY)).toEqual(['prologue', 'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'epilogue']);
     expect(STORY.map((c) => c.trigger)).toEqual([
       { day: 1 },
-      { all: [{ flag: 'story:prologue' }, { day: 2 }] },
+      { all: [{ flag: 'story:prologue' }, { day: 2 }, { hasReturned: true }] },
       { all: [{ flag: 'story:ch1' }, { dungeonConfirmed: 'old_mine' }] },
       { all: [{ flag: 'story:ch2' }, { keyHeld: 'ruin_key' }] },
       { all: [{ flag: 'story:ch3' }, { questsDone: 10 }] },

@@ -100,6 +100,7 @@ const { serialize } = await import('../src/core/save');
 const { readDueStories } = await import('../src/core/story');
 const { canBless } = await import('../src/core/blessing');
 const { canTrain, trainSkill } = await import('../src/core/training');
+const { acceptUniqueRequest, deliverUniqueRequest, uniqueRequests } = await import('../src/core/events');
 const { PARTY_MAX } = await import('../src/core/types');
 const { travelDays } = await import('../src/core/world');
 
@@ -279,6 +280,16 @@ interface Run {
 
 function runSeed(seed: number, log: boolean): Run {
   const s: GameState = newGame(seed);
+  readDueStories(s);
+  const serviceUniqueRequests = () => {
+    for (const request of uniqueRequests(s)) {
+      if (!request.accepted && request.canAccept) acceptUniqueRequest(s, request.unique, request.step);
+      const current = uniqueRequests(s).find((x) => x.unique === request.unique);
+      if (current?.accepted && current.kind === 'deliver' && current.item && (s.inventory[current.item] ?? 0) > 0) {
+        deliverUniqueRequest(s, current.unique, current.step);
+      }
+    }
+  };
   const startDay = s.day;
   const roles = new Map<string, Role>();
   const questOf = new Map<string, string>();
@@ -1115,6 +1126,7 @@ function runSeed(seed: number, log: boolean): Run {
       ms.debt ??= day;
     }
     answerMails();
+    serviceUniqueRequests();
     hireOne();
     buildOne();
     releaseWorkers();
@@ -1141,6 +1153,7 @@ function runSeed(seed: number, log: boolean): Run {
     const rep = advanceDay(s);
     // 物語を読まないので、出た章はその日に読んだことにする(章の読了で仲間が加入する)
     readDueStories(s);
+    serviceUniqueRequests();
     tally(head, day);
     const p = periodOf(day);
     if (p) p.days++;

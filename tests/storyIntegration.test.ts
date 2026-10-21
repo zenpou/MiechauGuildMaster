@@ -5,6 +5,8 @@ import { captureDragonVictory, dragonBattleLines, isDragonVictory, storyPartyFor
 import { endingPages, onDragonDefeated } from '../src/core/ending';
 import { advanceDay, dispatch, newGame } from '../src/core/game';
 import { canChangeJob } from '../src/core/jobs';
+import { getIntroExploration } from '../src/core/introExploration';
+import { deliver } from '../src/core/quests';
 import { deserialize, migrate, serialize } from '../src/core/save';
 import { markStorySeen, presentChapter, readDueStories, STORY, storyDue, storySeenDay } from '../src/core/story';
 import type { DispatchOrder, GameState, JourneyFrame } from '../src/core/types';
@@ -213,6 +215,48 @@ describe('初勝利の回想とセーブ互換', () => {
 });
 
 describe('人物別会話の進行', () => {
+  it('派遣前に8日目まで待っても物語が先走らず、初回の安全探索を残す', () => {
+    const s = newGame(825);
+    markStorySeen(s, 'prologue');
+    while (s.day < 8) {
+      advanceDay(s);
+      expect(storyDue(s)).toEqual([]);
+    }
+    expect(getIntroExploration(s, order(s))).not.toBeNull();
+    expect(dispatch(s, order(s)).ok).toBe(true);
+    advanceDay(s);
+    expect(s.history).toHaveLength(1);
+    expect(storyDue(s).map(c => c.id)).toEqual(['ch1']);
+    readDueStories(s);
+    expect(storyDue(s)).toEqual([]);
+    advanceDay(s);
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:tina:50']);
+  });
+
+  it('個別会話の後に10件目を納品しても、本編の割り込みは翌日まで待つ', () => {
+    const s = newGame(1);
+    for (const id of ['prologue', 'ch1', 'ch2', 'ch3']) markStorySeen(s, id, 0);
+    s.day = 20;
+    const q = s.quests.find(q => q.type === 'deliver')!;
+    expect(q).toBeDefined();
+    q.status = 'accepted';
+    q.dueDay = 30;
+    for (let i = 0; i < 9; i++) s.quests.push({ ...q, id: `completed-${i}`, status: 'done' });
+    s.inventory[q.target.item!] = q.target.n!;
+    expect(storyDue(s).map(c => c.id)).toEqual(['loyalty:tina:50']);
+    readDueStories(s);
+    expect(deliver(s, q.id).ok).toBe(true);
+    expect(storyDue(s)).toEqual([]);
+    expect(storyDue(deserialize(serialize(s))!)).toEqual([]);
+    s.day++;
+    expect(storyDue(s).map(c => c.id)).toEqual(['ch4']);
+    readDueStories(s);
+    s.inventory.dragon_crest = 1;
+    expect(storyDue(s)).toEqual([]);
+    s.day++;
+    expect(storyDue(s).map(c => c.id)).toEqual(['ch5']);
+  });
+
   it('初回派遣の帰還後2日目は本編を優先し、個別会話を開かない', () => {
     const s = newGame(818);
     markStorySeen(s, 'prologue');
@@ -242,6 +286,7 @@ describe('人物別会話の進行', () => {
 
   it('個別話の解禁後も本編の帰還待ち・読了日は保留し、botや読み返しでも日送りを守る', () => {
     const s = newGame(824);
+    s.adventurers[0].history.expeditions = 1;
     markStorySeen(s, 'prologue');
     s.day = 8;
     const sera = s.adventurers.find(a => a.unique === 'sera')!;
@@ -318,6 +363,7 @@ describe('人物別会話の進行', () => {
 
   it('旧メール50の印と関係なく、加入7日経過・導入読了後に会話を開き、読み返しでは再発生しない', () => {
     const s = newGame(816);
+    s.adventurers[0].history.expeditions = 1;
     const tina = s.adventurers[0];
     markStorySeen(s, 'prologue');
     expect(s.flags[`loyal:${tina.id}:50`]).toBe(true);
@@ -353,6 +399,7 @@ describe('人物別会話の進行', () => {
 
   it('物語導入前の移行で本編を補完しても、追加された仲間の会話は未読のまま残す', () => {
     const s = newGame(817);
+    s.adventurers[0].history.expeditions = 1;
     s.day = 10;
     const loaded = deserialize(serialize(s))!;
     expect(storySeenDay(loaded, 'prologue')).toBe(0);

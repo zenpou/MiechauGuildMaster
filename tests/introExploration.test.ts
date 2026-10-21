@@ -148,8 +148,9 @@ describe('初回の安全な導入探索', () => {
       expect(s.history).toHaveLength(1);
       expect(s.dungeons.forest_cave.floors.f1.visited.length).toBe(e.result.mapDeltas[0].cells.length);
       expect(s.dungeons.forest_cave.floors.f1.visited.length).toBeLessThan(parseFloor(DUNGEON.forest_cave.floors[0]).cells.filter((cell) => cell.kind !== 'wall').length);
-      expect(s.flags['sera:herb']).toBe(1);
-      expect(s.notices.some((notice) => notice.text.includes('セラ') && notice.text.includes('薬草を1個'))).toBe(true);
+      expect(s.inventory.herb).toBe(1);
+      expect(s.flags['sera:herb']).toBeUndefined();
+      expect(s.notices.some((notice) => notice.text.includes('セラ') && notice.text.includes('薬草を1個'))).toBe(false);
       expect(storyDue(s).map((chapter) => chapter.id)).toContain('ch1');
       markStorySeen(s, 'ch1');
       expect(s.adventurers.filter((a) => a.unique === 'sera')).toHaveLength(1);

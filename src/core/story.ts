@@ -17,6 +17,7 @@ export type StoryTrigger =
   | { dragonDefeated: boolean }
   | { endingSeen: boolean }
   | { questsDone: number }
+  | { hasReturned: boolean }
   | { loyalty: { unique: string; value: number } }
   | { joinedDays: { unique: string; days: number } }
   | { recovered: string }
@@ -48,6 +49,7 @@ export function triggerMet(s: GameState, t: StoryTrigger): boolean {
   if ('dragonDefeated' in t) return s.dragonDefeated === t.dragonDefeated;
   if ('endingSeen' in t) return Boolean(s.flags['ending:seen']) === t.endingSeen;
   if ('questsDone' in t) return s.quests.filter((q) => q.status === 'done').length >= t.questsDone;
+  if ('hasReturned' in t) return (s.history.length > 0 || s.adventurers.some(a => a.history.expeditions > 0)) === t.hasReturned;
   if ('loyalty' in t) return s.adventurers.some(a => a.unique === t.loyalty.unique && a.loyalty >= t.loyalty.value);
   if ('joinedDays' in t) return s.adventurers.some(a => a.unique === t.joinedDays.unique && s.day - a.history.hiredDay >= t.joinedDays.days);
   if ('recovered' in t) return s.adventurers.some(a => a.unique === t.recovered && a.injuryDays === 0);
@@ -76,25 +78,15 @@ export function castAway(s: GameState, c: StoryChapter): string[] {
   return s.adventurers.flatMap((a) => (a.unique && a.status === 'away' && onStage.has(a.unique) ? [a.unique] : []));
 }
 
-/** 本編を今日新しく読んだら、人物別会話は次の日まで待つ(0は日付不明なので数えない)。 */
-function mainStoryReadToday(s: GameState): boolean {
-  return s.day > 0 && STORY.some((chapter) => storySeenDay(s, chapter.id) === s.day);
-}
-
-/** 人物別会話を同じ日に二つ開かない。日付0の旧既読は枠を消費しない。 */
-function loyaltyStoryReadToday(s: GameState): boolean {
-  return s.day > 0 && LOYALTY_STORIES.some((chapter) => storySeenDay(s, chapter.id) === s.day);
-}
-
 /** 未読で条件を満たし、出る人物が全員拠点にいる章(台本の並び順) */
 export function storyDue(s: GameState): StoryChapter[] {
+  // 個別会話の後に依頼を達成して本編条件が開いた場合も含め、新規の物語は1日1話。
+  // 日付0の旧既読は枠を使わない。読み返しは最初の既読日を保持する。
+  if (s.day > 0 && ALL_STORIES.some(c => storySeenDay(s, c.id) === s.day)) return [];
   const due = (chapters: StoryChapter[]) => chapters.filter(c => storySeenDay(s, c.id) === null && triggerMet(s, c.trigger));
   // 本編が開いているときは先に読む。登場人物の帰還待ちの間も脇話を割り込ませない。
   const main = due(STORY);
-  if (main.length) return main.filter(c => castAway(s, c).length === 0);
-  // 本編を読み終えた直後に、そのまま人物別会話まで連続表示しない。
-  if (mainStoryReadToday(s)) return [];
-  if (loyaltyStoryReadToday(s)) return [];
+  if (main.length) return main.filter(c => castAway(s, c).length === 0).slice(0, 1);
   const loyalty = due(LOYALTY_STORIES)
     .filter(c => castAway(s, c).length === 0);
   // 台本の順序をそのまま使い、同日に複数の人物別会話を開かない。
@@ -117,18 +109,10 @@ export function markStorySeen(s: GameState, id: string, day: number = s.day): vo
 }
 
 /**
- * 出ている本編を順に読み、人物別会話はその日の上限を守る。物語を読まない bot・計測用。
- * 本編は前章の読了を条件にした鎖なので、1つ既読にすると次が出る。出なくなるまで繰り返す
+ * その日に出せる1話を読んだことにする。bot・計測でもプレイヤーと同じ日内上限を守る。
  */
 export function readDueStories(s: GameState, day: number = s.day): void {
-  for (let due = storyDue(s); due.length > 0; due = storyDue(s)) {
-    if (LOYALTY_STORIES.includes(due[0])) {
-      // day=0 は過去移行用の日付不明値でも、同じ呼出しで全人物別会話を既読にしない。
-      markStorySeen(s, due[0].id, day);
-      return;
-    }
-    for (const c of due) markStorySeen(s, c.id, day);
-  }
+  for (const c of storyDue(s)) markStorySeen(s, c.id, day);
 }
 
 /** 読み終えた章(台本の並び順)。読み返し用 */

@@ -6,7 +6,7 @@
       "all": [
         { "loyalty": { "unique": "tina", "value": 50 } },
         { "joinedDays": { "unique": "tina", "days": 7 } },
-        { "flag": "story:prologue" },
+        { "flag": "story:ch1" },
         { "recovered": "tina" }
       ]
     },

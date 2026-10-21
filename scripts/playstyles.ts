@@ -9,6 +9,7 @@ import { parseFloor } from '../src/core/dungeon';
 import { equip } from '../src/core/equipment';
 import { acceptQuest, advanceDay, buildFacility, dispatch, exploredRateOf, newGame, sellItem } from '../src/core/game';
 import { dispatchBlock, markRead, replyMail } from '../src/core/mail';
+import { acceptUniqueRequest, deliverUniqueRequest, uniqueRequests } from '../src/core/events';
 import { activeQuests, deliver, visibleQuests } from '../src/core/quests';
 import { capacity, hire, hireFee } from '../src/core/recruit';
 import { canBless } from '../src/core/blessing';
@@ -114,6 +115,7 @@ type Target = { action: ActionKind; target: DispatchOrder['target']; questId?: s
 
 function runStyle(style: Style, seed: number): Run {
   const s = addStarterParty(newGame(seed), seed);
+  readDueStories(s);
   const takesQuests = style !== 'no-quests';
   const seen = new Set<string>();
   const accepted = new Set<string>();
@@ -137,6 +139,17 @@ function runStyle(style: Style, seed: number): Run {
     for (const q of activeQuests(s)) {
       if (q.type !== 'deliver') continue;
       if ((s.inventory[q.target.item!] ?? 0) >= (q.target.n ?? 0)) deliver(s, q.id);
+    }
+  };
+
+  // 仲間の頼みも、表示・受注・納品は共通Coreのコマンドを通す。
+  const serviceUniqueRequests = () => {
+    for (const request of uniqueRequests(s)) {
+      if (!request.accepted && request.canAccept) acceptUniqueRequest(s, request.unique, request.step);
+      const current = uniqueRequests(s).find((x) => x.unique === request.unique);
+      if (current?.accepted && current.kind === 'deliver' && current.item && (s.inventory[current.item] ?? 0) > 0) {
+        deliverUniqueRequest(s, current.unique, current.step);
+      }
     }
   };
 
@@ -340,6 +353,7 @@ function runStyle(style: Style, seed: number): Run {
 
   while (s.day < LAST_DAY) {
     if (MAIL === 'reply') answerMails();
+    serviceUniqueRequests();
     if (takesQuests) {
       deliverAll();
       acceptAll();
@@ -353,6 +367,7 @@ function runStyle(style: Style, seed: number): Run {
     advanceDay(s);
     // 物語を読まないので、出た章はその日に読んだことにする(章の読了で仲間が加入する)
     readDueStories(s);
+    serviceUniqueRequests();
     if (s.debt) debtDays++;
   }
 

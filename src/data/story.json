@@ -57,7 +57,7 @@
   {
     "id": "ch1",
     "title": "第一章 · 名医も匙を投げた病",
-    "trigger": {"all": [{"flag": "story:prologue"}, {"day": 2}]},
+    "trigger": {"all": [{"flag": "story:prologue"}, {"day": 2}, {"hasReturned": true}]},
     "lines": [
       {"speaker": "セラ", "text": "アイリスちゃん！ しっかりして、アイリスちゃん……っ！", "background": "bg_guild_office", "cast": [{"character": "sera", "pose": "teary", "position": "left"}, {"character": "iris", "pose": "dizzy", "position": "right"}], "transition": "fade"},
       {"speaker": "アイリス", "text": "う……あたまが、熱くて……", "background": "bg_guild_office", "cast": [{"character": "sera", "pose": "teary", "position": "left"}, {"character": "iris", "pose": "dizzy", "position": "right", "motion": "tremble", "motionAt": "熱くて"}]},
@@ -69,7 +69,7 @@
       {"speaker": "カイ", "text": "……あのさ", "background": "bg_guild_office", "cast": [{"character": "kai", "pose": "neutral", "position": "left"}, {"character": "iris", "pose": "dizzy", "position": "right"}]},
       {"speaker": "セラ", "text": "カイさん……！ アイリスちゃんが、また……。はぁ、はぁ……", "background": "bg_guild_office", "cast": [{"character": "sera", "pose": "teary", "position": "left"}, {"character": "kai", "pose": "neutral", "position": "right"}]},
       {"speaker": "ティナ", "text": "セラ、少し休んで。ずっと祈りっぱなしじゃない", "background": "bg_guild_office", "cast": [{"character": "tina", "pose": "neutral", "position": "left"}, {"character": "kai", "pose": "neutral", "position": "right"}]},
-      {"speaker": "カイ", "text": "昨日は魔力が多いな、くらいに思ってたけど。……今の熱と、癒しても変わらない様子を見て、分かった。アイリス、使わない魔力が溜まって、体がきつくなってるんじゃないか", "background": "bg_guild_office", "cast": [{"character": "iris", "pose": "dizzy", "position": "left"}, {"character": "kai", "pose": "neutral", "position": "right"}]},
+      {"speaker": "カイ", "text": "初めて会った時は魔力が多いな、くらいに思ってたけど。……今の熱と、癒しても変わらない様子を見て、分かった。アイリス、使わない魔力が溜まって、体がきつくなってるんじゃないか", "background": "bg_guild_office", "cast": [{"character": "iris", "pose": "dizzy", "position": "left"}, {"character": "kai", "pose": "neutral", "position": "right"}]},
       {"speaker": "セラ", "text": "えっ……？ で、でも、お体が弱いから、セラが癒しの祈りで治してあげないと……", "background": "bg_guild_office", "cast": [{"character": "sera", "pose": "surprised", "position": "left"}, {"character": "kai", "pose": "neutral", "position": "right"}]},
       {"speaker": "カイ", "text": "そっちは逆。……アイリスは癒される側じゃなくて、人を癒すほうがずっと向いてる", "background": "bg_guild_office", "cast": [{"character": "sera", "pose": "surprised", "position": "left"}, {"character": "kai", "pose": "neutral", "position": "right"}]},
       {"speaker": "ノエル", "text": "お嬢様が癒す側……！？ だめです、お医者様も安静にして魔法なんて使っちゃいけないって……！", "background": "bg_guild_office", "cast": [{"character": "noel", "pose": "angry", "position": "left", "motion": "jump", "motionAt": "だめです"}, {"character": "kai", "pose": "neutral", "position": "right"}]},

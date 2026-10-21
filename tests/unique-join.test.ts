@@ -87,14 +87,18 @@ describe('章の読了で加入', () => {
 });
 
 describe('readDueStories', () => {
-  it('前章の読了で開く章も、出なくなるまで続けて既読にする', () => {
+  it('前章の読了で開く章も翌日まで待つ', () => {
     const s = newGame(1);
     s.day = 2;
+    s.adventurers[0].history.expeditions = 1;
     expect(storyDue(s).map((c) => c.id)).toEqual(['prologue']);
     readDueStories(s);
     expect(storyDue(s)).toHaveLength(0);
     expect(s.flags['story:prologue']).toBe(2);
-    expect(s.flags['story:ch1']).toBe(2);
+    expect(s.flags['story:ch1']).toBeUndefined();
+    s.day++;
+    readDueStories(s);
+    expect(s.flags['story:ch1']).toBe(3);
     expect(s.flags['story:ch2']).toBeUndefined();
   });
 });

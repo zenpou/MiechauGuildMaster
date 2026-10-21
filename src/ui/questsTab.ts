@@ -1,4 +1,5 @@
 import { DUNGEON, ENEMY, ITEM, NODE, RECIPE } from '../core/data';
+import { acceptUniqueRequest, deliverUniqueRequest, uniqueRequests, type UniqueRequest } from '../core/events';
 import { acceptQuest } from '../core/game';
 import { activeQuests, deliver, questCargo, visibleBoards, visibleQuests, activeMax, dungeonRate, questRewardGold } from '../core/quests';
 import type { Quest, QuestType } from '../core/types';
@@ -32,10 +33,14 @@ export function questsTab(): HTMLElement {
   const active = activeQuests(state).filter((q) => q.type !== 'unlock');
   const unlocks = visibleQuests(state).filter((q) => q.type === 'unlock');
   const boards = visibleBoards(state);
+  const unique = uniqueRequests(state);
   return div('tab-body',
-    div('summary', span('big', `${state.day}日目`), span('big', `${state.gold}G`), span('dim', `受注中 ${activeQuests(state).length}/${activeMax(state)}件`)),
+    div('summary', span('big', `${state.day}日目`), span('big', `${state.gold}G`), span('dim', `通常依頼 ${activeQuests(state).length}/${activeMax(state)}件`)),
     h('h2', null, '受注中'),
     active.length ? h('ul', { class: 'plain quests' }, ...active.map(activeRow)) : div('dim', '受けている依頼はありません'),
+    h('h2', null, '仲間の頼み'),
+    div('dim small', '期限はなく、通常依頼の受注枠は使いません。受注後に「渡す」または派遣で進めます。'),
+    unique.length ? h('ul', { class: 'plain quests' }, ...unique.map(uniqueRequestRow)) : div('dim small', 'まだ見つけていません。忠誠の会話を読むと頼みが解放されます。'),
     h('h2', null, '掲示板'),
     div('dim small', '拠点で受けられます。他の街の掲示板は、隊がその街を通ると見えるようになります。'),
     ...boards.map((b) => div(null,
@@ -49,6 +54,44 @@ export function questsTab(): HTMLElement {
     div('dim small', '職人などからの頼み事。達成すると作れる物が増えます。締め切りはありません。'),
     unlocks.length ? h('ul', { class: 'plain quests' }, ...unlocks.map(unlockRow)) : div('dim small', 'まだ見つけていません。街を訪れると見つかることがあります。'),
   );
+}
+
+function uniqueProgressView(request: UniqueRequest): HTMLElement {
+  switch (request.kind) {
+    case 'deliver': {
+      const item = request.item ?? '';
+      const have = state.inventory[item] ?? 0;
+      return span(request.progress >= request.required ? 'pos' : 'neg', `${ITEM[item]?.name ?? item} ${request.progress}/${request.required}（所持${have}）`);
+    }
+    case 'visit':
+      return span(request.progress >= request.required ? 'pos' : 'neg', `${DUNGEON[request.dungeon ?? '']?.name ?? request.dungeon}へ ${request.progress}/${request.required}回`);
+    case 'soloKill':
+      return span(request.progress >= request.required ? 'pos' : 'neg', `${ENEMY[request.enemy ?? '']?.name ?? request.enemy} ${request.progress}/${request.required}体`);
+  }
+}
+
+function uniqueRequestRow(request: UniqueRequest): HTMLElement {
+  const button = request.completed
+    ? div('small pos', '達成済み')
+    : request.accepted
+      ? request.kind === 'deliver'
+        ? h('button', { class: 'small', onclick: () => doUniqueDeliver(request) }, '渡す')
+        : div('small pos', '受注中')
+      : request.canAccept
+        ? h('button', { class: 'small', onclick: () => doUniqueAccept(request) }, '受ける')
+        : div('small dim', '受注できません');
+  return h('li', null,
+    span('badge', '仲間'), ' ', request.name,
+    div('dim small', request.text),
+    div('small', uniqueProgressView(request), request.accepted ? ' / 受注中・期限なし' : ' / 期限なし'),
+    div('dim small', uniqueRequestHint(request)),
+    button,
+  );
+}
+
+function uniqueRequestHint(request: UniqueRequest): string {
+  if (request.kind === 'deliver') return '受けた後に「渡す」まで在庫は消費しません。';
+  return '受注後に出発した隊が対象です。';
 }
 
 function progressView(q: Quest): HTMLElement | string {
@@ -112,6 +155,20 @@ function accept(id: string, name: string) {
   if (!r.ok) return toast(r.reason, true);
   commit();
   toast(`「${name}」を受けました`);
+}
+
+function doUniqueAccept(request: UniqueRequest) {
+  const r = acceptUniqueRequest(state, request.unique, request.step);
+  if (!r.ok) return toast(r.reason, true);
+  commit();
+  toast(`「${request.text}」を受けました`);
+}
+
+function doUniqueDeliver(request: UniqueRequest) {
+  const r = deliverUniqueRequest(state, request.unique, request.step);
+  if (!r.ok) return toast(r.reason, true);
+  commit();
+  toast(`「${request.text}」に納品しました`);
 }
 
 function doDeliver(q: Quest) {

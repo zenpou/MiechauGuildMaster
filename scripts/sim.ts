@@ -7,6 +7,7 @@ import { build, facilityLevel } from '../src/core/base';
 import { canCraft, startCraft } from '../src/core/craft';
 import { DUNGEON, ENEMY, ITEM, JOB, PERSONALITIES } from '../src/core/data';
 import { equip } from '../src/core/equipment';
+import { acceptUniqueRequest, deliverUniqueRequest, uniqueRequests } from '../src/core/events';
 import { parseFloor } from '../src/core/dungeon';
 import { cellDepths } from '../src/core/explore';
 import { advanceDay, dispatch, exploredRateOf, newGame, sellItem } from '../src/core/game';
@@ -80,6 +81,7 @@ const ready = (a: Adventurer) => a.status === 'idle' && a.injuryDays === 0;
 
 function run(seed: number, leaderPersonality?: string): RunResult {
   const s = addStarterParty(newGame(seed), seed);
+  readDueStories(s);
   if (leaderPersonality) s.adventurers[0].personality = leaderPersonality;
   const rate: number[] = [];
   rate[s.day] = exploredRateOf(s, DUNGEON_ID, FLOOR_ID);
@@ -89,8 +91,18 @@ function run(seed: number, leaderPersonality?: string): RunResult {
   const skip = (why: string) => { skips[why] = (skips[why] ?? 0) + 1; };
   let count = 0;
   let sold = 0;
+  const serviceUniqueRequests = () => {
+    for (const request of uniqueRequests(s)) {
+      if (!request.accepted && request.canAccept) acceptUniqueRequest(s, request.unique, request.step);
+      const current = uniqueRequests(s).find((x) => x.unique === request.unique);
+      if (current?.accepted && current.kind === 'deliver' && current.item && (s.inventory[current.item] ?? 0) > 0) {
+        deliverUniqueRequest(s, current.unique, current.step);
+      }
+    }
+  };
 
   while (s.day < LAST_DAY) {
+    serviceUniqueRequests();
     const party = s.adventurers.filter(ready).slice(0, PARTY_MAX);
     const leader = leaderPersonality ? s.adventurers[0] : party[0];
     if (party.length >= MIN_PARTY && leader && party.includes(leader)) {
@@ -113,6 +125,7 @@ function run(seed: number, leaderPersonality?: string): RunResult {
     const rep = advanceDay(s);
     // 物語を読まないので、出た章はその日に読んだことにする(章の読了で仲間が加入する)
     readDueStories(s);
+    serviceUniqueRequests();
     rate[s.day] = exploredRateOf(s, DUNGEON_ID, FLOOR_ID);
     for (const e of rep.returned) dispatches.push(record(e, pending.get(e.id)!));
     // 人が遊ぶときは帰還した素材を売って日給に充てるので、sim も毎日全部売る
@@ -203,6 +216,7 @@ interface PlanRun {
 
 function runPlan(plan: PlanId, seed: number): PlanRun {
   const s = addStarterParty(newGame(seed), seed);
+  readDueStories(s);
   const prepare = plan === 'forest-then-mine';
   if (plan === 'mine-geared') {
     for (const [it, n] of Object.entries(GEAR_KIT)) addInventory(s, it, n);
@@ -232,8 +246,18 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
   let alchemyDay: number | null = null;
   let armoredAtSwitch = 0;
   const armoredCount = () => s.adventurers.filter((a) => a.equipment.armor).length;
+  const serviceUniqueRequests = () => {
+    for (const request of uniqueRequests(s)) {
+      if (!request.accepted && request.canAccept) acceptUniqueRequest(s, request.unique, request.step);
+      const current = uniqueRequests(s).find((x) => x.unique === request.unique);
+      if (current?.accepted && current.kind === 'deliver' && current.item && (s.inventory[current.item] ?? 0) > 0) {
+        deliverUniqueRequest(s, current.unique, current.step);
+      }
+    }
+  };
 
   while (s.day < LAST_DAY) {
+    serviceUniqueRequests();
     if (prepare) {
       for (const a of s.adventurers) {
         if (!a.equipment.armor) for (const it of ARMORS) if ((s.inventory[it] ?? 0) > 0 && equip(s, a.id, it).ok) break;
@@ -294,6 +318,7 @@ function runPlan(plan: PlanId, seed: number): PlanRun {
     const rep = advanceDay(s);
     // 物語を読まないので、出た章はその日に読んだことにする(章の読了で仲間が加入する)
     readDueStories(s);
+    serviceUniqueRequests();
     for (const e of rep.returned) {
       if (!pending.has(e.id)) continue;
       const res = e.result;

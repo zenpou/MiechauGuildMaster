@@ -9,7 +9,7 @@ import { DUNGEON, EDGE, ITEM, NODE, POLICY, QUEST_TEMPLATES, TUNING, type Return
 import { exploredRate, parseFloor } from './dungeon';
 import { onDragonDefeated } from './ending';
 import { storyPartyFor } from './dragonStory';
-import { onReturn, advanceUniqueChain, joinInitialUniques } from './events';
+import { onReturn, joinInitialUniques } from './events';
 import { floorTransit, returnDialogue, runExploration } from './explore';
 import { getIntroExploration, introExplorationItem } from './introExploration';
 import { journeyUntil } from './journey';
@@ -595,7 +595,6 @@ export function advanceDay(s: GameState): DayReport {
   // 完成したその日から産む
   dailyProduction(s, notices);
   completeTraining(s, notices);
-  advanceUniqueChain(s, notices);
   tickBlessing(s, notices);
 
   const returnedIds = new Set(returned.flatMap((e) => e.order.partyIds));
