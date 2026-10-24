@@ -5,12 +5,14 @@ import { activeQuests, deliver, questCargo, visibleBoards, visibleQuests, active
 import type { Quest, QuestType } from '../core/types';
 import { commit, render, state, toast, ui } from './app';
 import { div, h, span } from './dom';
+import { tutorialFeatureUnlocked } from '../core/tutorial';
 
 export const QUEST_TYPE_NAME: Record<QuestType, string> = {
   deliver: '納品', hunt: '討伐', explore: '探索', survey: '踏査', escort: '護衛', transport: '運搬', unlock: '解放',
 };
 
 const nodeName = (id: string | null | undefined) => (id ? NODE[id]?.name ?? id : '');
+const travelRequestLocked = (q: Quest) => (q.type === 'escort' || q.type === 'transport') && !tutorialFeatureUnlocked(state, 'travel');
 const left = (day: number) => {
   const n = day - state.day;
   return n > 0 ? `あと${n}日` : n === 0 ? '今日まで' : '期限切れ';
@@ -43,11 +45,12 @@ export function questsTab(): HTMLElement {
     unique.length ? h('ul', { class: 'plain quests' }, ...unique.map(uniqueRequestRow)) : div('dim small', 'まだ見つけていません。忠誠の会話を読むと頼みが解放されます。'),
     h('h2', null, '掲示板'),
     div('dim small', '拠点で受けられます。他の街の掲示板は、隊がその街を通ると見えるようになります。'),
+    !tutorialFeatureUnlocked(state, 'travel') ? div('dim small', '護衛と運搬はワールドの案内後に受注できます。今は納品・探索などの依頼を確認しましょう。') : null,
     ...boards.map((b) => div(null,
       h('h3', null, nodeName(b.town)),
       b.quests.filter((q) => q.type !== 'unlock').length
         ? h('ul', { class: 'plain quests' }, ...b.quests.filter((q) => q.type !== 'unlock').map((q) => h('li', null, questLine(q),
-          h('button', { class: 'small', onclick: () => accept(q.id, q.name) }, '受注'))))
+          h('button', { class: 'small', disabled: travelRequestLocked(q), onclick: () => accept(q.id, q.name) }, '受注'))))
         : div('dim small', '今は依頼がありません'),
     )),
     h('h2', null, '解放依頼'),
@@ -126,7 +129,7 @@ function activeRow(q: Quest): HTMLElement {
       q.dueDay !== null ? span(q.dueDay - state.day <= 1 ? 'neg' : '', ` / 納期 ${q.dueDay}日目(${left(q.dueDay)})`) : ''),
     q.type === 'deliver' ? h('button', { class: 'small', onclick: () => doDeliver(q) }, '納品する') : null,
     out ? div('small pos', '隊が向かっています') : null,
-    !out && canGo ? h('button', { class: 'small', onclick: () => goDispatch(q.id) }, '派遣タブで隊を出す') : null,
+    !out && canGo ? h('button', { class: 'small', disabled: travelRequestLocked(q), onclick: () => goDispatch(q.id) }, '派遣タブで隊を出す') : null,
     !out && q.type === 'escort' && q.departDay !== null && q.departDay > state.day ? div('dim small', `出発日(${q.departDay}日目)に派遣タブから出せます`) : null,
   );
 }
@@ -145,12 +148,15 @@ function unlockRow(q: Quest): HTMLElement {
 }
 
 function goDispatch(questId: string) {
+  if (!tutorialFeatureUnlocked(state, 'travel')) return toast('ワールドの案内を終えると、依頼の行き先へ派遣できます。');
   ui.d.questId = questId;
   ui.tab = 'dispatch';
   render();
 }
 
 function accept(id: string, name: string) {
+  const q = state.quests.find(q => q.id === id);
+  if (q && travelRequestLocked(q)) return toast('護衛と運搬はワールドの案内後に受注できます。');
   const r = acceptQuest(state, id);
   if (!r.ok) return toast(r.reason, true);
   commit();

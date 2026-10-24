@@ -9,6 +9,7 @@ import { canOpenJourney, openJourney } from './journeyHost';
 import { mapFace } from './mapFace';
 import { openDispatchDraft } from './dispatchForm';
 import './returnReport.css';
+import { tutorialFeatureUnlocked, tutorialTabUnlocked } from '../core/tutorial';
 
 const itemList = (items: Record<string, number>) => Object.entries(items)
   .filter(([, n]) => n > 0).map(([id, n]) => `${ITEM[id]?.name ?? id} ×${n}`).join('、') || 'なし';
@@ -65,14 +66,14 @@ export function returnReportCard(e: Expedition, showLog = true): HTMLElement | n
       m.injuryDays ? div('small neg', `帰還時に負傷 ${m.injuryDays}日`) : null),
     ))) : null,
     quote ? div('return-quote small', `${quote.name}「${quote.text}」`) : null,
-    h('h4', null, '次の準備'),
-    div('small dim', '以下は現在の名簿・在庫での準備です。'),
-    div('return-actions',
+    tutorialFeatureUnlocked(state, 'preparation') ? h('h4', null, '次の準備') : null,
+    tutorialFeatureUnlocked(state, 'preparation') ? div('small dim', '以下は現在の名簿・在庫での準備です。') : null,
+    tutorialFeatureUnlocked(state, 'preparation') ? div('return-actions',
       e.order.target.dungeon ? h('button', { onclick: () => prepareFromReturn(e) }, 'この隊を組み直す') : null,
-      ...gathers.map((g) => h('button', { onclick: () => prepareFromReturn(e, { ...g, action: 'gather' }) }, `${ITEM[g.item]?.name ?? g.item}を採りに行く準備`)),
-      ...(report?.unlockedFloors ?? []).map((f) => h('button', { onclick: () => prepareFromReturn(e, { ...f, action: 'explore' }) }, `${placeName(f.dungeon, f.floor)}への準備`)),
-      ...recipes.map((r) => h('button', { onclick: () => openWorkshop(r.id) }, `${r.name}の製作を確認`)),
-      ...(!recipes.length ? materialFacilities.map((id) => h('button', {
+      ...(tutorialFeatureUnlocked(state, 'travel') ? gathers : []).map((g) => h('button', { onclick: () => prepareFromReturn(e, { ...g, action: 'gather' }) }, `${ITEM[g.item]?.name ?? g.item}を採りに行く準備`)),
+      ...(tutorialFeatureUnlocked(state, 'travel') ? report?.unlockedFloors ?? [] : []).map((f) => h('button', { onclick: () => prepareFromReturn(e, { ...f, action: 'explore' }) }, `${placeName(f.dungeon, f.floor)}への準備`)),
+      ...(tutorialTabUnlocked(state, 'base') ? recipes : []).map((r) => h('button', { onclick: () => openWorkshop(r.id) }, `${r.name}の製作を確認`)),
+      ...(!recipes.length && tutorialTabUnlocked(state, 'base') ? materialFacilities.map((id) => h('button', {
         onclick: () => openWorkshop(undefined, id),
       }, `素材を使う${FACILITY[id]?.name ?? id}を確認`)) : []),
       h('button', { onclick: () => {
@@ -80,8 +81,8 @@ export function returnReportCard(e: Expedition, showLog = true): HTMLElement | n
         render(); document.querySelector('.equip')?.scrollIntoView({ block: 'center' });
       } }, '装備と休養を確認'),
       canOpenJourney(e) ? h('button', { onclick: () => openJourney(e) }, '道中を再生') : null,
-      showLog ? h('button', { onclick: () => { ui.tab = 'log'; ui.selLog = e.id; render(); } }, '詳しい記録') : null,
-    ),
+      showLog && tutorialTabUnlocked(state, 'log') ? h('button', { onclick: () => { ui.tab = 'log'; ui.selLog = e.id; render(); } }, '詳しい記録') : null,
+    ) : null,
   );
 }
 

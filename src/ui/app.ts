@@ -2,6 +2,7 @@
 import { DUNGEON, ENEMY, FACILITY, ITEM, NODE } from '../core/data';
 import { newGame, type DayReport } from '../core/game';
 import { getIntroExploration } from '../core/introExploration';
+import { tutorialFor } from '../core/tutorial';
 import type { Readiness } from '../core/readiness';
 import { load, save } from '../core/save';
 import type { ActionKind, Adventurer, DispatchOrder, EquipSlot, Expedition, GameState, Persona, StatKey, WorldStep } from '../core/types';
@@ -83,12 +84,15 @@ function newDispatchForm() {
     partyIds: members, leaderId: members[0], action: 'explore',
     target: { dungeon: 'forest_cave', floor: 'f1' }, policy: 'standard', days: 1, items: {},
   });
+  const second = tutorialFor(state)?.id === 'second-dispatch';
   return {
-    members: initial ? members : [] as string[], leader: initial ? members[0] : null as string | null, policy: 'standard', days: 1, potions: 0, blessed: false,
+    members: initial || second ? members : [] as string[], leader: initial || second ? members[0] ?? null : null as string | null, policy: second ? 'safe' : 'standard', days: 1, potions: second ? Math.min(2, state.inventory.potion ?? 0) : 0, blessed: false,
     /** 護衛・運搬の依頼に出すときの依頼ID。空ならダンジョンへ */
     dungeon: 'forest_cave', floor: 'f1', questId: '', action: 'explore' as ActionKind, item: '', enemy: '',
   };
 }
+
+export function resetDispatchForm() { ui.d = newDispatchForm(); ui.forecast = null; }
 
 export function toast(text: string, err = false) {
   ui.toast = { text, err };

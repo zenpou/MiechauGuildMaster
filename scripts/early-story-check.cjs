@@ -54,9 +54,12 @@ async function story(expected) {
   const next = page.locator('[data-story-next]');
   for (let i = 0; i < lines.length; i++) {
     await page.waitForFunction(n => document.querySelector('.vn-player-progress')?.textContent?.startsWith(`${n} / `), i + 1);
-    if (await next.textContent() === '全文を表示') await next.click();
-    await page.waitForFunction(() => document.querySelector('[data-story-next]')?.textContent !== '全文を表示');
+    // 全文表示を調べてから押す間にタイプ表示が完了する場合も、一行を二度送らない。
     await next.click();
+    await page.waitForFunction(n => !document.querySelector('.vn-player-progress')?.textContent?.startsWith(`${n} / `)
+      || document.querySelector('[data-story-next]')?.textContent !== '全文を表示', i + 1);
+    const progress = page.locator('.vn-player-progress');
+    if (await progress.count() && (await progress.textContent())?.startsWith(`${i + 1} / `)) await next.click();
   }
   const s = await state();
   assert.equal(s.flags[`story:${expected}`], s.day, expected);
@@ -87,6 +90,7 @@ const requestRow = name => page.locator('li').filter({ has: page.locator('.badge
 async function mainPlay() {
   await open(initial);
   await story('prologue');
+  await click('案内を終了して全機能を開く');
   await click('依頼');
   assert.equal(await requestRow('ティナ').count(), 0);
   await click('派遣');
@@ -162,6 +166,7 @@ async function mainPlay() {
 async function idlePlay() {
   await open(initial);
   await story('prologue');
+  await click('案内を終了して全機能を開く');
   for (let n = 2; n <= 8; n++) await day();
   await click('派遣');
   assert.equal(await page.getByRole('region', { name: '初回の探索' }).count(), 1);

@@ -14,6 +14,7 @@ import { activeQuests, deliver, visibleQuests } from '../src/core/quests';
 import { capacity, hire, hireFee } from '../src/core/recruit';
 import { canBless } from '../src/core/blessing';
 import { readDueStories } from '../src/core/story';
+import { skipTutorial } from '../src/core/tutorial';
 import { addStarterParty } from './roster';
 import {
   PARTIES_MAX, PARTY_MAX,
@@ -115,6 +116,7 @@ type Target = { action: ActionKind; target: DispatchOrder['target']; questId?: s
 
 function runStyle(style: Style, seed: number): Run {
   const s = addStarterParty(newGame(seed), seed);
+  skipTutorial(s);
   readDueStories(s);
   const takesQuests = style !== 'no-quests';
   const seen = new Set<string>();

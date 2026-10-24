@@ -17,6 +17,7 @@ import { artUrl } from './storyPlayer';
 import { returnReportsBlock } from './returnReport';
 import { operationsBlock } from './operations';
 import { equipText, equipmentChangeText as statDiff } from './equipmentText';
+import { tutorialFor, tutorialFeatureUnlocked } from '../core/tutorial';
 
 const ARMOR_NAME: Record<string, string> = { light: '軽装', medium: '中装', heavy: '重装' };
 const TIER_NAME: Record<JobDef['tier'], string> = { lower: '下級', upper: '上級', special: '固有' };
@@ -32,6 +33,7 @@ function skillText(def: TrainedSkillDef | undefined): string {
 
 /** 最初の数日の「次にやること」。受付のノエルが案内する体裁(心配性なので顔は worried)。赤字のヒントは状態で消えるので閉じるボタンを出さない */
 function hintBlock(): HTMLElement | null {
+  if (tutorialFor(state)) return null;
   const hint = hintFor(state);
   if (!hint) return null;
   return div('hint', { role: 'note' },
@@ -50,9 +52,19 @@ function hintBlock(): HTMLElement | null {
 export function homeTab(): HTMLElement {
   const s = state;
   const potion = ITEM.potion;
+  if (!tutorialFeatureUnlocked(s, 'preparation')) return div('tab-body',
+    returnReportsBlock(),
+    h('h2', null, '最初の仲間'),
+    h('ul', { class: 'plain tutorial-party' }, ...s.adventurers.map(a => h('li', null,
+      h('strong', null, a.name), div('small', `${JOB[a.job].name} Lv${a.level} / ${statusText(a)}`),
+      div('dim small', a.unique === 'tina' ? '前に立って道を確かめる剣士です。' : '仲間の回復を支える僧侶です。')))),
+    div('dim small', '装備・在庫の操作は、帰還報告と地図の案内を終えると使えるようになります。'),
+    saveTransferRow(),
+    div('row footer', h('button', { class: 'danger', onclick: restart }, '新しく始める')),
+  );
   return div('tab-body',
     returnReportsBlock(),
-    operationsBlock(),
+    tutorialFeatureUnlocked(s, 'planning') ? operationsBlock() : null,
     noticesBlock(),
     hintBlock(),
     blessingBlock(),
@@ -222,8 +234,8 @@ function equipPanel(): HTMLElement | null {
         })) : div('dim small', '在庫に着けられる物がありません'),
       );
     }),
-    trainingBlock(a),
-    jobBlock(a),
+    tutorialFeatureUnlocked(state, 'planning') ? trainingBlock(a) : null,
+    tutorialFeatureUnlocked(state, 'planning') ? jobBlock(a) : null,
   );
 }
 
@@ -310,6 +322,8 @@ function act(r: Result, msg: string) {
 }
 
 export function nextDay() {
+  const guide = tutorialFor(state);
+  if (guide && !guide.canAdvanceDay) return toast('まずはノエルの案内に沿って準備を進めましょう。', true);
   const r = advanceDay(state);
   ui.lastReport = r;
   if (r.returned.length) ui.tab = 'home';

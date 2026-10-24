@@ -221,6 +221,12 @@ function makeTester(run, page, context, vp, env, site) {
 // エンディングの間は後ろが inert になり role では引けないことがあるので、見出しは CSS で待つ
 const waitApp = (page) => page.locator('h1', { hasText: TITLE }).waitFor();
 
+// 自由操作を対象にした既存シナリオ。案内そのものは tutorial-check.cjs で検証する。
+async function skipTutorial(page) {
+  const button = page.getByRole('button', { name: '案内を終了して全機能を開く', exact: true });
+  if (await button.count()) await button.click();
+}
+
 // モバイルの表示では、中身がはみ出すと innerWidth もそれに合わせて広がる(375 → 415 など)ので、innerWidth と比べるだけでは見逃す
 const widths = (page) => page.evaluate(() => {
   const d = document.documentElement;
@@ -350,6 +356,7 @@ async function newGame(t) {
 async function newGameTabs(t) {
   await t.open();
   await skipStories(t, '開いた直後');
+  await skipTutorial(t.page);
   await tour(t, 'tabs');
 }
 
@@ -357,6 +364,7 @@ async function dispatchRoundTrip(t) {
   const { page } = t;
   await t.open();
   await skipStories(t, '開いた直後');
+  await skipTutorial(page);
   const start = await t.save();
   if (!t.check(start && start.expeditions === 0 && start.history === 0, `新規開始のセーブが想定と違う: ${JSON.stringify(start)}`)) return;
   await openTab(page, '派遣');

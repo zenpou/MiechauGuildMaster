@@ -19,6 +19,7 @@ import './returnReport.css';
 import { memberUnavailableReason } from '../core/expeditionPlan';
 import { partyPlanEditor, partyPlansBlock } from './partyPlans';
 import { financeOutlook } from './financeOutlook';
+import { tutorialDispatchReason, tutorialFeatureUnlocked, tutorialFor } from '../core/tutorial';
 
 const DAY_CHOICES = Array.from({ length: TUNING.game.daysMax }, (_, i) => i + 1);
 const ACTIONS: ActionKind[] = ['explore', 'gather', 'hunt', 'boss', 'survey'];
@@ -70,6 +71,8 @@ type Choices = ReturnType<typeof choicesFor>;
 
 function tidy() {
   const d = ui.d;
+  if (!tutorialFeatureUnlocked(state, 'travel')) { d.dungeon = 'forest_cave'; d.floor = 'f1'; d.questId = ''; }
+  if (tutorialFor(state)?.id === 'second-dispatch') { d.action = 'explore'; d.days = 1; }
   const ok = new Set(available().map((a) => a.id));
   d.members = d.members.filter((id) => ok.has(id));
   if (!d.leader || !d.members.includes(d.leader)) d.leader = d.members[0] ?? null;
@@ -125,6 +128,26 @@ function currentOrder(): DispatchOrder | null {
 const orderKey = (o: DispatchOrder | null) => (o ? JSON.stringify([o, state.day, state.counters.dispatches]) : '');
 
 export function dispatchTab(): HTMLElement {
+  const guide = tutorialFor(state);
+  if (guide?.id === 'dispatch') {
+    const members = ['tina', 'sera'].map(unique => state.adventurers.find(a => a.unique === unique)).filter(a => !!a);
+    ui.d = { members: members.map(a => a.id), leader: members[0]?.id ?? null, policy: 'standard', days: 1, potions: 0, blessed: false,
+      dungeon: 'forest_cave', floor: 'f1', questId: '', action: 'explore', item: '', enemy: '' };
+    const order = currentOrder();
+    const reason = order ? tutorialDispatchReason(state, order) : '出発する仲間がいません';
+    return div('tab-body',
+      h('h2', null, 'はじめての派遣'),
+      div('dispatch-notes', '森の洞窟・入口付近 / 日帰り / 回復薬は不要'),
+      h('ul', { class: 'plain tutorial-party' }, ...members.map(a => h('li', null, h('strong', null, a.name), div('small', JOB[a.job].name)))),
+      h('p', null, 'ティナとセラで薬草を1個採り、安全な道を確かめて帰ります。最初の行き先と編成は準備済みです。'),
+      h('p', { class: 'dim small' }, '行動・隊長・回復薬の選び方は、次の派遣で案内します。'),
+      reason ? div('warn', reason) : null,
+      h('button', { class: 'primary wide', disabled: !!reason, onclick: depart }, '出発'),
+    );
+  }
+  if (guide && guide.id !== 'second-dispatch' && !tutorialFeatureUnlocked(state, 'planning')) return div('tab-body',
+    state.expeditions.length ? h('ul', { class: 'plain' }, ...state.expeditions.map(awayRow)) : div('dim', '次の派遣の前に、ノエルの案内を確認しましょう。'),
+  );
   tidy();
   const d = ui.d;
   const free = new Set(available().map((a) => a.id));
@@ -136,7 +159,8 @@ export function dispatchTab(): HTMLElement {
   const forecast = ui.forecast && ui.forecast.key === orderKey(order) ? ui.forecast.r : null;
   const intro = order ? getIntroExploration(state, order) : null;
   const trip = plannedTrip(quest);
-  const blocker = quest?.type === 'escort' && quest.departDay !== state.day ? `この護衛は${quest.departDay}日目に出発します` : '';
+  const blocker = (order ? tutorialDispatchReason(state, order) : null)
+    ?? (quest?.type === 'escort' && quest.departDay !== state.day ? `この護衛は${quest.departDay}日目に出発します` : '');
 
   const memberRows = state.adventurers.map((a) => {
     const checked = d.members.includes(a.id);
@@ -158,12 +182,12 @@ export function dispatchTab(): HTMLElement {
   });
 
   return div('tab-body',
-    partyPlansBlock(),
+    tutorialFeatureUnlocked(state, 'planning') ? partyPlansBlock() : null,
     h('div', { id: 'dispatch-preparation' }),
     ui.dispatchNotes.length ? div('dispatch-notes', { role: 'status' },
       ...ui.dispatchNotes.map((text) => div('small', text))) : null,
     h('h2', null, '行き先'),
-    h('select', { class: 'wide', onchange: (ev: Event) => pickDest(val(ev)) },
+    h('select', { class: 'wide', disabled: !tutorialFeatureUnlocked(state, 'travel'), onchange: (ev: Event) => pickDest(val(ev)) },
       h('optgroup', { label: 'ダンジョン' }, ...dungeonIds().map((id) => h('option', { value: id, selected: !quest && id === d.dungeon ? true : undefined },
         `${DUNGEON[id].name}${state.dungeons[id].confirmed ? '' : '(噂)'}`))),
       questDests().length ? h('optgroup', { label: '受注中の依頼' }, ...questDests().map((q) => h('option', { value: QUEST_PREFIX + q.id, selected: quest?.id === q.id ? true : undefined },
@@ -184,7 +208,7 @@ export function dispatchTab(): HTMLElement {
           ...POLICIES.map((p) => h('option', { value: p.id, selected: p.id === d.policy ? true : undefined }, p.name))),
       ),
       quest ? null : h('label', null, '現地の日数 ',
-        h('select', { disabled: !!intro, onchange: (ev: Event) => { d.days = Number(val(ev)); render(); } },
+        h('select', { disabled: !!intro || guide?.id === 'second-dispatch', onchange: (ev: Event) => { d.days = Number(val(ev)); render(); } },
           ...DAY_CHOICES.map((n) => h('option', { value: n, selected: n === d.days ? true : undefined }, `${n}日`))),
       ),
       h('label', null, `回復薬(在庫${potionStock}) `,
@@ -193,7 +217,7 @@ export function dispatchTab(): HTMLElement {
       ),
       blessingRow(),
     ),
-    partyPlanEditor(order),
+    tutorialFeatureUnlocked(state, 'planning') ? partyPlanEditor(order) : null,
     div('dim small', intro ? '初回は決められた入口付近の行程を歩きます。' : POLICIES.find((p) => p.id === d.policy)?.desc ?? ''),
     div('trip', tripText(quest)),
     trip ? financeOutlook(Math.max(1, trip.go + trip.stay + trip.back), true) : null,
@@ -210,7 +234,7 @@ export function dispatchTab(): HTMLElement {
 
 function awayRow(e: Expedition): HTMLElement {
   const st = stepToday(e);
-  const canRecall = e.recalledDay === null && st?.phase !== 'return';
+  const canRecall = tutorialFor(state)?.id !== 'return' && e.recalledDay === null && st?.phase !== 'return';
   const yesterday = state.day - 1;
   const canObserve = !!e.journey?.frames.some((frame) => journeyFrameAbsoluteDay(e.journey!, frame) === yesterday);
   return h('li', null,
@@ -231,7 +255,8 @@ function dungeonBlock(c: Choices): HTMLElement {
     h('h2', null, '行動'),
     div('actions', ...ACTIONS.map((a) => h('label', { class: c.reason[a] ? 'dim' : '' },
       h('input', {
-        type: 'radio', name: 'action', value: a, checked: d.action === a ? true : undefined, disabled: !!c.reason[a],
+        type: 'radio', name: 'action', value: a, checked: d.action === a ? true : undefined,
+        disabled: !!c.reason[a] || tutorialFor(state)?.id === 'second-dispatch',
         onchange: () => { d.action = a; render(); },
       }),
       ` ${ACTION_NAME[a]}`))),
@@ -421,6 +446,8 @@ function depart() {
   const d = ui.d;
   const order = currentOrder();
   if (!order) return toast('隊長を選んでください', true);
+  const tutorialReason = tutorialDispatchReason(state, order);
+  if (tutorialReason) return toast(tutorialReason, true);
   const r = dispatch(state, order);
   if (!r.ok) return toast(r.reason, true);
   d.members = [];

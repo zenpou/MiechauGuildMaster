@@ -21,6 +21,8 @@ import { recruitTab } from './recruitTab';
 import { storyOverlay } from './storyHost';
 import { TAB_DEFS } from './tabs';
 import { worldTab } from './worldTab';
+import { tutorialFor, tutorialTabUnlocked } from '../core/tutorial';
+import { tutorialPanel } from './tutorial';
 
 const VIEWS: Record<Tab, () => HTMLElement> = {
   home: homeTab, inbox: inboxTab, quests: questsTab, dispatch: dispatchTab, world: worldTab,
@@ -31,6 +33,7 @@ const TABS = TAB_DEFS.map((t) => ({ ...t, view: VIEWS[t.id] }));
 /** 上部に固定の HUD。日数・資金・評判・未読と「次の日へ」をどのタブからでも見せる */
 function hud(unread: number): HTMLElement {
   const s = state;
+  const guide = tutorialFor(s);
   const lv = repLevel(s.rep);
   const next = REP_LEVELS[lv];
   return h('header', { class: 'hud' },
@@ -42,27 +45,31 @@ function hud(unread: number): HTMLElement {
         `評判 Lv${lv}`,
         span('pips', ...REP_LEVELS.map((_, i) => span(i < lv ? 'pip on' : 'pip'))),
       ),
-      unread ? h('button', { class: 'hud-unread', onclick: () => { ui.tab = 'inbox'; render(); } }, span('badge unread', `未読${unread}`)) : null,
+      unread && tutorialTabUnlocked(s, 'inbox') ? h('button', { class: 'hud-unread', onclick: () => { ui.tab = 'inbox'; render(); } }, span('badge unread', `未読${unread}`)) : null,
     ),
-    h('button', { class: 'primary hud-next', onclick: nextDay }, '次の日へ'),
+    h('button', { class: 'primary hud-next', disabled: guide && !guide.canAdvanceDay, title: guide && !guide.canAdvanceDay ? 'まずはノエルの案内に沿って準備を進めましょう' : '', onclick: nextDay }, '次の日へ'),
   );
 }
 
 function render() {
   const app = document.getElementById('app')!;
+  const guide = tutorialFor(state);
+  // 帰還報告・工房などのショートカットからも、未解放の画面へは入れない。
+  if (!tutorialTabUnlocked(state, ui.tab)) ui.tab = 'home';
   const tab = TABS.find((t) => t.id === ui.tab) ?? TABS[0];
   const unread = unreadCount(state);
   const pages = endingPending(state) ? endingPages(state) : [];
   const body = [
     hud(unread),
     h('nav', { class: 'tabs', 'aria-label': 'コマンド' }, ...TABS.map((t) =>
-      h('button', { class: t.id === tab.id ? 'on' : '', 'aria-current': t.id === tab.id ? 'page' : undefined, onclick: () => { ui.tab = t.id; render(); } },
+      h('button', { class: `${t.id === tab.id ? 'on' : ''}${guide?.target === t.id ? ' tutorial-next' : ''}`, disabled: !tutorialTabUnlocked(state, t.id), title: tutorialTabUnlocked(state, t.id) ? undefined : 'はじめの案内が進むと使えるようになります', 'aria-current': t.id === tab.id ? 'page' : undefined, onclick: () => { if (!tutorialTabUnlocked(state, t.id)) return; ui.tab = t.id; render(); window.scrollTo(0, 0); } },
         t.label,
         icon(t.id),
         t.id === 'inbox' && unread ? span('badge unread', unread) : null))),
     h('main', { class: 'window' },
       div('window-title', tab.label),
       ui.saveWarning ? div('warn', ui.saveWarning) : null,
+      tutorialPanel(nextDay),
       tab.view(),
     ),
   ].filter((x): x is HTMLElement => !!x);

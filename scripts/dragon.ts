@@ -98,6 +98,7 @@ const { assessReadiness } = await import('../src/core/readiness');
 const { capacity, hire, hireFee } = await import('../src/core/recruit');
 const { serialize } = await import('../src/core/save');
 const { readDueStories } = await import('../src/core/story');
+const { skipTutorial } = await import('../src/core/tutorial');
 const { canBless } = await import('../src/core/blessing');
 const { canTrain, trainSkill } = await import('../src/core/training');
 const { acceptUniqueRequest, deliverUniqueRequest, uniqueRequests } = await import('../src/core/events');
@@ -280,6 +281,7 @@ interface Run {
 
 function runSeed(seed: number, log: boolean): Run {
   const s: GameState = newGame(seed);
+  skipTutorial(s);
   readDueStories(s);
   const serviceUniqueRequests = () => {
     for (const request of uniqueRequests(s)) {

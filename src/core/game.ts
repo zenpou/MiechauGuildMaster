@@ -154,6 +154,7 @@ export function dailyRestRecovery(s: GameState): number {
 
 export function newGame(seed: number, playerName = ''): GameState {
   const s = emptyState(seed, playerName);
+  s.flags['tutorial:version'] = 1;
   s.gold = START_GOLD;
   ledger(s, '開業資金', START_GOLD);
   joinInitialUniques(s);

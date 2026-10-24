@@ -14,6 +14,7 @@ import { advanceDay, dispatch, exploredRateOf, newGame, sellItem } from '../src/
 import { addInventory } from '../src/core/ledger';
 import { canBless } from '../src/core/blessing';
 import { readDueStories } from '../src/core/story';
+import { skipTutorial } from '../src/core/tutorial';
 import { addStarterParty } from './roster';
 import { PARTY_MAX, type ActionKind, type Adventurer, type DispatchOrder, type Expedition } from '../src/core/types';
 
@@ -81,6 +82,7 @@ const ready = (a: Adventurer) => a.status === 'idle' && a.injuryDays === 0;
 
 function run(seed: number, leaderPersonality?: string): RunResult {
   const s = addStarterParty(newGame(seed), seed);
+  skipTutorial(s);
   readDueStories(s);
   if (leaderPersonality) s.adventurers[0].personality = leaderPersonality;
   const rate: number[] = [];
@@ -216,6 +218,7 @@ interface PlanRun {
 
 function runPlan(plan: PlanId, seed: number): PlanRun {
   const s = addStarterParty(newGame(seed), seed);
+  skipTutorial(s);
   readDueStories(s);
   const prepare = plan === 'forest-then-mine';
   if (plan === 'mine-geared') {
